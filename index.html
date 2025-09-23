@@ -1,25 +1,99 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Justice-Bot | Legal Clarity Without the Noise</title>
-    <meta name="description" content="Smart triage, auto-filled forms, and plain-language guidance for Ontario courts and tribunals. LTB, HRTO, Small Claims, Family Court - simplified for self-represented litigants." />
-    <meta name="author" content="Justice-Bot" />
-    <meta name="keywords" content="tenant rights, LTB forms, HRTO forms, Small Claims Ontario, custody and access, CAS, court locator, legal triage, form autofill, merit score, evidence bundle, plain-language law, self-represented litigant, Canada, Ontario" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Justice‑Bot – Frontend (Monorepo)</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 24px; max-width: 900px }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; margin: 16px 0 }
+    .row { display:flex; gap:12px; flex-wrap: wrap }
+    input, button { padding: 8px; }
+    pre { background:#f6f6f6; padding:12px; border-radius:8px; overflow:auto }
+    .ok { color:green } .err { color:#b00020 }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Load config.json at runtime so you can change API_BASE_URL without editing HTML.
+    window.DEFAULTS = {
+      SUPABASE_URL: "https://vkzquzjtewqhcisvhsvg.supabase.co",
+      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrenF1emp0ZXdxaGNpc3Zoc3ZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1OTYwODEsImV4cCI6MjA3NDE3MjA4MX0.g2NbpEw7MXx1p7ipGhtEVfkbtEwfd9Ebuw2nO44F584",
+      API_BASE_URL: "https://YOUR-RAILWAY.up.railway.app/api"
+    };
+    fetch('./config.json')
+      .then(r => r.json())
+      .then(cfg => Object.assign(window.DEFAULTS, cfg))
+      .catch(() => {});
+  </script>
+</head>
+<body>
+  <h1>Justice‑Bot – Frontend</h1>
+  <p>Monorepo-friendly static page. Uses Supabase Auth and calls your API with <code>Authorization: Bearer &lt;token&gt;</code>.</p>
 
-    <meta property="og:title" content="Justice-Bot | Legal Clarity Without the Noise" />
-    <meta property="og:description" content="Smart triage, auto-filled forms, and plain-language guidance for Ontario courts and tribunals. Navigate the legal system with confidence." />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+  <div class="card">
+    <h3>Environment (from config.json)</h3>
+    <div><b>SUPABASE_URL:</b> <span id="showUrl"></span></div>
+    <div><b>API_BASE_URL:</b> <span id="showApi"></span></div>
+  </div>
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-  </head>
+  <div class="card">
+    <h3>Auth</h3>
+    <div class="row">
+      <div>
+        <div><input id="email" type="email" placeholder="you@example.com" /></div>
+        <div><input id="password" type="password" placeholder="password" /></div>
+        <div class="row">
+          <button onclick="signUp()">Sign Up</button>
+          <button onclick="signIn()">Sign In</button>
+          <button onclick="signOut()">Sign Out</button>
+          <button onclick="showSession()">Show Session</button>
+        </div>
+      </div>
+    </div>
+    <pre id="sessionBox">(no session)</pre>
+  </div>
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+  <div class="card">
+    <h3>API Calls (Bearer token forwarded)</h3>
+    <div class="row">
+      <button onclick="listEntitlements()">GET /entitlements</button>
+      <button onclick="createOrder()">POST /payments/create-order (5.99 CAD)</button>
+      <input id="orderId" placeholder="orderID to capture" size="28" />
+      <button onclick="captureOrder()">POST /payments/capture-order</button>
+    </div>
+    <div class="row">
+      <input id="docSlug" placeholder="t6-tenant-rights" value="t6-tenant-rights" />
+      <button onclick="downloadDoc()">GET /docs/{slug}/download</button>
+    </div>
+    <pre id="apiOut">(no output)</pre>
+  </div>
+
+  <script>
+    let sb=null;
+    function client() {
+      if (sb) return sb;
+      const d = window.DEFAULTS;
+      sb = window.supabase.createClient(d.SUPABASE_URL, d.SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true } });
+      document.getElementById('showUrl').textContent = d.SUPABASE_URL;
+      document.getElementById('showApi').textContent = d.API_BASE_URL;
+      return sb;
+    }
+    function apiBase() { return window.DEFAULTS.API_BASE_URL; }
+
+    async function signUp(){ const s=client(); const { data, error }=await s.auth.signUp({ email:email.value.trim(), password:password.value.trim() }); out(data||error); }
+    async function signIn(){ const s=client(); const { data, error }=await s.auth.signInWithPassword({ email:email.value.trim(), password:password.value.trim() }); out(data||error); }
+    async function signOut(){ const s=client(); await s.auth.signOut(); out({ signedOut:true }); }
+    async function showSession(){ const s=client(); const { data: { session } }=await s.auth.getSession(); sessionBox.textContent = JSON.stringify(session,null,2); }
+    async function token(){ const s=client(); const { data: { session } }=await s.auth.getSession(); if(!session) throw new Error('Not signed in'); return session.access_token; }
+    function headers(t){ return { 'Content-Type':'application/json','Authorization':`Bearer ${t}` } }
+
+    async function listEntitlements(){ try{ const t=await token(); const r=await fetch(apiBase()+'/entitlements',{headers:headers(t)}); out(await r.json()); }catch(e){ outErr(e) } }
+    async function createOrder(){ try{ const t=await token(); const r=await fetch(apiBase()+'/payments/create-order',{method:'POST',headers:headers(t),body:JSON.stringify({intent:'CAPTURE',type:'one_time',amount:5.99,currency:'CAD',doc_slug:'t6-tenant-rights'})}); const j=await r.json(); orderId.value=j.orderID||''; out(j); }catch(e){ outErr(e) } }
+    async function captureOrder(){ try{ const t=await token(); const r=await fetch(apiBase()+'/payments/capture-order',{method:'POST',headers:headers(t),body:JSON.stringify({orderID:orderId.value.trim()})}); out(await r.json()); }catch(e){ outErr(e) } }
+    async function downloadDoc(){ try{ const t=await token(); const slug=docSlug.value.trim(); const r=await fetch(apiBase()+'/docs/'+encodeURIComponent(slug)+'/download',{headers:headers(t)}); if(r.ok){ const b=await r.blob(); const url=URL.createObjectURL(b); const a=document.createElement('a'); a.href=url; a.download=slug+'.pdf'; a.click(); out({download:'started',slug}); } else { outErr(new Error(r.status+' '+r.statusText)); } }catch(e){ outErr(e) } }
+
+    function out(o){ apiOut.textContent = JSON.stringify(o,null,2) }
+    function outErr(e){ apiOut.textContent = (e&&e.stack)?e.stack:String(e) }
+  </script>
+</body>
 </html>
