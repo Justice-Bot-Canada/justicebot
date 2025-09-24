@@ -1,109 +1,231 @@
 // frontend/script.js
+// Works with your /dev.html and any page that has the IDs used below.
 
-// 1) Load env from config.json and expose to window.env
-async function loadEnv() {
+// ---------- tiny DOM helpers ----------
+const $  = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+const setText = (sel, val) => { const el = $(sel); if (el) el.textContent = typeof val === 'string' ? val : JSON.stringify(val, null, 2); };
+const setHTML = (sel, html) => { const el = $(sel); if (el) el.innerHTML = html; };
+
+// Prefer these outputs if present; fall back to older IDs.
+const logAuth = (x) => {
+  if ($('#authlog')) setText('#authlog', x);
+  else if ($('#session')) setText('#session', x);
+  else console.log('AUTH:', x);
+};
+const logApi = (x) => {
+  if ($('#apilog')) setText('#apilog', x);
+  else if ($('#apiResponse')) setText('#apiResponse', x);
+  else console.log('API:', x);
+};
+const logLine = (msg) => {
+  if ($('#log')) setText('#log', msg);
+  else console.log(msg);
+};
+
+// ---------- 1) Load config.json ----------
+async function loadConfig() {
   const res = await fetch('./config.json', { cache: 'no-store' });
   if (!res.ok) throw new Error(`config.json ${res.status}`);
-  const env = await res.json();
-  if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) {
+  const cfg = await res.json();
+
+  // Defaults
+  cfg.API_BASE_URL = cfg.API_BASE_URL || '/api';
+
+  // Render env summary on either layout you used
+  if ($('#env')) {
+    setHTML('#env',
+      `SUPABASE_URL: <code>${cfg.SUPABASE_URL || '(missing)'}</code><br>` +
+      `API_BASE_URL: <code>${cfg.API_BASE_URL}</code><br>` +
+      `PAYPAL_CLIENT_ID: <code>${cfg.PAYPAL_CLIENT_ID ? '(set)' : '(missing)'}</code>`
+    );
+  }
+  if ($('#cfg-url')) setText('#cfg-url', cfg.SUPABASE_URL || '(missing)');
+  if ($('#cfg-api')) setText('#cfg-api', cfg.API_BASE_URL);
+  if ($('#cfg-pp'))  setText('#cfg-pp',  cfg.PAYPAL_CLIENT_ID ? '(set)' : '(missing)');
+
+  return cfg;
+}
+
+// ---------- 2) Supabase client (via CDN global) ----------
+let supabase;
+async function initSupabase(SUPABASE_URL, SUPABASE_ANON_KEY) {
+  if (!window.supabase) throw new Error('Supabase CDN not loaded. Include it before script.js');
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     throw new Error('Missing SUPABASE_URL or SUPABASE_ANON_KEY in config.json');
   }
-  if (!env.API_BASE_URL) env.API_BASE_URL = '/api';
-  window.env = env;
-  return env;
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // On state change, reflect the session
+  supabase.auth.onAuthStateChange(async (_event, session) => logAuth(session ?? '(no session)'));
+  const { data } = await supabase.auth.getSession();
+  logAuth(data);
+  return supabase;
 }
 
-let supabase;
-function $(id) { return document.getElementById(id); }
-function log(msg) { const el = $('log'); if (el) el.textContent = msg; }
-function show(obj, el = $('session')) { el.textContent = JSON.stringify(obj, null, 2); }
-
-// 2) Supabase helpers
 async function currentSession() {
   const { data } = await supabase.auth.getSession();
-  return data.session;
+  return data?.session ?? null;
 }
 async function getAccessToken() {
-  const s = await currentSession();
-  return s?.access_token || null;
+  return (await currentSession())?.access_token || null;
 }
 
-// 3) API helpers (through the Cloudflare Worker at /api/*)
-async function callApi(path, opts = {}) {
+// ---------- 3) API helper (goes through Worker at /api/*) ----------
+async function callApi(base, path, { method='GET', body, headers } = {}) {
   const token = await getAccessToken();
-  const headers = new Headers(opts.headers || {});
-  if (token) headers.set('Authorization', `Bearer ${token}`);
-  if (!headers.has('Content-Type') && opts.body) headers.set('Content-Type', 'application/json');
+  const h = new Headers(headers || {});
+  if (token) h.set('Authorization', `Bearer ${token}`);
+  if (body && !h.has('Content-Type')) h.set('Content-Type', 'application/json');
 
-  const resp = await fetch(`${window.env.API_BASE_URL}${path}`, { ...opts, headers });
+  const url = `${base}${path}`;
+  const resp = await fetch(url, { method, headers: h, body: body ? JSON.stringify(body) : undefined });
   const text = await resp.text();
-  let body;
-  try { body = JSON.parse(text); } catch { body = text; }
-  return { status: resp.status, body };
+  let parsed; try { parsed = JSON.parse(text); } catch { parsed = text; }
+  return { status: resp.status, body: parsed };
 }
 
-// 4) Wire up page
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    const env = await loadEnv();
-    // init Supabase
+// ---------- 4) Wire up Auth buttons ----------
+function wireAuth(cfg) {
+  $('#btnSignUp')?.addEventListener('click', onSignUp);
+  $('#signup')?.addEventListener('click', onSignUp);
+
+  $('#btnSignIn')?.addEventListener('click', onSignIn);
+  $('#signin')?.addEventListener('click', onSignIn);
+
+  $('#btnSignOut')?.addEventListener('click', onSignOut);
+  $('#signout')?.addEventListener('click', onSignOut);
+
+  $('#btnShowSession')?.addEventListener('click', async () => logAuth(await currentSession()));
+  $('#reset')?.addEventListener('click', onReset);
+
+  $('#password')?.addEventListener('keydown', (e) => { if (e.key === 'Enter') onSignIn(); });
+
+  async function onSignUp() {
+    const email = $('#email')?.value?.trim();
+    const password = $('#password')?.value || '';
+    if (!email || !password) return logLine('Enter email and password');
+    logLine('Signing up…');
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    logAuth(error ?? data);
+    if (!error && !data.session) logLine('Check your email to confirm, then Sign In.');
+  }
+
+  async function onSignIn() {
+    const email = $('#email')?.value?.trim();
+    const password = $('#password')?.value || '';
+    if (!email || !password) return logLine('Enter email and password');
+    logLine('Signing in…');
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    logAuth(error ?? data);
+    if (!error) logLine('Signed in.');
+  }
+
+  async function onSignOut() {
+    await supabase.auth.signOut();
+    logAuth('(signed out)');
+  }
+
+  async function onReset() {
+    const email = $('#email')?.value?.trim();
+    if (!email) return logLine('Enter your email first');
+    const redirectTo = location.origin; // or hardcode to https://justice-bot.com
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+    logAuth(error ?? data);
+    if (!error) logLine('Password reset email sent.');
+  }
+}
+
+// ---------- 5) Wire up API test buttons ----------
+function wireApiTests(cfg) {
+  $('#btnGetHealth')?.addEventListener('click', async () => {
+    logLine('Calling /api/health…');
+    logApi(await callApi(cfg.API_BASE_URL, '/health'));
+  });
+  $('#ping')?.addEventListener('click', async () => {
+    logLine('Calling /api/health…');
+    logApi(await callApi(cfg.API_BASE_URL, '/health'));
+  });
+
+  $('#btnGetWhoami')?.addEventListener('click', async () => {
+    logLine('Calling /api/whoami…');
+    logApi(await callApi(cfg.API_BASE_URL, '/whoami'));
+  });
+  $('#whoami')?.addEventListener('click', async () => {
+    logLine('Calling /api/whoami…');
+    logApi(await callApi(cfg.API_BASE_URL, '/whoami'));
+  });
+
+  $('#getEnt')?.addEventListener('click', async () => {
+    logLine('Calling /api/entitlements…');
+    logApi(await callApi(cfg.API_BASE_URL, '/entitlements'));
+  });
+}
+
+// ---------- 6) PayPal Buttons ----------
+function wirePayPal(cfg) {
+  const container = $('#paypal-container');
+  const note = $('#paypal-note');
+
+  if (!container) return; // page may not have payments section
+
+  if (!cfg.PAYPAL_CLIENT_ID) {
+    if (note) note.textContent = 'No PAYPAL_CLIENT_ID in config.json — buttons disabled.';
+    return;
+  }
+
+  // Load SDK
+  const sdk = document.createElement('script');
+  sdk.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(cfg.PAYPAL_CLIENT_ID)}&currency=CAD&intent=capture&components=buttons`;
+  sdk.onload = renderButtons;
+  sdk.onerror = () => { if (note) note.textContent = 'Failed to load PayPal SDK.'; };
+  document.head.appendChild(sdk);
+
+  function renderButtons() {
+    // PayPal global is provided by the SDK script
     // eslint-disable-next-line no-undef
-    supabase = window.supabase.createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+    paypal.Buttons({
+      async createOrder() {
+        const r = await callApi(cfg.API_BASE_URL, '/payments/create-order', {
+          method: 'POST',
+          body: { productId: 'doc_small' }
+        });
+        if (r.status !== 200 || !r.body?.id) throw new Error('Create order failed: ' + JSON.stringify(r.body));
+        return r.body.id;
+      },
+      async onApprove(data) {
+        const r = await callApi(cfg.API_BASE_URL, '/payments/capture-order', {
+          method: 'POST',
+          body: { orderId: data.orderID, productId: 'doc_small' }
+        });
+        if (r.status !== 200) {
+          alert('Payment error: ' + JSON.stringify(r.body));
+          return;
+        }
+        alert('Payment captured! Entitlement granted.');
+        $('#getEnt')?.click();
+      },
+      onError(err) { alert('Payment error: ' + err); }
+    }).render('#paypal-container');
+  }
+}
 
-    // Auth buttons
-    $('btnSignUp')?.addEventListener('click', async () => {
-      log('Signing up…');
-      const email = $('email').value.trim();
-      const password = $('password').value;
-      const { data, error } = await supabase.auth.signUp({ email, password });
-      if (error) { log(error.message); return; }
-      log('Sign-up submitted. Check your email to confirm.');
-      show(data);
-    });
+// ---------- 7) Boot ----------
+(async function boot() {
+  try {
+    const cfg = await loadConfig();
+    await initSupabase(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+    wireAuth(cfg);
+    wireApiTests(cfg);
+    wirePayPal(cfg);
 
-    $('btnSignIn')?.addEventListener('click', async () => {
-      log('Signing in…');
-      const email = $('email').value.trim();
-      const password = $('password').value;
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) { log(error.message); return; }
-      log('Signed in.');
-      show(await currentSession());
-    });
+    // Optional: special-case when running on *.pages.dev and you want to hit production API directly.
+    // if (location.hostname.endsWith('.pages.dev')) {
+    //   cfg.API_BASE_URL = 'https://justice-bot.com/api';
+    // }
 
-    $('btnSignOut')?.addEventListener('click', async () => {
-      await supabase.auth.signOut();
-      log('Signed out.');
-      show(await currentSession());
-    });
-
-    $('btnShowSession')?.addEventListener('click', async () => {
-      show(await currentSession());
-    });
-
-    // API tests
-    $('btnGetHealth')?.addEventListener('click', async () => {
-      log('Calling /api/health…');
-      const r = await callApi('/health');
-      $('apiResponse').textContent = JSON.stringify(r, null, 2);
-      log('Done.');
-    });
-
-    $('btnGetWhoami')?.addEventListener('click', async () => {
-      log('Calling /api/whoami…');
-      const r = await callApi('/whoami');
-      $('apiResponse').textContent = JSON.stringify(r, null, 2);
-      log('Done.');
-    });
-
-    // Enter key to sign in
-    $('password')?.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') $('btnSignIn').click();
-    });
-
-    log('Ready.');
+    logLine('Ready.');
   } catch (e) {
     console.error(e);
-    log(`Error: ${e.message}`);
+    logLine(`Error: ${e.message}`);
   }
-});
+})();
