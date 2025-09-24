@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Justice-Bot — Fast access to the right legal forms</title>
+  <meta name="description" content="Justice-Bot helps you sign in securely, pay with PayPal, and download the legal documents you need." />
+  <link rel="icon" href="/favicon.ico">
+  <style>
+    :root { --bg:#0b1220; --panel:#0f172a; --muted:#94a3b8; --text:#e2e8f0; --brand:#3b82f6; --brand-2:#60a5fa; }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;background:linear-gradient(180deg,#0a0f1a, #0b1220 35%, #0a1426); color:var(--text); font:16px/1.6 system-ui, Segoe UI, Roboto, Helvetica, Arial,sans-serif}
+    a{color:var(--brand); text-decoration:none} a:hover{text-decoration:underline}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px}
+    .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+    .logo{font-size:28px;font-weight:800;letter-spacing:.5px}
+    .badge{font-size:12px;border:1px solid #1f2937;border-radius:999px;padding:4px 10px;color:var(--muted);background:#0b1220aa}
+    .hero{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center;padding:48px 0}
+    .h1{font-size:48px;line-height:1.1;margin:0 0 14px}
+    .lead{color:var(--muted);font-size:18px;margin:0 0 22px}
+    .cta{display:flex;gap:12px;flex-wrap:wrap}
+    .btn{border:1px solid #26344d;background:#0e1627;color:var(--text);padding:12px 16px;border-radius:12px;font-weight:600}
+    .btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand-2));border:none;color:white}
+    .panel{background:var(--panel);border:1px solid #1f2937;border-radius:16px;padding:20px}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .kicker{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+    .footer{color:#8aa1c2; font-size:13px; padding:32px 0; border-top:1px solid #1f2937; margin-top:48px}
+    @media (max-width:900px){.hero{grid-template-columns:1fr}.h1{font-size:36px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="logo">Justice-Bot</div>
+      <div class="badge">Secure · Supabase · Cloudflare · Railway</div>
+    </div>
+
+    <section class="hero">
+      <div>
+        <h1 class="h1">Get the right legal documents, fast.</h1>
+        <p class="lead">Sign in securely, pay with PayPal, and download the forms you need. No appointments, no guesswork — just the files.</p>
+        <div class="cta">
+          <a class="btn primary" href="/dev">Open App</a>
+          <a class="btn" href="mailto:payments@justice-bot.com">Contact support</a>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="kicker">How it works</div>
+        <ol style="margin:10px 0 0 18px">
+          <li>Sign in with email & password (Supabase Auth).</li>
+          <li>Purchase the doc you need (PayPal).</li>
+          <li>Instant download unlock — tied to your account.</li>
+        </ol>
+        <p style="color:#9fb3d9;margin-top:10px">You can still use the developer console at <strong>/dev</strong> to test health, whoami, payments, and entitlements.</p>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="panel">
+        <div class="kicker">Security</div>
+        <h3 style="margin:.2rem 0 0">Account-locked downloads</h3>
+        <p style="color:#9fb3d9">Every purchase is attached to your Supabase user, so you can re-download anytime.</p>
+      </div>
+      <div class="panel">
+        <div class="kicker">Payments</div>
+        <h3 style="margin:.2rem 0 0">PayPal checkout</h3>
+        <p style="color:#9fb3d9">Card or balance via PayPal. Server verifies captures to prevent fraud.</p>
+      </div>
+      <div class="panel">
+        <div class="kicker">Roadmap</div>
+        <h3 style="margin:.2rem 0 0">More provinces, more forms</h3>
+        <p style="color:#9fb3d9">We’ll keep adding document packs as you tell us what you need.</p>
+      </div>
+    </section>
+
+    <div class="footer">
+      © <span id="y"></span> Justice-Bot · <a href="/dev">Developer Console</a>
+    </div>
+  </div>
+  <script>document.getElementById('y').textContent=new Date().getFullYear()</script>
+</body>
+</html>
