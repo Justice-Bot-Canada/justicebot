@@ -1,99 +1,137 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Justice‑Bot – Frontend (Monorepo)</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Justice-Bot</title>
+  <meta name="description" content="Supabase auth + same-origin API via Cloudflare Worker proxy." />
+  <link rel="icon" href="/favicon.ico" />
+  <!-- Lightweight, nice defaults -->
+  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2.0.6/css/pico.min.css">
   <style>
-    body { font-family: system-ui, Arial, sans-serif; margin: 24px; max-width: 900px }
-    .card { border: 1px solid #ddd; border-radius: 12px; padding: 16px; margin: 16px 0 }
-    .row { display:flex; gap:12px; flex-wrap: wrap }
-    input, button { padding: 8px; }
-    pre { background:#f6f6f6; padding:12px; border-radius:8px; overflow:auto }
-    .ok { color:green } .err { color:#b00020 }
+    :root { --brand:#0a6cff; }
+    header { margin: 1rem 0 0.5rem }
+    .brand { color: var(--brand); font-weight: 700; }
+    .grid { gap: 1rem }
+    pre { background:#0f172a0d; padding: 12px; border-radius: 8px; }
+    .muted { color:#64748b; font-size: .9rem }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    // Load config.json at runtime so you can change API_BASE_URL without editing HTML.
-    window.DEFAULTS = {
-      SUPABASE_URL: "https://vkzquzjtewqhcisvhsvg.supabase.co",
-      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrenF1emp0ZXdxaGNpc3Zoc3ZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1OTYwODEsImV4cCI6MjA3NDE3MjA4MX0.g2NbpEw7MXx1p7ipGhtEVfkbtEwfd9Ebuw2nO44F584",
-      API_BASE_URL: "https://YOUR-RAILWAY.up.railway.app/api"
-    };
-    fetch('./config.json')
-      .then(r => r.json())
-      .then(cfg => Object.assign(window.DEFAULTS, cfg))
-      .catch(() => {});
-  </script>
 </head>
 <body>
-  <h1>Justice‑Bot – Frontend</h1>
-  <p>Monorepo-friendly static page. Uses Supabase Auth and calls your API with <code>Authorization: Bearer &lt;token&gt;</code>.</p>
+  <main class="container">
+    <header>
+      <h1 class="brand">Justice-Bot</h1>
+      <p class="muted">Static frontend → Cloudflare Worker → Railway API. Sign in with Supabase and call <code>/api</code> with your Bearer token.</p>
+    </header>
 
-  <div class="card">
-    <h3>Environment (from config.json)</h3>
-    <div><b>SUPABASE_URL:</b> <span id="showUrl"></span></div>
-    <div><b>API_BASE_URL:</b> <span id="showApi"></span></div>
-  </div>
+    <article>
+      <h3>Environment (from <code>/config.json</code>)</h3>
+      <div>SUPABASE_URL: <strong id="cfg-url" class="muted">(loading)</strong></div>
+      <div>API_BASE_URL: <strong id="cfg-api" class="muted">(loading)</strong></div>
+    </article>
 
-  <div class="card">
-    <h3>Auth</h3>
-    <div class="row">
-      <div>
-        <div><input id="email" type="email" placeholder="you@example.com" /></div>
-        <div><input id="password" type="password" placeholder="password" /></div>
-        <div class="row">
-          <button onclick="signUp()">Sign Up</button>
-          <button onclick="signIn()">Sign In</button>
-          <button onclick="signOut()">Sign Out</button>
-          <button onclick="showSession()">Show Session</button>
+    <div class="grid">
+      <article>
+        <h3>Auth</h3>
+        <label>Email <input id="email" type="email" placeholder="you@example.com" required></label>
+        <label>Password <input id="password" type="password" placeholder="••••••••" required></label>
+        <div>
+          <button id="signup">Sign Up</button>
+          <button id="signin" class="secondary">Sign In</button>
+          <button id="signout" class="contrast">Sign Out</button>
+          <button id="reset" style="float:right">Reset Password</button>
         </div>
-      </div>
+        <details>
+          <summary>Session</summary>
+          <pre id="authlog">(no session)</pre>
+        </details>
+      </article>
+
+      <article>
+        <h3>API Tests</h3>
+        <div>
+          <button id="ping">GET /api/health</button>
+          <button id="whoami" class="secondary">GET /api/whoami (needs login)</button>
+        </div>
+        <details open>
+          <summary>Response</summary>
+          <pre id="apilog">(no calls yet)</pre>
+        </details>
+      </article>
     </div>
-    <pre id="sessionBox">(no session)</pre>
-  </div>
 
-  <div class="card">
-    <h3>API Calls (Bearer token forwarded)</h3>
-    <div class="row">
-      <button onclick="listEntitlements()">GET /entitlements</button>
-      <button onclick="createOrder()">POST /payments/create-order (5.99 CAD)</button>
-      <input id="orderId" placeholder="orderID to capture" size="28" />
-      <button onclick="captureOrder()">POST /payments/capture-order</button>
-    </div>
-    <div class="row">
-      <input id="docSlug" placeholder="t6-tenant-rights" value="t6-tenant-rights" />
-      <button onclick="downloadDoc()">GET /docs/{slug}/download</button>
-    </div>
-    <pre id="apiOut">(no output)</pre>
-  </div>
+    <p class="muted">Tip: if anything looks stale, hard-refresh (Cmd/Ctrl+Shift+R) — Pages can cache.</p>
+  </main>
 
-  <script>
-    let sb=null;
-    function client() {
-      if (sb) return sb;
-      const d = window.DEFAULTS;
-      sb = window.supabase.createClient(d.SUPABASE_URL, d.SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true } });
-      document.getElementById('showUrl').textContent = d.SUPABASE_URL;
-      document.getElementById('showApi').textContent = d.API_BASE_URL;
-      return sb;
-    }
-    function apiBase() { return window.DEFAULTS.API_BASE_URL; }
+  <script type="module">
+    (async () => {
+      // 1) Load public config (never put secrets here)
+      const cfg = await fetch('/config.json', { cache: 'no-cache' }).then(r => r.json());
+      const $ = sel => document.querySelector(sel);
+      $('#cfg-url').textContent = cfg.SUPABASE_URL ?? '(missing)';
+      $('#cfg-api').textContent = cfg.API_BASE_URL ?? '(missing)';
 
-    async function signUp(){ const s=client(); const { data, error }=await s.auth.signUp({ email:email.value.trim(), password:password.value.trim() }); out(data||error); }
-    async function signIn(){ const s=client(); const { data, error }=await s.auth.signInWithPassword({ email:email.value.trim(), password:password.value.trim() }); out(data||error); }
-    async function signOut(){ const s=client(); await s.auth.signOut(); out({ signedOut:true }); }
-    async function showSession(){ const s=client(); const { data: { session } }=await s.auth.getSession(); sessionBox.textContent = JSON.stringify(session,null,2); }
-    async function token(){ const s=client(); const { data: { session } }=await s.auth.getSession(); if(!session) throw new Error('Not signed in'); return session.access_token; }
-    function headers(t){ return { 'Content-Type':'application/json','Authorization':`Bearer ${t}` } }
+      // 2) Supabase client via ESM (no bundler)
+      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+      const supabase = createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
+        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+      });
 
-    async function listEntitlements(){ try{ const t=await token(); const r=await fetch(apiBase()+'/entitlements',{headers:headers(t)}); out(await r.json()); }catch(e){ outErr(e) } }
-    async function createOrder(){ try{ const t=await token(); const r=await fetch(apiBase()+'/payments/create-order',{method:'POST',headers:headers(t),body:JSON.stringify({intent:'CAPTURE',type:'one_time',amount:5.99,currency:'CAD',doc_slug:'t6-tenant-rights'})}); const j=await r.json(); orderId.value=j.orderID||''; out(j); }catch(e){ outErr(e) } }
-    async function captureOrder(){ try{ const t=await token(); const r=await fetch(apiBase()+'/payments/capture-order',{method:'POST',headers:headers(t),body:JSON.stringify({orderID:orderId.value.trim()})}); out(await r.json()); }catch(e){ outErr(e) } }
-    async function downloadDoc(){ try{ const t=await token(); const slug=docSlug.value.trim(); const r=await fetch(apiBase()+'/docs/'+encodeURIComponent(slug)+'/download',{headers:headers(t)}); if(r.ok){ const b=await r.blob(); const url=URL.createObjectURL(b); const a=document.createElement('a'); a.href=url; a.download=slug+'.pdf'; a.click(); out({download:'started',slug}); } else { outErr(new Error(r.status+' '+r.statusText)); } }catch(e){ outErr(e) } }
+      const logAuth = (x) => $('#authlog').textContent = typeof x === 'string' ? x : JSON.stringify(x, null, 2);
+      const logApi  = (x) =>  $('#apilog').textContent  = typeof x === 'string' ? x : JSON.stringify(x, null, 2);
 
-    function out(o){ apiOut.textContent = JSON.stringify(o,null,2) }
-    function outErr(e){ apiOut.textContent = (e&&e.stack)?e.stack:String(e) }
+      // 3) Keep UI in sync with auth state
+      supabase.auth.onAuthStateChange(async (_event, session) => {
+        logAuth(session ?? '(no session)');
+      });
+
+      // 4) Auth buttons
+      $('#signup').onclick = async () => {
+        const { data, error } = await supabase.auth.signUp({
+          email: $('#email').value, password: $('#password').value
+        });
+        logAuth(error ?? data);
+      };
+
+      $('#signin').onclick = async () => {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: $('#email').value, password: $('#password').value
+        });
+        logAuth(error ?? data);
+      };
+
+      $('#signout').onclick = async () => {
+        const { error } = await supabase.auth.signOut();
+        logAuth(error ?? '(signed out)');
+      };
+
+      $('#reset').onclick = async () => {
+        const url = location.origin; // send reset link back to this site
+        const { data, error } = await supabase.auth.resetPasswordForEmail($('#email').value, { redirectTo: url });
+        logAuth(error ?? data);
+      };
+
+      // 5) Helper to call your API through the Worker
+      async function callApi(path, opts = {}) {
+        const token = (await supabase.auth.getSession()).data.session?.access_token;
+        const headers = new Headers(opts.headers || {});
+        if (token) headers.set('Authorization', `Bearer ${token}`);
+        const res = await fetch(`${cfg.API_BASE_URL}${path}`, { ...opts, headers });
+        const text = await res.text();
+        let body; try { body = JSON.parse(text) } catch { body = text }
+        return { status: res.status, body };
+      }
+
+      $('#ping').onclick = async () => {
+        try { logApi(await callApi('/health')); } catch (e) { logApi(String(e)) }
+      };
+      $('#whoami').onclick = async () => {
+        try { logApi(await callApi('/whoami')); } catch (e) { logApi(String(e)) }
+      };
+
+      // Show current session on load
+      logAuth(await supabase.auth.getSession());
+    })();
   </script>
 </body>
 </html>
