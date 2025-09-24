@@ -1,91 +1,109 @@
 // frontend/script.js
-(async () => {
-  const $ = (sel) => document.querySelector(sel);
-  const log = (msg) => {
-    console.log(msg);
-    const el = $('#log');
-    if (el) el.textContent = String(msg);
-  };
 
-  // 1) Load config.json (no cache so updates take effect immediately)
-  let env;
-  try {
-    const res = await fetch('config.json', { cache: 'no-store' });
-    if (!res.ok) throw new Error(`config.json ${res.status}`);
-    env = await res.json();
-    window.env = env;
-  } catch (e) {
-    alert('Failed to load config.json: ' + e.message);
-    return;
-  }
-
+// 1) Load env from config.json and expose to window.env
+async function loadEnv() {
+  const res = await fetch('./config.json', { cache: 'no-store' });
+  if (!res.ok) throw new Error(`config.json ${res.status}`);
+  const env = await res.json();
   if (!env.SUPABASE_URL || !env.SUPABASE_ANON_KEY) {
-    alert('Missing SUPABASE_URL or SUPABASE_ANON_KEY in config.json');
-    return;
+    throw new Error('Missing SUPABASE_URL or SUPABASE_ANON_KEY in config.json');
   }
+  if (!env.API_BASE_URL) env.API_BASE_URL = '/api';
+  window.env = env;
+  return env;
+}
 
-  // 2) Init Supabase client
-  const supabase = window.supabase.createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
-  window.sb = supabase; // handy for debugging in DevTools
+let supabase;
+function $(id) { return document.getElementById(id); }
+function log(msg) { const el = $('log'); if (el) el.textContent = msg; }
+function show(obj, el = $('session')) { el.textContent = JSON.stringify(obj, null, 2); }
 
-  async function showSession() {
-    const { data } = await supabase.auth.getSession();
-    const pre = $('#session');
-    if (pre) pre.textContent = JSON.stringify(data, null, 2);
-    return data?.session ?? null;
-  }
+// 2) Supabase helpers
+async function currentSession() {
+  const { data } = await supabase.auth.getSession();
+  return data.session;
+}
+async function getAccessToken() {
+  const s = await currentSession();
+  return s?.access_token || null;
+}
 
-  // 3) Wire up buttons
-  $('#btnSignUp')?.addEventListener('click', async () => {
-    const email = $('#email')?.value?.trim();
-    const password = $('#password')?.value ?? '';
-    if (!email || !password) return log('Enter email and password');
+// 3) API helpers (through the Cloudflare Worker at /api/*)
+async function callApi(path, opts = {}) {
+  const token = await getAccessToken();
+  const headers = new Headers(opts.headers || {});
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+  if (!headers.has('Content-Type') && opts.body) headers.set('Content-Type', 'application/json');
 
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) return log('SignUp error: ' + error.message);
+  const resp = await fetch(`${window.env.API_BASE_URL}${path}`, { ...opts, headers });
+  const text = await resp.text();
+  let body;
+  try { body = JSON.parse(text); } catch { body = text; }
+  return { status: resp.status, body };
+}
 
-    // If email confirmation is ON, session will be null until you click the email
-    if (!data.session) log('Sign up ok. Check your email to confirm, then Sign In.');
-    else log('Signed up and logged in.');
-    await showSession();
-  });
+// 4) Wire up page
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const env = await loadEnv();
+    // init Supabase
+    // eslint-disable-next-line no-undef
+    supabase = window.supabase.createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
 
-  $('#btnSignIn')?.addEventListener('click', async () => {
-    const email = $('#email')?.value?.trim();
-    const password = $('#password')?.value ?? '';
-    if (!email || !password) return log('Enter email and password');
-
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return log('SignIn error: ' + error.message);
-
-    log('Signed in.');
-    await showSession();
-  });
-
-  $('#btnSignOut')?.addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    log('Signed out.');
-    await showSession();
-  });
-
-  $('#btnShowSession')?.addEventListener('click', showSession);
-
-  // API test buttons
-  $('#btnGetHealth')?.addEventListener('click', async () => {
-    const r = await fetch('/api/health');
-    $('#apiResponse').textContent = (await r.text()) || r.status;
-  });
-
-  $('#btnGetWhoami')?.addEventListener('click', async () => {
-    const sess = await showSession();
-    const token = sess?.access_token;
-    const r = await fetch('/api/whoami', {
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    // Auth buttons
+    $('btnSignUp')?.addEventListener('click', async () => {
+      log('Signing up…');
+      const email = $('email').value.trim();
+      const password = $('password').value;
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) { log(error.message); return; }
+      log('Sign-up submitted. Check your email to confirm.');
+      show(data);
     });
-    $('#apiResponse').textContent = await r.text();
-  });
 
-  // Show whatever session exists right away
-  await showSession();
-  log('Ready.');
-})();
+    $('btnSignIn')?.addEventListener('click', async () => {
+      log('Signing in…');
+      const email = $('email').value.trim();
+      const password = $('password').value;
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) { log(error.message); return; }
+      log('Signed in.');
+      show(await currentSession());
+    });
+
+    $('btnSignOut')?.addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      log('Signed out.');
+      show(await currentSession());
+    });
+
+    $('btnShowSession')?.addEventListener('click', async () => {
+      show(await currentSession());
+    });
+
+    // API tests
+    $('btnGetHealth')?.addEventListener('click', async () => {
+      log('Calling /api/health…');
+      const r = await callApi('/health');
+      $('apiResponse').textContent = JSON.stringify(r, null, 2);
+      log('Done.');
+    });
+
+    $('btnGetWhoami')?.addEventListener('click', async () => {
+      log('Calling /api/whoami…');
+      const r = await callApi('/whoami');
+      $('apiResponse').textContent = JSON.stringify(r, null, 2);
+      log('Done.');
+    });
+
+    // Enter key to sign in
+    $('password')?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') $('btnSignIn').click();
+    });
+
+    log('Ready.');
+  } catch (e) {
+    console.error(e);
+    log(`Error: ${e.message}`);
+  }
+});
