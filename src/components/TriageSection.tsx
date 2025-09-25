@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Building2, Users, DollarSign, Heart } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import CaseManager from "@/components/CaseManager";
 
 const venues = [
   {
@@ -39,6 +41,17 @@ const venues = [
 ];
 
 const TriageSection = () => {
+  const { user } = useAuth();
+  
+  // Show case manager if user is logged in, otherwise show triage info
+  if (user) {
+    return (
+      <section id="triage" className="py-20 bg-secondary/30">
+        <CaseManager />
+      </section>
+    );
+  }
+
   return (
     <section id="triage" className="py-20 bg-secondary/30">
       <div className="container mx-auto px-4">
