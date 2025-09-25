@@ -14,7 +14,145 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cases: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          law_section: string | null
+          merit_score: number | null
+          municipality: string | null
+          province: string
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          law_section?: string | null
+          merit_score?: number | null
+          municipality?: string | null
+          province: string
+          status?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          law_section?: string | null
+          merit_score?: number | null
+          municipality?: string | null
+          province?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      entitlements: {
+        Row: {
+          granted_at: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          granted_at?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      evidence: {
+        Row: {
+          case_id: string
+          description: string | null
+          file_name: string
+          file_path: string
+          file_type: string
+          id: string
+          upload_date: string
+        }
+        Insert: {
+          case_id: string
+          description?: string | null
+          file_name: string
+          file_path: string
+          file_type: string
+          id?: string
+          upload_date?: string
+        }
+        Update: {
+          case_id?: string
+          description?: string | null
+          file_name?: string
+          file_path?: string
+          file_type?: string
+          id?: string
+          upload_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evidence_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      legal_pathways: {
+        Row: {
+          case_id: string
+          confidence_score: number
+          created_at: string
+          id: string
+          next_steps: Json | null
+          pathway_type: string
+          recommendation: string
+          relevant_laws: Json | null
+        }
+        Insert: {
+          case_id: string
+          confidence_score?: number
+          created_at?: string
+          id?: string
+          next_steps?: Json | null
+          pathway_type: string
+          recommendation: string
+          relevant_laws?: Json | null
+        }
+        Update: {
+          case_id?: string
+          confidence_score?: number
+          created_at?: string
+          id?: string
+          next_steps?: Json | null
+          pathway_type?: string
+          recommendation?: string
+          relevant_laws?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_pathways_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
