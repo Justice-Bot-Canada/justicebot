@@ -1,7 +1,28 @@
-import { Scale, Menu } from "lucide-react";
+import { Scale, Menu, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import AuthDialog from "@/components/AuthDialog";
 const Header = () => {
-  return <header className="bg-background border-b border-border sticky top-0 z-50">
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const { user, signOut } = useAuth();
+
+  const handleGetStarted = () => {
+    if (user) {
+      // Scroll to triage section if authenticated
+      document.getElementById('triage')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      setAuthDialogOpen(true);
+    }
+  };
+
+  const handleSignIn = () => {
+    setAuthDialogOpen(true);
+  };
+
+  return (
+    <>
+      <header className="bg-background border-b border-border sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -22,11 +43,23 @@ const Header = () => {
           </nav>
 
           <div className="flex items-center gap-4">
-            <Button variant="ghost" className="hidden md:inline-flex">
-              Sign In
-            </Button>
-            <Button variant="cta">
-              Get Started
+            {user ? (
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-muted-foreground hidden md:inline">
+                  {user.email}
+                </span>
+                <Button variant="ghost" onClick={signOut} className="hidden md:inline-flex">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Button variant="ghost" className="hidden md:inline-flex" onClick={handleSignIn}>
+                Sign In
+              </Button>
+            )}
+            <Button variant="cta" onClick={handleGetStarted}>
+              {user ? "Start Case" : "Get Started"}
             </Button>
             <Button variant="ghost" size="icon" className="md:hidden">
               <Menu className="w-5 h-5" />
@@ -34,6 +67,9 @@ const Header = () => {
           </div>
         </div>
       </div>
-    </header>;
+    </header>
+    <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
+    </>
+  );
 };
 export default Header;
