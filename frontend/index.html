@@ -3,80 +3,217 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Justice-Bot — Fast access to the right legal forms</title>
-  <meta name="description" content="Justice-Bot helps you sign in securely, pay with PayPal, and download the legal documents you need." />
-  <link rel="icon" href="/favicon.ico">
+  <title>Justice-Bot</title>
+  <meta name="description" content="Supabase auth + same-origin API via Cloudflare Worker proxy. Paywall, entitlements, and gated downloads." />
+  <link rel="icon" href="/favicon.ico" />
+  <!-- Lightweight, nice defaults -->
+  <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@2.0.6/css/pico.min.css">
   <style>
-    :root { --bg:#0b1220; --panel:#0f172a; --muted:#94a3b8; --text:#e2e8f0; --brand:#3b82f6; --brand-2:#60a5fa; }
-    *{box-sizing:border-box} html,body{height:100%}
-    body{margin:0;background:linear-gradient(180deg,#0a0f1a, #0b1220 35%, #0a1426); color:var(--text); font:16px/1.6 system-ui, Segoe UI, Roboto, Helvetica, Arial,sans-serif}
-    a{color:var(--brand); text-decoration:none} a:hover{text-decoration:underline}
-    .wrap{max-width:1100px;margin:0 auto;padding:24px}
-    .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
-    .logo{font-size:28px;font-weight:800;letter-spacing:.5px}
-    .badge{font-size:12px;border:1px solid #1f2937;border-radius:999px;padding:4px 10px;color:var(--muted);background:#0b1220aa}
-    .hero{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:center;padding:48px 0}
-    .h1{font-size:48px;line-height:1.1;margin:0 0 14px}
-    .lead{color:var(--muted);font-size:18px;margin:0 0 22px}
-    .cta{display:flex;gap:12px;flex-wrap:wrap}
-    .btn{border:1px solid #26344d;background:#0e1627;color:var(--text);padding:12px 16px;border-radius:12px;font-weight:600}
-    .btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand-2));border:none;color:white}
-    .panel{background:var(--panel);border:1px solid #1f2937;border-radius:16px;padding:20px}
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-    .kicker{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
-    .footer{color:#8aa1c2; font-size:13px; padding:32px 0; border-top:1px solid #1f2937; margin-top:48px}
-    @media (max-width:900px){.hero{grid-template-columns:1fr}.h1{font-size:36px}}
+    :root { --brand: #0a6cff; }
+    body { padding-bottom: 4rem; }
+    header { margin: 1rem 0 0.5rem }
+    .brand { color: var(--brand); font-weight: 800; letter-spacing: 0.2px; }
+    .muted { color:#64748b; font-size:.95rem }
+    pre { background:#0f172a0d; padding:12px; border-radius:8px; }
+    code { background:#0f172a0d; padding:.1rem .3rem; border-radius:.35rem }
+    .grid { gap: 1rem }
+    .right { float: right }
+    .tag { display:inline-block; padding:.15rem .5rem; border-radius:.5rem; background:#eef2ff; color:#374151; font-size:.8rem }
+    #paypal-container { min-height: 45px; }
+    footer { margin-top: 2rem; border-top: 1px solid #e5e7eb; padding-top: 1rem; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="nav">
-      <div class="logo">Justice-Bot</div>
-      <div class="badge">Secure · Supabase · Cloudflare · Railway</div>
-    </div>
+<main class="container">
 
-    <section class="hero">
-      <div>
-        <h1 class="h1">Get the right legal documents, fast.</h1>
-        <p class="lead">Sign in securely, pay with PayPal, and download the forms you need. No appointments, no guesswork — just the files.</p>
-        <div class="cta">
-          <a class="btn primary" href="/dev">Open App</a>
-          <a class="btn" href="mailto:payments@justice-bot.com">Contact support</a>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="kicker">How it works</div>
-        <ol style="margin:10px 0 0 18px">
-          <li>Sign in with email & password (Supabase Auth).</li>
-          <li>Purchase the doc you need (PayPal).</li>
-          <li>Instant download unlock — tied to your account.</li>
-        </ol>
-        <p style="color:#9fb3d9;margin-top:10px">You can still use the developer console at <strong>/dev</strong> to test health, whoami, payments, and entitlements.</p>
-      </div>
-    </section>
+  <header>
+    <h1 class="brand">Justice-Bot</h1>
+    <p class="muted">Static frontend → Cloudflare Worker proxy → Railway API. Sign in with Supabase, pay with PayPal, unlock documents.</p>
+  </header>
 
-    <section class="grid">
-      <div class="panel">
-        <div class="kicker">Security</div>
-        <h3 style="margin:.2rem 0 0">Account-locked downloads</h3>
-        <p style="color:#9fb3d9">Every purchase is attached to your Supabase user, so you can re-download anytime.</p>
-      </div>
-      <div class="panel">
-        <div class="kicker">Payments</div>
-        <h3 style="margin:.2rem 0 0">PayPal checkout</h3>
-        <p style="color:#9fb3d9">Card or balance via PayPal. Server verifies captures to prevent fraud.</p>
-      </div>
-      <div class="panel">
-        <div class="kicker">Roadmap</div>
-        <h3 style="margin:.2rem 0 0">More provinces, more forms</h3>
-        <p style="color:#9fb3d9">We’ll keep adding document packs as you tell us what you need.</p>
-      </div>
-    </section>
+  <article>
+    <h3>Environment (from <code>/config.json</code>)</h3>
+    <div>SUPABASE_URL: <strong id="cfg-url" class="muted">(loading)</strong></div>
+    <div>API_BASE_URL: <strong id="cfg-api" class="muted">(loading)</strong></div>
+    <div>PAYPAL_CLIENT_ID: <strong id="cfg-pp" class="muted">(loading)</strong></div>
+  </article>
 
-    <div class="footer">
-      © <span id="y"></span> Justice-Bot · <a href="/dev">Developer Console</a>
-    </div>
+  <div class="grid">
+    <article>
+      <h3>Auth</h3>
+      <label>Email <input id="email" type="email" placeholder="you@example.com" required></label>
+      <label>Password <input id="password" type="password" placeholder="••••••••" required></label>
+      <div role="group">
+        <button id="signup">Sign Up</button>
+        <button id="signin" class="secondary">Sign In</button>
+        <button id="signout" class="contrast">Sign Out</button>
+        <button id="reset" class="right">Reset Password</button>
+      </div>
+      <details>
+        <summary>Session</summary>
+        <pre id="authlog">(no session)</pre>
+      </details>
+    </article>
+
+    <article>
+      <h3>API Tests</h3>
+      <div role="group">
+        <button id="ping">GET /api/health</button>
+        <button id="whoami" class="secondary">GET /api/whoami (needs login)</button>
+        <button id="getEnt" class="secondary">GET /api/entitlements</button>
+      </div>
+      <details open>
+        <summary>Response</summary>
+        <pre id="apilog">(no calls yet)</pre>
+      </details>
+    </article>
   </div>
-  <script>document.getElementById('y').textContent=new Date().getFullYear()</script>
+
+  <article>
+    <h3>Paywall — “Small Guide” <span class="tag">CAD 5.00</span></h3>
+    <p class="muted">Pay with PayPal, we verify the capture server-side, then grant you entitlement to download <code>small-guide.pdf</code>.</p>
+    <div id="paypal-container"></div>
+    <div class="muted" id="paypal-note"></div>
+  </article>
+
+  <article>
+    <h3>Your Downloads</h3>
+    <p class="muted">Once entitled, you can fetch your file. Backend enforces access — try it:</p>
+    <a id="dl-small" role="button" href="/api/docs/small-guide/download">Download: Small Guide (PDF)</a>
+  </article>
+
+  <footer>
+    <p class="muted">
+      Billing & refunds: <a id="supportEmail" href="mailto:payments@justice-bot.com">payments@justice-bot.com</a>
+    </p>
+  </footer>
+
+</main>
+
+<script type="module">
+  // --- 1) Load public config (never put secrets here) ---
+  const cfg = await fetch('/config.json', { cache: 'no-cache' }).then(r => r.json()).catch(() => ({}));
+  const $ = sel => document.querySelector(sel);
+  const logAuth = (x) => $('#authlog').textContent = typeof x === 'string' ? x : JSON.stringify(x, null, 2);
+  const logApi  = (x) =>  $('#apilog').textContent  = typeof x === 'string' ? x : JSON.stringify(x, null, 2);
+
+  const SUPABASE_URL  = cfg.SUPABASE_URL;
+  const ANON_KEY      = cfg.SUPABASE_ANON_KEY;
+  const PAYPAL_ID     = cfg.PAYPAL_CLIENT_ID || "";
+  let   API_BASE      = cfg.API_BASE_URL || "/api";
+
+  // If you're previewing on *.pages.dev and want to hit API, you can force the worker URL:
+  // if (location.hostname.endsWith('.pages.dev')) API_BASE = 'https://jb-api-proxy.smartdisputecanada.workers.dev';
+
+  $('#cfg-url').textContent = SUPABASE_URL ?? '(missing)';
+  $('#cfg-api').textContent = API_BASE;
+  $('#cfg-pp').textContent  = PAYPAL_ID ? '(set)' : '(missing)';
+
+  // Optional support email in config
+  if (cfg.SUPPORT_EMAIL) {
+    const a = $('#supportEmail');
+    a.textContent = cfg.SUPPORT_EMAIL;
+    a.href = `mailto:${cfg.SUPPORT_EMAIL}`;
+  }
+
+  // --- 2) Supabase client via ESM (no bundler) ---
+  const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+  const supabase = createClient(SUPABASE_URL, ANON_KEY, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+  });
+
+  supabase.auth.onAuthStateChange(async (_event, session) => {
+    logAuth(session ?? '(no session)');
+  });
+  logAuth(await supabase.auth.getSession());
+
+  // --- 3) Auth actions ---
+  $('#signup').onclick = async () => {
+    const { data, error } = await supabase.auth.signUp({
+      email: $('#email').value, password: $('#password').value
+    });
+    logAuth(error ?? data);
+  };
+  $('#signin').onclick = async () => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: $('#email').value, password: $('#password').value
+    });
+    logAuth(error ?? data);
+  };
+  $('#signout').onclick = async () => {
+    const { error } = await supabase.auth.signOut();
+    logAuth(error ?? '(signed out)');
+  };
+  $('#reset').onclick = async () => {
+    const redirectTo = location.origin; // you can hardcode to https://justice-bot.com if you prefer
+    const { data, error } = await supabase.auth.resetPasswordForEmail($('#email').value, { redirectTo });
+    logAuth(error ?? data);
+  };
+
+  // --- 4) Helper to call your API through the Worker (sends Bearer when logged in) ---
+  async function callApi(path, { method='GET', body, headers } = {}) {
+    const token = (await supabase.auth.getSession()).data.session?.access_token;
+    const h = new Headers(headers || {});
+    if (token) h.set('Authorization', `Bearer ${token}`);
+    if (body && !h.has('Content-Type')) h.set('Content-Type', 'application/json');
+    const res = await fetch(`${API_BASE}${path}`, { method, headers: h, body: body ? JSON.stringify(body) : undefined });
+    const text = await res.text();
+    let data; try { data = JSON.parse(text) } catch { data = text }
+    return { status: res.status, body: data };
+  }
+
+  // --- 5) Buttons for basic checks ---
+  $('#ping').onclick = async () => {
+    try { logApi(await callApi('/health')); } catch (e) { logApi(String(e)); }
+  };
+  $('#whoami').onclick = async () => {
+    try { logApi(await callApi('/whoami')); } catch (e) { logApi(String(e)); }
+  };
+  $('#getEnt').onclick = async () => {
+    try { logApi(await callApi('/entitlements')); } catch (e) { logApi(String(e)); }
+  };
+
+  // --- 6) PayPal Buttons (server-driven price; productId = "doc_small") ---
+  const paypalNote = $('#paypal-note');
+  if (!PAYPAL_ID) {
+    paypalNote.textContent = 'No PAYPAL_CLIENT_ID in config.json — buttons disabled.';
+  } else {
+    const sdk = document.createElement('script');
+    sdk.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(PAYPAL_ID)}&currency=CAD&intent=capture&components=buttons`;
+    sdk.onload = renderButtons;
+    sdk.onerror = () => paypalNote.textContent = 'Failed to load PayPal SDK.';
+    document.head.appendChild(sdk);
+  }
+
+  function renderButtons() {
+    // @ts-ignore PayPal global injected by SDK
+    paypal.Buttons({
+      async createOrder() {
+        const r = await callApi('/payments/create-order', { method: 'POST', body: { productId: 'doc_small' } });
+        if (r.status !== 200 || !r.body?.id) throw new Error('Create order failed: ' + JSON.stringify(r.body));
+        return r.body.id; // PayPal expects order id string
+      },
+      async onApprove(data) {
+        const r = await callApi('/payments/capture-order', {
+          method: 'POST',
+          body: { orderId: data.orderID, productId: 'doc_small' }
+        });
+        if (r.status !== 200) { alert('Payment error: ' + JSON.stringify(r.body)); return; }
+        alert('Payment captured! Entitlement granted.');
+        // Optional: refresh entitlements panel
+        $('#getEnt').click();
+      },
+      onError(err) {
+        alert('Payment error: ' + err);
+      }
+    }).render('#paypal-container');
+  }
+</script>
+<!-- Supabase CDN -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<!-- Your wiring code -->
+<!-- Correct: dev/ -> ../script.js -->
+<script src="../script.js" defer></script>
+
 </body>
 </html>
