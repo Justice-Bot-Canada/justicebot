@@ -45,34 +45,88 @@ serve(async (req) => {
       caseCategory = 'Employment';
     }
 
-    // Calculate merit score based on case strength indicators
+    // Calculate merit score with detailed breakdown
     let meritScore = 50; // Base score
+    const scoreBreakdown = {
+      baseScore: 50,
+      evidenceBonus: 0,
+      lawSectionBonus: 0,
+      descriptionBonus: 0,
+      categoryBonus: 0,
+      variationBonus: 0
+    };
     
-    // Boost score for evidence
-    if (evidenceFiles?.length > 0) meritScore += 15;
-    if (evidenceFiles?.length > 2) meritScore += 10;
+    const caseStrengths = [];
+    const caseWeaknesses = [];
     
-    // Boost for specific law section cited
-    if (lawSection && lawSection.trim()) meritScore += 10;
+    // Evidence analysis
+    if (evidenceFiles?.length > 0) {
+      const evidenceBonus = evidenceFiles.length > 2 ? 25 : 15;
+      meritScore += evidenceBonus;
+      scoreBreakdown.evidenceBonus = evidenceBonus;
+      caseStrengths.push(`Strong evidence documentation (${evidenceFiles.length} files provided)`);
+    } else {
+      caseWeaknesses.push('No supporting evidence uploaded');
+    }
     
-    // Boost for detailed description
-    if (description.length > 200) meritScore += 10;
+    // Law section analysis
+    if (lawSection && lawSection.trim()) {
+      meritScore += 10;
+      scoreBreakdown.lawSectionBonus = 10;
+      caseStrengths.push('Specific legal provision cited');
+    } else {
+      caseWeaknesses.push('No specific law section referenced');
+    }
     
-    // Category-specific scoring
-    if (isLandlordTenant && province === 'Ontario') meritScore += 5; // Strong tenant protections
-    if (isHumanRights) meritScore += 8; // Protected grounds
+    // Description quality
+    if (description.length > 200) {
+      meritScore += 10;
+      scoreBreakdown.descriptionBonus = 10;
+      caseStrengths.push('Detailed case description provided');
+    } else if (description.length < 100) {
+      caseWeaknesses.push('Case description lacks detail');
+    }
     
-    // Random variation to simulate analysis complexity
-    meritScore += Math.floor(Math.random() * 15) - 7; // -7 to +7
-    meritScore = Math.max(30, Math.min(95, meritScore)); // Clamp between 30-95
+    // Category-specific analysis
+    if (isLandlordTenant && province === 'Ontario') {
+      meritScore += 5;
+      scoreBreakdown.categoryBonus = 5;
+      caseStrengths.push('Strong tenant protection laws in Ontario');
+    }
+    if (isHumanRights) {
+      meritScore += 8;
+      scoreBreakdown.categoryBonus += 8;
+      caseStrengths.push('Protected under human rights legislation');
+    }
+    
+    // Add context-specific strengths and weaknesses
+    if (isLandlordTenant) {
+      if (lowerDesc.includes('notice') || lowerDesc.includes('lease')) {
+        caseStrengths.push('Documented rental relationship');
+      }
+      if (!lowerDesc.includes('notice') && !lowerDesc.includes('written')) {
+        caseWeaknesses.push('Consider obtaining written documentation');
+      }
+    }
+    
+    // Random variation for analysis complexity
+    const variation = Math.floor(Math.random() * 15) - 7;
+    meritScore += variation;
+    scoreBreakdown.variationBonus = variation;
+    meritScore = Math.max(30, Math.min(95, meritScore));
 
     const analysis = {
       meritScore,
+      scoreBreakdown,
+      caseStrengths,
+      caseWeaknesses,
       pathwayType,
       recommendation: `Based on the case details for ${province}, this appears to be a ${caseCategory.toLowerCase()} matter. ${evidenceFiles?.length ? 'The provided evidence supports your claim.' : 'Additional documentation would strengthen your case.'} ${isLandlordTenant ? 'Landlord and tenant disputes in ' + province + ' are typically handled through specialized tribunals.' : isHumanRights ? 'Human rights complaints may be filed with the provincial human rights tribunal.' : 'This matter may proceed through the civil court system.'} Recommended next steps include consulting with a qualified attorney and gathering additional documentation.`,
       confidenceScore: Math.floor(Math.random() * 20) + 75, // 75-95 range
       relevantLaws: getRelevantLaws(province, pathwayType, lawSection),
-      nextSteps: getNextSteps(pathwayType, province)
+      nextSteps: getNextSteps(pathwayType, province),
+      filingInstructions: getFilingInstructions(pathwayType, province),
+      recommendedForms: getRecommendedForms(pathwayType, province)
     };
 
     console.log('Generated analysis:', analysis);
@@ -180,5 +234,67 @@ function getNextSteps(pathwayType: string, province: string): string[] {
     ...baseSteps,
     'File preliminary motion if applicable',
     'Prepare for mediation or court proceedings'
+  ];
+}
+
+function getFilingInstructions(pathwayType: string, province: string): string[] {
+  if (pathwayType === 'landlord-tenant') {
+    if (province === 'Ontario') {
+      return [
+        'File application online at tribunalsontario.ca',
+        'Pay the required filing fee ($53 for most applications)',
+        'Serve the application on the other party within 5 days',
+        'Attend the hearing on the scheduled date',
+        'Bring all evidence and witnesses to the hearing'
+      ];
+    }
+    return [
+      `File application with ${province} Residential Tenancy Branch`,
+      'Pay the required filing fee',
+      'Serve documents on the other party',
+      'Attend scheduled hearing'
+    ];
+  }
+  
+  if (pathwayType === 'human-rights-workplace' || pathwayType === 'human-rights') {
+    return [
+      `File complaint with ${province} Human Rights Commission`,
+      'Complete the human rights complaint form',
+      'Submit within one year of the incident',
+      'Provide detailed description and evidence',
+      'Participate in mediation if offered'
+    ];
+  }
+  
+  return [
+    'File statement of claim in appropriate court',
+    'Pay court filing fees',
+    'Serve defendant with court documents',
+    'Follow court procedures for your jurisdiction'
+  ];
+}
+
+function getRecommendedForms(pathwayType: string, province: string): string[] {
+  if (pathwayType === 'landlord-tenant' && province === 'Ontario') {
+    return [
+      'Form L1 - Application to Evict a Tenant for Non-payment of Rent',
+      'Form T1 - Tenant Application for a Rent Reduction',
+      'Form T2 - Tenant Application about Tenant Rights',
+      'Form N4 - Notice to End Tenancy Early for Non-payment of Rent'
+    ];
+  }
+  
+  if (pathwayType === 'human-rights-workplace' || pathwayType === 'human-rights') {
+    return [
+      'Human Rights Complaint Form',
+      'Application for Interim Relief',
+      'Request for Accommodation Form'
+    ];
+  }
+  
+  return [
+    'Statement of Claim',
+    'Notice of Civil Claim',
+    'Application for Interim Relief'
   ];
 }

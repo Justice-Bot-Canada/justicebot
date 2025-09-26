@@ -6,10 +6,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Upload, FileText, Scale, TrendingUp, AlertCircle } from "lucide-react";
+import { Upload, FileText, Scale, TrendingUp, AlertCircle, ArrowRight, Target } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import LegalPathwayGuide from "./LegalPathwayGuide";
 
 interface Case {
   id: string;
@@ -31,12 +32,23 @@ interface Evidence {
   description: string;
 }
 
+interface LegalPathway {
+  id: string;
+  pathway_type: string;
+  recommendation: string;
+  confidence_score: number;
+  relevant_laws: any; // JSON field from database
+  next_steps: any; // JSON field from database
+}
+
 const CaseManager = () => {
   const { user } = useAuth();
   const [cases, setCases] = useState<Case[]>([]);
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
   const [evidence, setEvidence] = useState<Evidence[]>([]);
+  const [pathways, setPathways] = useState<LegalPathway[]>([]);
   const [showNewCase, setShowNewCase] = useState(false);
+  const [showPathwayGuide, setShowPathwayGuide] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
@@ -57,6 +69,7 @@ const CaseManager = () => {
   useEffect(() => {
     if (selectedCase) {
       fetchEvidence(selectedCase.id);
+      fetchPathways(selectedCase.id);
     }
   }, [selectedCase]);
 
@@ -89,6 +102,21 @@ const CaseManager = () => {
     } catch (error) {
       console.error('Error fetching evidence:', error);
       toast.error('Failed to fetch evidence');
+    }
+  };
+
+  const fetchPathways = async (caseId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('legal_pathways')
+        .select('*')
+        .eq('case_id', caseId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPathways(data || []);
+    } catch (error) {
+      console.error('Error fetching pathways:', error);
     }
   };
 
@@ -131,7 +159,7 @@ const CaseManager = () => {
       setNewCase({ title: '', description: '', province: '', municipality: '', law_section: '' });
       setShowNewCase(false);
       fetchCases();
-      toast.success('Case created successfully');
+      toast.success('Case created and analysis started');
     } catch (error) {
       console.error('Error creating case:', error);
       toast.error('Failed to create case');
@@ -166,6 +194,7 @@ const CaseManager = () => {
       if (dbError) throw dbError;
 
       fetchEvidence(selectedCase.id);
+      fetchPathways(selectedCase.id); // Refresh pathways after evidence upload
       toast.success('Evidence uploaded successfully');
     } catch (error) {
       console.error('Error uploading evidence:', error);
@@ -184,12 +213,30 @@ const CaseManager = () => {
     }
   };
 
+  const getPathwayTitle = (pathwayType: string) => {
+    switch (pathwayType) {
+      case 'landlord-tenant': return 'Landlord & Tenant Board';
+      case 'human-rights-workplace': return 'Human Rights (Workplace)';
+      case 'human-rights': return 'Human Rights Tribunal';
+      case 'employment': return 'Employment Standards';
+      default: return 'Civil Court';
+    }
+  };
+
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-success';
     if (score >= 60) return 'text-warning';
     return 'text-destructive';
   };
 
+  if (showPathwayGuide && selectedCase) {
+    return (
+      <LegalPathwayGuide 
+        caseId={selectedCase.id} 
+        onBack={() => setShowPathwayGuide(false)} 
+      />
+    );
+  }
   if (!user) {
     return (
       <div className="text-center py-12">
@@ -358,6 +405,45 @@ const CaseManager = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* Legal Pathways Section */}
+              {pathways.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="h-5 w-5" />
+                      Available Legal Pathways
+                    </CardTitle>
+                    <CardDescription>Choose the best pathway for your case</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {pathways.map((pathway) => (
+                      <div 
+                        key={pathway.id} 
+                        className="p-4 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+                        onClick={() => setShowPathwayGuide(true)}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-semibold">{getPathwayTitle(pathway.pathway_type)}</h4>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className={getScoreColor(pathway.confidence_score)}>
+                              {pathway.confidence_score}% Confidence
+                            </Badge>
+                            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {pathway.recommendation.substring(0, 150)}...
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <Scale className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm">{pathway.relevant_laws[0]}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              )}
             </div>
           ) : (
             <Card>
