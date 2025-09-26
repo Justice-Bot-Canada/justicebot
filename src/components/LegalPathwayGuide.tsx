@@ -105,6 +105,7 @@ const LegalPathwayGuide: React.FC<LegalPathwayGuideProps> = ({ caseId, onBack })
 
   const getPathwayTitle = (pathwayType: string) => {
     switch (pathwayType) {
+      case 'criminal': return 'Criminal Court System';
       case 'landlord-tenant': return 'Landlord and Tenant Board';
       case 'human-rights-workplace': return 'Human Rights Tribunal (Workplace)';
       case 'human-rights': return 'Human Rights Tribunal';

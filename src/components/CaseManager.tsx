@@ -215,6 +215,7 @@ const CaseManager = () => {
 
   const getPathwayTitle = (pathwayType: string) => {
     switch (pathwayType) {
+      case 'criminal': return 'Criminal Court';
       case 'landlord-tenant': return 'Landlord & Tenant Board';
       case 'human-rights-workplace': return 'Human Rights (Workplace)';
       case 'human-rights': return 'Human Rights Tribunal';

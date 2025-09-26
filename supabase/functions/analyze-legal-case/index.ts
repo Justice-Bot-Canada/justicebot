@@ -27,11 +27,20 @@ serve(async (req) => {
     const isLandlordTenant = lowerDesc.includes('landlord') || lowerDesc.includes('tenant') || lowerDesc.includes('rent') || lowerDesc.includes('eviction') || lowerDesc.includes('lease');
     const isWorkplace = lowerDesc.includes('workplace') || lowerDesc.includes('employer') || lowerDesc.includes('boss') || lowerDesc.includes('work') || lowerDesc.includes('job');
     const isHumanRights = lowerDesc.includes('discrimination') || lowerDesc.includes('harassment') || lowerDesc.includes('human rights');
+    const isCriminal = lowerDesc.includes('assault') || lowerDesc.includes('theft') || lowerDesc.includes('fraud') || lowerDesc.includes('criminal') || 
+                      lowerDesc.includes('police') || lowerDesc.includes('arrest') || lowerDesc.includes('charges') || lowerDesc.includes('court') ||
+                      lowerDesc.includes('murder') || lowerDesc.includes('robbery') || lowerDesc.includes('break') || lowerDesc.includes('drug') ||
+                      lowerDesc.includes('violence') || lowerDesc.includes('sexual') || lowerDesc.includes('domestic') || lowerDesc.includes('dui') ||
+                      lowerDesc.includes('drunk driving') || lowerDesc.includes('impaired') || lowerDesc.includes('weapon') || lowerDesc.includes('threatening');
     
     let pathwayType = 'civil';
     let caseCategory = 'General Civil';
     
-    if (isLandlordTenant) {
+    
+    if (isCriminal) {
+      pathwayType = 'criminal';
+      caseCategory = 'Criminal Law';
+    } else if (isLandlordTenant) {
       pathwayType = 'landlord-tenant';
       caseCategory = 'Landlord and Tenant';
     } else if (isWorkplace && isHumanRights) {
@@ -98,9 +107,40 @@ serve(async (req) => {
       scoreBreakdown.categoryBonus += 8;
       caseStrengths.push('Protected under human rights legislation');
     }
+    if (isCriminal) {
+      // Criminal cases have different scoring - focus on evidence strength
+      if (evidenceFiles?.length > 0) {
+        meritScore += 10;
+        scoreBreakdown.categoryBonus += 10;
+        caseStrengths.push('Evidence is crucial in criminal matters');
+      }
+      if (lowerDesc.includes('witness') || lowerDesc.includes('video') || lowerDesc.includes('photo')) {
+        meritScore += 8;
+        scoreBreakdown.categoryBonus += 8;
+        caseStrengths.push('Supporting evidence or witnesses available');
+      }
+      if (lowerDesc.includes('police report') || lowerDesc.includes('incident report')) {
+        meritScore += 12;
+        scoreBreakdown.categoryBonus += 12;
+        caseStrengths.push('Official police documentation strengthens case');
+      }
+    }
     
     // Add context-specific strengths and weaknesses
-    if (isLandlordTenant) {
+    if (isCriminal) {
+      if (lowerDesc.includes('police report') || lowerDesc.includes('incident report')) {
+        caseStrengths.push('Official police documentation available');
+      }
+      if (lowerDesc.includes('witness') || lowerDesc.includes('video') || lowerDesc.includes('photo')) {
+        caseStrengths.push('Supporting evidence or witnesses identified');
+      }
+      if (!lowerDesc.includes('police') && !lowerDesc.includes('report')) {
+        caseWeaknesses.push('No police report mentioned - consider filing a report');
+      }
+      if (!lowerDesc.includes('witness') && !lowerDesc.includes('evidence')) {
+        caseWeaknesses.push('Additional evidence or witnesses may strengthen the case');
+      }
+    } else if (isLandlordTenant) {
       if (lowerDesc.includes('notice') || lowerDesc.includes('lease')) {
         caseStrengths.push('Documented rental relationship');
       }
@@ -179,7 +219,18 @@ serve(async (req) => {
 function getRelevantLaws(province: string, pathwayType: string, lawSection?: string): string[] {
   const laws: string[] = [];
   
-  if (pathwayType === 'landlord-tenant') {
+  if (pathwayType === 'criminal') {
+    laws.push('Criminal Code of Canada');
+    laws.push('Charter of Rights and Freedoms');
+    laws.push(`${province} Provincial Offences Act`);
+    if (province === 'Ontario') {
+      laws.push('Courts of Justice Act');
+    } else if (province === 'Quebec') {
+      laws.push('Code of Penal Procedure');
+    } else if (province === 'British Columbia') {
+      laws.push('Offence Act');
+    }
+  } else if (pathwayType === 'landlord-tenant') {
     if (province === 'Ontario') {
       laws.push('Residential Tenancies Act, 2006');
       laws.push('Landlord and Tenant Board Rules');
@@ -207,7 +258,16 @@ function getRelevantLaws(province: string, pathwayType: string, lawSection?: str
 function getNextSteps(pathwayType: string, province: string): string[] {
   const baseSteps = ['Consult with a qualified attorney', 'Gather additional documentation'];
   
-  if (pathwayType === 'landlord-tenant') {
+  if (pathwayType === 'criminal') {
+    return [
+      'Contact police if incident not yet reported',
+      'Obtain copy of police report and incident number',
+      'Consult with a criminal defense lawyer immediately',
+      'Document all evidence and witness information',
+      'Understand your rights under the Charter',
+      'Prepare for potential court proceedings'
+    ];
+  } else if (pathwayType === 'landlord-tenant') {
     return [
       ...baseSteps,
       'File application with Landlord and Tenant Board',
@@ -238,6 +298,17 @@ function getNextSteps(pathwayType: string, province: string): string[] {
 }
 
 function getFilingInstructions(pathwayType: string, province: string): string[] {
+  if (pathwayType === 'criminal') {
+    return [
+      'File police report at nearest police station or online',
+      'Request incident report number for your records',
+      'Contact Crown Attorney office if charges are being laid',
+      'Apply for legal aid if you cannot afford representation',
+      'File victim impact statement if applicable',
+      'Attend all scheduled court appearances'
+    ];
+  }
+  
   if (pathwayType === 'landlord-tenant') {
     if (province === 'Ontario') {
       return [
@@ -275,6 +346,25 @@ function getFilingInstructions(pathwayType: string, province: string): string[] 
 }
 
 function getRecommendedForms(pathwayType: string, province: string): string[] {
+  if (pathwayType === 'criminal') {
+    const forms = [
+      'Police Incident Report Form',
+      'Victim Impact Statement',
+      'Application for Legal Aid'
+    ];
+    
+    if (province === 'Ontario') {
+      forms.push('Victim/Witness Assistance Program Application');
+      forms.push('Criminal Injuries Compensation Board Application');
+    } else if (province === 'British Columbia') {
+      forms.push('Crime Victim Assistance Program Application');
+    } else if (province === 'Alberta') {
+      forms.push('Victims of Crime Financial Benefits Application');
+    }
+    
+    return forms;
+  }
+  
   if (pathwayType === 'landlord-tenant' && province === 'Ontario') {
     return [
       'Form L1 - Application to Evict a Tenant for Non-payment of Rent',
