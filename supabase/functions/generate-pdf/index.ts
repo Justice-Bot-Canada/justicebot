@@ -29,7 +29,7 @@ serve(async (req) => {
     const { data: userData, error: userError } = await supabase.auth.getUser(token);
     if (userError || !userData.user) throw new Error('User not authenticated');
 
-    // Check if user has premium access
+    // Check if user has premium access or free tier eligibility
     const { data: entitlements } = await supabase
       .from('entitlements')
       .select('product_id')
@@ -37,7 +37,14 @@ serve(async (req) => {
 
     const hasPremiumAccess = entitlements && entitlements.length > 0;
     
+    // Check free tier eligibility if no premium access
+    let hasFreeAccess = false;
     if (!hasPremiumAccess) {
+      const { data: freeEligible } = await supabase.rpc('check_free_tier_eligibility');
+      hasFreeAccess = freeEligible === true;
+    }
+    
+    if (!hasPremiumAccess && !hasFreeAccess) {
       return new Response(JSON.stringify({ 
         error: 'Premium access required for PDF generation',
         requiresPayment: true 

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Check, CreditCard, FileText, Zap } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Check, CreditCard, FileText, Zap, Mail, DollarSign, Users } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -11,8 +11,25 @@ import { useAuth } from "@/hooks/useAuth";
 
 const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
+  const [isFreeUser, setIsFreeUser] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+
+  useEffect(() => {
+    checkFreeEligibility();
+  }, [user]);
+
+  const checkFreeEligibility = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase.rpc('check_free_tier_eligibility');
+      if (error) throw error;
+      setIsFreeUser(data === true);
+    } catch (error) {
+      console.error('Error checking free eligibility:', error);
+    }
+  };
 
   const handlePayPalPayment = async (plan: string, amount: string) => {
     if (!user) {
@@ -30,14 +47,13 @@ const Pricing = () => {
         body: {
           planType: plan,
           amount: amount.replace('$', ''),
-          caseId: null // For general premium access
+          caseId: null
         }
       });
 
       if (error) throw error;
 
       if (data?.approvalUrl) {
-        // Open PayPal in new tab
         window.open(data.approvalUrl, '_blank');
         toast({
           title: "Redirecting to PayPal",
@@ -56,49 +72,78 @@ const Pricing = () => {
     }
   };
 
+  const handleETransferPayment = (plan: string, amount: string) => {
+    const subject = `Justice Bot - ${plan} Plan Payment`;
+    const body = `I would like to purchase the ${plan} plan for $${amount} CAD. Please send me payment instructions for e-transfer.`;
+    const mailtoLink = `mailto:admin@justice-bot.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoLink;
+    
+    toast({
+      title: "Email Client Opened",
+      description: "Please send the email to complete your e-transfer payment.",
+    });
+  };
+
   const plans = [
     {
-      name: "Basic",
-      description: "Essential legal document services",
-      price: "$29.99",
-      period: "per month",
+      name: "Free",
+      description: "Limited time - First 1000 users only!",
+      price: "$0",
+      period: "forever",
+      isFree: true,
       features: [
-        "Legal case analysis",
-        "Merit score assessment",
-        "Basic form templates",
+        "Basic legal case analysis",
+        "Merit score assessment", 
+        "Access to all forms",
         "Standard recommendations",
         "Community support"
       ],
     },
     {
-      name: "Premium", 
-      description: "Professional legal document suite",
-      price: "$59.99",
+      name: "Premium Monthly",
+      description: "Full access to all premium features",
+      price: "$9.99",
       period: "per month",
       popular: true,
       features: [
-        "Everything in Basic",
+        "Everything in Free",
         "Professional PDF generation",
         "Smart form pre-filling",
-        "Priority support",
+        "Priority email support",
         "Advanced case tracking",
-        "Document templates library"
+        "Document templates library",
+        "Cancel anytime"
       ],
     },
     {
-      name: "Enterprise",
-      description: "Complete legal practice solution",
-      price: "$149.99", 
-      period: "per month",
+      name: "Premium Yearly", 
+      description: "Best value - 2 months free!",
+      price: "$99.99",
+      period: "per year",
+      originalPrice: "$119.88",
       features: [
-        "Everything in Premium",
-        "Automated form filing",
-        "Real-time case tracking",
-        "Dedicated legal consultant",
-        "Custom document generation",
-        "API access",
-        "White-label options"
+        "Everything in Premium Monthly",
+        "20% discount (2 months free)",
+        "Priority phone support",
+        "Early access to new features",
+        "Advanced analytics",
+        "Bulk case processing"
       ],
+    },
+    {
+      name: "Low-Income",
+      description: "Affordable access for qualified applicants",
+      price: "$2.99", 
+      period: "per month",
+      badge: "Verification Required",
+      features: [
+        "All Premium features",
+        "90% discount rate",
+        "Income verification required",
+        "Annual billing only - $35.88/year",
+        "Same premium support"
+      ],
+      requiresApproval: true
     }
   ];
 
@@ -106,21 +151,35 @@ const Pricing = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-16">
+        {/* Hero Banner */}
         <div className="text-center mb-12">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-6 rounded-lg mb-8 mx-auto max-w-2xl">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Users className="w-5 h-5" />
+              <span className="font-bold">LIMITED TIME OFFER</span>
+            </div>
+            <p className="text-lg">
+              FREE access for the first 1000 users! 🎉
+            </p>
+            <p className="text-sm opacity-90">
+              No credit card required - Just sign up and start using all features
+            </p>
+          </div>
+
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Choose Your Plan
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
-            Professional legal document services powered by AI
+            Professional legal document services built for Canadians
           </p>
           <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-300">
             <div className="flex items-center gap-2">
               <CreditCard className="w-4 h-4" />
-              <span>Secure PayPal payments</span>
+              <span>PayPal accepted</span>
             </div>
             <div className="flex items-center gap-2">
-              <FileText className="w-4 h-4" />
-              <span>Professional PDF generation</span>
+              <Mail className="w-4 h-4" />
+              <span>E-transfer available</span>
             </div>
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4" />
@@ -129,30 +188,45 @@ const Pricing = () => {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {plans.map((plan) => (
             <Card 
               key={plan.name} 
               className={`relative ${
                 plan.popular ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800' : ''
-              }`}
+              } ${plan.isFree ? 'border-green-500 ring-2 ring-green-200 dark:ring-green-800' : ''}`}
             >
               {plan.popular && (
                 <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600">
                   Most Popular
                 </Badge>
               )}
+              {plan.isFree && (
+                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-600">
+                  Limited Time
+                </Badge>
+              )}
+              {plan.badge && (
+                <Badge variant="secondary" className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  {plan.badge}
+                </Badge>
+              )}
               
               <CardHeader className="text-center">
-                <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+                <CardTitle className="text-xl font-bold text-gray-900 dark:text-white">
                   {plan.name}
                 </CardTitle>
                 <CardDescription className="text-gray-600 dark:text-gray-300">
                   {plan.description}
                 </CardDescription>
                 <div className="mt-4">
-                  <div className="text-4xl font-bold text-gray-900 dark:text-white">
+                  <div className="text-3xl font-bold text-gray-900 dark:text-white">
                     {plan.price}
+                    {plan.originalPrice && (
+                      <span className="text-lg text-gray-400 line-through ml-2">
+                        {plan.originalPrice}
+                      </span>
+                    )}
                   </div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
                     {plan.period}
@@ -161,32 +235,63 @@ const Pricing = () => {
               </CardHeader>
 
               <CardContent>
-                <ul className="space-y-3 mb-8">
+                <ul className="space-y-2 mb-6 text-sm">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start">
-                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
+                      <Check className="h-4 w-4 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
                       <span className="text-gray-700 dark:text-gray-300">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
-                <div className="space-y-3">
-                  <Button
-                    onClick={() => handlePayPalPayment(plan.name, plan.price)}
-                    disabled={loading === plan.name}
-                    className="w-full bg-blue-600 hover:bg-blue-700"
-                  >
-                    {loading === plan.name ? "Processing..." : `Pay with PayPal - ${plan.price} CAD`}
-                  </Button>
-                  
-                  {plan.name === "Basic" && (
+                <div className="space-y-2">
+                  {plan.isFree ? (
+                    <div className="text-center">
+                      {isFreeUser ? (
+                        <Badge variant="default" className="bg-green-600 text-white">
+                          ✅ You qualify for FREE access!
+                        </Badge>
+                      ) : user ? (
+                        <Badge variant="secondary">
+                          Free tier full - Premium plans available
+                        </Badge>
+                      ) : (
+                        <Button 
+                          className="w-full bg-green-600 hover:bg-green-700"
+                          onClick={() => window.location.href = '/auth'}
+                        >
+                          Sign Up - Get FREE Access
+                        </Button>
+                      )}
+                    </div>
+                  ) : plan.requiresApproval ? (
                     <Button 
-                      variant="outline" 
-                      className="w-full"
-                      onClick={() => window.location.href = "/low-income-approval"}
+                      className="w-full" 
+                      variant="outline"
+                      onClick={() => window.location.href = '/low-income-approval'}
                     >
-                      Apply for Low-Income Discount
+                      Apply for Low-Income Plan
                     </Button>
+                  ) : (
+                    <div className="space-y-2">
+                      <Button
+                        onClick={() => handlePayPalPayment(plan.name, plan.price)}
+                        disabled={loading === plan.name}
+                        className="w-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center gap-2"
+                      >
+                        <DollarSign className="w-4 h-4" />
+                        {loading === plan.name ? "Processing..." : `PayPal - ${plan.price}`}
+                      </Button>
+                      
+                      <Button
+                        onClick={() => handleETransferPayment(plan.name, plan.price)}
+                        variant="outline"
+                        className="w-full flex items-center justify-center gap-2"
+                      >
+                        <Mail className="w-4 h-4" />
+                        E-Transfer - {plan.price}
+                      </Button>
+                    </div>
                   )}
                 </div>
               </CardContent>
@@ -194,16 +299,25 @@ const Pricing = () => {
           ))}
         </div>
 
-        <div className="text-center mt-12 text-gray-600 dark:text-gray-300 space-y-2">
-          <p>
-            <strong>PayPal payments:</strong> Instant access after successful payment
-          </p>
-          <p>
-            <strong>Need help?</strong> Contact us at admin@justice-bot.com
-          </p>
-          <p className="text-sm">
-            All plans include Canadian legal compliance and professional document generation
-          </p>
+        <div className="text-center mt-12 text-gray-600 dark:text-gray-300 space-y-3">
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg max-w-2xl mx-auto">
+            <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+              🇨🇦 Built for Canadians
+            </h3>
+            <p className="text-sm">
+              All plans include access to Canadian legal forms, provincial compliance, 
+              and support for all provinces and territories.
+            </p>
+          </div>
+          
+          <div className="space-y-2">
+            <p>
+              <strong>PayPal:</strong> Instant access • <strong>E-Transfer:</strong> 24-hour activation
+            </p>
+            <p className="text-sm">
+              Questions? Email us at admin@justice-bot.com
+            </p>
+          </div>
         </div>
       </main>
       <Footer />
