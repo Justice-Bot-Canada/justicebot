@@ -56,6 +56,47 @@ export type Database = {
         }
         Relationships: []
       }
+      documents: {
+        Row: {
+          case_id: string
+          created_at: string | null
+          form_key: string
+          id: string
+          mime: string
+          path: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          case_id: string
+          created_at?: string | null
+          form_key: string
+          id?: string
+          mime?: string
+          path: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          case_id?: string
+          created_at?: string | null
+          form_key?: string
+          id?: string
+          mime?: string
+          path?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       entitlements: {
         Row: {
           granted_at: string
@@ -77,6 +118,7 @@ export type Database = {
       evidence: {
         Row: {
           case_id: string
+          content_tsvector: unknown | null
           description: string | null
           file_name: string
           file_path: string
@@ -86,6 +128,7 @@ export type Database = {
         }
         Insert: {
           case_id: string
+          content_tsvector?: unknown | null
           description?: string | null
           file_name: string
           file_path: string
@@ -95,6 +138,7 @@ export type Database = {
         }
         Update: {
           case_id?: string
+          content_tsvector?: unknown | null
           description?: string | null
           file_name?: string
           file_path?: string
@@ -111,6 +155,111 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      form_usage: {
+        Row: {
+          case_id: string | null
+          completion_status: string | null
+          completion_time_minutes: number | null
+          created_at: string
+          feedback: string | null
+          field_data: Json | null
+          form_id: string
+          id: string
+          success_rating: number | null
+          user_id: string | null
+        }
+        Insert: {
+          case_id?: string | null
+          completion_status?: string | null
+          completion_time_minutes?: number | null
+          created_at?: string
+          feedback?: string | null
+          field_data?: Json | null
+          form_id: string
+          id?: string
+          success_rating?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          case_id?: string | null
+          completion_status?: string | null
+          completion_time_minutes?: number | null
+          created_at?: string
+          feedback?: string | null
+          field_data?: Json | null
+          form_id?: string
+          id?: string
+          success_rating?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_usage_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "form_usage_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forms: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          filing_requirements: Json | null
+          form_code: string
+          form_fields: Json | null
+          id: string
+          instructions: string | null
+          is_active: boolean
+          price_cents: number
+          title: string
+          tribunal_type: string
+          updated_at: string
+          usage_count: number | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          filing_requirements?: Json | null
+          form_code: string
+          form_fields?: Json | null
+          id?: string
+          instructions?: string | null
+          is_active?: boolean
+          price_cents?: number
+          title: string
+          tribunal_type: string
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          filing_requirements?: Json | null
+          form_code?: string
+          form_fields?: Json | null
+          id?: string
+          instructions?: string | null
+          is_active?: boolean
+          price_cents?: number
+          title?: string
+          tribunal_type?: string
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Relationships: []
       }
       legal_pathways: {
         Row: {
@@ -158,7 +307,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_form_usage: {
+        Args: { form_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
