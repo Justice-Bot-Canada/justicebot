@@ -42,6 +42,8 @@ const Header = () => {
             <a href="#locator" className="text-foreground hover:text-primary transition-colors">Court Locator</a>
             <a href="#forms" className="text-foreground hover:text-primary transition-colors">Forms</a>
             <a href="#merit" className="text-foreground hover:text-primary transition-colors">Merit Score</a>
+            <a href="/pricing" className="text-foreground hover:text-primary transition-colors">Pricing</a>
+            <a href="/low-income" className="text-foreground hover:text-primary transition-colors">Low-Income</a>
           </nav>
 
           <div className="flex items-center gap-4">

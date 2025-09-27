@@ -82,11 +82,10 @@ const LowIncomeApproval = () => {
           full_name: formData.full_name,
           email: formData.email,
           phone: formData.phone,
-          income_amount: parseInt(formData.income_amount),
+          annual_income: parseInt(formData.income_amount),
           household_size: parseInt(formData.household_size),
           employment_status: formData.employment_status,
-          additional_info: formData.additional_info,
-          proof_file_path: filePath,
+          proof_of_income_url: filePath,
           status: 'pending'
         });
 

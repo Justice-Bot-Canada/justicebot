@@ -24,6 +24,8 @@ const Footer = () => {
               <li><a href="#locator" className="hover:text-background transition-colors">Court Locator</a></li>
               <li><a href="#forms" className="hover:text-background transition-colors">Form Builder</a></li>
               <li><a href="#merit" className="hover:text-background transition-colors">Merit Score</a></li>
+              <li><a href="/pricing" className="hover:text-background transition-colors">Pricing</a></li>
+              <li><a href="/low-income" className="hover:text-background transition-colors">Low-Income Program</a></li>
             </ul>
           </div>
 
@@ -54,8 +56,8 @@ const Footer = () => {
               © 2024 Justice-Bot. All rights reserved.
             </div>
             <div className="flex gap-6 text-sm text-background/80">
-              <a href="#" className="hover:text-background transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-background transition-colors">Terms of Service</a>
+              <a href="/privacy" className="hover:text-background transition-colors">Privacy Policy</a>
+              <a href="/terms" className="hover:text-background transition-colors">Terms of Service</a>
               <a href="#" className="hover:text-background transition-colors">Disclaimer</a>
             </div>
           </div>

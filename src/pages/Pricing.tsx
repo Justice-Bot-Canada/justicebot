@@ -1,48 +1,47 @@
 import { useState } from "react";
-import { Check } from "lucide-react";
+import { Check, Mail, DollarSign } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 const Pricing = () => {
-  const { user } = useAuth();
-  const { toast } = useToast();
   const [loading, setLoading] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  const handleSubscribe = async (priceKey: string) => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to subscribe",
-        variant: "destructive",
-      });
-      return;
-    }
+  const handlePayPalPayment = (plan: string, amount: string) => {
+    setLoading(plan);
+    // For demo purposes - in production, integrate with PayPal SDK
+    toast({
+      title: "PayPal Payment",
+      description: `Redirecting to PayPal for ${plan} payment of ${amount}...`,
+    });
+    // Simulate PayPal redirect
+    setTimeout(() => {
+      window.location.href = "/payment-success";
+    }, 2000);
+  };
 
-    setLoading(priceKey);
-    try {
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { price_key: priceKey }
-      });
+  const handleETransferPayment = (plan: string, amount: string) => {
+    const email = "payments@justice-bot.com";
+    const subject = `Justice-Bot ${plan} Payment`;
+    const body = `Hello,
 
-      if (error) throw error;
-      if (data?.url) {
-        window.open(data.url, '_blank');
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create checkout session",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(null);
-    }
+I would like to purchase the ${plan} plan for ${amount}.
+
+Please confirm receipt of this email and provide payment instructions.
+
+Thank you!`;
+
+    const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoLink;
+    
+    toast({
+      title: "E-Transfer Instructions",
+      description: "Check your email client for payment instructions. We'll contact you within 24 hours.",
+    });
   };
 
   const plans = [
@@ -57,9 +56,7 @@ const Pricing = () => {
         "Basic guidance",
         "Document generation",
         "Email support"
-      ],
-      priceKey: "per_form_regular",
-      lowIncomePriceKey: "per_form_low_income"
+      ]
     },
     {
       name: "Regular",
@@ -76,9 +73,7 @@ const Pricing = () => {
         "Merit score analysis",
         "Priority support",
         "Legal pathway guidance"
-      ],
-      priceKey: "regular_monthly",
-      yearlyPriceKey: "regular_yearly"
+      ]
     },
     {
       name: "Low-Income",
@@ -92,7 +87,6 @@ const Pricing = () => {
         "Annual billing only",
         "Income verification required"
       ],
-      priceKey: "low_income_yearly",
       requiresApproval: true
     }
   ];
@@ -106,6 +100,16 @@ const Pricing = () => {
           <p className="text-xl text-muted-foreground mb-8">
             Choose the plan that works best for your legal needs
           </p>
+          <div className="flex justify-center gap-4 mb-8">
+            <Badge variant="outline" className="flex items-center gap-2">
+              <DollarSign className="w-4 h-4" />
+              PayPal Accepted
+            </Badge>
+            <Badge variant="outline" className="flex items-center gap-2">
+              <Mail className="w-4 h-4" />
+              E-Transfer Available
+            </Badge>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -165,23 +169,45 @@ const Pricing = () => {
                     </Button>
                   ) : (
                     <>
-                      <Button 
-                        className="w-full" 
-                        variant={plan.popular ? "default" : "outline"}
-                        onClick={() => handleSubscribe(plan.priceKey)}
-                        disabled={loading === plan.priceKey}
-                      >
-                        {loading === plan.priceKey ? "Processing..." : `Get ${plan.name}`}
-                      </Button>
-                      {plan.yearlyPriceKey && (
+                      <div className="grid grid-cols-2 gap-2">
                         <Button 
-                          className="w-full" 
-                          variant="outline"
-                          onClick={() => handleSubscribe(plan.yearlyPriceKey)}
-                          disabled={loading === plan.yearlyPriceKey}
+                          variant="default"
+                          onClick={() => handlePayPalPayment(plan.name, plan.price)}
+                          disabled={loading === plan.name}
+                          className="flex items-center gap-2"
                         >
-                          {loading === plan.yearlyPriceKey ? "Processing..." : "Get Yearly (Save 75%)"}
+                          <DollarSign className="w-4 h-4" />
+                          PayPal
                         </Button>
+                        <Button 
+                          variant="outline"
+                          onClick={() => handleETransferPayment(plan.name, plan.price)}
+                          className="flex items-center gap-2"
+                        >
+                          <Mail className="w-4 h-4" />
+                          E-Transfer
+                        </Button>
+                      </div>
+                      {plan.yearlyPrice && (
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                          <Button 
+                            variant="secondary"
+                            onClick={() => handlePayPalPayment(plan.name + " Yearly", plan.yearlyPrice)}
+                            disabled={loading === plan.name + " Yearly"}
+                            className="flex items-center gap-2 text-xs"
+                          >
+                            <DollarSign className="w-3 h-3" />
+                            PayPal Yearly
+                          </Button>
+                          <Button 
+                            variant="outline"
+                            onClick={() => handleETransferPayment(plan.name + " Yearly", plan.yearlyPrice)}
+                            className="flex items-center gap-2 text-xs"
+                          >
+                            <Mail className="w-3 h-3" />
+                            E-Transfer Yearly
+                          </Button>
+                        </div>
                       )}
                     </>
                   )}
@@ -194,6 +220,12 @@ const Pricing = () => {
         <div className="text-center mt-12">
           <p className="text-muted-foreground mb-4">
             All plans include access to Ontario legal forms and guidance
+          </p>
+          <p className="text-sm text-muted-foreground mb-2">
+            <strong>PayPal:</strong> Instant access after payment confirmation
+          </p>
+          <p className="text-sm text-muted-foreground mb-4">
+            <strong>E-Transfer:</strong> Manual processing within 24 hours
           </p>
           <p className="text-sm text-muted-foreground">
             Questions? Contact us at support@justice-bot.com
