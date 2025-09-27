@@ -1,8 +1,9 @@
-import { Scale, Menu, LogOut, User } from "lucide-react";
+import { Menu, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import AuthDialog from "@/components/AuthDialog";
+import justiceBotLogo from "@/assets/justice-bot-logo.jpeg";
 const Header = () => {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const { user, signOut } = useAuth();
@@ -27,8 +28,12 @@ const Header = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <a href="/" className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 bg-primary rounded-lg">
-                <Scale className="w-6 h-6 text-primary-foreground" />
+              <div className="flex items-center justify-center w-10 h-10 bg-white rounded-lg shadow-sm">
+                <img 
+                  src={justiceBotLogo} 
+                  alt="Justice-Bot Logo" 
+                  className="w-8 h-8 object-contain"
+                />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-foreground">Justice-Bot</h1>
