@@ -29,7 +29,7 @@ serve(async (req) => {
     if (evidenceFiles?.length > 0) {
       console.log('Processing evidence files for form pre-filling');
       extractedData = await extractDataFromFiles(evidenceFiles, description);
-      documentText = extractedData.fullText || '';
+      documentText = (extractedData as any).fullText || '';
     }
 
     // Analyze case context to determine pathway type
