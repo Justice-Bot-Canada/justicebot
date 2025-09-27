@@ -77,6 +77,13 @@ const SmallClaimsCourt = () => {
                   Start Your Small Claims Assessment
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  onClick={() => navigate("/small-claims-journey")}
+                >
+                  View Step-by-Step Guide
+                </Button>
                 <Button size="lg" variant="outline" onClick={() => navigate("/pricing")}>
                   View Pricing
                 </Button>
