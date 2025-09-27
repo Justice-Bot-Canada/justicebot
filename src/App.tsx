@@ -20,6 +20,7 @@ import FormSelector from "./pages/FormSelector";
 import FormBuilder from "./pages/FormBuilder";
 import TribunalLocatorPage from "./pages/TribunalLocatorPage";
 import Profile from "./pages/Profile";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -31,21 +32,21 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/assessment" element={<CaseAssessment />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/assessment" element={<ProtectedRoute><CaseAssessment /></ProtectedRoute>} />
           <Route path="/triage" element={<Triage />} />
           <Route path="/tribunal-locator" element={<TribunalLocatorPage />} />
-          <Route path="/forms/:venue" element={<FormSelector />} />
-          <Route path="/form/:formId" element={<FormBuilder />} />
+          <Route path="/forms/:venue" element={<ProtectedRoute><FormSelector /></ProtectedRoute>} />
+          <Route path="/form/:formId" element={<ProtectedRoute><FormBuilder /></ProtectedRoute>} />
           <Route path="/pricing" element={<Pricing />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="/low-income" element={<LowIncomeApproval />} />
+          <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+          <Route path="/low-income" element={<ProtectedRoute><LowIncomeApproval /></ProtectedRoute>} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/liability" element={<Liability />} />
           <Route path="/terms" element={<Terms />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/payment-success" element={<PaymentSuccess />} />
-          <Route path="/payment-cancel" element={<PaymentCancel />} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+          <Route path="/payment-cancel" element={<ProtectedRoute><PaymentCancel /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

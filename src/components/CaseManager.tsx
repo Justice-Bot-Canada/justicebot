@@ -238,15 +238,7 @@ const CaseManager = () => {
       />
     );
   }
-  if (!user) {
-    return (
-      <div className="text-center py-12">
-        <AlertCircle className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-semibold mb-2">Authentication Required</h3>
-        <p className="text-muted-foreground">Please sign in to manage your legal cases.</p>
-      </div>
-    );
-  }
+  // Auth check is now handled by ProtectedRoute
 
   return (
     <div className="container mx-auto px-4 py-8">

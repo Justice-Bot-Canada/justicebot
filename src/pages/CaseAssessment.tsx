@@ -75,11 +75,7 @@ const CaseAssessment = () => {
   };
 
   const handleSubmit = async () => {
-    if (!user) {
-      toast.error("Please sign in to submit your case");
-      return;
-    }
-
+    // Auth check is now handled by ProtectedRoute
     if (!formData.title || !formData.description || !formData.province) {
       toast.error("Please fill in all required fields");
       return;
@@ -289,19 +285,7 @@ const CaseAssessment = () => {
                     </div>
                   </div>
 
-                  {!user && (
-                    <div className="p-4 border border-warning/20 bg-warning/5 rounded-lg">
-                      <div className="flex items-start gap-3">
-                        <AlertCircle className="h-5 w-5 text-warning mt-0.5" />
-                        <div>
-                          <p className="font-medium text-warning mb-1">Sign In Required</p>
-                          <p className="text-sm text-muted-foreground">
-                            Please sign in to submit your case for analysis and save your progress.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                  {/* Auth check is now handled by ProtectedRoute */}
                 </div>
               )}
 
@@ -318,7 +302,7 @@ const CaseAssessment = () => {
                 {currentStep === steps.length - 1 ? (
                   <Button
                     onClick={handleSubmit}
-                    disabled={loading || !user}
+                    disabled={loading}
                   >
                     {loading ? "Submitting..." : "Submit for Analysis"}
                     <ArrowRight className="h-4 w-4 ml-2" />

@@ -23,24 +23,7 @@ const Dashboard = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("cases");
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-20">
-          <Card className="text-center py-12">
-            <CardContent>
-              <AlertCircle className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Authentication Required</h3>
-              <p className="text-muted-foreground mb-4">Please sign in to access your dashboard.</p>
-              <Button>Sign In</Button>
-            </CardContent>
-          </Card>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+  // Auth check is now handled by ProtectedRoute
 
   return (
     <div className="min-h-screen bg-background">
