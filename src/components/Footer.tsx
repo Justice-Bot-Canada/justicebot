@@ -30,12 +30,11 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4">Legal Areas</h3>
+            <h3 className="font-semibold mb-4">Legal</h3>
             <ul className="space-y-2 text-sm text-background/80">
-              <li>Landlord & Tenant (LTB)</li>
-              <li>Human Rights (HRTO)</li>
-              <li>Small Claims Court</li>
-              <li>Family & CAS</li>
+              <li><a href="/liability" className="hover:text-background transition-colors text-red-300">⚠️ Legal Liability</a></li>
+              <li><a href="/terms" className="hover:text-background transition-colors">Terms of Service</a></li>
+              <li><a href="/privacy" className="hover:text-background transition-colors">Privacy Policy</a></li>
             </ul>
           </div>
 
@@ -56,9 +55,9 @@ const Footer = () => {
               © 2024 Justice-Bot. All rights reserved.
             </div>
             <div className="flex gap-6 text-sm text-background/80">
+              <a href="/liability" className="hover:text-background transition-colors text-red-300">⚠️ Liability</a>
               <a href="/privacy" className="hover:text-background transition-colors">Privacy Policy</a>
               <a href="/terms" className="hover:text-background transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-background transition-colors">Disclaimer</a>
             </div>
           </div>
           

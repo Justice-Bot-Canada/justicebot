@@ -91,10 +91,15 @@ const Terms = () => {
               <ul className="text-red-700 mt-2">
                 <li>Justice-Bot is not liable for legal outcomes or missed deadlines</li>
                 <li>You use this service at your own risk</li>
-                <li>Maximum liability limited to amounts paid to us</li>
+                <li>Maximum liability limited to amounts paid to us in the past 12 months</li>
                 <li>No warranty that information is complete or current</li>
                 <li>Laws change frequently - verify current requirements</li>
+                <li>No liability for consequential, indirect, or punitive damages</li>
+                <li>User must indemnify Justice-Bot against any claims</li>
               </ul>
+              <p className="font-bold text-red-800 mt-2">
+                See our <a href="/liability" className="underline">Legal Liability page</a> for complete disclaimers.
+              </p>
             </div>
           </section>
 
