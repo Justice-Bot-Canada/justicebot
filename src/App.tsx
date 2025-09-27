@@ -30,6 +30,8 @@ import Contact from "./pages/Contact";
 import HRTOJourney from "./pages/HRTOJourney";
 import LTBJourney from "./pages/LTBJourney";
 import SmallClaimsJourney from "./pages/SmallClaimsJourney";
+import CriminalJourney from "./pages/CriminalJourney";
+import FamilyJourney from "./pages/FamilyJourney";
 
 const queryClient = new QueryClient();
 
@@ -45,9 +47,11 @@ const AppContent = () => {
           <Route path="/hrto-help" element={<HRTOHelp />} />
           <Route path="/ltb-help" element={<LTBHelp />} />
           <Route path="/small-claims-court" element={<SmallClaimsCourt />} />
-          <Route path="/hrto-journey" element={<HRTOJourney />} />
-          <Route path="/ltb-journey" element={<LTBJourney />} />
-          <Route path="/small-claims-journey" element={<SmallClaimsJourney />} />
+        <Route path="/hrto-journey" element={<HRTOJourney />} />
+        <Route path="/ltb-journey" element={<LTBJourney />} />
+        <Route path="/small-claims-journey" element={<SmallClaimsJourney />} />
+        <Route path="/criminal-journey" element={<CriminalJourney />} />
+        <Route path="/family-journey" element={<FamilyJourney />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/assessment" element={<ProtectedRoute><CaseAssessment /></ProtectedRoute>} />

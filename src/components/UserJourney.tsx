@@ -32,7 +32,7 @@ interface JourneyStep {
 }
 
 interface UserJourneyProps {
-  venue: 'hrto' | 'ltb' | 'small-claims' | 'family';
+  venue: 'hrto' | 'ltb' | 'small-claims' | 'family' | 'criminal';
   userSituation?: string;
   incidentDate?: Date;
   onStepComplete?: (stepId: string) => void;
@@ -219,6 +219,106 @@ const getJourneyData = (venue: string) => {
             id: 'serve-defendant',
             title: 'Serve the Defendant',
             description: 'Personally serve court documents to defendant within 6 months',
+            timeEstimate: '1-2 weeks',
+            priority: 'medium' as const,
+            actionText: 'Service Guide'
+          }
+        ]
+      };
+      
+    case 'criminal':
+      return {
+        title: "Your Criminal Law Journey",
+        subtitle: "Navigate criminal charges and court proceedings",
+        criticalWarning: "⚠️ URGENT: Criminal matters have strict deadlines. Contact duty counsel immediately if charged.",
+        helpfulLinks: [
+          { title: "Ontario Court of Justice", url: "https://www.ontariocourts.ca/ocj/" },
+          { title: "Legal Aid Ontario", url: "https://www.legalaid.on.ca/" },
+          { title: "CanLII Case Law", url: "https://www.canlii.org/en/on/" }
+        ],
+        steps: [
+          {
+            id: 'understand-charges',
+            title: 'Understand Your Charges',
+            description: 'Review the charges against you and understand potential penalties',
+            timeEstimate: '1 hour',
+            priority: 'critical' as const,
+            actionText: 'Review Charges'
+          },
+          {
+            id: 'legal-representation',
+            title: 'Secure Legal Representation',
+            description: 'Contact a criminal lawyer or apply for legal aid immediately',
+            timeEstimate: '1-2 days',
+            priority: 'critical' as const,
+            actionText: 'Find Lawyer'
+          },
+          {
+            id: 'gather-evidence',
+            title: 'Collect Supporting Evidence',
+            description: 'Gather documents, witness information, and any evidence supporting your case',
+            timeEstimate: '1-2 weeks',
+            priority: 'high' as const,
+            actionText: 'Evidence Checklist'
+          },
+          {
+            id: 'court-appearance',
+            title: 'Prepare for Court Appearances',
+            description: 'Understand court procedures and prepare for your first appearance',
+            timeEstimate: '1 week',
+            priority: 'high' as const,
+            actionText: 'Court Prep Guide'
+          }
+        ]
+      };
+      
+    case 'family':
+      return {
+        title: "Your Family Law Journey",
+        subtitle: "Navigate divorce, custody, and child protection matters",
+        criticalWarning: "⚠️ TIME-SENSITIVE: Child protection matters have urgent deadlines. Act quickly.",
+        helpfulLinks: [
+          { title: "Family Court Ontario", url: "https://www.ontariocourts.ca/scj/family/" },
+          { title: "Ontario Family Law Forms", url: "https://www.ontariocourts.ca/scj/family/forms/" },
+          { title: "CanLII Family Law", url: "https://www.canlii.org/en/on/onsc/" }
+        ],
+        steps: [
+          {
+            id: 'determine-issue-type',
+            title: 'Identify Your Family Law Issue',
+            description: 'Determine if you need divorce, custody, support, or child protection assistance',
+            timeEstimate: '30 minutes',
+            priority: 'high' as const,
+            actionText: 'Issue Assessment'
+          },
+          {
+            id: 'gather-documents',
+            title: 'Collect Required Documents',
+            description: 'Gather marriage certificate, financial records, and child-related documents',
+            timeEstimate: '1-2 weeks',
+            priority: 'high' as const,
+            actionText: 'Document Checklist'
+          },
+          {
+            id: 'complete-forms',
+            title: 'Complete Court Forms',
+            description: 'Fill out appropriate family law forms for your specific situation',
+            timeEstimate: '2-4 hours',
+            priority: 'high' as const,
+            actionText: 'Start Forms'
+          },
+          {
+            id: 'file-documents',
+            title: 'File with Family Court',
+            description: 'Submit completed forms and pay required court fees',
+            timeEstimate: '1 hour',
+            priority: 'medium' as const,
+            actionText: 'File Forms'
+          },
+          {
+            id: 'serve-other-party',
+            title: 'Serve the Other Party',
+            description: 'Properly serve court documents to spouse or other involved parties',
             timeEstimate: '1-2 weeks',
             priority: 'medium' as const,
             actionText: 'Service Guide'
@@ -470,6 +570,22 @@ export const UserJourney: React.FC<UserJourneyProps> = ({
                       <li>• Personal service is usually required for defendants</li>
                       <li>• Keep detailed records of your damages</li>
                       <li>• Consider costs - filing fees, service costs, etc.</li>
+                    </>
+                  )}
+                  {venue === 'criminal' && (
+                    <>
+                      <li>• Never speak to police without a lawyer present</li>
+                      <li>• Attend all court dates - failure to appear is a separate charge</li>
+                      <li>• Keep all court documents and police paperwork</li>
+                      <li>• Follow all bail conditions strictly</li>
+                    </>
+                  )}
+                  {venue === 'family' && (
+                    <>
+                      <li>• Put children's best interests first in all decisions</li>
+                      <li>• Keep detailed financial records and receipts</li>
+                      <li>• Document all interactions with ex-spouse or CAS</li>
+                      <li>• Consider mediation before going to court</li>
                     </>
                   )}
                 </ul>
