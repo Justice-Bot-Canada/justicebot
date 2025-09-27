@@ -87,8 +87,11 @@ const EvidenceBuilder: React.FC<EvidenceBuilderProps> = ({ caseId, onUpdate }) =
       // Parse tags and other JSON fields
       const processedEvidence = (data || []).map(item => ({
         ...item,
-        tags: Array.isArray(item.description) ? [] : (item.tags || []),
-        order_index: item.order_index || 0
+        tags: Array.isArray((item as any).tags) ? (item as any).tags : [],
+        order_index: (item as any).order_index || 0,
+        ocr_text: (item as any).ocr_text || null,
+        page_count: (item as any).page_count || 1,
+        redacted_regions: (item as any).redacted_regions || []
       }));
       
       setEvidence(processedEvidence);
@@ -125,7 +128,7 @@ const EvidenceBuilder: React.FC<EvidenceBuilderProps> = ({ caseId, onUpdate }) =
             file_type: file.type,
             description: `Uploaded ${file.name}`,
             order_index: evidence.length + uploadedIds.length
-          })
+          } as any)
           .select()
           .single();
 
@@ -175,7 +178,7 @@ const EvidenceBuilder: React.FC<EvidenceBuilderProps> = ({ caseId, onUpdate }) =
         .update({ 
           ocr_text: mockOcrText,
           page_count: Math.floor(Math.random() * 10) + 1
-        })
+        } as any)
         .eq('id', evidenceId);
 
       if (error) throw error;
@@ -194,7 +197,7 @@ const EvidenceBuilder: React.FC<EvidenceBuilderProps> = ({ caseId, onUpdate }) =
     try {
       const { error } = await supabase
         .from('evidence')
-        .update({ tags })
+        .update({ tags } as any)
         .eq('id', evidenceId);
 
       if (error) throw error;
@@ -211,7 +214,7 @@ const EvidenceBuilder: React.FC<EvidenceBuilderProps> = ({ caseId, onUpdate }) =
     try {
       const { error } = await supabase
         .from('evidence')
-        .update({ order_index: newIndex })
+        .update({ order_index: newIndex } as any)
         .eq('id', evidenceId);
 
       if (error) throw error;

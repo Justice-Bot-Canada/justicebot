@@ -127,6 +127,11 @@ export type Database = {
           file_path: string
           file_type: string
           id: string
+          ocr_text: string | null
+          order_index: number | null
+          page_count: number | null
+          redacted_regions: Json | null
+          tags: string[] | null
           upload_date: string
         }
         Insert: {
@@ -137,6 +142,11 @@ export type Database = {
           file_path: string
           file_type: string
           id?: string
+          ocr_text?: string | null
+          order_index?: number | null
+          page_count?: number | null
+          redacted_regions?: Json | null
+          tags?: string[] | null
           upload_date?: string
         }
         Update: {
@@ -147,6 +157,11 @@ export type Database = {
           file_path?: string
           file_type?: string
           id?: string
+          ocr_text?: string | null
+          order_index?: number | null
+          page_count?: number | null
+          redacted_regions?: Json | null
+          tags?: string[] | null
           upload_date?: string
         }
         Relationships: [
