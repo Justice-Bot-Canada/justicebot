@@ -25,6 +25,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import HRTOHelp from "./pages/HRTOHelp";
 import LTBHelp from "./pages/LTBHelp";
 import SmallClaimsCourt from "./pages/SmallClaimsCourt";
+import Contact from "./pages/Contact";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
           <Route path="/hrto-help" element={<HRTOHelp />} />
           <Route path="/ltb-help" element={<LTBHelp />} />
           <Route path="/small-claims-court" element={<SmallClaimsCourt />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/assessment" element={<ProtectedRoute><CaseAssessment /></ProtectedRoute>} />
           <Route path="/triage" element={<Triage />} />

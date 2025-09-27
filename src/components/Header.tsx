@@ -61,6 +61,9 @@ const Header = () => {
               <a href="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Pricing
               </a>
+              <a href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Contact
+              </a>
               {isAdmin && (
                 <a href="/admin" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                   Admin
@@ -140,6 +143,13 @@ const Header = () => {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Pricing
+              </a>
+              <a 
+                href="/contact" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Contact
               </a>
               {isAdmin && (
                 <a 
