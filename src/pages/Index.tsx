@@ -6,6 +6,7 @@ import MeritScoreDemo from "@/components/MeritScoreDemo";
 import FormPrefillDemo from "@/components/FormPrefillDemo";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
+import { AccessibilityPanel } from "@/components/EnhancedAccessibility";
 
 const Index = () => {
   const structuredData = {
@@ -64,6 +65,7 @@ const Index = () => {
         <FormPrefillDemo />
       </main>
       <Footer />
+      <AccessibilityPanel />
     </div>
   );
 };

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -127,6 +129,10 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Nunito Sans', 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   /* High contrast mode styles */
@@ -165,18 +171,136 @@ All colors MUST be HSL.
     border: 0;
   }
 
-  /* Focus visible styles */
+  /* Enhanced focus styles for better accessibility */
   *:focus-visible {
-    outline: 2px solid hsl(var(--ring));
+    outline: 3px solid hsl(var(--ring));
     outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* High contrast focus for accessibility */
+  .high-contrast *:focus-visible {
+    outline: 4px solid hsl(60 100% 50%);
+    outline-offset: 3px;
+  }
+
+  /* Focus styles for interactive elements */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  [role="button"]:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 3px solid hsl(var(--ring));
+    outline-offset: 2px;
+    box-shadow: 0 0 0 1px hsl(var(--background)), 0 0 8px hsl(var(--ring) / 0.3);
+  }
+
+  /* Skip link styles */
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    z-index: 9999;
+    transition: top 0.2s ease;
+  }
+
+  .skip-link:focus {
+    top: 6px;
+  }
+
+  /* Ensure sufficient color contrast */
+  .text-muted-foreground {
+    color: hsl(var(--muted-foreground));
+    /* Ensure minimum 4.5:1 contrast ratio */
+  }
+
+  /* High contrast improvements */
+  .high-contrast .text-muted-foreground {
+    color: hsl(0 0% 85%);
+  }
+
+  /* Improved button focus states */
+  .btn-focus-enhanced:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px hsl(var(--primary) / 0.4);
   }
 
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
-    * {
+    *,
+    *::before,
+    *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
+  }
+
+  /* Additional reduced motion class for programmatic control */
+  .reduce-motion,
+  .reduce-motion *,
+  .reduce-motion *::before,
+  .reduce-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Improved text readability */
+  body {
+    text-rendering: optimizeLegibility;
+    -webkit-font-feature-settings: "kern" 1;
+    font-feature-settings: "kern" 1;
+  }
+
+  /* Ensure minimum touch target size */
+  button,
+  input[type="button"],
+  input[type="submit"],
+  input[type="reset"],
+  [role="button"],
+  [tabindex] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Improve focus visibility for keyboard navigation */
+  a:focus-visible,
+  button:focus-visible,
+  [tabindex]:focus-visible {
+    box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
+  }
+
+  /* Video accessibility styles */
+  .video-container {
+    position: relative;
+  }
+
+  .video-captions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 16px;
+    font-size: 16px;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  /* High contrast video controls */
+  .high-contrast video::-webkit-media-controls {
+    filter: contrast(150%) brightness(120%);
   }
 }

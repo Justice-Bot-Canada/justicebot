@@ -2,7 +2,7 @@ import justiceBotLogo from "@/assets/justice-bot-logo.jpeg";
 
 const Footer = () => {
   return (
-    <footer className="bg-foreground text-background py-16">
+    <footer id="footer" className="bg-foreground text-background py-16">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           <div className="space-y-4">
@@ -10,7 +10,7 @@ const Footer = () => {
               <div className="flex items-center justify-center w-8 h-8 bg-background rounded-lg">
                 <img 
                   src={justiceBotLogo} 
-                  alt="Justice-Bot Logo" 
+                  alt="Justice-Bot logo featuring scales of justice symbolizing legal balance and fairness" 
                   className="w-6 h-6 object-contain"
                 />
               </div>

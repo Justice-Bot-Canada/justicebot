@@ -59,7 +59,7 @@ const Header = () => {
             </a>
           </div>
           
-            <nav className="hidden md:flex items-center gap-6" role="navigation" aria-label="Main navigation">
+            <nav id="main-navigation" className="hidden md:flex items-center gap-6" role="navigation" aria-label="Main navigation">
               <a 
                 href="#merit" 
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"

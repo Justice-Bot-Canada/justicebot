@@ -68,11 +68,16 @@ const HeroSection = () => {
               <Button 
                 variant="outline" 
                 size="lg"
+                onClick={() => {
+                  // Demo modal would open here with accessible video player
+                  const demoSection = document.getElementById('merit');
+                  demoSection?.scrollIntoView({ behavior: 'smooth' });
+                }}
                 aria-describedby="demo-description"
               >
                 Watch Demo
                 <span id="demo-description" className="sr-only">
-                  View demonstration of Justice-Bot features
+                  View demonstration of Justice-Bot features and merit scoring system
                 </span>
               </Button>
             </div>
