@@ -3,45 +3,46 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { TrendingUp, AlertTriangle, CheckCircle, Info } from "lucide-react";
 
-const sampleCases = [
+// DEMO DATA ONLY - Never use real user data on homepage
+const DEMO_CASES = [
   {
-    title: "Landlord Won't Fix Heating",
-    score: 85,
+    title: "Sample Tenant Rights Issue",
+    score: 78,
     venue: "LTB",
     status: "Strong Case",
     factors: [
-      { type: "positive", text: "Clear duty to maintain heating" },
-      { type: "positive", text: "Multiple written complaints" },
-      { type: "positive", text: "Temperature logs documented" },
-      { type: "neutral", text: "Recent notice given to landlord" }
+      { type: "positive", text: "Clear legal duty documented" },
+      { type: "positive", text: "Written notices provided" },
+      { type: "positive", text: "Evidence properly collected" },
+      { type: "neutral", text: "Reasonable timeline followed" }
     ],
-    recommendation: "Proceed with LTB application. Strong documentation supports your case."
+    recommendation: "Example recommendation for demonstration purposes only."
   },
   {
-    title: "Workplace Harassment Claim",
-    score: 62,
+    title: "Sample Employment Dispute",
+    score: 55,
     venue: "HRTO",
     status: "Moderate Case",
     factors: [
-      { type: "positive", text: "Pattern of behavior documented" },
-      { type: "negative", text: "Limited witness testimony" },
-      { type: "positive", text: "HR complaint filed timely" },
-      { type: "negative", text: "Some evidence is circumstantial" }
+      { type: "positive", text: "Documentation exists" },
+      { type: "negative", text: "Some gaps in evidence" },
+      { type: "positive", text: "Proper procedures followed" },
+      { type: "negative", text: "Timeline considerations" }
     ],
-    recommendation: "Consider gathering additional evidence before filing. Case has merit but could be strengthened."
+    recommendation: "Example assessment for demonstration purposes only."
   },
   {
-    title: "Unpaid Contractor Invoice",
-    score: 45,
+    title: "Sample Contract Dispute",
+    score: 42,
     venue: "Small Claims",
     status: "Weak Case",
     factors: [
-      { type: "negative", text: "No written contract" },
-      { type: "positive", text: "Email confirmations exist" },
-      { type: "negative", text: "Dispute over work quality" },
-      { type: "negative", text: "Payment terms unclear" }
+      { type: "negative", text: "Limited documentation" },
+      { type: "positive", text: "Some evidence available" },
+      { type: "negative", text: "Disputed terms" },
+      { type: "negative", text: "Unclear agreements" }
     ],
-    recommendation: "Consider negotiation first. Court action carries significant risk without stronger documentation."
+    recommendation: "Example guidance for demonstration purposes only."
   }
 ];
 
@@ -75,7 +76,7 @@ const MeritScoreDemo = () => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {sampleCases.map((caseItem, index) => (
+          {DEMO_CASES.map((caseItem, index) => (
             <Card key={index} className="h-full">
               <CardHeader className="space-y-4">
                 <div className="flex items-center justify-between">
