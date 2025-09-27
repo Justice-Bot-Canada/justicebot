@@ -302,6 +302,51 @@ export type Database = {
           },
         ]
       }
+      low_income_applications: {
+        Row: {
+          annual_income: number
+          created_at: string
+          email: string
+          employment_status: string
+          full_name: string
+          household_size: number
+          id: string
+          phone: string | null
+          proof_of_income_url: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          annual_income: number
+          created_at?: string
+          email: string
+          employment_status: string
+          full_name: string
+          household_size: number
+          id?: string
+          phone?: string | null
+          proof_of_income_url: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          annual_income?: number
+          created_at?: string
+          email?: string
+          employment_status?: string
+          full_name?: string
+          household_size?: number
+          id?: string
+          phone?: string | null
+          proof_of_income_url?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
