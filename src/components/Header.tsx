@@ -2,15 +2,14 @@ import { Menu, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useRole } from "@/hooks/useRole";
 import AuthDialog from "@/components/AuthDialog";
 import justiceBotLogo from "@/assets/justice-bot-logo.jpeg";
 
 const Header = () => {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const { user, signOut } = useAuth();
-  
-  // Simple admin check - in production, you'd want proper role-based auth
-  const isAdmin = user?.email === 'admin@justice-bot.ca' || user?.email?.includes('admin');
+  const { isAdmin } = useRole();
 
   const handleGetStarted = () => {
     if (user) {
@@ -46,15 +45,22 @@ const Header = () => {
             </a>
           </div>
           
-          <nav className="hidden md:flex items-center gap-6">
-            <a href="#triage" className="text-foreground hover:text-primary transition-colors">Smart Triage</a>
-            <a href="#locator" className="text-foreground hover:text-primary transition-colors">Court Locator</a>
-            <a href="#forms" className="text-foreground hover:text-primary transition-colors">Forms</a>
-            <a href="#merit" className="text-foreground hover:text-primary transition-colors">Merit Score</a>
-            <a href="/pricing" className="text-foreground hover:text-primary transition-colors">Pricing</a>
-            <a href="/low-income" className="text-foreground hover:text-primary transition-colors">Low-Income</a>
-            <a href="/liability" className="text-destructive hover:text-destructive/80 transition-colors font-medium">⚠️ Liability</a>
-          </nav>
+            <nav className="hidden md:flex items-center gap-6">
+              <a href="#merit" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Merit Score
+              </a>
+              <a href="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Pricing
+              </a>
+              {isAdmin && (
+                <a href="/admin" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  Admin
+                </a>
+              )}
+              <a href="/liability" className="text-sm text-warning hover:text-warning/80 transition-colors font-medium">
+                ⚠️ Legal Disclaimer
+              </a>
+            </nav>
 
           <div className="flex items-center gap-4">
             {user ? (

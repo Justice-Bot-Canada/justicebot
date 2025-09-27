@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
+import { useRole } from "@/hooks/useRole";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import Header from "@/components/Header";
@@ -58,6 +59,7 @@ interface Case {
 
 const Admin = () => {
   const { user } = useAuth();
+  const { isAdmin, loading: roleLoading } = useRole();
   const [userStats, setUserStats] = useState<UserStats>({
     totalUsers: 0,
     newUsersToday: 0,
@@ -143,9 +145,9 @@ const Admin = () => {
   };
 
   // Simple admin check - in production, you'd want proper role-based auth
-  const isAdmin = user?.email === 'admin@justice-bot.ca' || user?.email?.includes('admin');
+  // const isAdmin = user?.email === 'admin@justice-bot.ca' || user?.email?.includes('admin');
 
-  if (!user) {
+  if (!user || roleLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
