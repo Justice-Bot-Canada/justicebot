@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import CaseAssessment from "./pages/CaseAssessment";
@@ -21,17 +22,24 @@ import FormBuilder from "./pages/FormBuilder";
 import TribunalLocatorPage from "./pages/TribunalLocatorPage";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
+import HRTOHelp from "./pages/HRTOHelp";
+import LTBHelp from "./pages/LTBHelp";
+import SmallClaimsCourt from "./pages/SmallClaimsCourt";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/hrto-help" element={<HRTOHelp />} />
+          <Route path="/ltb-help" element={<LTBHelp />} />
+          <Route path="/small-claims-court" element={<SmallClaimsCourt />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/assessment" element={<ProtectedRoute><CaseAssessment /></ProtectedRoute>} />
           <Route path="/triage" element={<Triage />} />
@@ -50,9 +58,10 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;
