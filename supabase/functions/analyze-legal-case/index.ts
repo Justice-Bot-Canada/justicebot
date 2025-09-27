@@ -22,6 +22,16 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Enhanced document analysis with Hugging Face
+    let extractedData = {};
+    let documentText = '';
+    
+    if (evidenceFiles?.length > 0) {
+      console.log('Processing evidence files for form pre-filling');
+      extractedData = await extractDataFromFiles(evidenceFiles, description);
+      documentText = extractedData.fullText || '';
+    }
+
     // Analyze case context to determine pathway type
     const lowerDesc = description.toLowerCase();
     const isLandlordTenant = lowerDesc.includes('landlord') || lowerDesc.includes('tenant') || lowerDesc.includes('rent') || lowerDesc.includes('eviction') || lowerDesc.includes('lease');
@@ -200,6 +210,23 @@ serve(async (req) => {
     if (pathwayError) {
       console.error('Error inserting pathway:', pathwayError);
       throw pathwayError;
+    }
+
+    // Store extracted form data for pre-filling
+    if (Object.keys(extractedData).length > 0) {
+      const { error: formDataError } = await supabase
+        .from('form_prefill_data')
+        .insert({
+          case_id: caseId,
+          extracted_data: extractedData,
+          pathway_type: analysis.pathwayType,
+          province: province
+        });
+
+      if (formDataError) {
+        console.error('Error storing form prefill data:', formDataError);
+        // Don't throw - this is not critical to case analysis
+      }
     }
 
     console.log('Case analysis completed successfully');
@@ -387,4 +414,175 @@ function getRecommendedForms(pathwayType: string, province: string): string[] {
     'Notice of Civil Claim',
     'Application for Interim Relief'
   ];
+}
+
+// Enhanced document analysis using Hugging Face free models
+async function extractDataFromFiles(evidenceFiles: any[], description: string) {
+  try {
+    console.log('Extracting data from files for form pre-filling');
+    
+    // Combine description with evidence analysis
+    const analysisText = `Case Description: ${description}\n\nEvidence Files: ${evidenceFiles.length} files uploaded`;
+    
+    // Use Hugging Face's free text classification and NER models
+    const extractedData = await analyzeTextWithHuggingFace(analysisText);
+    
+    return extractedData;
+  } catch (error) {
+    console.error('Error extracting data from files:', error);
+    return {};
+  }
+}
+
+async function analyzeTextWithHuggingFace(text: string) {
+  try {
+    // Use free Hugging Face models for information extraction
+    const responses = await Promise.allSettled([
+      // Extract names using NER
+      fetch('https://api-inference.huggingface.co/models/dbmdz/bert-large-cased-finetuned-conll03-english', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${huggingfaceApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ inputs: text }),
+      }),
+      
+      // Extract key information using text classification
+      fetch('https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${huggingfaceApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          inputs: `Extract the following information from this legal case: names, dates, addresses, amounts, incident details:\n\n${text}\n\nExtracted information:`,
+          parameters: { max_length: 200, temperature: 0.3 }
+        }),
+      })
+    ]);
+
+    const extractedData: any = {
+      fullText: text,
+      entities: [],
+      formFields: {}
+    };
+
+    // Process NER results
+    if (responses[0].status === 'fulfilled') {
+      const nerData = await responses[0].value.json();
+      if (Array.isArray(nerData)) {
+        extractedData.entities = nerData.filter(entity => 
+          entity.entity_group === 'PER' || 
+          entity.entity_group === 'LOC' || 
+          entity.entity_group === 'ORG'
+        );
+        
+        // Map entities to common form fields
+        extractedData.formFields = mapEntitiesToFormFields(nerData, text);
+      }
+    }
+
+    // Process text generation results for additional extraction
+    if (responses[1].status === 'fulfilled') {
+      const genData = await responses[1].value.json();
+      if (genData && genData[0]?.generated_text) {
+        const generatedInfo = genData[0].generated_text;
+        extractedData.aiExtraction = generatedInfo;
+        
+        // Parse AI-generated text for additional fields
+        const additionalFields = parseAIExtraction(generatedInfo);
+        extractedData.formFields = { ...extractedData.formFields, ...additionalFields };
+      }
+    }
+
+    console.log('Extracted data:', extractedData);
+    return extractedData;
+    
+  } catch (error) {
+    console.error('Error with Hugging Face analysis:', error);
+    return { fullText: text, error: error.message };
+  }
+}
+
+function mapEntitiesToFormFields(entities: any[], text: string) {
+  const formFields: any = {};
+  
+  entities.forEach(entity => {
+    switch (entity.entity_group) {
+      case 'PER':
+        if (!formFields.applicantName && entity.score > 0.8) {
+          formFields.applicantName = entity.word;
+        } else if (!formFields.respondentName && entity.score > 0.8) {
+          formFields.respondentName = entity.word;
+        }
+        break;
+      case 'LOC':
+        if (!formFields.address && entity.score > 0.7) {
+          formFields.address = entity.word;
+        }
+        break;
+      case 'ORG':
+        if (!formFields.organization && entity.score > 0.7) {
+          formFields.organization = entity.word;
+        }
+        break;
+    }
+  });
+
+  // Extract dates using regex
+  const dateRegex = /(\d{1,2}\/\d{1,2}\/\d{4}|\d{4}-\d{2}-\d{2}|(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4})/gi;
+  const dates = text.match(dateRegex);
+  if (dates && dates.length > 0) {
+    formFields.incidentDate = dates[0];
+  }
+
+  // Extract monetary amounts
+  const moneyRegex = /\$[\d,]+\.?\d*/g;
+  const amounts = text.match(moneyRegex);
+  if (amounts && amounts.length > 0) {
+    formFields.claimAmount = amounts[0];
+  }
+
+  return formFields;
+}
+
+function parseAIExtraction(text: string) {
+  const fields: any = {};
+  const lines = text.split('\n');
+  
+  for (const line of lines) {
+    const lowerLine = line.toLowerCase();
+    
+    // Extract common legal form fields
+    if (lowerLine.includes('name:') || lowerLine.includes('plaintiff:') || lowerLine.includes('applicant:')) {
+      const nameMatch = line.match(/:\s*([A-Za-z\s]+)/);
+      if (nameMatch && !fields.applicantName) {
+        fields.applicantName = nameMatch[1].trim();
+      }
+    }
+    
+    if (lowerLine.includes('defendant:') || lowerLine.includes('respondent:')) {
+      const nameMatch = line.match(/:\s*([A-Za-z\s]+)/);
+      if (nameMatch && !fields.respondentName) {
+        fields.respondentName = nameMatch[1].trim();
+      }
+    }
+    
+    if (lowerLine.includes('address:') || lowerLine.includes('location:')) {
+      const addressMatch = line.match(/:\s*(.+)/);
+      if (addressMatch && !fields.address) {
+        fields.address = addressMatch[1].trim();
+      }
+    }
+    
+    if (lowerLine.includes('phone:') || lowerLine.includes('telephone:')) {
+      const phoneMatch = line.match(/:\s*(.+)/);
+      if (phoneMatch && !fields.phoneNumber) {
+        fields.phoneNumber = phoneMatch[1].trim();
+      }
+    }
+  }
+  
+  return fields;
 }
