@@ -8,6 +8,7 @@ import justiceBotLogo from "@/assets/justice-bot-logo.jpeg";
 
 const Header = () => {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { isAdmin } = useRole();
 
@@ -89,11 +90,98 @@ const Header = () => {
             <Button variant="cta" onClick={handleGetStarted}>
               {user ? "Start Case" : "Get Started"}
             </Button>
-            <Button variant="ghost" size="icon" className="md:hidden">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
               <Menu className="w-5 h-5" />
             </Button>
           </div>
         </div>
+        
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden mt-4 pb-4 border-t border-border">
+            <nav className="flex flex-col gap-4 mt-4">
+              <a 
+                href="#merit" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Merit Score
+              </a>
+              <a 
+                href="/pricing" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Pricing
+              </a>
+              {isAdmin && (
+                <a 
+                  href="/admin" 
+                  className="text-sm text-primary hover:text-primary/80 transition-colors font-medium"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  🔧 Admin Console
+                </a>
+              )}
+              <a 
+                href="/liability" 
+                className="text-sm text-warning hover:text-warning/80 transition-colors font-medium"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                ⚠️ Legal Disclaimer
+              </a>
+              
+              {user ? (
+                <div className="flex flex-col gap-3 pt-4 border-t border-border">
+                  <div className="text-xs text-muted-foreground">
+                    Signed in as: {user.email}
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      window.location.href = "/dashboard";
+                      setMobileMenuOpen(false);
+                    }}
+                    className="justify-start"
+                  >
+                    <User className="w-4 h-4 mr-2" />
+                    Dashboard
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => {
+                      signOut();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="justify-start"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    handleSignIn();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="justify-start mt-4"
+                >
+                  Sign In
+                </Button>
+              )}
+            </nav>
+          </div>
+        )}
       </div>
     </header>
     <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
