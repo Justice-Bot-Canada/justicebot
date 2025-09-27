@@ -4,9 +4,13 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import AuthDialog from "@/components/AuthDialog";
 import justiceBotLogo from "@/assets/justice-bot-logo.jpeg";
+
 const Header = () => {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const { user, signOut } = useAuth();
+  
+  // Simple admin check - in production, you'd want proper role-based auth
+  const isAdmin = user?.email === 'admin@justice-bot.ca' || user?.email?.includes('admin');
 
   const handleGetStarted = () => {
     if (user) {

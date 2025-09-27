@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import CaseAssessment from "./pages/CaseAssessment";
 import Pricing from "./pages/Pricing";
+import Admin from "./pages/Admin";
 import LowIncomeApproval from "./pages/LowIncomeApproval";
 import Privacy from "./pages/Privacy";
 import Liability from "./pages/Liability";
@@ -28,7 +29,8 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/assessment" element={<CaseAssessment />} />
           <Route path="/pricing" element={<Pricing />} />
-          <Route path="/low-income" element={<LowIncomeApproval />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/low-income" element={<LowIncomeApproval />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/liability" element={<Liability />} />
           <Route path="/terms" element={<Terms />} />
