@@ -27,6 +27,7 @@ export type Database = {
           title: string
           updated_at: string
           user_id: string
+          user_number: number | null
         }
         Insert: {
           created_at?: string
@@ -40,6 +41,7 @@ export type Database = {
           title: string
           updated_at?: string
           user_id: string
+          user_number?: number | null
         }
         Update: {
           created_at?: string
@@ -53,6 +55,7 @@ export type Database = {
           title?: string
           updated_at?: string
           user_id?: string
+          user_number?: number | null
         }
         Relationships: []
       }
@@ -94,6 +97,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "cases"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documents_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_free_tier_status"
+            referencedColumns: ["user_id"]
           },
         ]
       }
@@ -463,13 +473,33 @@ export type Database = {
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_free_tier_status"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
     }
     Views: {
-      [_ in never]: never
+      user_free_tier_status: {
+        Row: {
+          email: string | null
+          qualifies_for_free: boolean | null
+          signup_number: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      get_user_signup_number: {
+        Args: { user_email: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
