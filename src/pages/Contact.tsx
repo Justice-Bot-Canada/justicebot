@@ -37,9 +37,15 @@ const Contact = () => {
                 </svg>
               </div>
               <h3 className="font-semibold mb-2">Media Inquiries</h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mb-3">
                 Press releases, interviews, and media coverage opportunities
               </p>
+              <a 
+                href="mailto:media@justice-bot.com" 
+                className="text-primary hover:underline font-medium text-sm"
+              >
+                media@justice-bot.com
+              </a>
             </div>
 
             <div className="text-center p-6 rounded-lg bg-card border">
@@ -49,9 +55,15 @@ const Contact = () => {
                 </svg>
               </div>
               <h3 className="font-semibold mb-2">Partnerships</h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mb-3">
                 Business collaborations, integrations, and strategic alliances
               </p>
+              <a 
+                href="mailto:press@justice-bot.com" 
+                className="text-primary hover:underline font-medium text-sm"
+              >
+                press@justice-bot.com
+              </a>
             </div>
 
             <div className="text-center p-6 rounded-lg bg-card border">
@@ -61,9 +73,29 @@ const Contact = () => {
                 </svg>
               </div>
               <h3 className="font-semibold mb-2">Government Relations</h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mb-3">
                 Public sector initiatives and government collaboration
               </p>
+              <p className="text-sm text-muted-foreground">
+                Contact us through the form above
+              </p>
+            </div>
+          </div>
+
+          {/* Direct Contact Information */}
+          <div className="mt-12 text-center max-w-2xl mx-auto">
+            <h3 className="text-xl font-semibold mb-6">Direct Contact Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-4 rounded-lg bg-muted/30 border">
+                <h4 className="font-medium mb-2">Privacy & Data Requests</h4>
+                <p className="text-sm text-muted-foreground mb-2">PIPEDA compliance and data subject rights</p>
+                <p className="text-sm text-muted-foreground">Contact form above or coming soon: privacy@justice-bot.com</p>
+              </div>
+              <div className="p-4 rounded-lg bg-muted/30 border">
+                <h4 className="font-medium mb-2">General Inquiries</h4>
+                <p className="text-sm text-muted-foreground mb-2">Questions, feedback, and general support</p>
+                <p className="text-sm text-muted-foreground">Use the contact form above</p>
+              </div>
             </div>
           </div>
         </main>

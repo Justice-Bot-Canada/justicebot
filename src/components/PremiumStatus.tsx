@@ -76,27 +76,38 @@ export const PremiumStatus = ({ caseId, formCode, formData }: PremiumStatusProps
         return;
       }
 
-      // Create and download the PDF
-      const pdfContent = data.content;
-      const blob = new Blob([pdfContent], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = data.fileName || 'legal_document.html';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      // Enhanced PDF download with proper file handling
+      if (data?.content) {
+        const pdfContent = data.content;
+        const fileName = data.fileName || `${formCode}_${new Date().toISOString().split('T')[0]}.pdf`;
+        
+        // Create a more robust blob for PDF content
+        const blob = new Blob([pdfContent], { 
+          type: data.mimeType || 'application/pdf' 
+        });
+        
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
 
-      toast({
-        title: "PDF Generated",
-        description: "Your document has been downloaded successfully.",
-      });
+        toast({
+          title: "Professional PDF Generated",
+          description: `Your ${formCode} form has been downloaded as ${fileName}`,
+        });
+      } else {
+        throw new Error('No PDF content received');
+      }
     } catch (error) {
       console.error('PDF generation error:', error);
       toast({
-        title: "PDF Generation Failed",
-        description: "Unable to generate PDF. Please try again.",
+        title: "PDF Generation Failed", 
+        description: error.message || "Unable to generate PDF. Please try again.",
         variant: "destructive",
       });
     } finally {
