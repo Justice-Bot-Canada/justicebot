@@ -3,6 +3,7 @@ import HeroSection from "@/components/HeroSection";
 import TriageSection from "@/components/TriageSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import MeritScoreDemo from "@/components/MeritScoreDemo";
+import FormPrefillDemo from "@/components/FormPrefillDemo";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -26,6 +27,7 @@ const Index = () => {
         <TriageSection />
         <FeaturesSection />
         <MeritScoreDemo />
+        <FormPrefillDemo />
       </main>
       <Footer />
     </div>

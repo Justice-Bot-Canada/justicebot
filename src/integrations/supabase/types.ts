@@ -156,6 +156,44 @@ export type Database = {
           },
         ]
       }
+      form_prefill_data: {
+        Row: {
+          case_id: string
+          created_at: string
+          extracted_data: Json
+          id: string
+          pathway_type: string
+          province: string
+          updated_at: string
+        }
+        Insert: {
+          case_id: string
+          created_at?: string
+          extracted_data?: Json
+          id?: string
+          pathway_type: string
+          province: string
+          updated_at?: string
+        }
+        Update: {
+          case_id?: string
+          created_at?: string
+          extracted_data?: Json
+          id?: string
+          pathway_type?: string
+          province?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_prefill_data_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       form_usage: {
         Row: {
           case_id: string | null

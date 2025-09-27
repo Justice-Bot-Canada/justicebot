@@ -23,7 +23,7 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Enhanced document analysis with Hugging Face
-    let extractedData = {};
+    let extractedData: any = {};
     let documentText = '';
     
     if (evidenceFiles?.length > 0) {
@@ -501,7 +501,7 @@ async function analyzeTextWithHuggingFace(text: string) {
     
   } catch (error) {
     console.error('Error with Hugging Face analysis:', error);
-    return { fullText: text, error: error.message };
+    return { fullText: text, error: (error as Error).message };
   }
 }
 
