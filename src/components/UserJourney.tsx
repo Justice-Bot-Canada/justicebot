@@ -280,45 +280,71 @@ const getJourneyData = (venue: string) => {
         helpfulLinks: [
           { title: "Family Court Ontario", url: "https://www.ontariocourts.ca/scj/family/" },
           { title: "Ontario Family Law Forms", url: "https://www.ontariocourts.ca/scj/family/forms/" },
-          { title: "CanLII Family Law", url: "https://www.canlii.org/en/on/onsc/" }
+          { title: "CanLII Family Law", url: "https://www.canlii.org/en/on/onsc/" },
+          { title: "Divorce Forms Package", url: "https://www.ontario.ca/page/how-file-divorce-ontario" },
+          { title: "Custody & Access Guide", url: "https://www.attorneygeneral.jus.gov.on.ca/english/family/guides/" }
         ],
         steps: [
           {
             id: 'determine-issue-type',
             title: 'Identify Your Family Law Issue',
-            description: 'Determine if you need divorce, custody, support, or child protection assistance',
+            description: 'Choose: Divorce, Custody/Access, Child Support, Spousal Support, or Child Protection',
             timeEstimate: '30 minutes',
-            priority: 'high' as const,
+            priority: 'critical' as const,
             actionText: 'Issue Assessment'
           },
           {
-            id: 'gather-documents',
-            title: 'Collect Required Documents',
-            description: 'Gather marriage certificate, financial records, and child-related documents',
+            id: 'divorce-specific',
+            title: 'Divorce-Specific Steps',
+            description: 'For divorce: Gather marriage certificate, separation agreement, financial disclosure. File Form 8A (Application) for uncontested or Form 8 for contested divorce.',
+            timeEstimate: '2-4 weeks',
+            priority: 'high' as const,
+            actionText: 'Divorce Checklist'
+          },
+          {
+            id: 'custody-specific',
+            title: 'Custody & Access Steps',
+            description: 'For custody: Complete parenting plan, gather evidence of child\'s best interests, file Form 8 (Application). Consider mediation before court.',
+            timeEstimate: '1-3 weeks',
+            priority: 'high' as const,
+            actionText: 'Custody Guide'
+          },
+          {
+            id: 'financial-disclosure',
+            title: 'Complete Financial Disclosure',
+            description: 'Fill out Form 13 (Financial Statement) with income, expenses, assets, and debts. Required for support matters.',
             timeEstimate: '1-2 weeks',
             priority: 'high' as const,
-            actionText: 'Document Checklist'
+            actionText: 'Financial Forms'
+          },
+          {
+            id: 'gather-evidence',
+            title: 'Collect Supporting Evidence',
+            description: 'Gather documents: marriage/birth certificates, financial records, communication records, medical records if relevant',
+            timeEstimate: '1-2 weeks',
+            priority: 'high' as const,
+            actionText: 'Evidence Checklist'
           },
           {
             id: 'complete-forms',
             title: 'Complete Court Forms',
-            description: 'Fill out appropriate family law forms for your specific situation',
-            timeEstimate: '2-4 hours',
+            description: 'Fill out Form 8/8A (Application), Form 13 (Financial), Form 35.1 (Affidavit), and any specialized forms for your case',
+            timeEstimate: '3-6 hours',
             priority: 'high' as const,
             actionText: 'Start Forms'
           },
           {
             id: 'file-documents',
             title: 'File with Family Court',
-            description: 'Submit completed forms and pay required court fees',
+            description: 'Submit completed forms to Superior Court of Justice and pay $447 filing fee ($157 for custody-only matters)',
             timeEstimate: '1 hour',
             priority: 'medium' as const,
             actionText: 'File Forms'
           },
           {
             id: 'serve-other-party',
-            title: 'Serve the Other Party',
-            description: 'Properly serve court documents to spouse or other involved parties',
+            title: 'Serve the Respondent',
+            description: 'Personally serve court documents to spouse/other party within 6 months of filing',
             timeEstimate: '1-2 weeks',
             priority: 'medium' as const,
             actionText: 'Service Guide'
