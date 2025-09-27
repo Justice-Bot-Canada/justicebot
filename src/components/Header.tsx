@@ -25,6 +25,14 @@ const Header = () => {
     setAuthDialogOpen(true);
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    setMobileMenuOpen(false);
+  };
+
+  // Debug logging
+  console.log('Header - User:', user?.email, 'IsAdmin:', isAdmin);
+
   return (
     <>
       <header className="bg-background border-b border-border sticky top-0 z-50">
@@ -77,7 +85,7 @@ const Header = () => {
                 <span className="text-sm text-muted-foreground hidden md:inline">
                   {user.email}
                 </span>
-                <Button variant="ghost" onClick={signOut} className="hidden md:inline-flex">
+                <Button variant="ghost" onClick={handleSignOut} className="hidden md:inline-flex">
                   <LogOut className="w-4 h-4 mr-2" />
                   Sign Out
                 </Button>
@@ -85,6 +93,13 @@ const Header = () => {
             ) : (
               <Button variant="ghost" className="hidden md:inline-flex" onClick={handleSignIn}>
                 Sign In
+              </Button>
+            )}
+            
+            {/* Always show sign out on mobile if user exists */}
+            {user && (
+              <Button variant="ghost" size="sm" onClick={handleSignOut} className="md:hidden">
+                <LogOut className="w-4 h-4" />
               </Button>
             )}
             <Button variant="cta" onClick={handleGetStarted}>
@@ -156,10 +171,7 @@ const Header = () => {
                   <Button 
                     variant="ghost" 
                     size="sm"
-                    onClick={() => {
-                      signOut();
-                      setMobileMenuOpen(false);
-                    }}
+                    onClick={handleSignOut}
                     className="justify-start"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
