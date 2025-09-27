@@ -240,31 +240,71 @@ const getJourneyData = (venue: string) => {
           {
             id: 'understand-charges',
             title: 'Understand Your Charges',
-            description: 'Review the charges against you and understand potential penalties',
-            timeEstimate: '1 hour',
+            description: 'Review the charges against you and understand potential penalties. Get copy of Information or Indictment.',
+            timeEstimate: '1-2 hours',
             priority: 'critical' as const,
             actionText: 'Review Charges'
           },
           {
             id: 'legal-representation',
             title: 'Secure Legal Representation',
-            description: 'Contact a criminal lawyer or apply for legal aid immediately',
+            description: 'Contact a criminal lawyer or apply for legal aid immediately. Duty counsel available at courthouse.',
             timeEstimate: '1-2 days',
             priority: 'critical' as const,
             actionText: 'Find Lawyer'
           },
           {
-            id: 'gather-evidence',
-            title: 'Collect Supporting Evidence',
-            description: 'Gather documents, witness information, and any evidence supporting your case',
-            timeEstimate: '1-2 weeks',
+            id: 'request-disclosure',
+            title: 'Request Full Disclosure',
+            description: 'Crown must provide all evidence: police reports, witness statements, video/audio, expert reports. Essential for defense.',
+            timeEstimate: '2-6 weeks',
+            priority: 'critical' as const,
+            actionText: 'Disclosure Request'
+          },
+          {
+            id: 'bail-hearing',
+            title: 'Bail/Judicial Interim Release',
+            description: 'If in custody or conditions imposed, may need bail hearing. Form 32 (Application) may be required.',
+            timeEstimate: '1-3 days',
             priority: 'high' as const,
-            actionText: 'Evidence Checklist'
+            actionText: 'Bail Application'
+          },
+          {
+            id: 'election-mode',
+            title: 'Election of Mode of Trial',
+            description: 'For hybrid/indictable offences: choose Provincial Court Judge, Superior Court Judge, or Judge and Jury trial.',
+            timeEstimate: '30 minutes',
+            priority: 'high' as const,
+            actionText: 'Trial Election'
+          },
+          {
+            id: 'pretrial-conference',
+            title: 'Pre-trial Conference',
+            description: 'Discuss case management, plea negotiations, trial length, and witness requirements with Crown.',
+            timeEstimate: '1-2 hours',
+            priority: 'medium' as const,
+            actionText: 'Pretrial Prep'
+          },
+          {
+            id: 'charter-applications',
+            title: 'Charter Applications (if applicable)',
+            description: 'File Charter s.8 (unreasonable search), s.10(b) (right to counsel), or s.11(b) (delay) applications if violations occurred.',
+            timeEstimate: '1-2 weeks',
+            priority: 'medium' as const,
+            actionText: 'Charter Motion'
+          },
+          {
+            id: 'gather-defense-evidence',
+            title: 'Collect Defense Evidence',
+            description: 'Gather alibi evidence, character references, expert reports, surveillance footage, phone records as needed.',
+            timeEstimate: '2-4 weeks',
+            priority: 'high' as const,
+            actionText: 'Defense Evidence'
           },
           {
             id: 'court-appearance',
             title: 'Prepare for Court Appearances',
-            description: 'Understand court procedures and prepare for your first appearance',
+            description: 'Understand court procedures, dress code, and prepare for first appearance and subsequent proceedings.',
             timeEstimate: '1 week',
             priority: 'high' as const,
             actionText: 'Court Prep Guide'
