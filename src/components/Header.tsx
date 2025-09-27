@@ -76,10 +76,17 @@ const Header = () => {
               <div className="flex items-center gap-4">
                 <Button 
                   variant="ghost" 
-                  onClick={() => window.location.href = "/dashboard"}
+                  onClick={() => window.location.href = "/profile"}
                   className="hidden md:inline-flex"
                 >
                   <User className="w-4 h-4 mr-2" />
+                  Profile
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => window.location.href = "/dashboard"}
+                  className="hidden md:inline-flex"
+                >
                   Dashboard
                 </Button>
                 <span className="text-sm text-muted-foreground hidden md:inline">
@@ -160,12 +167,23 @@ const Header = () => {
                     variant="outline" 
                     size="sm"
                     onClick={() => {
-                      window.location.href = "/dashboard";
+                      window.location.href = "/profile";
                       setMobileMenuOpen(false);
                     }}
                     className="justify-start"
                   >
                     <User className="w-4 h-4 mr-2" />
+                    Profile
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      window.location.href = "/dashboard";
+                      setMobileMenuOpen(false);
+                    }}
+                    className="justify-start"
+                  >
                     Dashboard
                   </Button>
                   <Button 

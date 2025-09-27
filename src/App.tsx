@@ -19,6 +19,7 @@ import Triage from "./pages/Triage";
 import FormSelector from "./pages/FormSelector";
 import FormBuilder from "./pages/FormBuilder";
 import TribunalLocatorPage from "./pages/TribunalLocatorPage";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/liability" element={<Liability />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-cancel" element={<PaymentCancel />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
