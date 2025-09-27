@@ -1,93 +1,104 @@
 import { useState } from "react";
-import { Check, Mail, DollarSign } from "lucide-react";
+import { Check, CreditCard, FileText, Zap } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
 
-  const handlePayPalPayment = (plan: string, amount: string) => {
+  const handlePayPalPayment = async (plan: string, amount: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to purchase a premium plan.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(plan);
-    // For demo purposes - in production, integrate with PayPal SDK
-    toast({
-      title: "PayPal Payment",
-      description: `Redirecting to PayPal for ${plan} payment of ${amount}...`,
-    });
-    // Simulate PayPal redirect
-    setTimeout(() => {
-      window.location.href = "/payment-success";
-    }, 2000);
-  };
+    try {
+      const { data, error } = await supabase.functions.invoke('create-paypal-payment', {
+        body: {
+          planType: plan,
+          amount: amount.replace('$', ''),
+          caseId: null // For general premium access
+        }
+      });
 
-  const handleETransferPayment = (plan: string, amount: string) => {
-    const email = "payments@justice-bot.com";
-    const subject = `Justice-Bot ${plan} Payment`;
-    const body = `Hello,
+      if (error) throw error;
 
-I would like to purchase the ${plan} plan for ${amount}.
-
-Please confirm receipt of this email and provide payment instructions.
-
-Thank you!`;
-
-    const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoLink;
-    
-    toast({
-      title: "E-Transfer Instructions",
-      description: "Check your email client for payment instructions. We'll contact you within 24 hours.",
-    });
+      if (data?.approvalUrl) {
+        // Open PayPal in new tab
+        window.open(data.approvalUrl, '_blank');
+        toast({
+          title: "Redirecting to PayPal",
+          description: "Complete your payment in the new tab.",
+        });
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast({
+        title: "Payment Error",
+        description: "Failed to create payment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(null);
+    }
   };
 
   const plans = [
     {
-      name: "Per-Form",
-      description: "Pay as you go for individual forms",
-      price: "$5.99",
-      lowIncomePrice: "$0.99",
-      period: "per form",
+      name: "Basic",
+      description: "Essential legal document services",
+      price: "$29.99",
+      period: "per month",
       features: [
-        "Individual form access",
-        "Basic guidance",
-        "Document generation",
-        "Email support"
-      ]
+        "Legal case analysis",
+        "Merit score assessment",
+        "Basic form templates",
+        "Standard recommendations",
+        "Community support"
+      ],
     },
     {
-      name: "Regular",
-      description: "Full access to all features",
+      name: "Premium", 
+      description: "Professional legal document suite",
       price: "$59.99",
-      yearlyPrice: "$150",
       period: "per month",
-      yearlyPeriod: "per year",
       popular: true,
       features: [
-        "Unlimited form access",
-        "Smart case triage",
-        "Advanced document prep",
-        "Merit score analysis",
+        "Everything in Basic",
+        "Professional PDF generation",
+        "Smart form pre-filling",
         "Priority support",
-        "Legal pathway guidance"
-      ]
+        "Advanced case tracking",
+        "Document templates library"
+      ],
     },
     {
-      name: "Low-Income",
-      description: "Affordable access for approved applicants",
-      price: "$25",
-      period: "per year",
-      badge: "Approval Required",
+      name: "Enterprise",
+      description: "Complete legal practice solution",
+      price: "$149.99", 
+      period: "per month",
       features: [
-        "All Regular features",
-        "Significant discount",
-        "Annual billing only",
-        "Income verification required"
+        "Everything in Premium",
+        "Automated form filing",
+        "Real-time case tracking",
+        "Dedicated legal consultant",
+        "Custom document generation",
+        "API access",
+        "White-label options"
       ],
-      requiresApproval: true
     }
   ];
 
@@ -96,120 +107,86 @@ Thank you!`;
       <Header />
       <main className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h1>
-          <p className="text-xl text-muted-foreground mb-8">
-            Choose the plan that works best for your legal needs
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Choose Your Plan
+          </h1>
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
+            Professional legal document services powered by AI
           </p>
-          <div className="flex justify-center gap-4 mb-8">
-            <Badge variant="outline" className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4" />
-              PayPal Accepted
-            </Badge>
-            <Badge variant="outline" className="flex items-center gap-2">
-              <Mail className="w-4 h-4" />
-              E-Transfer Available
-            </Badge>
+          <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+            <div className="flex items-center gap-2">
+              <CreditCard className="w-4 h-4" />
+              <span>Secure PayPal payments</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              <span>Professional PDF generation</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4" />
+              <span>Instant access</span>
+            </div>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {plans.map((plan) => (
-            <Card key={plan.name} className={`relative ${plan.popular ? 'border-primary ring-2 ring-primary' : ''}`}>
+            <Card 
+              key={plan.name} 
+              className={`relative ${
+                plan.popular ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800' : ''
+              }`}
+            >
               {plan.popular && (
-                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600">
                   Most Popular
-                </Badge>
-              )}
-              {plan.badge && (
-                <Badge variant="secondary" className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  {plan.badge}
                 </Badge>
               )}
               
               <CardHeader className="text-center">
-                <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                <CardDescription className="text-base">{plan.description}</CardDescription>
+                <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+                  {plan.name}
+                </CardTitle>
+                <CardDescription className="text-gray-600 dark:text-gray-300">
+                  {plan.description}
+                </CardDescription>
                 <div className="mt-4">
-                  <div className="text-3xl font-bold">
+                  <div className="text-4xl font-bold text-gray-900 dark:text-white">
                     {plan.price}
-                    {plan.lowIncomePrice && (
-                      <span className="text-lg text-muted-foreground ml-2">
-                        (${plan.lowIncomePrice} low-income)
-                      </span>
-                    )}
                   </div>
-                  <div className="text-muted-foreground">
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
                     {plan.period}
-                    {plan.yearlyPrice && (
-                      <div className="text-sm mt-1">
-                        or {plan.yearlyPrice} {plan.yearlyPeriod}
-                      </div>
-                    )}
                   </div>
                 </div>
               </CardHeader>
 
               <CardContent>
-                <ul className="space-y-3 mb-6">
+                <ul className="space-y-3 mb-8">
                   {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-center">
-                      <Check className="h-4 w-4 text-primary mr-3 flex-shrink-0" />
-                      <span className="text-sm">{feature}</span>
+                    <li key={feature} className="flex items-start">
+                      <Check className="h-5 w-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-700 dark:text-gray-300">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
-                <div className="space-y-2">
-                  {plan.requiresApproval ? (
+                <div className="space-y-3">
+                  <Button
+                    onClick={() => handlePayPalPayment(plan.name, plan.price)}
+                    disabled={loading === plan.name}
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                  >
+                    {loading === plan.name ? "Processing..." : `Pay with PayPal - ${plan.price} CAD`}
+                  </Button>
+                  
+                  {plan.name === "Basic" && (
                     <Button 
-                      className="w-full" 
-                      onClick={() => window.location.href = '/low-income'}
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => window.location.href = "/low-income-approval"}
                     >
-                      Apply for Low-Income
+                      Apply for Low-Income Discount
                     </Button>
-                  ) : (
-                    <>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Button 
-                          variant="default"
-                          onClick={() => handlePayPalPayment(plan.name, plan.price)}
-                          disabled={loading === plan.name}
-                          className="flex items-center gap-2"
-                        >
-                          <DollarSign className="w-4 h-4" />
-                          PayPal
-                        </Button>
-                        <Button 
-                          variant="outline"
-                          onClick={() => handleETransferPayment(plan.name, plan.price)}
-                          className="flex items-center gap-2"
-                        >
-                          <Mail className="w-4 h-4" />
-                          E-Transfer
-                        </Button>
-                      </div>
-                      {plan.yearlyPrice && (
-                        <div className="grid grid-cols-2 gap-2 mt-2">
-                          <Button 
-                            variant="secondary"
-                            onClick={() => handlePayPalPayment(plan.name + " Yearly", plan.yearlyPrice)}
-                            disabled={loading === plan.name + " Yearly"}
-                            className="flex items-center gap-2 text-xs"
-                          >
-                            <DollarSign className="w-3 h-3" />
-                            PayPal Yearly
-                          </Button>
-                          <Button 
-                            variant="outline"
-                            onClick={() => handleETransferPayment(plan.name + " Yearly", plan.yearlyPrice)}
-                            className="flex items-center gap-2 text-xs"
-                          >
-                            <Mail className="w-3 h-3" />
-                            E-Transfer Yearly
-                          </Button>
-                        </div>
-                      )}
-                    </>
                   )}
                 </div>
               </CardContent>
@@ -217,18 +194,15 @@ Thank you!`;
           ))}
         </div>
 
-        <div className="text-center mt-12">
-          <p className="text-muted-foreground mb-4">
-            All plans include access to Ontario legal forms and guidance
+        <div className="text-center mt-12 text-gray-600 dark:text-gray-300 space-y-2">
+          <p>
+            <strong>PayPal payments:</strong> Instant access after successful payment
           </p>
-          <p className="text-sm text-muted-foreground mb-2">
-            <strong>PayPal:</strong> Instant access after payment confirmation
+          <p>
+            <strong>Need help?</strong> Contact us at admin@justice-bot.com
           </p>
-          <p className="text-sm text-muted-foreground mb-4">
-            <strong>E-Transfer:</strong> Manual processing within 24 hours
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Questions? Contact us at support@justice-bot.com
+          <p className="text-sm">
+            All plans include Canadian legal compliance and professional document generation
           </p>
         </div>
       </main>

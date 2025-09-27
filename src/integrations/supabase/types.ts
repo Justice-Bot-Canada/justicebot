@@ -385,6 +385,65 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          amount: number
+          captured_at: string | null
+          case_id: string | null
+          created_at: string
+          currency: string
+          id: string
+          payer_id: string | null
+          payment_id: string
+          payment_provider: string
+          paypal_response: Json | null
+          plan_type: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          captured_at?: string | null
+          case_id?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          payer_id?: string | null
+          payment_id: string
+          payment_provider?: string
+          paypal_response?: Json | null
+          plan_type: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          captured_at?: string | null
+          case_id?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          payer_id?: string | null
+          payment_id?: string
+          payment_provider?: string
+          paypal_response?: Json | null
+          plan_type?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
