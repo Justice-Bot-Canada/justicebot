@@ -91,22 +91,27 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent 
+        className="sm:max-w-[425px]" 
+        role="dialog" 
+        aria-labelledby="auth-dialog-title"
+        aria-describedby="auth-dialog-description"
+      >
         <DialogHeader>
-          <DialogTitle>Welcome to Justice-Bot</DialogTitle>
-          <DialogDescription>
-            Sign in to your account or create a new one to get started.
+          <DialogTitle id="auth-dialog-title">Welcome to Justice-Bot</DialogTitle>
+          <DialogDescription id="auth-dialog-description">
+            Sign in to your account or create a new one to get started with your legal case assessment.
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs defaultValue="signin" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signin">Sign In</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
+        <Tabs defaultValue="signin" className="w-full" aria-label="Authentication options">
+          <TabsList className="grid w-full grid-cols-2" role="tablist">
+            <TabsTrigger value="signin" role="tab" aria-controls="signin-panel">Sign In</TabsTrigger>
+            <TabsTrigger value="signup" role="tab" aria-controls="signup-panel">Sign Up</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="signin">
-            <form onSubmit={handleSignIn} className="space-y-4">
+          <TabsContent value="signin" id="signin-panel" role="tabpanel" aria-labelledby="signin-tab">
+            <form onSubmit={handleSignIn} className="space-y-4" aria-label="Sign in form">
               <div className="space-y-2">
                 <Label htmlFor="signin-email">Email</Label>
                 <Input
@@ -135,8 +140,8 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
             </form>
           </TabsContent>
           
-          <TabsContent value="signup">
-            <form onSubmit={handleSignUp} className="space-y-4">
+          <TabsContent value="signup" id="signup-panel" role="tabpanel" aria-labelledby="signup-tab">
+            <form onSubmit={handleSignUp} className="space-y-4" aria-label="Sign up form">
               <div className="space-y-2">
                 <Label htmlFor="signup-email">Email</Label>
                 <Input

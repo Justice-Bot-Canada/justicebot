@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+import { SkipToContent, useFocusManagement, useKeyboardNavigation } from "@/components/AccessibilityFeatures";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import CaseAssessment from "./pages/CaseAssessment";
@@ -29,14 +30,14 @@ import Contact from "./pages/Contact";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <HelmetProvider>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-        <Routes>
+const AppContent = () => {
+  useFocusManagement();
+  useKeyboardNavigation();
+  
+  return (
+    <div className="min-h-screen">
+      <SkipToContent />
+      <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/hrto-help" element={<HRTOHelp />} />
           <Route path="/ltb-help" element={<LTBHelp />} />
@@ -60,6 +61,18 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+    </div>
+  );
+};
+
+const App = () => (
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppContent />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

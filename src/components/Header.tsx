@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useRole } from "@/hooks/useRole";
 import AuthDialog from "@/components/AuthDialog";
+import { HighContrastToggle, ScreenReaderOnly } from "@/components/AccessibilityFeatures";
 import justiceBotLogo from "@/assets/justice-bot-logo.jpeg";
 
 const Header = () => {
@@ -35,15 +36,19 @@ const Header = () => {
 
   return (
     <>
-      <header className="bg-background border-b border-border sticky top-0 z-50">
+      <header className="bg-background border-b border-border sticky top-0 z-50" role="banner">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <a href="/" className="flex items-center gap-3">
+            <a 
+              href="/" 
+              className="flex items-center gap-3" 
+              aria-label="Justice-Bot - Legal clarity, simplified - Go to homepage"
+            >
               <div className="flex items-center justify-center w-10 h-10 bg-white rounded-lg shadow-sm">
                 <img 
                   src={justiceBotLogo} 
-                  alt="Justice-Bot Logo" 
+                  alt="Justice-Bot logo - Scale of justice symbol" 
                   className="w-8 h-8 object-contain"
                 />
               </div>
@@ -54,24 +59,43 @@ const Header = () => {
             </a>
           </div>
           
-            <nav className="hidden md:flex items-center gap-6">
-              <a href="#merit" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <nav className="hidden md:flex items-center gap-6" role="navigation" aria-label="Main navigation">
+              <a 
+                href="#merit" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
+              >
                 Merit Score
+                <ScreenReaderOnly>Assess the strength of your legal case</ScreenReaderOnly>
               </a>
-              <a href="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <a 
+                href="/pricing" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
+              >
                 Pricing
               </a>
-              <a href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <a 
+                href="/contact" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
+              >
                 Contact
               </a>
               {isAdmin && (
-                <a href="/admin" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <a 
+                  href="/admin" 
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
+                  aria-label="Admin console - Administrative functions"
+                >
                   Admin
                 </a>
               )}
-              <a href="/liability" className="text-sm text-warning hover:text-warning/80 transition-colors font-medium">
+              <a 
+                href="/liability" 
+                className="text-sm text-warning hover:text-warning/80 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
+                aria-label="Legal disclaimer - Important legal information"
+              >
                 ⚠️ Legal Disclaimer
               </a>
+              <HighContrastToggle />
             </nav>
 
           <div className="flex items-center gap-4">
@@ -120,16 +144,25 @@ const Header = () => {
               size="icon" 
               className="md:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu"
             >
               <Menu className="w-5 h-5" />
+              <ScreenReaderOnly>{mobileMenuOpen ? "Close menu" : "Open menu"}</ScreenReaderOnly>
             </Button>
           </div>
         </div>
         
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t border-border">
-            <nav className="flex flex-col gap-4 mt-4">
+          <div 
+            id="mobile-menu" 
+            className="md:hidden mt-4 pb-4 border-t border-border"
+            role="region"
+            aria-label="Mobile navigation menu"
+          >
+            <nav className="flex flex-col gap-4 mt-4" role="navigation">
               <a 
                 href="#merit" 
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
