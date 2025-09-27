@@ -1,4 +1,4 @@
-import { Scale, Menu, LogOut } from "lucide-react";
+import { Scale, Menu, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,13 +26,15 @@ const Header = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-primary rounded-lg">
-              <Scale className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-foreground">Justice-Bot</h1>
-              <p className="text-xs text-muted-foreground">Legal clarity, simplified</p>
-            </div>
+            <a href="/" className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-10 h-10 bg-primary rounded-lg">
+                <Scale className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-foreground">Justice-Bot</h1>
+                <p className="text-xs text-muted-foreground">Legal clarity, simplified</p>
+              </div>
+            </a>
           </div>
           
           <nav className="hidden md:flex items-center gap-6">
@@ -45,6 +47,14 @@ const Header = () => {
           <div className="flex items-center gap-4">
             {user ? (
               <div className="flex items-center gap-4">
+                <Button 
+                  variant="ghost" 
+                  onClick={() => window.location.href = "/dashboard"}
+                  className="hidden md:inline-flex"
+                >
+                  <User className="w-4 h-4 mr-2" />
+                  Dashboard
+                </Button>
                 <span className="text-sm text-muted-foreground hidden md:inline">
                   {user.email}
                 </span>

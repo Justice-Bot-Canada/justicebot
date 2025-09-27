@@ -102,7 +102,12 @@ const TriageSection = () => {
               Describe your legal situation in your own words. Our smart triage will determine 
               the best venue and next steps for your case.
             </p>
-            <Button variant="cta" size="lg" className="group">
+            <Button 
+              variant="cta" 
+              size="lg" 
+              className="group"
+              onClick={() => window.location.href = "/assessment"}
+            >
               Begin Case Assessment
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
