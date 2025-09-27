@@ -15,6 +15,9 @@ import Terms from "./pages/Terms";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
 import NotFound from "./pages/NotFound";
+import Triage from "./pages/Triage";
+import FormSelector from "./pages/FormSelector";
+import FormBuilder from "./pages/FormBuilder";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +31,9 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/assessment" element={<CaseAssessment />} />
+          <Route path="/triage" element={<Triage />} />
+          <Route path="/forms/:venue" element={<FormSelector />} />
+          <Route path="/form/:formId" element={<FormBuilder />} />
           <Route path="/pricing" element={<Pricing />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/low-income" element={<LowIncomeApproval />} />

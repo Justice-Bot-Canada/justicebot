@@ -106,9 +106,9 @@ const TriageSection = () => {
               variant="cta" 
               size="lg" 
               className="group"
-              onClick={() => window.location.href = "/assessment"}
+              onClick={() => window.location.href = "/triage"}
             >
-              Begin Case Assessment
+              Start Smart Triage
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
