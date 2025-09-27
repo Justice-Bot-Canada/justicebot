@@ -11,16 +11,28 @@ const Terms = () => {
           <p className="text-muted-foreground mb-8">Last updated: {new Date().toLocaleDateString()}</p>
           
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">Important Legal Disclaimer</h2>
-            <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-              <p className="font-semibold text-yellow-800">WARNING: This is Information, Not Legal Advice</p>
-              <ul className="text-yellow-700 mt-2">
-                <li>Justice-Bot is NOT a law firm and does NOT provide legal advice</li>
-                <li>No lawyer-client relationship is created by using this service</li>
-                <li>The information provided is for educational purposes only</li>
-                <li>Legal deadlines are strict - consult a lawyer for time-sensitive matters</li>
-                <li>For emergencies or urgent legal matters, contact a lawyer immediately</li>
+            <h2 className="text-2xl font-semibold mb-4">Critical Legal Disclaimers & User Acknowledgment</h2>
+            <div className="bg-red-50 border-2 border-red-300 p-6 rounded-lg mb-4">
+              <p className="font-bold text-red-800 text-lg mb-3">⚠️ MANDATORY USER ACKNOWLEDGMENT ⚠️</p>
+              <p className="font-semibold text-red-700 mb-3">
+                BY USING JUSTICE-BOT, YOU EXPLICITLY ACKNOWLEDGE AND AGREE TO THE FOLLOWING:
+              </p>
+              <ul className="text-red-700 space-y-2 font-medium">
+                <li>✓ Justice-Bot is NOT a law firm and provides NO legal advice</li>
+                <li>✓ No attorney-client relationship exists or will be created</li>
+                <li>✓ Information is educational only and may be inaccurate or outdated</li>
+                <li>✓ You assume ALL legal and financial risks of using this service</li>
+                <li>✓ You will consult qualified legal counsel for all legal matters</li>
+                <li>✓ You understand legal deadlines are strict and missing them can be catastrophic</li>
+                <li>✓ You indemnify Justice-Bot against all claims arising from your use</li>
               </ul>
+            </div>
+            <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+              <p className="font-semibold text-yellow-800">🚨 EMERGENCY LEGAL SITUATIONS</p>
+              <p className="text-yellow-700 mt-2">
+                For urgent legal matters, immediately contact: Legal Aid Ontario (1-800-668-8258) or 
+                Law Society Lawyer Referral Service (1-855-947-5255). Do not rely on Justice-Bot for time-critical legal issues.
+              </p>
             </div>
           </section>
 
@@ -85,20 +97,29 @@ const Terms = () => {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibold mb-4">Limitation of Liability</h2>
-            <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
-              <p className="font-semibold text-red-800">IMPORTANT LIABILITY LIMITATIONS</p>
-              <ul className="text-red-700 mt-2">
-                <li>Justice-Bot is not liable for legal outcomes or missed deadlines</li>
-                <li>You use this service at your own risk</li>
-                <li>Maximum liability limited to amounts paid to us in the past 12 months</li>
-                <li>No warranty that information is complete or current</li>
-                <li>Laws change frequently - verify current requirements</li>
-                <li>No liability for consequential, indirect, or punitive damages</li>
-                <li>User must indemnify Justice-Bot against any claims</li>
-              </ul>
-              <p className="font-bold text-red-800 mt-2">
-                See our <a href="/liability" className="underline">Legal Liability page</a> for complete disclaimers.
+            <h2 className="text-2xl font-semibold mb-4">Comprehensive Limitation of Liability & Indemnification</h2>
+            <div className="bg-red-50 border-2 border-red-300 p-6 rounded-lg">
+              <p className="font-bold text-red-800 text-lg mb-3">🛡️ MAXIMUM LEGAL PROTECTION CLAUSE</p>
+              <div className="text-red-700 space-y-2">
+                <p className="font-semibold">JUSTICE-BOT AND ITS OFFICERS, DIRECTORS, EMPLOYEES, AGENTS, AND AFFILIATES SHALL NOT BE LIABLE FOR:</p>
+                <ul className="ml-4 space-y-1">
+                  <li>• Any legal outcomes, case results, settlements, or judgments</li>
+                  <li>• Missed deadlines, statute of limitations, or procedural failures</li>
+                  <li>• Errors, omissions, or inaccuracies in any content or forms</li>
+                  <li>• Direct, indirect, incidental, consequential, or punitive damages</li>
+                  <li>• Lost profits, business interruption, or opportunity costs</li>
+                  <li>• Legal fees, court costs, or professional service expenses</li>
+                  <li>• Data loss, security breaches, or system failures</li>
+                  <li>• Third-party actions or government decisions</li>
+                  <li>• Any damages exceeding amounts paid in the prior 12 months</li>
+                </ul>
+                <div className="mt-4 p-3 bg-red-100 rounded border">
+                  <p className="font-bold text-red-800">MANDATORY INDEMNIFICATION:</p>
+                  <p className="text-red-700">You agree to defend, indemnify, and hold harmless Justice-Bot from any claims, lawsuits, damages, losses, costs, or expenses (including attorney fees) arising from your use of this service or violation of these terms.</p>
+                </div>
+              </div>
+              <p className="font-bold text-red-800 mt-4 text-center">
+                📋 <a href="/liability" className="underline">READ COMPLETE LIABILITY DISCLAIMERS</a> 📋
               </p>
             </div>
           </section>

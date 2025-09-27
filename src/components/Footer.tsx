@@ -54,22 +54,65 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-background/20 pt-8">
+          {/* Critical Legal Warnings Section */}
+          <div className="mb-6 p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
+            <div className="text-center mb-3">
+              <span className="text-red-300 font-bold text-lg">⚠️ CRITICAL LEGAL NOTICE ⚠️</span>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4 text-xs text-background/90 leading-relaxed">
+              <div>
+                <p className="font-semibold text-red-300 mb-2">NOT LEGAL ADVICE:</p>
+                <ul className="space-y-1 text-background/80">
+                  <li>• Not a law firm or attorney service</li>
+                  <li>• No lawyer-client relationship created</li>
+                  <li>• Information for educational purposes only</li>
+                  <li>• Always consult qualified legal counsel</li>
+                </ul>
+              </div>
+              <div>
+                <p className="font-semibold text-red-300 mb-2">USE AT YOUR OWN RISK:</p>
+                <ul className="space-y-1 text-background/80">
+                  <li>• No liability for legal outcomes</li>
+                  <li>• No warranty of accuracy or completeness</li>
+                  <li>• User assumes all risks and liability</li>
+                  <li>• Time-sensitive matters require immediate legal help</li>
+                </ul>
+              </div>
+            </div>
+            <div className="mt-3 text-center">
+              <p className="text-red-300 font-semibold text-xs">
+                EMERGENCY? Contact: Legal Aid Ontario 1-800-668-8258 | Law Society Referral 1-855-947-5255
+              </p>
+            </div>
+          </div>
+
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-sm text-background/80">
-              © 2024 Justice-Bot. All rights reserved.
+              © 2024 Justice-Bot Technologies Inc. All rights reserved.
             </div>
             <div className="flex gap-6 text-sm text-background/80">
-              <a href="/liability" className="hover:text-background transition-colors text-red-300">⚠️ Liability</a>
+              <a href="/liability" className="hover:text-background transition-colors text-red-300 font-semibold">⚠️ Liability & Disclaimers</a>
               <a href="/privacy" className="hover:text-background transition-colors">Privacy Policy</a>
               <a href="/terms" className="hover:text-background transition-colors">Terms of Service</a>
             </div>
           </div>
           
+          {/* Data Protection Notice */}
           <div className="mt-4 p-4 bg-background/10 rounded-lg">
             <p className="text-xs text-background/70 leading-relaxed">
-              <strong>Legal Disclaimer:</strong> Justice-Bot is not a law firm and does not provide legal advice. 
-              This platform is designed to help users understand legal processes and prepare documentation. 
-              For complex legal matters, consult with a qualified lawyer.
+              <strong>Data Protection & Privacy:</strong> Your personal information is protected with enterprise-grade encryption. 
+              We comply with PIPEDA, GDPR, and implement HIPAA-level security standards. Data is stored in Canadian facilities 
+              with strict access controls. We never sell your data. 
+              <span className="font-semibold text-background/90"> By using this service, you acknowledge reading our complete 
+              legal disclaimers and privacy policy.</span>
+            </p>
+          </div>
+
+          {/* Regulatory Compliance */}
+          <div className="mt-3 p-3 bg-background/5 rounded text-center">
+            <p className="text-xs text-background/60">
+              Licensed Technology Provider | PIPEDA Compliant | ISO 27001 Security Standards | 
+              Accessible under AODA | Professional Liability Insured
             </p>
           </div>
         </div>
