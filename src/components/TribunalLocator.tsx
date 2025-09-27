@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { 
   MapPin, 
@@ -12,11 +13,16 @@ import {
   Clock, 
   ExternalLink,
   Edit3,
-  Search
+  Search,
+  FileText,
+  CalendarDays,
+  AlertTriangle
 } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { toast } from "sonner";
+import { DeadlineTimeline } from "./DeadlineTimeline";
+import { FilingInstructions } from "./FilingInstructions";
 
 // Fix for default markers in react-leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -40,6 +46,10 @@ interface Court {
   lat: number;
   lng: number;
   venueTypes: string[];
+  filingUrl?: string;
+  filingRequirements?: string[];
+  deadlineWarning?: string;
+  serviceMethods?: string[];
 }
 
 interface TribunalLocatorProps {
@@ -65,7 +75,15 @@ const courts: Court[] = [
     hours: "Monday-Friday 8:30 AM - 5:00 PM",
     lat: 43.6532,
     lng: -79.3832,
-    venueTypes: ["ltb"]
+    venueTypes: ["ltb"],
+    filingUrl: "https://tribunalsontario.ca/ltb/forms/",
+    filingRequirements: [
+      "Completed application form",
+      "Filing fee (may be waived for low income)",
+      "Supporting evidence and documents",
+      "Copy of lease agreement if applicable"
+    ],
+    serviceMethods: ["Email", "Registered mail", "In-person delivery", "Fax"]
   },
   {
     id: "hrto-toronto",
@@ -80,7 +98,16 @@ const courts: Court[] = [
     hours: "Monday-Friday 8:30 AM - 5:00 PM",
     lat: 43.6577,
     lng: -79.3864,
-    venueTypes: ["hrto"]
+    venueTypes: ["hrto"],
+    filingUrl: "https://www.sjto.gov.on.ca/hrto/application-process/",
+    deadlineWarning: "⚠️ CRITICAL: You must file within 1 year of the incident. Late applications may be refused.",
+    filingRequirements: [
+      "Completed Human Rights Application",
+      "Supporting evidence and documentation", 
+      "No filing fee required",
+      "Detailed statement of facts"
+    ],
+    serviceMethods: ["Online portal", "Email", "Registered mail", "In-person delivery"]
   },
   {
     id: "small-claims-toronto",
@@ -95,7 +122,15 @@ const courts: Court[] = [
     hours: "Monday-Friday 8:30 AM - 4:30 PM",
     lat: 43.7615,
     lng: -79.4111,
-    venueTypes: ["small-claims"]
+    venueTypes: ["small-claims"],
+    filingUrl: "https://www.ontariocourts.ca/scj/small-claims/guides/",
+    filingRequirements: [
+      "Plaintiff's Claim form",
+      "Filing fee ($102 for claims under $6,000)",
+      "Supporting documents and evidence",
+      "Proof of service if defendants served"
+    ],
+    serviceMethods: ["Personal service", "Alternative service", "Substituted service"]
   },
   {
     id: "family-court-toronto",
@@ -110,7 +145,15 @@ const courts: Court[] = [
     hours: "Monday-Friday 8:30 AM - 4:30 PM",
     lat: 43.6550,
     lng: -79.3890,
-    venueTypes: ["family"]
+    venueTypes: ["family"],
+    filingUrl: "https://www.ontariocourts.ca/scj/family/guides/",
+    filingRequirements: [
+      "Application form for family matters",
+      "Financial statement (if applicable)",
+      "Supporting affidavits and evidence",
+      "Filing fee ($280-$315 depending on application)"
+    ],
+    serviceMethods: ["Personal service", "Special service", "Substituted service"]
   }
 ];
 
@@ -231,223 +274,327 @@ const TribunalLocator: React.FC<TribunalLocatorProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5" />
-            Find Nearby Courts & Tribunals
-          </CardTitle>
-          <CardDescription>
-            {venue ? `Showing ${getVenueTypeLabel(venue)} locations` : 'Showing all court locations'} near your address
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Address Section */}
-          <div className="space-y-2">
-            <Label>Search Location</Label>
-            {!isEditingAddress ? (
-              <div className="flex items-center gap-2">
-                <Input 
-                  value={searchAddress}
-                  readOnly
-                  className="flex-1"
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddressEdit}
-                >
-                  <Edit3 className="h-4 w-4" />
-                </Button>
-              </div>
-            ) : (
-              <div className="flex gap-2">
-                <Input
-                  value={customAddress}
-                  onChange={(e) => setCustomAddress(e.target.value)}
-                  placeholder="Enter address or city, province"
-                  className="flex-1"
-                  onKeyPress={(e) => e.key === 'Enter' && handleAddressUpdate()}
-                />
-                <Button onClick={handleAddressUpdate} size="sm">
-                  <Search className="h-4 w-4" />
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setIsEditingAddress(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
-            )}
-            <p className="text-sm text-muted-foreground">
-              {isEditingAddress 
-                ? "Change this if the incident happened in a different location"
-                : "Click edit if the incident happened elsewhere"
-              }
-            </p>
-          </div>
+    <Tabs defaultValue="locations" className="space-y-6">
+      <TabsList className="grid w-full grid-cols-4">
+        <TabsTrigger value="locations" className="flex items-center gap-2">
+          <MapPin className="h-4 w-4" />
+          Locations
+        </TabsTrigger>
+        <TabsTrigger value="filing" className="flex items-center gap-2">
+          <FileText className="h-4 w-4" />
+          Filing Info
+        </TabsTrigger>
+        <TabsTrigger value="timeline" className="flex items-center gap-2">
+          <CalendarDays className="h-4 w-4" />
+          Timeline
+        </TabsTrigger>
+        <TabsTrigger value="evidence" className="flex items-center gap-2">
+          <FileText className="h-4 w-4" />
+          Evidence
+        </TabsTrigger>
+      </TabsList>
 
-          {/* Map */}
-          <div className="h-64 w-full rounded-lg overflow-hidden border">
-            <MapContainer
-              center={[mapCenter.lat, mapCenter.lng]}
-              zoom={12}
-              style={{ height: '100%', width: '100%' }}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              <MapCenter lat={mapCenter.lat} lng={mapCenter.lng} />
-              
-              {/* User location marker */}
-              <Marker position={[mapCenter.lat, mapCenter.lng]}>
-                <Popup>
-                  <div className="text-center">
-                    <strong>Your Location</strong><br />
-                    {searchAddress}
-                  </div>
-                </Popup>
-              </Marker>
+      <TabsContent value="locations" className="space-y-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5" />
+              Find Nearby Courts & Tribunals
+            </CardTitle>
+            <CardDescription>
+              {venue ? `Showing ${getVenueTypeLabel(venue)} locations` : 'Showing all court locations'} near your address
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* Address Section */}
+            <div className="space-y-2">
+              <Label>Search Location</Label>
+              {!isEditingAddress ? (
+                <div className="flex items-center gap-2">
+                  <Input 
+                    value={searchAddress}
+                    readOnly
+                    className="flex-1"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAddressEdit}
+                  >
+                    <Edit3 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Input
+                    value={customAddress}
+                    onChange={(e) => setCustomAddress(e.target.value)}
+                    placeholder="Enter address or city, province"
+                    className="flex-1"
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddressUpdate()}
+                  />
+                  <Button onClick={handleAddressUpdate} size="sm">
+                    <Search className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setIsEditingAddress(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              )}
+              <p className="text-sm text-muted-foreground">
+                {isEditingAddress 
+                  ? "Change this if the incident happened in a different location"
+                  : "Click edit if the incident happened elsewhere"
+                }
+              </p>
+            </div>
 
-              {/* Court markers */}
-              {filteredCourts.map((court) => (
-                <Marker 
-                  key={court.id} 
-                  position={[court.lat, court.lng]}
-                >
+            {/* Map */}
+            <div className="h-64 w-full rounded-lg overflow-hidden border">
+              <MapContainer
+                center={[mapCenter.lat, mapCenter.lng]}
+                zoom={12}
+                style={{ height: '100%', width: '100%' }}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                <MapCenter lat={mapCenter.lat} lng={mapCenter.lng} />
+                
+                {/* User location marker */}
+                <Marker position={[mapCenter.lat, mapCenter.lng]}>
                   <Popup>
-                    <div className="min-w-48">
-                      <h4 className="font-semibold mb-1">{court.name}</h4>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {court.address}<br />
-                        {court.city}, {court.province} {court.postalCode}
-                      </p>
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          setSelectedCourt(court);
-                          onCourtSelected?.(court);
-                        }}
-                        className="w-full"
-                      >
-                        Select This Location
-                      </Button>
+                    <div className="text-center">
+                      <strong>Your Location</strong><br />
+                      {searchAddress}
                     </div>
                   </Popup>
                 </Marker>
-              ))}
-            </MapContainer>
-          </div>
-        </CardContent>
-      </Card>
 
-      {/* Courts List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            Nearby Locations ({sortedCourts.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {sortedCourts.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <MapPin className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No courts found for the selected criteria.</p>
-              <p className="text-sm">Try expanding your search area or checking different venue types.</p>
+                {/* Court markers */}
+                {filteredCourts.map((court) => (
+                  <Marker 
+                    key={court.id} 
+                    position={[court.lat, court.lng]}
+                  >
+                    <Popup>
+                      <div className="min-w-48">
+                        <h4 className="font-semibold mb-1">{court.name}</h4>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {court.address}<br />
+                          {court.city}, {court.province} {court.postalCode}
+                        </p>
+                        <Button
+                          size="sm"
+                          onClick={() => {
+                            setSelectedCourt(court);
+                            onCourtSelected?.(court);
+                          }}
+                          className="w-full"
+                        >
+                          Select This Location
+                        </Button>
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
+              </MapContainer>
             </div>
-          ) : (
-            sortedCourts.map((court) => (
-              <div 
-                key={court.id}
-                className={`p-4 border rounded-lg transition-colors ${
-                  selectedCourt?.id === court.id ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'
-                }`}
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg mb-1">{court.name}</h3>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="outline">{court.type}</Badge>
-                      <Badge variant="secondary">
-                        {court.distance.toFixed(1)} km away
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
+          </CardContent>
+        </Card>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div className="space-y-2">
-                    <div className="flex items-start gap-2">
-                      <MapPin className="h-4 w-4 mt-1 text-muted-foreground" />
-                      <div className="text-sm">
-                        {court.address}<br />
-                        {court.city}, {court.province} {court.postalCode}
+        {/* Courts List */}
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              Nearby Locations ({sortedCourts.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {sortedCourts.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <MapPin className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No courts found for the selected criteria.</p>
+                <p className="text-sm">Try expanding your search area or checking different venue types.</p>
+              </div>
+            ) : (
+              sortedCourts.map((court) => (
+                <div 
+                  key={court.id}
+                  className={`p-4 border rounded-lg transition-colors ${
+                    selectedCourt?.id === court.id ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'
+                  }`}
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg mb-1">{court.name}</h3>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="outline">{court.type}</Badge>
+                        <Badge variant="secondary">
+                          {court.distance.toFixed(1)} km away
+                        </Badge>
+                        {court.deadlineWarning && (
+                          <Badge variant="destructive" className="text-xs">
+                            <AlertTriangle className="h-3 w-3 mr-1" />
+                            1-Year Limit
+                          </Badge>
+                        )}
                       </div>
                     </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{court.phone}</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-2">
+                        <MapPin className="h-4 w-4 mt-1 text-muted-foreground" />
+                        <div className="text-sm">
+                          {court.address}<br />
+                          {court.city}, {court.province} {court.postalCode}
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{court.phone}</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{court.hours}</span>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                        <a 
+                          href={court.website} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-sm text-primary hover:underline"
+                        >
+                          Visit Website
+                        </a>
+                      </div>
+                      
+                      {court.filingUrl && (
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-4 w-4 text-muted-foreground" />
+                          <a 
+                            href={court.filingUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-sm text-primary hover:underline"
+                          >
+                            Filing Portal
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{court.hours}</span>
-                    </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => {
+                        setSelectedCourt(court);
+                        onCourtSelected?.(court);
+                        toast.success(`Selected ${court.name}`);
+                      }}
+                      variant={selectedCourt?.id === court.id ? "default" : "outline"}
+                      className="flex-1"
+                    >
+                      <Navigation className="h-4 w-4 mr-2" />
+                      {selectedCourt?.id === court.id ? "Selected" : "Select Location"}
+                    </Button>
                     
-                    <div className="flex items-center gap-2">
-                      <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                      <a 
-                        href={court.website} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-sm text-primary hover:underline"
-                      >
-                        Visit Website
-                      </a>
-                    </div>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+                          `${court.address}, ${court.city}, ${court.province} ${court.postalCode}`
+                        )}`;
+                        window.open(url, '_blank');
+                      }}
+                    >
+                      <MapPin className="h-4 w-4 mr-2" />
+                      Directions
+                    </Button>
                   </div>
                 </div>
+              ))
+            )}
+          </CardContent>
+        </Card>
+      </TabsContent>
 
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => {
-                      setSelectedCourt(court);
-                      onCourtSelected?.(court);
-                      toast.success(`Selected ${court.name}`);
-                    }}
-                    variant={selectedCourt?.id === court.id ? "default" : "outline"}
-                    className="flex-1"
-                  >
-                    <Navigation className="h-4 w-4 mr-2" />
-                    {selectedCourt?.id === court.id ? "Selected" : "Select Location"}
-                  </Button>
-                  
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-                        `${court.address}, ${court.city}, ${court.province} ${court.postalCode}`
-                      )}`;
-                      window.open(url, '_blank');
-                    }}
-                  >
-                    <MapPin className="h-4 w-4 mr-2" />
-                    Directions
-                  </Button>
-                </div>
-              </div>
-            ))
-          )}
-        </CardContent>
-      </Card>
-    </div>
+      <TabsContent value="filing">
+        {selectedCourt ? (
+          <FilingInstructions 
+            venue={venue || 'general'}
+            courtName={selectedCourt.name}
+            filingUrl={selectedCourt.filingUrl}
+            filingRequirements={selectedCourt.filingRequirements}
+            serviceMethods={selectedCourt.serviceMethods}
+            deadlineWarning={selectedCourt.deadlineWarning}
+          />
+        ) : (
+          <Card>
+            <CardContent className="text-center py-8">
+              <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p className="text-muted-foreground">
+                Select a court or tribunal from the Locations tab to see filing information.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </TabsContent>
+
+      <TabsContent value="timeline">
+        {venue ? (
+          <DeadlineTimeline 
+            venue={venue}
+            incidentDate={new Date()}
+          />
+        ) : (
+          <Card>
+            <CardContent className="text-center py-8">
+              <CalendarDays className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p className="text-muted-foreground">
+                Timeline information will be shown once you select a venue type.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </TabsContent>
+
+      <TabsContent value="evidence">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Evidence & Book of Documents
+            </CardTitle>
+            <CardDescription>
+              Upload, organize, and generate your evidence package
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center py-8">
+            <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <p className="text-muted-foreground mb-4">
+              Evidence management is available from your dashboard after you create a case.
+            </p>
+            <Button onClick={() => window.location.href = '/dashboard'}>
+              Go to Dashboard
+            </Button>
+          </CardContent>
+        </Card>
+      </TabsContent>
+    </Tabs>
   );
 };
 
