@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound";
 import Triage from "./pages/Triage";
 import FormSelector from "./pages/FormSelector";
 import FormBuilder from "./pages/FormBuilder";
+import TribunalLocatorPage from "./pages/TribunalLocatorPage";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/assessment" element={<CaseAssessment />} />
           <Route path="/triage" element={<Triage />} />
+          <Route path="/tribunal-locator" element={<TribunalLocatorPage />} />
           <Route path="/forms/:venue" element={<FormSelector />} />
           <Route path="/form/:formId" element={<FormBuilder />} />
           <Route path="/pricing" element={<Pricing />} />

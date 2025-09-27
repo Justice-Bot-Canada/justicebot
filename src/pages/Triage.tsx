@@ -17,6 +17,7 @@ import {
   Clock,
   MapPin
 } from "lucide-react";
+import TribunalLocator from "@/components/TribunalLocator";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,6 +77,8 @@ const Triage = () => {
   const [triageResult, setTriageResult] = useState<TriageResult | null>(null);
   const [userInput, setUserInput] = useState("");
   const [location, setLocation] = useState({ province: "Ontario", postalCode: "" });
+  const [showLocator, setShowLocator] = useState(false);
+  const [selectedCourt, setSelectedCourt] = useState<any>(null);
 
   const analyzeUserInput = async () => {
     if (!userInput.trim()) {
@@ -355,14 +358,25 @@ const Triage = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <Button onClick={proceedToForms} className="flex-1">
-                      Start Forms for {venues[triageResult.venue as keyof typeof venues].title}
-                      <ArrowRight className="h-4 w-4 ml-2" />
+                  <div className="flex flex-col gap-4">
+                    <Button 
+                      onClick={() => setShowLocator(true)} 
+                      variant="outline" 
+                      className="w-full"
+                    >
+                      <MapPin className="h-4 w-4 mr-2" />
+                      Find Nearby Courts & Tribunals
                     </Button>
-                    <Button variant="outline" onClick={startFullAssessment} className="flex-1">
-                      Full Case Assessment
-                    </Button>
+                    
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <Button onClick={proceedToForms} className="flex-1">
+                        Start Forms for {venues[triageResult.venue as keyof typeof venues].title}
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
+                      <Button variant="outline" onClick={startFullAssessment} className="flex-1">
+                        Full Case Assessment
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="text-center text-sm text-muted-foreground">
@@ -389,6 +403,46 @@ const Triage = () => {
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Try Different Issue
               </Button>
+            </div>
+          )}
+
+          {/* Tribunal Locator Modal */}
+          {showLocator && triageResult && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="bg-background rounded-lg w-full max-w-4xl max-h-[90vh] overflow-auto">
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold">Find Your {venues[triageResult.venue as keyof typeof venues].title}</h2>
+                    <Button variant="outline" onClick={() => setShowLocator(false)}>
+                      Close
+                    </Button>
+                  </div>
+                  
+                  <TribunalLocator
+                    venue={triageResult.venue}
+                    userProvince={location.province}
+                    userMunicipality={location.postalCode ? `${location.postalCode}, ${location.province}` : location.province}
+                    caseDescription={userInput}
+                    onCourtSelected={(court) => {
+                      setSelectedCourt(court);
+                    }}
+                  />
+                  
+                  {selectedCourt && (
+                    <div className="mt-6 pt-6 border-t">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Selected Court:</p>
+                          <p className="font-medium">{selectedCourt.name}</p>
+                        </div>
+                        <Button onClick={() => setShowLocator(false)}>
+                          Continue with This Location
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </div>
