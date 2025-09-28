@@ -74,6 +74,12 @@ const Header = () => {
                 Pricing
               </a>
               <a 
+                href="/feedback" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
+              >
+                Feedback
+              </a>
+              <a 
                 href="/contact" 
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
               >
@@ -176,6 +182,13 @@ const Header = () => {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Pricing
+              </a>
+              <a 
+                href="/feedback" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Feedback
               </a>
               <a 
                 href="/contact" 

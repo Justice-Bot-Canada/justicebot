@@ -93,6 +93,21 @@ serve(async (req) => {
     if (insertError) {
       console.error('Error storing payment:', insertError);
       // Don't throw - payment was created successfully
+    } else {
+      // Create payment audit log
+      await supabase
+        .from('payment_audit')
+        .insert({
+          payment_id: payment.id,
+          user_id: userData.user.id,
+          event_type: 'created',
+          metadata: {
+            amount: parseFloat(amount),
+            currency: 'CAD',
+            plan_type: planType,
+            case_id: caseId
+          }
+        });
     }
 
     // Find the approval URL

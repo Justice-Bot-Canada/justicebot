@@ -403,6 +403,33 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_audit: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          payment_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          payment_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          payment_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
@@ -498,6 +525,57 @@ export type Database = {
           phone?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_feedback: {
+        Row: {
+          admin_response: string | null
+          case_id: string | null
+          created_at: string
+          email: string
+          feedback_type: string
+          id: string
+          is_public: boolean | null
+          is_resolved: boolean | null
+          message: string
+          name: string
+          rating: number | null
+          subject: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_response?: string | null
+          case_id?: string | null
+          created_at?: string
+          email: string
+          feedback_type: string
+          id?: string
+          is_public?: boolean | null
+          is_resolved?: boolean | null
+          message: string
+          name: string
+          rating?: number | null
+          subject: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_response?: string | null
+          case_id?: string | null
+          created_at?: string
+          email?: string
+          feedback_type?: string
+          id?: string
+          is_public?: boolean | null
+          is_resolved?: boolean | null
+          message?: string
+          name?: string
+          rating?: number | null
+          subject?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }

@@ -27,6 +27,7 @@ import HRTOHelp from "./pages/HRTOHelp";
 import LTBHelp from "./pages/LTBHelp";
 import SmallClaimsCourt from "./pages/SmallClaimsCourt";
 import Contact from "./pages/Contact";
+import Feedback from "./pages/Feedback";
 import HRTOJourney from "./pages/HRTOJourney";
 import LTBJourney from "./pages/LTBJourney";
 import SmallClaimsJourney from "./pages/SmallClaimsJourney";
@@ -53,6 +54,7 @@ const AppContent = () => {
         <Route path="/criminal-journey" element={<CriminalJourney />} />
         <Route path="/family-journey" element={<FamilyJourney />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/feedback" element={<Feedback />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/assessment" element={<ProtectedRoute><CaseAssessment /></ProtectedRoute>} />
           <Route path="/triage" element={<Triage />} />

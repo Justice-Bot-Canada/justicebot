@@ -98,6 +98,21 @@ serve(async (req) => {
         } else {
           console.log('Premium access granted for user:', userData.user.id);
         }
+
+        // Create payment audit log
+        await supabase
+          .from('payment_audit')
+          .insert({
+            payment_id: paymentId,
+            user_id: userData.user.id,
+            event_type: isSuccessful ? 'completed' : 'failed',
+            metadata: {
+              amount: paymentData?.amount || 0,
+              plan_type: paymentData.plan_type,
+              payer_id: payerId,
+              transaction_id: captureData.id
+            }
+          });
       }
     }
 
