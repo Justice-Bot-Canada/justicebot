@@ -61,7 +61,9 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/`,
+          emailRedirectTo: window.location.origin.includes('localhost') 
+            ? 'https://justice-bot.lovable.app/' 
+            : `${window.location.origin}/`,
         },
       });
 
