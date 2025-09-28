@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EvidenceBuilder from "@/components/EvidenceBuilder";
+import { PremiumGate } from "@/components/PremiumGate";
 
 const Evidence = () => {
   const navigate = useNavigate();
@@ -66,12 +67,14 @@ const Evidence = () => {
             </p>
           </div>
 
-          <EvidenceBuilder 
-            caseId={caseId} 
-            onUpdate={() => {
-              // Refresh case data if needed
-            }}
-          />
+          <PremiumGate feature="Evidence Management">
+            <EvidenceBuilder 
+              caseId={caseId} 
+              onUpdate={() => {
+                // Refresh case data if needed
+              }}
+            />
+          </PremiumGate>
         </div>
       </main>
       <Footer />

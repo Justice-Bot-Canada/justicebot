@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRole } from "@/hooks/useRole";
 import AuthDialog from "@/components/AuthDialog";
 import { HighContrastToggle, ScreenReaderOnly } from "@/components/AccessibilityFeatures";
+import { PremiumStatusBanner } from "@/components/PremiumStatusBanner";
 import justiceBotLogo from "@/assets/justice-bot-logo.jpeg";
 
 const Header = () => {
@@ -270,6 +271,7 @@ const Header = () => {
         )}
       </div>
     </header>
+    <PremiumStatusBanner />
     <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </>
   );

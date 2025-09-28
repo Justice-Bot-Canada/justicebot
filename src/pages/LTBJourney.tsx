@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { UserJourney } from "@/components/UserJourney";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
+import { PremiumGate } from "@/components/PremiumGate";
 
 const LTBJourney = () => {
   const navigate = useNavigate();
@@ -109,13 +110,15 @@ const LTBJourney = () => {
             </p>
           </div>
 
-          <UserJourney 
-            venue="ltb"
-            userSituation={userSituation}
-            onStepComplete={(stepId) => {
-              console.log("Step completed:", stepId);
-            }}
-          />
+          <PremiumGate feature="LTB Legal Journey Guide">
+            <UserJourney 
+              venue="ltb"
+              userSituation={userSituation}
+              onStepComplete={(stepId) => {
+                console.log("Step completed:", stepId);
+              }}
+            />
+          </PremiumGate>
         </div>
       </main>
       

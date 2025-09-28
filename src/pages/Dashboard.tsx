@@ -12,15 +12,19 @@ import {
   ArrowRight,
   CheckCircle,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Gift
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import CaseManager from "@/components/CaseManager";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { PremiumGate } from "@/components/PremiumGate";
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { hasAccess, isFreeUser, userNumber } = usePremiumAccess();
   const [activeTab, setActiveTab] = useState("cases");
 
   // Auth check is now handled by ProtectedRoute
@@ -32,6 +36,20 @@ const Dashboard = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Legal Dashboard</h1>
           <p className="text-muted-foreground">Manage your cases, access forms, and track your progress</p>
+          
+          {isFreeUser && userNumber && (
+            <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+              <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                <Gift className="w-4 h-4" />
+                <Badge variant="outline" className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200">
+                  FREE User #{userNumber}
+                </Badge>
+              </div>
+              <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                You have lifetime free access to all premium features!
+              </p>
+            </div>
+          )}
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -59,6 +77,7 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="forms" className="mt-6">
+            <PremiumGate feature="Premium Form Access">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Card className="hover:shadow-lg transition-shadow">
                 <CardHeader>
@@ -145,6 +164,7 @@ const Dashboard = () => {
                 </CardContent>
               </Card>
             </div>
+            </PremiumGate>
           </TabsContent>
 
           <TabsContent value="payments" className="mt-6">
