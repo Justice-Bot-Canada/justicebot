@@ -1,14 +1,85 @@
+# SEO-optimized robots.txt for Justice-Bot
+# Updated: 2025-01-27
+
+# Primary search engines - full access
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
+Crawl-delay: 1
 
+User-agent: Slurp
+Allow: /
+Crawl-delay: 2
+
+# Social media crawlers
 User-agent: Twitterbot
 Allow: /
 
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: LinkedInBot
+Allow: /
+
+# AI training bots - controlled access
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+Crawl-delay: 5
+
+User-agent: Google-Extended
+Allow: /
+Crawl-delay: 10
+
+User-agent: CCBot
+Allow: /
+Crawl-delay: 10
+
+User-agent: anthropic-ai
+Allow: /
+Crawl-delay: 5
+
+User-agent: Claude-Web
+Allow: /
+Crawl-delay: 5
+
+# Block aggressive crawlers
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# Block AI scrapers that don't respect content
+User-agent: CCBot
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /admin
+
+User-agent: PerplexityBot
+Allow: /
+Crawl-delay: 10
+
+# Default rule for all other bots
 User-agent: *
 Allow: /
+Crawl-delay: 2
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /admin
+Disallow: /payment-success
+Disallow: /payment-cancel
+
+# Sitemap location
+Sitemap: https://justice-bot.com/sitemap.xml
