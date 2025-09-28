@@ -6,6 +6,7 @@ import MeritScoreDemo from "@/components/MeritScoreDemo";
 import FormPrefillDemo from "@/components/FormPrefillDemo";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
+import InteractiveTutorial from "@/components/InteractiveTutorial";
 import { AccessibilityPanel } from "@/components/AccessibilityEnhanced";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 
@@ -80,6 +81,14 @@ const Index = () => {
       </div>
       <main id="main-content" tabIndex={-1}>
         <HeroSection />
+        
+        {/* Interactive Tutorial Section */}
+        <section id="tutorials" className="py-16 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <InteractiveTutorial />
+          </div>
+        </section>
+        
         <TriageSection />
         <FeaturesSection />
         <section id="merit" aria-labelledby="merit-heading">
