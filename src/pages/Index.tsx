@@ -5,8 +5,9 @@ import FeaturesSection from "@/components/FeaturesSection";
 import MeritScoreDemo from "@/components/MeritScoreDemo";
 import FormPrefillDemo from "@/components/FormPrefillDemo";
 import Footer from "@/components/Footer";
-import SEOHead from "@/components/SEOHead";
+import EnhancedSEO from "@/components/EnhancedSEO";
 import { AccessibilityPanel } from "@/components/EnhancedAccessibility";
+import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 
 const Index = () => {
   const structuredData = {
@@ -29,13 +30,35 @@ const Index = () => {
     }
   };
 
+  const faqData = [
+    {
+      question: "How much does Justice-Bot cost?",
+      answer: "Justice-Bot offers affordable legal guidance starting at $5.99 CAD. We also provide free access to the first 1,000 users and have special programs for low-income individuals."
+    },
+    {
+      question: "Can Justice-Bot replace a lawyer?",
+      answer: "No, Justice-Bot is not a replacement for legal advice from a qualified lawyer. We provide guidance, forms, and information to help you navigate legal processes, but complex cases may require professional legal representation."
+    },
+    {
+      question: "What types of legal issues does Justice-Bot help with?",
+      answer: "Justice-Bot helps with landlord-tenant disputes, human rights complaints, small claims court cases, employment issues, and family law matters in Ontario, Canada."
+    }
+  ];
+
+  const breadcrumbs = [
+    { name: "Home", url: "https://justice-bot.com/" }
+  ];
+
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead
+      <PerformanceMonitor />
+      <EnhancedSEO
         title="Affordable Legal Help Canada - AI-Powered Legal Services"
         description="Get affordable legal help for landlord-tenant disputes, human rights issues, small claims court, and employment law. AI-powered legal services starting at $5.99. No expensive lawyers needed."
         keywords="cheap lawyer Canada, affordable legal help, landlord tenant board, human rights tribunal, small claims court, legal advice, AI legal services"
         structuredData={structuredData}
+        breadcrumbs={breadcrumbs}
+        faqData={faqData}
       />
       
       <Header />

@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import { SkipToContent, useFocusManagement, useKeyboardNavigation } from "@/components/AccessibilityFeatures";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
@@ -42,6 +43,7 @@ const AppContent = () => {
   
   return (
     <div className="min-h-screen">
+      <PerformanceMonitor />
       <SkipToContent />
       <Routes>
           <Route path="/" element={<Index />} />
