@@ -602,7 +602,39 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_feedback: {
+        Row: {
+          admin_response: string | null
+          created_at: string | null
+          feedback_type: string | null
+          id: string | null
+          is_resolved: boolean | null
+          message: string | null
+          rating: number | null
+          subject: string | null
+        }
+        Insert: {
+          admin_response?: string | null
+          created_at?: string | null
+          feedback_type?: string | null
+          id?: string | null
+          is_resolved?: boolean | null
+          message?: string | null
+          rating?: number | null
+          subject?: string | null
+        }
+        Update: {
+          admin_response?: string | null
+          created_at?: string | null
+          feedback_type?: string | null
+          id?: string | null
+          is_resolved?: boolean | null
+          message?: string | null
+          rating?: number | null
+          subject?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       check_free_tier_eligibility: {
