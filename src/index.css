@@ -133,7 +133,107 @@ All colors MUST be HSL.
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+/* Accessibility Enhancements */
+.high-contrast {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --card: 0 0% 5%;
+  --card-foreground: 0 0% 100%;
+  --popover: 0 0% 5%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 60 100% 50%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 0 0% 20%;
+  --secondary-foreground: 0 0% 100%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 85%;
+  --accent: 60 100% 50%;
+  --accent-foreground: 0 0% 0%;
+  --destructive: 0 100% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 30%;
+  --input: 0 0% 20%;
+  --ring: 60 100% 50%;
+}
+
+.reduce-motion,
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+.large-cursor,
+.large-cursor * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="white" stroke="black" stroke-width="2" d="M2 2 L14 14 L8 14 L8 30 L14 30 L30 14 L30 8 L14 8 L2 2 Z"/></svg>') 2 2, auto !important;
+}
+
+.large-cursor button,
+.large-cursor a,
+.large-cursor [role="button"] {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><path fill="white" stroke="black" stroke-width="2" d="M16 2 L16 10 L24 6 L20 14 L28 16 L20 18 L24 26 L16 22 L16 30 L14 30 L14 22 L6 26 L10 18 L2 16 L10 14 L6 6 L14 10 L14 2 Z"/></svg>') 16 16, pointer !important;
+}
+
+.screen-reader-mode {
+  /* Enhanced focus indicators */
+  --focus-ring-width: 4px;
+  --focus-ring-color: hsl(var(--primary));
+}
+
+.screen-reader-mode *:focus {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color) !important;
+  outline-offset: 2px !important;
+}
+
+/* Skip link styles */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  z-index: 1000;
+  font-weight: 600;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+/* Loading states */
+@keyframes pulse-accessible {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
   }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+.loading-pulse {
+  animation: pulse-accessible 2s infinite;
+}
+
+/* Error states */
+.error-flash {
+  animation: error-flash 0.5s ease-in-out;
+}
+
+@keyframes error-flash {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: hsl(var(--destructive) / 0.1); }
+}
 
   /* High contrast mode styles */
   .high-contrast {

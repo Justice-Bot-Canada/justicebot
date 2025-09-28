@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +19,10 @@ import {
   BookOpen
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import ProgressIndicator from "@/components/ProgressIndicator";
+import { LoadingSpinner, StatusIndicator, LoadingOverlay } from "@/components/LoadingStates";
+import { ErrorHandler, useErrorHandler } from "@/components/ErrorHandler";
+import { LiveRegion } from "@/components/AccessibilityFeatures";
 
 interface JourneyStep {
   id: string;
@@ -411,30 +415,93 @@ export const UserJourney: React.FC<UserJourneyProps> = ({
 }) => {
   const navigate = useNavigate();
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
+  const [liveMessage, setLiveMessage] = useState('');
+  const { errors, addError, dismissError } = useErrorHandler();
   const journeyData = getJourneyData(venue);
 
-  const handleStepComplete = (stepId: string) => {
+  // Enhanced step completion with loading states
+  const handleStepComplete = async (stepId: string) => {
     if (!completedSteps.includes(stepId)) {
-      setCompletedSteps([...completedSteps, stepId]);
-      onStepComplete?.(stepId);
+      setIsLoading(true);
+      setLoadingMessage('Marking step as complete...');
+      
+      try {
+        // Simulate API call for step completion
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        setCompletedSteps([...completedSteps, stepId]);
+        onStepComplete?.(stepId);
+        
+        setLiveMessage(`Step completed: ${journeyData.steps.find(s => s.id === stepId)?.title}`);
+        
+        // Auto-clear live message after announcement
+        setTimeout(() => setLiveMessage(''), 3000);
+        
+      } catch (error) {
+        addError({
+          type: 'client',
+          severity: 'medium',
+          title: 'Step Completion Failed',
+          message: 'Unable to mark step as complete',
+          details: error instanceof Error ? error.message : 'Unknown error',
+          retryAction: () => handleStepComplete(stepId),
+          dismissible: true
+        });
+      } finally {
+        setIsLoading(false);
+        setLoadingMessage('');
+      }
     }
   };
 
+  // Enhanced step actions with error handling
   const getStepActions = (step: JourneyStep) => {
+    const executeAction = async (action: () => void) => {
+      setIsLoading(true);
+      setLoadingMessage('Loading...');
+      
+      try {
+        action();
+      } catch (error) {
+        addError({
+          type: 'client',
+          severity: 'medium',
+          title: 'Navigation Error',
+          message: 'Unable to navigate to the requested page',
+          details: error instanceof Error ? error.message : 'Unknown error',
+          retryAction: () => executeAction(action),
+          dismissible: true
+        });
+      } finally {
+        setIsLoading(false);
+        setLoadingMessage('');
+      }
+    };
+
     switch (step.id) {
       case 'assess-case':
-        return () => navigate('/assessment');
+        return () => executeAction(() => navigate('/assessment'));
       case 'gather-evidence':
-        return () => navigate('/dashboard');
+        return () => executeAction(() => navigate('/dashboard'));
       case 'file-application':
       case 'file-claim':
-        return () => navigate(`/forms/${venue}`);
+        return () => executeAction(() => navigate(`/forms/${venue}`));
       case 'find-courthouse':
-        return () => navigate('/tribunal-locator', { 
+        return () => executeAction(() => navigate('/tribunal-locator', { 
           state: { venue, userSituation } 
-        });
+        }));
       default:
-        return undefined;
+        return () => executeAction(() => {
+          addError({
+            type: 'client',
+            severity: 'low',
+            title: 'Feature Coming Soon',
+            message: 'This feature is currently being developed',
+            dismissible: true
+          });
+        });
     }
   };
 
@@ -455,8 +522,38 @@ export const UserJourney: React.FC<UserJourneyProps> = ({
     }
   };
 
+  // Convert journey steps for ProgressIndicator
+  const progressSteps = journeyData.steps.map(step => ({
+    id: step.id,
+    title: step.title,
+    description: step.description,
+    status: completedSteps.includes(step.id) 
+      ? 'completed' as const
+      : step.id === journeyData.steps[0]?.id 
+        ? 'current' as const 
+        : 'upcoming' as const,
+    timeEstimate: step.timeEstimate,
+    priority: step.priority
+  }));
+
   return (
     <div className="space-y-6">
+      {/* Loading Overlay */}
+      <LoadingOverlay 
+        isVisible={isLoading} 
+        message={loadingMessage}
+      />
+      
+      {/* Live Region for Screen Readers */}
+      <LiveRegion message={liveMessage} />
+      
+      {/* Error Handler */}
+      <ErrorHandler 
+        errors={errors}
+        onDismiss={dismissError}
+        maxVisible={2}
+      />
+
       {/* Header */}
       <Card>
         <CardHeader>
@@ -491,6 +588,28 @@ export const UserJourney: React.FC<UserJourneyProps> = ({
               </Button>
             ))}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Progress Overview */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Your Progress</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ProgressIndicator
+            steps={progressSteps}
+            currentStepId={progressSteps.find(s => s.status === 'current')?.id || progressSteps[0]?.id}
+            showDescriptions={false}
+            showTimeEstimates={true}
+            onStepClick={(stepId) => {
+              const step = journeyData.steps.find(s => s.id === stepId);
+              if (step) {
+                const action = getStepActions(step);
+                action?.();
+              }
+            }}
+          />
         </CardContent>
       </Card>
 

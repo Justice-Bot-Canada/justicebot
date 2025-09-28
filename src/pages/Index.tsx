@@ -6,7 +6,7 @@ import MeritScoreDemo from "@/components/MeritScoreDemo";
 import FormPrefillDemo from "@/components/FormPrefillDemo";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
-import { AccessibilityPanel } from "@/components/EnhancedAccessibility";
+import { AccessibilityPanel } from "@/components/AccessibilityEnhanced";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 
 const Index = () => {

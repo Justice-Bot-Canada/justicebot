@@ -34,6 +34,7 @@ import LTBJourney from "./pages/LTBJourney";
 import SmallClaimsJourney from "./pages/SmallClaimsJourney";
 import CriminalJourney from "./pages/CriminalJourney";
 import FamilyJourney from "./pages/FamilyJourney";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
@@ -42,9 +43,10 @@ const AppContent = () => {
   useKeyboardNavigation();
   
   return (
-    <div className="min-h-screen">
-      <PerformanceMonitor />
-      <SkipToContent />
+    <ErrorBoundary>
+      <div className="min-h-screen">
+        <PerformanceMonitor />
+        <SkipToContent />
       <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/hrto-help" element={<HRTOHelp />} />
@@ -75,7 +77,8 @@ const AppContent = () => {
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 };
 
