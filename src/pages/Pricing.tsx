@@ -102,7 +102,7 @@ const Pricing = () => {
     {
       name: "Premium Monthly",
       description: "Full access to all premium features",
-      price: "$9.99",
+      price: "$19.99",
       period: "per month",
       popular: true,
       features: [
@@ -117,13 +117,13 @@ const Pricing = () => {
     },
     {
       name: "Premium Yearly", 
-      description: "Best value - 2 months free!",
+      description: "Best value - Save $140!",
       price: "$99.99",
       period: "per year",
-      originalPrice: "$119.88",
+      originalPrice: "$239.88",
       features: [
         "Everything in Premium Monthly",
-        "20% discount (2 months free)",
+        "58% discount - Save over $140/year",
         "Priority phone support",
         "Early access to new features",
         "Advanced analytics",
