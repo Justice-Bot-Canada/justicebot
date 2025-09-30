@@ -87,41 +87,40 @@ const Admin = () => {
     try {
       setLoading(true);
       
-      // Load user statistics from profiles table (accessible to admin users)
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('user_id, created_at, display_name');
+      // Load all users using admin function
+      const { data: usersData, error: usersError } = await supabase
+        .rpc('get_all_users_admin');
 
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-        toast.error('Failed to load user data');
+      if (usersError) {
+        console.error('Error fetching users:', usersError);
+        toast.error('Failed to load user data: ' + usersError.message);
         return;
       }
 
-      const profiles = profilesData || [];
+      const allUsers = usersData || [];
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
       const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-      const newUsersToday = profiles.filter(p => new Date(p.created_at) >= today).length;
-      const newUsersThisWeek = profiles.filter(p => new Date(p.created_at) >= weekAgo).length;
-      const newUsersThisMonth = profiles.filter(p => new Date(p.created_at) >= monthAgo).length;
+      const newUsersToday = allUsers.filter(u => new Date(u.created_at) >= today).length;
+      const newUsersThisWeek = allUsers.filter(u => new Date(u.created_at) >= weekAgo).length;
+      const newUsersThisMonth = allUsers.filter(u => new Date(u.created_at) >= monthAgo).length;
 
       setUserStats({
-        totalUsers: profiles.length,
+        totalUsers: allUsers.length,
         newUsersToday,
         newUsersThisWeek,
         newUsersThisMonth
       });
 
-      // Format users data from profiles
-      const formattedUsers = profiles.map(p => ({
-        id: p.user_id,
-        email: p.display_name || 'User', // Using display_name as we can't access auth.users directly
-        created_at: p.created_at,
-        last_sign_in_at: '',
-        email_confirmed_at: p.created_at // Assume confirmed if profile exists
+      // Format users data with real emails
+      const formattedUsers = allUsers.map(u => ({
+        id: u.id,
+        email: u.email,
+        created_at: u.created_at,
+        last_sign_in_at: u.last_sign_in_at || '',
+        email_confirmed_at: u.email_confirmed_at || ''
       }));
       setUsers(formattedUsers);
 

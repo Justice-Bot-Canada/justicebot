@@ -641,6 +641,18 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      get_all_users_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          cases_count: number
+          created_at: string
+          display_name: string
+          email: string
+          email_confirmed_at: string
+          id: string
+          last_sign_in_at: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
