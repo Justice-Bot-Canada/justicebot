@@ -1,0 +1,79 @@
+{
+"prereqs": [],
+"who": "Tenant",
+"venue": "LTB",
+"deadlineTip": "ASAP — you’ll need proof you asked for repairs before filing."
+},
+{
+"title": "File the LTB application",
+"summary": "Start an application for tenant rights/maintenance (commonly T2/T6).",
+"actions": [
+"Complete LTB forms (T2: Tenant Rights; T6: Maintenance).",
+"Attach evidence and your detailed timeline."
+],
+"forms": [
+{"id": "ON-LTB-T2", "name": "LTB T2 — Application about Tenant Rights", "url": "https://tribunalsontario.ca/ltb/forms/"},
+{"id": "ON-LTB-T6", "name": "LTB T6 — Tenant Application about Maintenance", "url": "https://tribunalsontario.ca/ltb/forms/"}
+],
+"prereqs": [],
+"who": "Tenant",
+"venue": "LTB",
+"deadlineTip": "Some remedies are time-sensitive — file promptly."
+},
+{
+"title": "Serve and prepare for the hearing",
+"summary": "Proper service and a clean evidence package matter.",
+"actions": [
+"Serve as required; keep proof of service.",
+"Organize exhibits, paginate, and prepare a short fact summary."
+],
+"forms": [],
+"prereqs": [],
+"who": "Tenant",
+"venue": "LTB",
+"deadlineTip": "Follow service rules exactly."
+}
+]
+}
+},
+"HRTO": {
+"discrimination": {
+"province": "ON",
+"venue": "HRTO",
+"issueCode": "discrimination",
+"confidence": 0.7,
+"steps": [
+{
+"title": "Write down what happened and when",
+"summary": "Map events, protected grounds, and adverse impacts.",
+"actions": [
+"List dates, people involved, and witnesses.",
+"Identify protected grounds (e.g., disability, family status)."
+],
+"forms": [],
+"prereqs": [],
+"who": "Applicant",
+"venue": "HRTO",
+"deadlineTip": "HRTO has limitation periods — do not wait."
+},
+{
+"title": "Start your HRTO application",
+"summary": "File Form 1 and Schedule A with facts and remedies sought.",
+"actions": [
+"Complete the core application and attach Schedule A.
+",
+"Describe remedies (monetary and non-monetary)."
+],
+"forms": [
+{"id": "ON-HRTO-F1", "name": "HRTO — Form 1 (Application)", "url": "https://tribunalsontario.ca/hrto/forms-and-filing/#otherforms"}
+],
+"prereqs": [],
+"who": "Applicant",
+"venue": "HRTO",
+"deadlineTip": "File before the deadline; extensions are discretionary."
+}
+]
+}
+}
+}
+}
