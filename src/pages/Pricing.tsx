@@ -87,7 +87,7 @@ const Pricing = () => {
   const plans = [
     {
       name: "Free",
-      description: "Limited time - First 1000 users only!",
+      description: "Limited time - First 800 users only!",
       price: "$0",
       period: "forever",
       isFree: true,
@@ -159,7 +159,7 @@ const Pricing = () => {
               <span className="font-bold">LIMITED TIME OFFER</span>
             </div>
             <p className="text-lg">
-              FREE access for the first 1000 users! 🎉
+              FREE access for the first 800 users! 🎉
             </p>
             <p className="text-sm opacity-90">
               No credit card required - Just sign up and start using all features
