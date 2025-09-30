@@ -1,0 +1,17 @@
+{
+"ON-LTB-T2": {
+"id": "ON-LTB-T2",
+"name": "LTB T2 — Application about Tenant Rights",
+"url": "https://tribunalsontario.ca/ltb/forms/"
+},
+"ON-LTB-T6": {
+"id": "ON-LTB-T6",
+"name": "LTB T6 — Tenant Application about Maintenance",
+"url": "https://tribunalsontario.ca/ltb/forms/"
+},
+"ON-HRTO-F1": {
+"id": "ON-HRTO-F1",
+"name": "HRTO — Form 1 (Application)",
+"url": "https://tribunalsontario.ca/hrto/forms-and-filing/#otherforms"
+}
+}
