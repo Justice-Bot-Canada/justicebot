@@ -35,6 +35,7 @@ import LTBJourney from "./pages/LTBJourney";
 import SmallClaimsJourney from "./pages/SmallClaimsJourney";
 import CriminalJourney from "./pages/CriminalJourney";
 import FamilyJourney from "./pages/FamilyJourney";
+import LegalChat from "./pages/LegalChat";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
@@ -76,6 +77,7 @@ const AppContent = () => {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
           <Route path="/payment-cancel" element={<ProtectedRoute><PaymentCancel /></ProtectedRoute>} />
+          <Route path="/legal-chat" element={<LegalChat />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

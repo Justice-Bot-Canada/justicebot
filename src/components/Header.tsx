@@ -86,6 +86,12 @@ const Header = () => {
               >
                 Contact
               </a>
+              <a 
+                href="/legal-chat" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
+              >
+                AI Assistant
+              </a>
               {isAdmin && (
                 <a 
                   href="/admin" 
@@ -197,6 +203,13 @@ const Header = () => {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Contact
+              </a>
+              <a 
+                href="/legal-chat" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                AI Assistant
               </a>
               {isAdmin && (
                 <a 
