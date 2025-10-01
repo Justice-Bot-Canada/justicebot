@@ -148,7 +148,7 @@ const LegalResources: React.FC = () => {
                   <div>
                     <CardTitle>Canadian Legal Database</CardTitle>
                     <CardDescription>
-                      Search 116,000+ cases and 5,700+ federal laws with advanced Boolean search
+                      Search 117,000+ cases and 5,700+ federal laws • Bilingual (EN/FR) • 1877-2025
                     </CardDescription>
                   </div>
                   <Badge variant="secondary">Powered by A2AJ</Badge>
@@ -263,16 +263,22 @@ const LegalResources: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Building2 className="h-5 w-5" />
-                    Case Law Coverage
+                    Case Law Coverage (117K+ cases)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-sm">
-                    <li>• <strong>Supreme Court of Canada</strong> (10,845)</li>
-                    <li>• <strong>Federal Courts</strong> (FCA: 7,580 | FC: 34,256)</li>
-                    <li>• <strong>Ontario Court of Appeal</strong> (16,951)</li>
-                    <li>• <strong>Immigration Tribunals</strong> (RAD, RPD)</li>
-                    <li>• <strong>Human Rights Tribunal</strong> (1,050)</li>
+                    <li>• <strong>Supreme Court of Canada (SCC)</strong> - 10,847 cases (1877-2025)</li>
+                    <li>• <strong>Federal Court (FC)</strong> - 34,461 cases</li>
+                    <li>• <strong>Federal Court of Appeal (FCA)</strong> - 7,612 cases</li>
+                    <li>• <strong>Ontario Court of Appeal (ONCA)</strong> - 17,050 cases</li>
+                    <li>• <strong>Social Security Tribunal (SST)</strong> - 16,585 cases</li>
+                    <li>• <strong>Refugee Appeal Division (RAD)</strong> - 14,081 cases</li>
+                    <li>• <strong>Tax Court of Canada (TCC)</strong> - 7,937 cases</li>
+                    <li>• <strong>Refugee Protection Division (RPD)</strong> - 6,729 cases</li>
+                    <li>• <strong>Human Rights Tribunal (CHRT)</strong> - 1,066 cases</li>
+                    <li>• <strong>Refugee Law Lab Reporter (RLLR)</strong> - 927 cases</li>
+                    <li>• <strong>Court Martial Appeal Court (CMAC)</strong> - 147 cases</li>
                   </ul>
                 </CardContent>
               </Card>
@@ -281,16 +287,16 @@ const LegalResources: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <FileText className="h-5 w-5" />
-                    Legislation Coverage
+                    Legislation Coverage (5,700+ laws)
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2 text-sm">
-                    <li>• <strong>Federal Statutes</strong> (954)</li>
-                    <li>• <strong>Federal Regulations</strong> (4,803)</li>
-                    <li>• Coverage: 1870 - 2025</li>
+                    <li>• <strong>Federal Statutes</strong> - 954 documents (1870-2025)</li>
+                    <li>• <strong>Federal Regulations</strong> - 4,808 documents (1945-2025)</li>
                     <li className="pt-2">
-                      <Badge variant="outline">Open Access Data</Badge>
+                      <Badge variant="outline">Bilingual (EN/FR)</Badge>
+                      <Badge variant="outline" className="ml-2">Open Access</Badge>
                     </li>
                   </ul>
                 </CardContent>
