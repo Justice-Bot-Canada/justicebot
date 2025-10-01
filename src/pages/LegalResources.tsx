@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import InteractiveTutorial from '@/components/InteractiveTutorial';
@@ -18,6 +19,7 @@ const LegalResources: React.FC = () => {
   const [activeTab, setActiveTab] = useState('tutorials');
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState<"cases" | "legislation">("cases");
+  const [legislationDataset, setLegislationDataset] = useState<string>("all");
   const { loading, data, searchCases, searchLegislation } = useLegalData();
 
   const handleSearch = async () => {
@@ -26,7 +28,8 @@ const LegalResources: React.FC = () => {
     if (searchType === "cases") {
       await searchCases(searchQuery);
     } else {
-      await searchLegislation(searchQuery);
+      const dataset = legislationDataset === "all" ? undefined : legislationDataset;
+      await searchLegislation(searchQuery, dataset);
     }
   };
 
@@ -163,6 +166,23 @@ const LegalResources: React.FC = () => {
                       Legislation
                     </TabsTrigger>
                   </TabsList>
+                  
+                  {searchType === "legislation" && (
+                    <Select value={legislationDataset} onValueChange={setLegislationDataset}>
+                      <SelectTrigger className="mb-3">
+                        <SelectValue placeholder="Select dataset" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Federal Laws</SelectItem>
+                        <SelectItem value="LEGISLATION-FED">
+                          Federal Statutes (954 docs)
+                        </SelectItem>
+                        <SelectItem value="REGULATIONS-FED">
+                          Federal Regulations (4,808 docs)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
                   
                   <div className="flex gap-2">
                     <Input
