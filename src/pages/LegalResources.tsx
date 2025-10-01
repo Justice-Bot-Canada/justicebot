@@ -1,18 +1,34 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import InteractiveTutorial from '@/components/InteractiveTutorial';
 import LegalFAQ from '@/components/LegalFAQ';
 import DocumentTemplateLibrary from '@/components/DocumentTemplateLibrary';
 import EnhancedSEO from '@/components/EnhancedSEO';
-import { BookOpen, HelpCircle, FileText, Video, Users, Scale, Phone, ExternalLink } from 'lucide-react';
+import { useLegalData } from '@/hooks/useLegalData';
+import { BookOpen, HelpCircle, FileText, Video, Users, Scale, Phone, ExternalLink, Search, Building2 } from 'lucide-react';
 
 const LegalResources: React.FC = () => {
   const [activeTab, setActiveTab] = useState('tutorials');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchType, setSearchType] = useState<"cases" | "legislation">("cases");
+  const { loading, data, searchCases, searchLegislation } = useLegalData();
+
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return;
+    
+    if (searchType === "cases") {
+      await searchCases(searchQuery);
+    } else {
+      await searchLegislation(searchQuery);
+    }
+  };
 
   const quickLinks = [
     {
@@ -99,7 +115,11 @@ const LegalResources: React.FC = () => {
 
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="database" className="flex items-center gap-2">
+              <Search className="h-4 w-4" />
+              Database
+            </TabsTrigger>
             <TabsTrigger value="tutorials" className="flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
               Tutorials
@@ -117,6 +137,124 @@ const LegalResources: React.FC = () => {
               Guides
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="database" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Canadian Legal Database</CardTitle>
+                    <CardDescription>
+                      Search 116,000+ cases and 5,700+ federal laws
+                    </CardDescription>
+                  </div>
+                  <Badge variant="secondary">Powered by A2AJ</Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Tabs value={searchType} onValueChange={(v) => setSearchType(v as "cases" | "legislation")}>
+                  <TabsList className="grid w-full grid-cols-2 mb-4">
+                    <TabsTrigger value="cases">
+                      <Building2 className="mr-2 h-4 w-4" />
+                      Case Law
+                    </TabsTrigger>
+                    <TabsTrigger value="legislation">
+                      <BookOpen className="mr-2 h-4 w-4" />
+                      Legislation
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder={searchType === "cases" ? "Search cases by keywords, party names, or topics..." : "Search federal statutes and regulations..."}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    />
+                    <Button onClick={handleSearch} disabled={loading}>
+                      <Search className="mr-2 h-4 w-4" />
+                      {loading ? "Searching..." : "Search"}
+                    </Button>
+                  </div>
+                </Tabs>
+              </CardContent>
+            </Card>
+
+            {/* Results */}
+            {data && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Search Results</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {data.results?.length > 0 ? (
+                      data.results.map((item: any, index: number) => (
+                        <div key={index} className="border-b pb-4 last:border-0">
+                          <h3 className="font-semibold text-lg mb-1">{item.name || item.title}</h3>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {item.citation} • {item.court || item.type} • {item.year}
+                          </p>
+                          {item.summary && (
+                            <p className="text-sm mb-2">{item.summary}</p>
+                          )}
+                          <Button variant="link" className="p-0 h-auto" asChild>
+                            <a href={item.url} target="_blank" rel="noopener noreferrer">
+                              View Full Document <ExternalLink className="ml-1 h-3 w-3" />
+                            </a>
+                          </Button>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-center text-muted-foreground py-8">
+                        No results found. Try different keywords.
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Coverage Info */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="h-5 w-5" />
+                    Case Law Coverage
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm">
+                    <li>• <strong>Supreme Court of Canada</strong> (10,845)</li>
+                    <li>• <strong>Federal Courts</strong> (FCA: 7,580 | FC: 34,256)</li>
+                    <li>• <strong>Ontario Court of Appeal</strong> (16,951)</li>
+                    <li>• <strong>Immigration Tribunals</strong> (RAD, RPD)</li>
+                    <li>• <strong>Human Rights Tribunal</strong> (1,050)</li>
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Legislation Coverage
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm">
+                    <li>• <strong>Federal Statutes</strong> (954)</li>
+                    <li>• <strong>Federal Regulations</strong> (4,803)</li>
+                    <li>• Coverage: 1870 - 2025</li>
+                    <li className="pt-2">
+                      <Badge variant="outline">Open Access Data</Badge>
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
 
           <TabsContent value="tutorials" className="space-y-6">
             <InteractiveTutorial />

@@ -64,5 +64,5 @@ verify_jwt = false
 [functions.send-notification]
 verify_jwt = false
 
-[functions.fetch-canlii-data]
+[functions.fetch-legal-data]
 verify_jwt = true
