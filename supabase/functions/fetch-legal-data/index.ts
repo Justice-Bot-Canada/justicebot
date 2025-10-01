@@ -62,9 +62,11 @@ async function handleA2AJRequest(queryType: string, params: any) {
         // A2AJ uses /fetch endpoint for citation lookups
         endpoint = `${A2AJ_API_BASE}/fetch`;
         if (params.citation) queryParams.set('citation', params.citation);
-        if (params.start) queryParams.set('start', params.start); // Character slice start
-        if (params.end) queryParams.set('end', params.end); // Character slice end
+        if (params.doc_type) queryParams.set('doc_type', params.doc_type); // 'cases' or 'laws'
+        if (params.output_language) queryParams.set('output_language', params.output_language); // 'en', 'fr', 'both'
         if (params.section) queryParams.set('section', params.section); // For laws only
+        if (params.start_char !== undefined) queryParams.set('start_char', params.start_char.toString());
+        if (params.end_char !== undefined) queryParams.set('end_char', params.end_char.toString());
         break;
 
       case 'get_coverage':

@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
 interface LegalDataParams {
-  queryType: 'search_cases' | 'search_legislation' | 'get_case' | 'get_legislation' | 'get_by_citation';
+  queryType: 'search_cases' | 'search_legislation' | 'get_case' | 'get_legislation' | 'get_by_citation' | 'get_coverage';
   params: {
     query?: string;
     jurisdiction?: string;
@@ -16,11 +16,12 @@ interface LegalDataParams {
     caseId?: string;
     legislationId?: string;
     citation?: string;
-    start?: string; // Character slice start position
-    end?: string; // Character slice end position
+    start_char?: number; // Character slice start position (default 0)
+    end_char?: number; // Character slice end position (-1 means end)
     section?: string; // Section number for laws/regulations
+    doc_type?: 'cases' | 'laws';
+    output_language?: 'en' | 'fr' | 'both';
     type?: 'statute' | 'regulation';
-    doc_type?: 'laws' | 'cases';
   };
   source?: 'a2aj' | 'canlii' | 'auto';
 }
@@ -88,17 +89,71 @@ export function useLegalData() {
     });
   };
 
-  const getCaseByCitation = async (citation: string, start?: string, end?: string) => {
+  const getCaseByCitation = async (
+    citation: string, 
+    startChar?: number, 
+    endChar?: number,
+    outputLanguage: 'en' | 'fr' | 'both' = 'en'
+  ) => {
+    // Validate citation format
+    if (!citation.trim() || citation.length > 200) {
+      toast({
+        title: "Invalid Citation",
+        description: "Citation must be between 1 and 200 characters",
+        variant: "destructive"
+      });
+      return null;
+    }
+
     return fetchLegalData({
       queryType: 'get_by_citation',
-      params: { citation, start, end }
+      params: { 
+        citation: citation.trim(), 
+        doc_type: 'cases',
+        start_char: startChar, 
+        end_char: endChar,
+        output_language: outputLanguage
+      }
     });
   };
 
-  const getLawByCitation = async (citation: string, section?: string, start?: string, end?: string) => {
+  const getLawByCitation = async (
+    citation: string, 
+    section?: string, 
+    startChar?: number, 
+    endChar?: number,
+    outputLanguage: 'en' | 'fr' | 'both' = 'en'
+  ) => {
+    // Validate citation format
+    if (!citation.trim() || citation.length > 200) {
+      toast({
+        title: "Invalid Citation",
+        description: "Citation must be between 1 and 200 characters",
+        variant: "destructive"
+      });
+      return null;
+    }
+
+    // Validate section if provided
+    if (section && section.length > 50) {
+      toast({
+        title: "Invalid Section",
+        description: "Section must be less than 50 characters",
+        variant: "destructive"
+      });
+      return null;
+    }
+
     return fetchLegalData({
       queryType: 'get_by_citation',
-      params: { citation, section, start, end }
+      params: { 
+        citation: citation.trim(),
+        doc_type: 'laws',
+        section: section?.trim(),
+        start_char: startChar,
+        end_char: endChar,
+        output_language: outputLanguage
+      }
     });
   };
 
