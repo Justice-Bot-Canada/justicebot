@@ -99,6 +99,24 @@ const Header = () => {
               >
                 Document Analyzer
               </a>
+              <a 
+                href="/tutorials" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
+              >
+                Tutorials
+              </a>
+              <a 
+                href="/templates" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
+              >
+                Templates
+              </a>
+              <a 
+                href="/referrals" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
+              >
+                Referrals
+              </a>
               {isAdmin && (
                 <a 
                   href="/admin" 
@@ -225,6 +243,27 @@ const Header = () => {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Document Analyzer
+              </a>
+              <a 
+                href="/tutorials" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Tutorials
+              </a>
+              <a 
+                href="/templates" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Templates
+              </a>
+              <a 
+                href="/referrals" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Referrals
               </a>
               {isAdmin && (
                 <a 

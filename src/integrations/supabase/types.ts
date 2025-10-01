@@ -67,6 +67,42 @@ export type Database = {
           },
         ]
       }
+      case_milestones: {
+        Row: {
+          case_id: string
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          id: string
+          milestone_type: string
+          order_index: number
+          title: string
+        }
+        Insert: {
+          case_id: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          milestone_type: string
+          order_index: number
+          title: string
+        }
+        Update: {
+          case_id?: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          milestone_type?: string
+          order_index?: number
+          title?: string
+        }
+        Relationships: []
+      }
       cases: {
         Row: {
           created_at: string
@@ -109,6 +145,51 @@ export type Database = {
           updated_at?: string
           user_id?: string
           user_number?: number | null
+        }
+        Relationships: []
+      }
+      document_templates: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          download_count: number
+          file_path: string
+          id: string
+          is_premium: boolean
+          preview_content: string | null
+          tags: string[] | null
+          template_type: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          download_count?: number
+          file_path: string
+          id?: string
+          is_premium?: boolean
+          preview_content?: string | null
+          tags?: string[] | null
+          template_type: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          download_count?: number
+          file_path?: string
+          id?: string
+          is_premium?: boolean
+          preview_content?: string | null
+          tags?: string[] | null
+          template_type?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -649,6 +730,210 @@ export type Database = {
           last_name?: string | null
           phone?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          total_credits_earned: number
+          user_id: string
+          uses_count: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          total_credits_earned?: number
+          user_id: string
+          uses_count?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          total_credits_earned?: number
+          user_id?: string
+          uses_count?: number
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          credit_amount: number
+          credited_at: string | null
+          id: string
+          referral_code: string
+          referred_user_id: string
+          referrer_user_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          credit_amount?: number
+          credited_at?: string | null
+          id?: string
+          referral_code: string
+          referred_user_id: string
+          referrer_user_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          credit_amount?: number
+          credited_at?: string | null
+          id?: string
+          referral_code?: string
+          referred_user_id?: string
+          referrer_user_id?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      support_messages: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          sender_name: string
+          sender_type: string
+          ticket_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          sender_name: string
+          sender_type: string
+          ticket_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          sender_name?: string
+          sender_type?: string
+          ticket_id?: string
+        }
+        Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+          priority: string
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          priority?: string
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          priority?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      tutorial_videos: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          duration_seconds: number | null
+          id: string
+          is_active: boolean
+          pathway_type: string
+          step_number: number | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string
+          video_url: string
+          view_count: number
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          is_active?: boolean
+          pathway_type: string
+          step_number?: number | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string
+          video_url: string
+          view_count?: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          is_active?: boolean
+          pathway_type?: string
+          step_number?: number | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string
+          video_url?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
+      user_credits: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          source: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          source: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          source?: string
           user_id?: string
         }
         Relationships: []

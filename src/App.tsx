@@ -37,7 +37,11 @@ import CriminalJourney from "./pages/CriminalJourney";
 import FamilyJourney from "./pages/FamilyJourney";
 import LegalChat from "./pages/LegalChat";
 import DocumentAnalysis from "./pages/DocumentAnalysis";
+import TutorialLibrary from "./pages/TutorialLibrary";
+import TemplateLibrary from "./pages/TemplateLibrary";
+import Referrals from "./pages/Referrals";
 import ErrorBoundary from "./components/ErrorBoundary";
+import LiveSupportWidget from "./components/LiveSupportWidget";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +54,7 @@ const AppContent = () => {
       <div className="min-h-screen">
         <PerformanceMonitor />
         <SkipToContent />
+        <LiveSupportWidget />
       <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/hrto-help" element={<HRTOHelp />} />
@@ -80,6 +85,9 @@ const AppContent = () => {
           <Route path="/payment-cancel" element={<ProtectedRoute><PaymentCancel /></ProtectedRoute>} />
           <Route path="/legal-chat" element={<LegalChat />} />
           <Route path="/document-analysis" element={<ProtectedRoute><DocumentAnalysis /></ProtectedRoute>} />
+          <Route path="/tutorials" element={<TutorialLibrary />} />
+          <Route path="/templates" element={<TemplateLibrary />} />
+          <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

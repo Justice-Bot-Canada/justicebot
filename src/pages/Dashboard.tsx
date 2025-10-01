@@ -20,6 +20,7 @@ import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import CaseManager from "@/components/CaseManager";
 import CaseCalendar from "@/components/CaseCalendar";
 import { DocumentAnalyzer } from "@/components/DocumentAnalyzer";
+import CaseProgressTracker from "@/components/CaseProgressTracker";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { PremiumGate } from "@/components/PremiumGate";
@@ -84,7 +85,14 @@ const Dashboard = () => {
           </TabsList>
 
           <TabsContent value="cases" className="mt-6">
-            <CaseManager onCaseSelect={setActiveCaseId} />
+            {activeCaseId ? (
+              <div className="space-y-6">
+                <CaseProgressTracker caseId={activeCaseId} />
+                <CaseManager onCaseSelect={setActiveCaseId} />
+              </div>
+            ) : (
+              <CaseManager onCaseSelect={setActiveCaseId} />
+            )}
           </TabsContent>
 
           <TabsContent value="calendar" className="mt-6">
