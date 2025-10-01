@@ -19,6 +19,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import CaseManager from "@/components/CaseManager";
 import CaseCalendar from "@/components/CaseCalendar";
+import { DocumentAnalyzer } from "@/components/DocumentAnalyzer";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { PremiumGate } from "@/components/PremiumGate";
@@ -55,7 +56,7 @@ const Dashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="cases" className="flex items-center gap-2">
               <Scale className="h-4 w-4" />
               Cases
@@ -63,6 +64,10 @@ const Dashboard = () => {
             <TabsTrigger value="calendar" className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
               Calendar
+            </TabsTrigger>
+            <TabsTrigger value="documents" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Documents
             </TabsTrigger>
             <TabsTrigger value="forms" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
@@ -90,6 +95,19 @@ const Dashboard = () => {
                 <CardContent className="pt-6 text-center text-muted-foreground">
                   <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
                   <p>Select a case to view its timeline and deadlines</p>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          <TabsContent value="documents" className="mt-6">
+            {activeCaseId ? (
+              <DocumentAnalyzer caseId={activeCaseId} />
+            ) : (
+              <Card>
+                <CardContent className="pt-6 text-center text-muted-foreground">
+                  <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>Select a case to analyze and upload documents</p>
                 </CardContent>
               </Card>
             )}

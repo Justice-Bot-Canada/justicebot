@@ -36,6 +36,7 @@ import SmallClaimsJourney from "./pages/SmallClaimsJourney";
 import CriminalJourney from "./pages/CriminalJourney";
 import FamilyJourney from "./pages/FamilyJourney";
 import LegalChat from "./pages/LegalChat";
+import DocumentAnalysis from "./pages/DocumentAnalysis";
 import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
@@ -78,6 +79,7 @@ const AppContent = () => {
           <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
           <Route path="/payment-cancel" element={<ProtectedRoute><PaymentCancel /></ProtectedRoute>} />
           <Route path="/legal-chat" element={<LegalChat />} />
+          <Route path="/document-analysis" element={<ProtectedRoute><DocumentAnalysis /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

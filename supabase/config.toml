@@ -57,3 +57,6 @@ verify_jwt = true
 
 [functions.legal-chat]
 verify_jwt = false
+
+[functions.analyze-document]
+verify_jwt = false

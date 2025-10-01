@@ -92,6 +92,12 @@ const Header = () => {
               >
                 AI Assistant
               </a>
+              <a 
+                href="/document-analysis" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
+              >
+                Document Analyzer
+              </a>
               {isAdmin && (
                 <a 
                   href="/admin" 
@@ -210,6 +216,13 @@ const Header = () => {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 AI Assistant
+              </a>
+              <a 
+                href="/document-analysis" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Document Analyzer
               </a>
               {isAdmin && (
                 <a 
