@@ -16,6 +16,9 @@ interface LegalDataParams {
     caseId?: string;
     legislationId?: string;
     citation?: string;
+    start?: string; // Character slice start position
+    end?: string; // Character slice end position
+    section?: string; // Section number for laws/regulations
     type?: 'statute' | 'regulation';
     doc_type?: 'laws' | 'cases';
   };
@@ -85,10 +88,17 @@ export function useLegalData() {
     });
   };
 
-  const getCaseByCitation = async (citation: string) => {
+  const getCaseByCitation = async (citation: string, start?: string, end?: string) => {
     return fetchLegalData({
       queryType: 'get_by_citation',
-      params: { citation }
+      params: { citation, start, end }
+    });
+  };
+
+  const getLawByCitation = async (citation: string, section?: string, start?: string, end?: string) => {
+    return fetchLegalData({
+      queryType: 'get_by_citation',
+      params: { citation, section, start, end }
     });
   };
 
@@ -100,6 +110,7 @@ export function useLegalData() {
     searchCases,
     searchLegislation,
     getCaseByCitation,
+    getLawByCitation,
     getCoverage
   };
 }

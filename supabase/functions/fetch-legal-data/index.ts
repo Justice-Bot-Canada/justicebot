@@ -62,6 +62,9 @@ async function handleA2AJRequest(queryType: string, params: any) {
         // A2AJ uses /fetch endpoint for citation lookups
         endpoint = `${A2AJ_API_BASE}/fetch`;
         if (params.citation) queryParams.set('citation', params.citation);
+        if (params.start) queryParams.set('start', params.start); // Character slice start
+        if (params.end) queryParams.set('end', params.end); // Character slice end
+        if (params.section) queryParams.set('section', params.section); // For laws only
         break;
 
       case 'get_coverage':
