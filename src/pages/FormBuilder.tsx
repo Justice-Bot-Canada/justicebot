@@ -219,22 +219,44 @@ const FormBuilder = () => {
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('generate-pdf', {
+      toast.loading("Generating official PDF form...");
+      
+      // Try official PDF filling first
+      const { data, error } = await supabase.functions.invoke('fill-official-pdf', {
         body: {
-          formData,
-          formInfo: {
-            form_code: form.form_code,
-            title: form.title,
-            tribunal_type: form.tribunal_type
-          }
+          caseId: location.state?.caseId || 'temp',
+          formCode: form.form_code,
+          formData
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Official PDF error:', error);
+        
+        // Fallback to custom PDF generation
+        const { data: fallbackData, error: fallbackError } = await supabase.functions.invoke('generate-pdf', {
+          body: {
+            formData,
+            formInfo: {
+              form_code: form.form_code,
+              title: form.title,
+              tribunal_type: form.tribunal_type
+            }
+          }
+        });
+
+        if (fallbackError) throw fallbackError;
+        
+        if (fallbackData?.pdfUrl) {
+          window.open(fallbackData.pdfUrl, '_blank');
+          toast.success("Custom PDF generated successfully!");
+        }
+        return;
+      }
 
       if (data?.pdfUrl) {
         window.open(data.pdfUrl, '_blank');
-        toast.success("PDF generated successfully!");
+        toast.success("Official PDF form generated and saved!");
       }
     } catch (error) {
       console.error('PDF generation error:', error);
