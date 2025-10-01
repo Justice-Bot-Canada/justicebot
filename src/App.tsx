@@ -36,9 +36,11 @@ import SmallClaimsJourney from "./pages/SmallClaimsJourney";
 import CriminalJourney from "./pages/CriminalJourney";
 import FamilyJourney from "./pages/FamilyJourney";
 import SuperiorCourtJourney from "./pages/SuperiorCourtJourney";
-import AccountabilityJourney from "./pages/AccountabilityJourney";
 import PoliceAccountabilityJourney from "./pages/PoliceAccountabilityJourney";
 import CASJourney from "./pages/CASJourney";
+import LabourBoardJourney from "./pages/LabourBoardJourney";
+import ImmigrationJourney from "./pages/ImmigrationJourney";
+import AccountabilityJourney from "./pages/AccountabilityJourney";
 import LegalChat from "./pages/LegalChat";
 import DocumentAnalysis from "./pages/DocumentAnalysis";
 import TutorialLibrary from "./pages/TutorialLibrary";
@@ -71,8 +73,10 @@ const AppContent = () => {
         <Route path="/family-journey" element={<FamilyJourney />} />
         <Route path="/superior-court-journey" element={<SuperiorCourtJourney />} />
         <Route path="/accountability-journey" element={<AccountabilityJourney />} />
-        <Route path="/police-accountability-journey" element={<PoliceAccountabilityJourney />} />
-        <Route path="/cas-journey" element={<CASJourney />} />
+          <Route path="/police-accountability-journey" element={<PoliceAccountabilityJourney />} />
+          <Route path="/cas-journey" element={<CASJourney />} />
+          <Route path="/labour-journey" element={<LabourBoardJourney />} />
+          <Route path="/immigration-journey" element={<ImmigrationJourney />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

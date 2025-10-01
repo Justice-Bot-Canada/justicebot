@@ -36,7 +36,7 @@ interface JourneyStep {
 }
 
 interface UserJourneyProps {
-  venue: 'hrto' | 'ltb' | 'small-claims' | 'family' | 'criminal' | 'superior' | 'accountability' | 'police-accountability' | 'cas';
+  venue: 'hrto' | 'ltb' | 'small-claims' | 'family' | 'criminal' | 'superior' | 'accountability' | 'police-accountability' | 'cas' | 'labour' | 'immigration';
   userSituation?: string;
   incidentDate?: Date;
   onStepComplete?: (stepId: string) => void;
@@ -667,6 +667,172 @@ const getJourneyData = (venue: string) => {
             timeEstimate: '1-2 years',
             priority: 'high' as const,
             actionText: 'Trial Guide'
+          }
+        ]
+      };
+      
+    case 'labour':
+      return {
+        title: "Your Labour Board Journey: Fighting for Workplace Rights",
+        subtitle: "Step-by-step guide for employment disputes and wrongful dismissal",
+        criticalWarning: "⚠️ CRITICAL: Most labour matters have strict time limits (2 years for ESA claims, 30-90 days for union matters). File promptly!",
+        helpfulLinks: [
+          { title: "Ontario Labour Relations Board", url: "https://www.olrb.gov.on.ca/" },
+          { title: "Employment Standards Act", url: "https://www.ontario.ca/laws/statute/00e41" },
+          { title: "File ESA Claim", url: "https://www.ontario.ca/document/your-guide-employment-standards-act-0/filing-claim" },
+          { title: "Find Employment Lawyer", url: "https://lso.ca/public-resources/finding-a-lawyer-or-paralegal" }
+        ],
+        steps: [
+          {
+            id: 'document-employment',
+            title: 'Gather All Employment Records',
+            description: 'Collect employment contract, pay stubs, job description, performance reviews, emails, termination letter, ROE (Record of Employment).',
+            timeEstimate: '1-2 days',
+            priority: 'critical' as const,
+            actionText: 'Document Checklist'
+          },
+          {
+            id: 'determine-claim-type',
+            title: 'Determine Your Claim Type',
+            description: 'Employment Standards (unpaid wages, vacation, termination pay), Wrongful Dismissal (common law), Constructive Dismissal, Human Rights violation, or Union Grievance.',
+            timeEstimate: '1-2 hours',
+            priority: 'high' as const,
+            actionText: 'Claim Assessment'
+          },
+          {
+            id: 'calculate-damages',
+            title: 'Calculate What You\'re Owed',
+            description: 'Termination pay, severance, vacation pay, unpaid wages, notice period. For wrongful dismissal: reasonable notice period (1 month per year of service is rough guide).',
+            timeEstimate: '2-3 hours',
+            priority: 'high' as const,
+            actionText: 'Calculate Now'
+          },
+          {
+            id: 'legal-consultation',
+            title: 'Consult Employment Lawyer',
+            description: 'Most employment lawyers offer free initial consultation. Bring all documents. Ask about contingency fee (lawyer only paid if you win).',
+            timeEstimate: '1 hour',
+            priority: 'high' as const,
+            actionText: 'Find Lawyer'
+          },
+          {
+            id: 'send-demand-letter',
+            title: 'Send Demand Letter (If Applicable)',
+            description: 'Before filing, lawyer may send demand letter requesting proper severance/notice. Many cases settle at this stage.',
+            timeEstimate: '1-2 weeks',
+            priority: 'medium' as const,
+            actionText: 'Sample Letters'
+          },
+          {
+            id: 'file-claim',
+            title: 'File Your Claim',
+            description: 'ESA claims: File online with Ministry of Labour. Small amounts: Small Claims Court. Large amounts: Superior Court. Union matters: File grievance.',
+            timeEstimate: '2-4 hours',
+            priority: 'high' as const,
+            actionText: 'File Now'
+          },
+          {
+            id: 'mediation-hearing',
+            title: 'Attend Mediation/Hearing',
+            description: 'Most cases go through mediation first. If no settlement, proceed to formal hearing. Present evidence of wrongful dismissal or ESA violations.',
+            timeEstimate: '6-18 months',
+            priority: 'medium' as const,
+            actionText: 'Hearing Guide'
+          }
+        ]
+      };
+
+    case 'immigration':
+      return {
+        title: "Your Immigration Journey: Navigating IRB & Immigration Matters",
+        subtitle: "Step-by-step guidance for refugee claims, immigration appeals, and hearings",
+        criticalWarning: "⚠️ CRITICAL: Immigration matters have strict deadlines. Missing deadlines can result in deportation. Get legal help immediately!",
+        helpfulLinks: [
+          { title: "Immigration and Refugee Board", url: "https://irb-cisr.gc.ca/" },
+          { title: "Refugee Claim Process", url: "https://www.canada.ca/en/immigration-refugees-citizenship/services/refugees/claim-protection-inside-canada.html" },
+          { title: "Find Immigration Lawyer", url: "https://www.canadianimmigrationlawyers.com/" },
+          { title: "Legal Aid Immigration", url: "https://www.legalaid.on.ca/services/immigration-refugee-law/" }
+        ],
+        steps: [
+          {
+            id: 'determine-case-type',
+            title: 'Determine Your Immigration Matter',
+            description: 'Refugee protection claim, Immigration Appeal Division (IAD) appeal, Detention review, or Admissibility hearing. Each has different processes.',
+            timeEstimate: '1 hour',
+            priority: 'critical' as const,
+            actionText: 'Case Type Guide'
+          },
+          {
+            id: 'get-immigration-lawyer',
+            title: 'Get Immigration Lawyer Immediately',
+            description: 'Immigration law is complex. Free legal aid available for refugee claimants. Do NOT proceed without legal advice - stakes are too high.',
+            timeEstimate: '1-3 days',
+            priority: 'critical' as const,
+            actionText: 'Find Lawyer'
+          },
+          {
+            id: 'gather-identity-docs',
+            title: 'Gather Identity & Supporting Documents',
+            description: 'Passport, birth certificate, identity documents from home country, travel documents, any previous immigration applications or refusals.',
+            timeEstimate: '1-2 weeks',
+            priority: 'high' as const,
+            actionText: 'Document List'
+          },
+          {
+            id: 'country-condition-research',
+            title: 'Research Country Conditions (Refugee Claims)',
+            description: 'Gather evidence of persecution, human rights reports, news articles about conditions in your country. Your lawyer will help identify key evidence.',
+            timeEstimate: '2-4 weeks',
+            priority: 'high' as const,
+            actionText: 'Country Docs'
+          },
+          {
+            id: 'prepare-narrative',
+            title: 'Prepare Your Personal Narrative',
+            description: 'Write detailed chronological account of why you left, persecution faced, threats received. Be specific with dates, names, locations. Practice with lawyer.',
+            timeEstimate: '2-3 weeks',
+            priority: 'high' as const,
+            actionText: 'Narrative Guide'
+          },
+          {
+            id: 'submit-basis-of-claim',
+            title: 'Submit Basis of Claim (BOC) Form',
+            description: 'For refugee claims: Must submit BOC form within 15 days of claim being referred to IRB. This is your written story. Lawyer will help draft.',
+            timeEstimate: '15 days',
+            priority: 'critical' as const,
+            actionText: 'BOC Guide'
+          },
+          {
+            id: 'disclosure-evidence',
+            title: 'Prepare and Submit Evidence',
+            description: 'Submit all supporting documents, expert reports, medical evidence, witness statements. Deadline: 10-45 days before hearing depending on case type.',
+            timeEstimate: '1-3 months',
+            priority: 'high' as const,
+            actionText: 'Evidence Guide'
+          },
+          {
+            id: 'hearing-preparation',
+            title: 'Prepare for Your IRB Hearing',
+            description: 'Practice testimony with lawyer. Understand questions you\'ll be asked. Arrange interpreter if needed (provided free). Prepare for cross-examination.',
+            timeEstimate: '2-4 weeks',
+            priority: 'critical' as const,
+            actionText: 'Hearing Prep'
+          },
+          {
+            id: 'attend-hearing',
+            title: 'Attend Your IRB Hearing',
+            description: 'Present your case to IRB member. Bring all original documents. Answer questions honestly and completely. Decision may be given same day or in writing later.',
+            timeEstimate: '1-2 days',
+            priority: 'critical' as const,
+            actionText: 'Day of Hearing'
+          },
+          {
+            id: 'post-decision',
+            title: 'Next Steps After Decision',
+            description: 'If accepted: Apply for PR. If refused: Consider appeal to RAD (Refugee Appeal Division) or Federal Court review. Act quickly - strict deadlines (15-30 days).',
+            timeEstimate: 'Varies',
+            priority: 'high' as const,
+            actionText: 'Appeal Options'
           }
         ]
       };

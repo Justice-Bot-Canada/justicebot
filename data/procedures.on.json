@@ -450,5 +450,286 @@
         }
       ]
     }
+  },
+  "LabourBoard": {
+    "wrongful_dismissal": {
+      "province": "ON",
+      "venue": "OLRB",
+      "issueCode": "wrongful_dismissal",
+      "confidence": 0.75,
+      "steps": [
+        {
+          "title": "Gather employment records and evidence",
+          "summary": "Collect all documentation related to your employment and termination.",
+          "actions": [
+            "Get employment contract, offer letter, job description.",
+            "Collect all pay stubs, T4s, ROE (Record of Employment).",
+            "Save all emails, texts, memos related to termination.",
+            "Get performance reviews and any disciplinary records.",
+            "List witnesses who can support your case.",
+            "Document timeline of events leading to dismissal."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Employee",
+          "venue": "OLRB",
+          "deadlineTip": "Act quickly - ESA claims must be filed within 2 years."
+        },
+        {
+          "title": "Determine type of claim and calculate damages",
+          "summary": "Identify what you're claiming and calculate what you're owed.",
+          "actions": [
+            "Employment Standards Act claim (unpaid wages, vacation, termination pay).",
+            "Wrongful dismissal (common law - inadequate notice).",
+            "Constructive dismissal (forced to quit).",
+            "Calculate: termination pay, severance, vacation pay, notice period.",
+            "Rule of thumb: 1 month notice per year of service (varies by factors)."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Employee",
+          "venue": "OLRB",
+          "deadlineTip": "Consult lawyer for accurate damage calculation."
+        },
+        {
+          "title": "Consult employment lawyer",
+          "summary": "Get legal advice before proceeding.",
+          "actions": [
+            "Most employment lawyers offer free initial consultation.",
+            "Ask about contingency fee arrangements (no win, no fee).",
+            "Bring all employment documents to consultation.",
+            "Discuss settlement prospects vs. litigation.",
+            "Lawyer can send demand letter to employer."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Employee",
+          "venue": "OLRB",
+          "deadlineTip": "Legal advice crucial for maximizing your claim."
+        },
+        {
+          "title": "File your claim or application",
+          "summary": "Submit claim with appropriate body.",
+          "actions": [
+            "ESA claims under $25,000: File with Ministry of Labour online.",
+            "Wrongful dismissal under $35,000: Small Claims Court.",
+            "Wrongful dismissal over $35,000: Superior Court.",
+            "Union grievances: File through your union.",
+            "Include all supporting documents and evidence."
+          ],
+          "forms": [
+            {"id": "ON-ESA-CLAIM", "name": "Employment Standards Claim", "url": "https://www.ontario.ca/document/your-guide-employment-standards-act-0/filing-claim"}
+          ],
+          "prereqs": [],
+          "who": "Employee",
+          "venue": "OLRB",
+          "deadlineTip": "File within limitation periods - usually 2 years."
+        },
+        {
+          "title": "Participate in mediation or hearing",
+          "summary": "Attend settlement discussions or formal hearing.",
+          "actions": [
+            "Most cases go through mediation first.",
+            "Be prepared to negotiate - most cases settle.",
+            "If no settlement, prepare for formal hearing.",
+            "Present evidence and witness testimony.",
+            "Employer must prove just cause if claiming it."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Employee",
+          "venue": "OLRB",
+          "deadlineTip": "Settlement often faster and less stressful than trial."
+        }
+      ]
+    }
+  },
+  "Immigration": {
+    "refugee_claim": {
+      "province": "Federal",
+      "venue": "IRB",
+      "issueCode": "refugee_claim",
+      "confidence": 0.8,
+      "steps": [
+        {
+          "title": "Make your refugee claim",
+          "summary": "File your claim for refugee protection in Canada.",
+          "actions": [
+            "Make claim at port of entry or inland at IRCC office.",
+            "Receive acknowledgement and referral to IRB.",
+            "Get your Basis of Claim (BOC) form kit.",
+            "Apply for work permit while claim is pending.",
+            "Register for healthcare coverage if eligible."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Claimant",
+          "venue": "IRB",
+          "deadlineTip": "Make claim as soon as possible after arriving in Canada."
+        },
+        {
+          "title": "Get legal representation immediately",
+          "summary": "Immigration law is complex - you need a lawyer.",
+          "actions": [
+            "Contact Legal Aid Ontario for free refugee legal services.",
+            "Find immigration lawyer through Law Society referral.",
+            "Many lawyers offer initial free consultation.",
+            "Do NOT proceed without legal advice.",
+            "Lawyer will help prepare your case and BOC form."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Claimant",
+          "venue": "IRB",
+          "deadlineTip": "Get lawyer before BOC deadline (15 days after referral to IRB)."
+        },
+        {
+          "title": "Submit Basis of Claim (BOC) form",
+          "summary": "Your written story explaining why you need protection.",
+          "actions": [
+            "Complete BOC form in detail - this is your written testimony.",
+            "Explain why you left your country and fear returning.",
+            "Include specific dates, names, locations, events.",
+            "Identify protected grounds (race, religion, nationality, political opinion, social group).",
+            "Your lawyer will help draft this critical document."
+          ],
+          "forms": [
+            {"id": "IRB-BOC", "name": "Basis of Claim Form", "url": "https://irb-cisr.gc.ca/en/refugee-claims/Pages/ClaDemDef.aspx"}
+          ],
+          "prereqs": [],
+          "who": "Claimant",
+          "venue": "IRB",
+          "deadlineTip": "CRITICAL: Must submit within 15 days of referral to IRB."
+        },
+        {
+          "title": "Gather evidence and documents",
+          "summary": "Collect all supporting documents for your claim.",
+          "actions": [
+            "Identity documents (passport, birth certificate, national ID).",
+            "Evidence of persecution (threats, police reports, hospital records).",
+            "Country condition documents (human rights reports, news articles).",
+            "Witness statements from people who know your situation.",
+            "Expert reports if applicable (psychological, country expert).",
+            "Photos, videos, social media evidence."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Claimant",
+          "venue": "IRB",
+          "deadlineTip": "Submit all documents at least 10-45 days before hearing."
+        },
+        {
+          "title": "Prepare for your IRB hearing",
+          "summary": "Practice your testimony and get ready for your hearing day.",
+          "actions": [
+            "Meet with lawyer multiple times to prepare.",
+            "Practice answering questions about your story.",
+            "Review your BOC form thoroughly - you'll be asked about it.",
+            "Prepare for cross-examination by government lawyer.",
+            "Arrange interpreter through IRB (free service).",
+            "Know what documents you'll need to bring."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Claimant",
+          "venue": "IRB",
+          "deadlineTip": "Hearing typically 12-24 months after claim filed."
+        },
+        {
+          "title": "Attend your refugee hearing",
+          "summary": "Present your case to the IRB member.",
+          "actions": [
+            "Arrive early with lawyer and all original documents.",
+            "Testify honestly and completely about your experiences.",
+            "Answer all questions - don't guess if you don't know.",
+            "IRB member may ask for clarification or additional evidence.",
+            "Decision may be given verbally at end of hearing or in writing later.",
+            "If accepted: Apply for permanent residence.",
+            "If refused: Discuss appeal options with lawyer immediately."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Claimant",
+          "venue": "IRB",
+          "deadlineTip": "If refused, you have 15 days to appeal to RAD."
+        }
+      ]
+    },
+    "immigration_appeal": {
+      "province": "Federal",
+      "venue": "IAD",
+      "issueCode": "immigration_appeal",
+      "confidence": 0.75,
+      "steps": [
+        {
+          "title": "Understand your appeal rights",
+          "summary": "Determine if you can appeal the immigration decision.",
+          "actions": [
+            "Review the refusal or removal order carefully.",
+            "Check if you have right to appeal to Immigration Appeal Division (IAD).",
+            "Permanent residents and some family class sponsors can appeal.",
+            "Refused refugee claimants appeal to Refugee Appeal Division (RAD), not IAD.",
+            "Note strict deadlines for filing appeal."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Appellant",
+          "venue": "IAD",
+          "deadlineTip": "Appeal deadlines vary - usually 15-30 days from decision."
+        },
+        {
+          "title": "File notice of appeal",
+          "summary": "Submit your appeal to the Immigration Appeal Division.",
+          "actions": [
+            "Complete IAD notice of appeal form.",
+            "Include copy of decision being appealed.",
+            "Pay filing fee (or apply for fee waiver).",
+            "Serve copy on CBSA or IRCC.",
+            "File within deadline or application to extend time."
+          ],
+          "forms": [
+            {"id": "IAD-APPEAL", "name": "Notice of Appeal", "url": "https://irb-cisr.gc.ca/en/immigration-appeals/Pages/index.aspx"}
+          ],
+          "prereqs": [],
+          "who": "Appellant",
+          "venue": "IAD",
+          "deadlineTip": "File within deadline - late appeals may be dismissed."
+        },
+        {
+          "title": "Prepare appeal submissions",
+          "summary": "Build your case for why decision should be overturned.",
+          "actions": [
+            "Review reasons for refusal - address each concern.",
+            "Gather new evidence that wasn't available at first decision.",
+            "Get letters of support from family, employers, community.",
+            "For H&C appeals: Show hardship if family separated.",
+            "Prepare detailed written submissions with lawyer.",
+            "Submit disclosure package before hearing."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Appellant",
+          "venue": "IAD",
+          "deadlineTip": "Submit evidence package 20-60 days before hearing."
+        },
+        {
+          "title": "Attend IAD hearing",
+          "summary": "Present your appeal to the Immigration Appeal Division.",
+          "actions": [
+            "Attend hearing with lawyer and all witnesses.",
+            "Present evidence showing decision was wrong in law.",
+            "Or, argue humanitarian and compassionate grounds.",
+            "Call witnesses to testify.",
+            "Government may oppose your appeal.",
+            "IAD can allow appeal, dismiss, or issue removal order with conditions."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Appellant",
+          "venue": "IAD",
+          "deadlineTip": "Hearing typically 12-36 months after filing appeal."
+        }
+      ]
+    }
   }
 }

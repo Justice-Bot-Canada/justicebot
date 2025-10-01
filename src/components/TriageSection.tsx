@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Building2, Users, DollarSign, Heart } from "lucide-react";
+import { ArrowRight, Building2, Users, DollarSign, Heart, Briefcase, Globe, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import CaseManager from "@/components/CaseManager";
 
@@ -37,6 +37,30 @@ const venues = [
     icon: Heart,
     color: "bg-rose-50 text-rose-700 border-rose-200",
     examples: ["Child custody", "Support payments", "CAS matters"]
+  },
+  {
+    id: "labour",
+    title: "Labour Board",
+    description: "Employment disputes, wrongful dismissal",
+    icon: Briefcase,
+    color: "bg-teal-50 text-teal-700 border-teal-200",
+    examples: ["Wrongful dismissal", "Employment standards", "Workplace rights"]
+  },
+  {
+    id: "immigration",
+    title: "Immigration & Refugee",
+    description: "IRB hearings, refugee claims, appeals",
+    icon: Globe,
+    color: "bg-indigo-50 text-indigo-700 border-indigo-200",
+    examples: ["Refugee claims", "Immigration appeals", "Detention reviews"]
+  },
+  {
+    id: "accountability",
+    title: "Government Accountability",
+    description: "Police complaints, CAS, agency issues",
+    icon: Shield,
+    color: "bg-orange-50 text-orange-700 border-orange-200",
+    examples: ["Police complaints (SIU/OIPRD)", "CAS matters", "Agency misconduct"]
   }
 ];
 
