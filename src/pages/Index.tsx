@@ -7,6 +7,7 @@ import FormPrefillDemo from "@/components/FormPrefillDemo";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import InteractiveTutorial from "@/components/InteractiveTutorial";
+import TrustSignals from "@/components/TrustSignals";
 import { AccessibilityPanel } from "@/components/AccessibilityEnhanced";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 
@@ -90,6 +91,7 @@ const Index = () => {
         </section>
         
         <TriageSection />
+        <TrustSignals />
         <FeaturesSection />
         <section id="merit" aria-labelledby="merit-heading">
           <MeritScoreDemo />
