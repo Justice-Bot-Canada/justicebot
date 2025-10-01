@@ -39,6 +39,20 @@ interface CaseStats {
   averageMeritScore: number;
 }
 
+interface RevenueStats {
+  totalRevenue: number;
+  monthlyRecurring: number;
+  averageOrderValue: number;
+  conversionRate: number;
+}
+
+interface EngagementStats {
+  activeUsersToday: number;
+  averageSessionTime: number;
+  formCompletionRate: number;
+  userRetentionRate: number;
+}
+
 interface User {
   id: string;
   email: string;
@@ -71,6 +85,18 @@ const Admin = () => {
     activeCases: 0,
     completedCases: 0,
     averageMeritScore: 0
+  });
+  const [revenueStats, setRevenueStats] = useState<RevenueStats>({
+    totalRevenue: 0,
+    monthlyRecurring: 0,
+    averageOrderValue: 0,
+    conversionRate: 0
+  });
+  const [engagementStats, setEngagementStats] = useState<EngagementStats>({
+    activeUsersToday: 0,
+    averageSessionTime: 0,
+    formCompletionRate: 0,
+    userRetentionRate: 0
   });
   const [users, setUsers] = useState<User[]>([]);
   const [cases, setCases] = useState<Case[]>([]);
@@ -142,6 +168,70 @@ const Admin = () => {
         });
 
         setCases(casesData);
+      }
+
+      // Load revenue statistics
+      const { data: paymentsData } = await supabase
+        .from('payments')
+        .select('amount, status, plan_type, created_at');
+
+      if (paymentsData) {
+        const completedPayments = paymentsData.filter(p => p.status === 'completed');
+        const totalRevenue = completedPayments.reduce((sum, p) => sum + Number(p.amount), 0);
+        const monthlySubscriptions = completedPayments.filter(p => 
+          p.plan_type === 'monthly' || p.plan_type === 'annual' || p.plan_type === 'low-income'
+        );
+        const avgOrderValue = completedPayments.length > 0 
+          ? totalRevenue / completedPayments.length 
+          : 0;
+        const conversionRate = allUsers.length > 0 
+          ? (completedPayments.length / allUsers.length) * 100 
+          : 0;
+
+        setRevenueStats({
+          totalRevenue,
+          monthlyRecurring: monthlySubscriptions.length * 59.99, // Rough estimate
+          averageOrderValue: avgOrderValue,
+          conversionRate: Math.round(conversionRate * 10) / 10
+        });
+      }
+
+      // Load engagement statistics
+      const todaySignIns = allUsers.filter(u => {
+        if (!u.last_sign_in_at) return false;
+        const signInDate = new Date(u.last_sign_in_at);
+        return signInDate >= today;
+      }).length;
+
+      const { data: formUsageData } = await supabase
+        .from('form_usage')
+        .select('completion_status, completion_time_minutes');
+
+      if (formUsageData) {
+        const completedForms = formUsageData.filter(f => f.completion_status === 'completed').length;
+        const completionRate = formUsageData.length > 0 
+          ? (completedForms / formUsageData.length) * 100 
+          : 0;
+        const avgSessionTime = formUsageData
+          .filter(f => f.completion_time_minutes)
+          .reduce((sum, f) => sum + (f.completion_time_minutes || 0), 0) / formUsageData.length || 0;
+
+        // Calculate retention (users who signed in within last 30 days)
+        const retainedUsers = allUsers.filter(u => {
+          if (!u.last_sign_in_at) return false;
+          const signInDate = new Date(u.last_sign_in_at);
+          return signInDate >= monthAgo;
+        }).length;
+        const retentionRate = allUsers.length > 0 
+          ? (retainedUsers / allUsers.length) * 100 
+          : 0;
+
+        setEngagementStats({
+          activeUsersToday: todaySignIns,
+          averageSessionTime: Math.round(avgSessionTime),
+          formCompletionRate: Math.round(completionRate * 10) / 10,
+          userRetentionRate: Math.round(retentionRate * 10) / 10
+        });
       }
     } catch (error) {
       console.error('Error loading admin data:', error);
@@ -244,6 +334,7 @@ const Admin = () => {
             </TabsList>
 
             <TabsContent value="overview" className="space-y-6">
+              {/* Top Metrics Row */}
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -258,6 +349,48 @@ const Admin = () => {
                   </CardContent>
                 </Card>
 
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">${revenueStats.totalRevenue.toFixed(2)}</div>
+                    <p className="text-xs text-muted-foreground">
+                      ${revenueStats.monthlyRecurring.toFixed(2)} MRR
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
+                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{revenueStats.conversionRate}%</div>
+                    <p className="text-xs text-muted-foreground">
+                      AOV: ${revenueStats.averageOrderValue.toFixed(2)}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+                    <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{engagementStats.activeUsersToday}</div>
+                    <p className="text-xs text-muted-foreground">
+                      {engagementStats.userRetentionRate}% retention
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Engagement Metrics Row */}
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium">Total Cases</CardTitle>
@@ -279,20 +412,33 @@ const Admin = () => {
                   <CardContent>
                     <div className="text-2xl font-bold">{caseStats.averageMeritScore}/100</div>
                     <p className="text-xs text-muted-foreground">
-                      Across all cases
+                      Quality indicator
                     </p>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Growth Rate</CardTitle>
+                    <CardTitle className="text-sm font-medium">Form Completion</CardTitle>
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{engagementStats.formCompletionRate}%</div>
+                    <p className="text-xs text-muted-foreground">
+                      Success rate
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Avg Session</CardTitle>
                     <BarChart3 className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">+{userStats.newUsersThisWeek}</div>
+                    <div className="text-2xl font-bold">{engagementStats.averageSessionTime}m</div>
                     <p className="text-xs text-muted-foreground">
-                      Users this week
+                      Per user
                     </p>
                   </CardContent>
                 </Card>
