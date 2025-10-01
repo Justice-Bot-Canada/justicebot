@@ -36,7 +36,7 @@ interface JourneyStep {
 }
 
 interface UserJourneyProps {
-  venue: 'hrto' | 'ltb' | 'small-claims' | 'family' | 'criminal' | 'superior' | 'accountability';
+  venue: 'hrto' | 'ltb' | 'small-claims' | 'family' | 'criminal' | 'superior' | 'accountability' | 'police-accountability' | 'cas';
   userSituation?: string;
   incidentDate?: Date;
   onStepComplete?: (stepId: string) => void;
@@ -529,6 +529,148 @@ const getJourneyData = (venue: string) => {
         ]
       };
       
+    case 'police-accountability':
+      return {
+        title: "Your Police Accountability Journey",
+        subtitle: "File complaints about police conduct through SIU, OIPRD, or police professional standards",
+        criticalWarning: "⚠️ CRITICAL: OIPRD complaints must be filed within 1 year. SIU incidents should be reported immediately.",
+        helpfulLinks: [
+          { title: "OIPRD - File Complaint", url: "https://oiprd.on.ca/complaints/file-a-complaint/" },
+          { title: "SIU - Special Investigations Unit", url: "https://www.siu.on.ca/" },
+          { title: "Your Rights - OIPRD Guide", url: "https://oiprd.on.ca/complaints/your-rights/" },
+          { title: "Police Services Act", url: "https://www.ontario.ca/laws/statute/90p15" }
+        ],
+        steps: [
+          {
+            id: 'document-incident',
+            title: 'Document the Incident Immediately',
+            description: 'Write down all details while fresh: date, time, location, officer names/badge numbers, witnesses, injuries, what was said',
+            timeEstimate: '1-2 hours',
+            priority: 'critical' as const,
+            actionText: 'Evidence Guide'
+          },
+          {
+            id: 'medical-attention',
+            title: 'Seek Medical Attention if Injured',
+            description: 'Get medical documentation of any injuries. This is crucial evidence. Take photos of injuries.',
+            timeEstimate: 'ASAP',
+            priority: 'critical' as const,
+            actionText: 'Medical Records'
+          },
+          {
+            id: 'determine-agency',
+            title: 'Determine the Right Complaint Body',
+            description: 'SIU: serious injury/death/sexual assault. OIPRD: misconduct/service complaints. Police Service: also accepts complaints.',
+            timeEstimate: '30 minutes',
+            priority: 'critical' as const,
+            actionText: 'Agency Guide'
+          },
+          {
+            id: 'file-complaint',
+            title: 'File Your Complaint',
+            description: 'Submit detailed complaint online (OIPRD), by mail, or in person. Include all evidence and witness information.',
+            timeEstimate: '2-4 hours',
+            priority: 'high' as const,
+            actionText: 'File Now'
+          },
+          {
+            id: 'cooperate-investigation',
+            title: 'Cooperate with Investigation',
+            description: 'Respond to investigator requests promptly. Provide additional evidence. You can have a lawyer present for interviews.',
+            timeEstimate: 'Ongoing',
+            priority: 'high' as const,
+            actionText: 'Investigation Process'
+          },
+          {
+            id: 'review-decision',
+            title: 'Review Decision & Appeal Rights',
+            description: 'Receive investigation results. If dissatisfied, you can request review by OIPRD Director or appeal to Divisional Court within 30 days.',
+            timeEstimate: '6-12 months',
+            priority: 'medium' as const,
+            actionText: 'Appeal Guide'
+          }
+        ]
+      };
+      
+    case 'cas':
+      return {
+        title: "Your CAS Journey: Child Protection",
+        subtitle: "Navigate Children's Aid Society involvement and protect your parental rights",
+        criticalWarning: "⚠️ CRITICAL: Get a lawyer IMMEDIATELY. Legal aid is available regardless of income for CAS cases. Never miss a court date.",
+        helpfulLinks: [
+          { title: "Legal Aid Ontario", url: "https://www.legalaid.on.ca/" },
+          { title: "Child, Youth and Family Services Act", url: "https://www.ontario.ca/laws/statute/17c14" },
+          { title: "Your Rights with CAS", url: "https://www.justice.gc.ca/eng/fl-df/parent/index.html" },
+          { title: "Find a Family Lawyer", url: "https://lso.ca/public-resources/finding-a-lawyer-or-paralegal" }
+        ],
+        steps: [
+          {
+            id: 'understand-cas-powers',
+            title: 'Understand CAS Powers and Your Rights',
+            description: 'Know what CAS can and cannot do. They need court order to keep child unless immediate danger. You have right to know concerns and see evidence.',
+            timeEstimate: '1 hour',
+            priority: 'critical' as const,
+            actionText: 'Your Rights'
+          },
+          {
+            id: 'get-lawyer-immediately',
+            title: 'Get Legal Representation NOW',
+            description: 'Apply for Legal Aid Ontario immediately (1-800-668-8258) or hire family lawyer. DO NOT go to court without lawyer. Legal aid is available regardless of income.',
+            timeEstimate: '1-2 days',
+            priority: 'critical' as const,
+            actionText: 'Apply for Legal Aid'
+          },
+          {
+            id: 'document-everything',
+            title: 'Document All CAS Interactions',
+            description: 'Keep detailed log of every CAS visit, phone call, and meeting. Note worker names, dates, times, and what was discussed.',
+            timeEstimate: 'Ongoing',
+            priority: 'critical' as const,
+            actionText: 'Documentation Guide'
+          },
+          {
+            id: 'comply-cooperate',
+            title: 'Comply with Safety Plan & Cooperate',
+            description: 'Follow all CAS safety plans and court orders exactly. Attend required programs (parenting, counseling). Refusing to cooperate can hurt your case.',
+            timeEstimate: 'Ongoing',
+            priority: 'high' as const,
+            actionText: 'Compliance Checklist'
+          },
+          {
+            id: 'first-court-hearing',
+            title: 'Attend First Court Hearing',
+            description: 'If child apprehended, court within 5 days. Judge decides temporary placement. Follow ALL court orders. Get future dates in writing.',
+            timeEstimate: '1 day',
+            priority: 'critical' as const,
+            actionText: 'Court Preparation'
+          },
+          {
+            id: 'complete-assessments',
+            title: 'Complete Required Assessments & Programs',
+            description: 'Attend parenting classes, counseling, drug testing, home visits. Document all completion certificates. Show positive changes.',
+            timeEstimate: '3-12 months',
+            priority: 'high' as const,
+            actionText: 'Program Guide'
+          },
+          {
+            id: 'build-support-network',
+            title: 'Build Strong Support Network',
+            description: 'Connect with family support, community resources, counselors. Character references matter. Show stable housing and employment.',
+            timeEstimate: 'Ongoing',
+            priority: 'medium' as const,
+            actionText: 'Support Resources'
+          },
+          {
+            id: 'trial-settlement',
+            title: 'Trial or Settlement Conference',
+            description: 'Present evidence of changes through your lawyer. Possible outcomes: reunification, supervision order, temporary/permanent wardship. Settlement may resolve without trial.',
+            timeEstimate: '1-2 years',
+            priority: 'high' as const,
+            actionText: 'Trial Guide'
+          }
+        ]
+      };
+      
     default:
       return {
         title: "Your Legal Journey",
@@ -904,6 +1046,22 @@ export const UserJourney: React.FC<UserJourneyProps> = ({
                       <li>• Keep detailed financial records and receipts</li>
                       <li>• Document all interactions with ex-spouse or CAS</li>
                       <li>• Consider mediation before going to court</li>
+                    </>
+                  )}
+                  {venue === 'police-accountability' && (
+                    <>
+                      <li>• Report SIU incidents immediately - do not delay</li>
+                      <li>• Take photos of injuries and scene as soon as possible</li>
+                      <li>• Get witness contact information while at scene</li>
+                      <li>• Keep all medical records and police documents</li>
+                    </>
+                  )}
+                  {venue === 'cas' && (
+                    <>
+                      <li>• NEVER miss a court date - it can cost you your case</li>
+                      <li>• Complete ALL required programs - document everything</li>
+                      <li>• Be professional and calm with CAS workers</li>
+                      <li>• Legal aid is available - apply immediately</li>
                     </>
                   )}
                 </ul>

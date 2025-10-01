@@ -71,7 +71,11 @@ const TriageSection = () => {
           {venues.map((venue) => {
             const Icon = venue.icon;
             return (
-              <Card key={venue.id} className="h-full hover:shadow-lg transition-shadow cursor-pointer group">
+              <Card 
+                key={venue.id} 
+                className="h-full hover:shadow-lg transition-shadow cursor-pointer group"
+                onClick={() => window.location.href = `/${venue.id}-journey`}
+              >
                 <CardHeader className="space-y-3">
                   <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${venue.color}`}>
                     <Icon className="w-6 h-6" />

@@ -158,7 +158,9 @@
           "actions": [
             "Read your appearance notice or promise to appear carefully.",
             "Note your first court date.",
-            "Consider contacting duty counsel or a lawyer."
+            "Consider contacting duty counsel or a lawyer.",
+            "Review the Criminal Code sections you're charged under.",
+            "Understand potential penalties (fines, probation, jail)."
           ],
           "forms": [],
           "prereqs": [],
@@ -167,18 +169,243 @@
           "deadlineTip": "Do not miss your first appearance date."
         },
         {
-          "title": "Attend first appearance",
-          "summary": "Appear in court on your scheduled date.",
+          "title": "Seek legal representation",
+          "summary": "Get legal advice before entering a plea.",
           "actions": [
-            "Arrive early and check in with court staff.",
-            "Speak with duty counsel if needed.",
-            "Enter your plea or request an adjournment."
+            "Apply for Legal Aid if you qualify financially.",
+            "Speak with duty counsel at courthouse (free).",
+            "Consider hiring a criminal defence lawyer.",
+            "Understand the difference between guilty plea, not guilty, and diversion options."
           ],
           "forms": [],
           "prereqs": [],
           "who": "Accused",
           "venue": "OCJ",
-          "deadlineTip": "Failure to appear can result in a warrant."
+          "deadlineTip": "Get legal advice before your first appearance if possible."
+        },
+        {
+          "title": "Attend first appearance",
+          "summary": "Appear in court on your scheduled date.",
+          "actions": [
+            "Arrive early (at least 30 minutes) and dress appropriately.",
+            "Bring photo ID and court documents.",
+            "Check in with court staff.",
+            "Speak with duty counsel if you don't have a lawyer.",
+            "Enter your plea or request an adjournment to get legal advice.",
+            "Get future court dates in writing."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Accused",
+          "venue": "OCJ",
+          "deadlineTip": "Failure to appear can result in a warrant for your arrest."
+        },
+        {
+          "title": "Disclosure and Crown meeting",
+          "summary": "Review evidence and discuss with Crown prosecutor.",
+          "actions": [
+            "Request disclosure (police reports, witness statements, evidence).",
+            "Review all disclosure with your lawyer.",
+            "Schedule Crown pre-trial meeting through your lawyer.",
+            "Discuss potential plea deals or trial options."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Accused",
+          "venue": "OCJ",
+          "deadlineTip": "Review disclosure carefully - it contains the case against you."
+        },
+        {
+          "title": "Trial or resolution",
+          "summary": "Proceed to trial or accept a resolution.",
+          "actions": [
+            "If pleading guilty: understand sentencing range and consequences.",
+            "If going to trial: prepare with lawyer, gather defence evidence.",
+            "Consider diversion programs if eligible (mental health court, drug treatment).",
+            "Attend all scheduled court dates."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Accused",
+          "venue": "OCJ",
+          "deadlineTip": "Missing court dates can result in additional charges."
+        }
+      ]
+    }
+  },
+  "PoliceAccountability": {
+    "police_complaint": {
+      "province": "ON",
+      "venue": "OIPRD",
+      "issueCode": "police_complaint",
+      "confidence": 0.8,
+      "steps": [
+        {
+          "title": "Document the incident immediately",
+          "summary": "Create a detailed record while memory is fresh.",
+          "actions": [
+            "Write down date, time, location of incident.",
+            "Record officer names and badge numbers if visible.",
+            "List all witnesses with contact information.",
+            "Take photos of injuries, property damage, or scene.",
+            "Keep all related documents (tickets, medical records)."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Complainant",
+          "venue": "OIPRD",
+          "deadlineTip": "Document everything ASAP while details are fresh."
+        },
+        {
+          "title": "Determine the right complaint body",
+          "summary": "File with correct agency based on nature of complaint.",
+          "actions": [
+            "SIU: Serious injury, death, or sexual assault by police.",
+            "OIPRD: Police conduct, policy complaints, service complaints.",
+            "Police Service: Can also file directly with the police service.",
+            "Note: OIPRD can refer matters to SIU if appropriate."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Complainant",
+          "venue": "OIPRD",
+          "deadlineTip": "SIU incidents should be reported immediately."
+        },
+        {
+          "title": "File your complaint",
+          "summary": "Submit complaint through appropriate channel.",
+          "actions": [
+            "OIPRD: File online at oiprd.on.ca or mail written complaint.",
+            "Include all evidence: photos, videos, witness statements.",
+            "Provide detailed chronological account of events.",
+            "Include impact statement (how incident affected you).",
+            "Keep copies of everything you submit."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Complainant",
+          "venue": "OIPRD",
+          "deadlineTip": "Must file within 1 year of incident (some exceptions apply)."
+        },
+        {
+          "title": "Participate in investigation",
+          "summary": "Cooperate with investigators and provide additional information.",
+          "actions": [
+            "Respond promptly to investigator requests.",
+            "Provide any additional evidence or witnesses.",
+            "Keep notes of all communication with investigators.",
+            "You can have a lawyer or support person present during interviews."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Complainant",
+          "venue": "OIPRD",
+          "deadlineTip": "Respond to requests within deadlines given by investigators."
+        },
+        {
+          "title": "Review decision and appeal if needed",
+          "summary": "Understand the outcome and your appeal rights.",
+          "actions": [
+            "Review the decision letter carefully.",
+            "If dissatisfied, you can request review by OIPRD Director.",
+            "Appeal to Divisional Court within 30 days if necessary.",
+            "Consider consulting a lawyer about appeal options."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Complainant",
+          "venue": "OIPRD",
+          "deadlineTip": "Appeal deadline is 30 days from decision."
+        }
+      ]
+    }
+  },
+  "CAS": {
+    "child_protection": {
+      "province": "ON",
+      "venue": "FamilyCourt",
+      "issueCode": "child_protection",
+      "confidence": 0.85,
+      "steps": [
+        {
+          "title": "Understand CAS involvement",
+          "summary": "Know your rights and CAS's authority.",
+          "actions": [
+            "CAS can investigate concerns about child safety.",
+            "You must allow CAS to see your child during investigation.",
+            "You have right to know why CAS is involved.",
+            "CAS can remove child only if immediate danger (then must go to court within 5 days).",
+            "Document all interactions with CAS workers."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Parent",
+          "venue": "FamilyCourt",
+          "deadlineTip": "Cooperate with investigation but get legal advice immediately."
+        },
+        {
+          "title": "Get legal representation IMMEDIATELY",
+          "summary": "Child protection cases require a lawyer.",
+          "actions": [
+            "Apply for Legal Aid Ontario - available regardless of income for CAS cases.",
+            "Contact a family lawyer with child protection experience.",
+            "Ask court for adjournment if needed to get lawyer.",
+            "Legal Aid: 1-800-668-8258 or apply online at legalaid.on.ca."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Parent",
+          "venue": "FamilyCourt",
+          "deadlineTip": "Do NOT go to court without a lawyer in CAS cases."
+        },
+        {
+          "title": "Court process - temporary care hearing",
+          "summary": "First court date within 5 days if child apprehended.",
+          "actions": [
+            "Attend court (failure to attend means case proceeds without you).",
+            "Court decides: child returns home, stays in care, or interim arrangements.",
+            "Judge may order conditions (counseling, no contact with certain people).",
+            "Follow all court orders exactly.",
+            "Future court dates will be scheduled."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Parent",
+          "venue": "FamilyCourt",
+          "deadlineTip": "NEVER miss a court date in a CAS case."
+        },
+        {
+          "title": "Work on CAS concerns and plan of care",
+          "summary": "Demonstrate changes to address safety concerns.",
+          "actions": [
+            "Complete all required programs (parenting, addiction treatment, counseling).",
+            "Attend all scheduled access visits with your child.",
+            "Document all efforts and progress.",
+            "Work with your lawyer to present evidence of positive changes.",
+            "Keep housing stable and safe.",
+            "Build support network (family, community resources)."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Parent",
+          "venue": "FamilyCourt",
+          "deadlineTip": "Progress takes time - consistent effort is key."
+        },
+        {
+          "title": "Trial or settlement",
+          "summary": "Final determination of child's placement.",
+          "actions": [
+            "Possible outcomes: child returned, supervision order, society wardship (temporary), crown wardship (permanent).",
+            "Present all evidence of changes through your lawyer.",
+            "Call witnesses who support your case.",
+            "CAS must prove child is in need of protection.",
+            "Settlement conferences may resolve case without trial."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Parent",
+          "venue": "FamilyCourt",
+          "deadlineTip": "Trials must occur within specific timelines (varies by age of child)."
         }
       ]
     }
