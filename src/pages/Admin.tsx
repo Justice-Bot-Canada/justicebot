@@ -171,12 +171,37 @@ const Admin = () => {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <div className="container mx-auto px-4 py-20 text-center">
+        <div className="container mx-auto px-4 py-20 text-center max-w-2xl">
           <AlertCircle className="w-16 h-16 text-warning mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-4">Admin Access Required</h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mb-6">
             You don't have permission to access the admin console.
           </p>
+          <Card className="text-left">
+            <CardHeader>
+              <CardTitle className="text-lg">How to Get Admin Access</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <p className="text-sm font-medium">1. Access Supabase SQL Editor</p>
+                <p className="text-sm text-muted-foreground">
+                  Go to your Supabase project dashboard and open the SQL Editor
+                </p>
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium">2. Run this SQL command:</p>
+                <code className="block p-3 bg-muted rounded text-xs">
+                  SELECT make_user_admin('{user?.email}');
+                </code>
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium">3. Refresh this page</p>
+                <p className="text-sm text-muted-foreground">
+                  After running the command, refresh this page to access the admin console
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
         <Footer />
       </div>
