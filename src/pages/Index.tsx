@@ -10,6 +10,7 @@ import InteractiveTutorial from "@/components/InteractiveTutorial";
 import TrustSignals from "@/components/TrustSignals";
 import { AccessibilityPanel } from "@/components/AccessibilityEnhanced";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
+import SuccessStories from "@/components/SuccessStories";
 
 const Index = () => {
   const structuredData = {
@@ -92,6 +93,7 @@ const Index = () => {
         
         <TriageSection />
         <TrustSignals />
+        <SuccessStories />
         <FeaturesSection />
         <section id="merit" aria-labelledby="merit-heading">
           <MeritScoreDemo />

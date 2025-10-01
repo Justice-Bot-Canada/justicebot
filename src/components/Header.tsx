@@ -7,6 +7,7 @@ import AuthDialog from "@/components/AuthDialog";
 import { HighContrastToggle, ScreenReaderOnly } from "@/components/AccessibilityFeatures";
 import { PremiumStatusBanner } from "@/components/PremiumStatusBanner";
 import justiceBotLogo from "@/assets/justice-bot-logo.jpeg";
+import NotificationBell from "./NotificationBell";
 
 const Header = () => {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
@@ -118,6 +119,7 @@ const Header = () => {
             </nav>
 
           <div className="flex items-center gap-4">
+            {user && <NotificationBell />}
             {user ? (
               <div className="flex items-center gap-4">
                 <Button 

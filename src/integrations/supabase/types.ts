@@ -456,6 +456,78 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          case_updates: boolean
+          created_at: string
+          deadline_reminders: boolean
+          email_notifications: boolean
+          reminder_days_before: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          case_updates?: boolean
+          created_at?: string
+          deadline_reminders?: boolean
+          email_notifications?: boolean
+          reminder_days_before?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          case_updates?: boolean
+          created_at?: string
+          deadline_reminders?: boolean
+          email_notifications?: boolean
+          reminder_days_before?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string
+          id: string
+          message: string
+          read: boolean
+          related_case_id: string | null
+          related_event_id: string | null
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean
+          related_case_id?: string | null
+          related_event_id?: string | null
+          title: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean
+          related_case_id?: string | null
+          related_event_id?: string | null
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       payment_audit: {
         Row: {
           created_at: string
