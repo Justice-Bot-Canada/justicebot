@@ -36,7 +36,7 @@ interface JourneyStep {
 }
 
 interface UserJourneyProps {
-  venue: 'hrto' | 'ltb' | 'small-claims' | 'family' | 'criminal';
+  venue: 'hrto' | 'ltb' | 'small-claims' | 'family' | 'criminal' | 'superior' | 'accountability';
   userSituation?: string;
   incidentDate?: Date;
   onStepComplete?: (stepId: string) => void;
@@ -392,6 +392,139 @@ const getJourneyData = (venue: string) => {
             timeEstimate: '1-2 weeks',
             priority: 'medium' as const,
             actionText: 'Service Guide'
+          }
+        ]
+      };
+      
+    case 'superior':
+      return {
+        title: "Your Superior Court Journey",
+        subtitle: "Navigate complex civil litigation and appeals",
+        criticalWarning: "⚠️ STRICT TIMELINES: Superior Court has rigid procedural deadlines. Missing a deadline can end your case.",
+        helpfulLinks: [
+          { title: "Superior Court of Justice", url: "https://www.ontariocourts.ca/scj/" },
+          { title: "Rules of Civil Procedure", url: "https://www.ontario.ca/laws/regulation/900194" },
+          { title: "CanLII Superior Court Cases", url: "https://www.canlii.org/en/on/onsc/" }
+        ],
+        steps: [
+          {
+            id: 'assess-jurisdiction',
+            title: 'Confirm Superior Court Jurisdiction',
+            description: 'Verify your case belongs in Superior Court (claims over $35,000, judicial review, complex matters)',
+            timeEstimate: '1 hour',
+            priority: 'critical' as const,
+            actionText: 'Jurisdiction Check'
+          },
+          {
+            id: 'retain-counsel',
+            title: 'Retain Experienced Lawyer',
+            description: 'Superior Court cases require skilled legal representation due to complex procedures and high stakes',
+            timeEstimate: '1-2 weeks',
+            priority: 'critical' as const,
+            actionText: 'Find Lawyer'
+          },
+          {
+            id: 'pleadings',
+            title: 'Draft and File Pleadings',
+            description: 'Prepare Statement of Claim/Defence (Rules 14-27). Must be filed within limitation periods (usually 2 years)',
+            timeEstimate: '2-4 weeks',
+            priority: 'high' as const,
+            actionText: 'Pleadings Guide'
+          },
+          {
+            id: 'discoveries',
+            title: 'Complete Documentary & Oral Discovery',
+            description: 'Exchange documents (Affidavit of Documents) and conduct examinations for discovery (Rules 30-31)',
+            timeEstimate: '3-6 months',
+            priority: 'high' as const,
+            actionText: 'Discovery Process'
+          },
+          {
+            id: 'mediation',
+            title: 'Mandatory Mediation',
+            description: 'Attend mandatory mediation session within 180 days in most regions (Rule 24.1)',
+            timeEstimate: '1 day',
+            priority: 'high' as const,
+            actionText: 'Mediation Info'
+          },
+          {
+            id: 'motions',
+            title: 'Pre-Trial Motions',
+            description: 'File motions for summary judgment, dismissal, evidence admissibility as needed (Rules 37-40)',
+            timeEstimate: '1-3 months',
+            priority: 'medium' as const,
+            actionText: 'Motion Practice'
+          },
+          {
+            id: 'trial-prep',
+            title: 'Trial Preparation',
+            description: 'Prepare witness lists, expert reports, trial record, and trial brief (Rules 48-52)',
+            timeEstimate: '2-3 months',
+            priority: 'high' as const,
+            actionText: 'Trial Checklist'
+          }
+        ]
+      };
+      
+    case 'accountability':
+      return {
+        title: "Your Government Accountability Journey",
+        subtitle: "Hold public bodies accountable through oversight mechanisms",
+        criticalWarning: "⚠️ EXHAUST INTERNAL REMEDIES: Most oversight bodies require you to complain to the organization first",
+        helpfulLinks: [
+          { title: "Ontario Ombudsman", url: "https://www.ombudsman.on.ca/" },
+          { title: "Integrity Commissioner", url: "https://www.oico.on.ca/" },
+          { title: "Auditor General", url: "https://www.auditor.on.ca/" },
+          { title: "Information & Privacy Commissioner", url: "https://www.ipc.on.ca/" }
+        ],
+        steps: [
+          {
+            id: 'identify-body',
+            title: 'Identify the Right Oversight Body',
+            description: 'Determine which body handles your complaint: Ombudsman (admin fairness), Integrity Commissioner (MPP ethics), IPC (privacy), or Auditor General (financial waste)',
+            timeEstimate: '30 minutes',
+            priority: 'critical' as const,
+            actionText: 'Body Selector'
+          },
+          {
+            id: 'internal-complaint',
+            title: 'File Internal Complaint First',
+            description: 'Submit formal complaint to the organization/ministry directly. Keep all correspondence and responses.',
+            timeEstimate: '1-2 weeks',
+            priority: 'critical' as const,
+            actionText: 'Internal Process'
+          },
+          {
+            id: 'gather-documentation',
+            title: 'Collect All Documentation',
+            description: 'Gather correspondence, policies, responses, timelines, and evidence of unfair treatment or wrongdoing',
+            timeEstimate: '1-2 weeks',
+            priority: 'high' as const,
+            actionText: 'Document Checklist'
+          },
+          {
+            id: 'ombudsman-complaint',
+            title: 'File Ombudsman Complaint',
+            description: 'Submit detailed complaint through online portal or mail. Explain unfair treatment, impact, and desired resolution.',
+            timeEstimate: '2-3 hours',
+            priority: 'high' as const,
+            actionText: 'File Complaint'
+          },
+          {
+            id: 'investigation-cooperation',
+            title: 'Cooperate with Investigation',
+            description: 'Respond promptly to investigator requests for information, interviews, or clarification',
+            timeEstimate: 'Ongoing',
+            priority: 'medium' as const,
+            actionText: 'Investigation Guide'
+          },
+          {
+            id: 'await-report',
+            title: 'Review Investigation Report',
+            description: 'Ombudsman will issue findings and recommendations. Organizations usually comply with recommendations.',
+            timeEstimate: '3-12 months',
+            priority: 'medium' as const,
+            actionText: 'Report Timeline'
           }
         ]
       };

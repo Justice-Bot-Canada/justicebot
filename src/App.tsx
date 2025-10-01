@@ -35,6 +35,8 @@ import LTBJourney from "./pages/LTBJourney";
 import SmallClaimsJourney from "./pages/SmallClaimsJourney";
 import CriminalJourney from "./pages/CriminalJourney";
 import FamilyJourney from "./pages/FamilyJourney";
+import SuperiorCourtJourney from "./pages/SuperiorCourtJourney";
+import AccountabilityJourney from "./pages/AccountabilityJourney";
 import LegalChat from "./pages/LegalChat";
 import DocumentAnalysis from "./pages/DocumentAnalysis";
 import TutorialLibrary from "./pages/TutorialLibrary";
@@ -65,6 +67,8 @@ const AppContent = () => {
         <Route path="/small-claims-journey" element={<SmallClaimsJourney />} />
         <Route path="/criminal-journey" element={<CriminalJourney />} />
         <Route path="/family-journey" element={<FamilyJourney />} />
+        <Route path="/superior-court-journey" element={<SuperiorCourtJourney />} />
+        <Route path="/accountability-journey" element={<AccountabilityJourney />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
