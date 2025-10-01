@@ -67,22 +67,35 @@ export interface SearchResult {
 interface LegalDataParams {
   queryType: 'search_cases' | 'search_legislation' | 'get_case' | 'get_legislation' | 'get_by_citation' | 'get_coverage';
   params: {
+    // Search parameters
     query?: string;
+    search_type?: 'full_text' | 'name'; // Search document content or titles only
+    size?: string; // Number of results (max 50, default 10)
+    search_language?: 'en' | 'fr'; // Search language
+    sort_results?: 'default' | 'newest_first' | 'oldest_first'; // Sort order
+    dataset?: string; // Comma-separated list (e.g., 'SCC,ONCA' or 'LEGISLATION-FED,REGULATIONS-FED')
+    start_date?: string; // YYYY-MM-DD format
+    end_date?: string; // YYYY-MM-DD format
+    
+    // Legacy parameters (keeping for compatibility)
     jurisdiction?: string;
     court?: string;
-    dataset?: string; // e.g., 'LEGISLATION-FED', 'REGULATIONS-FED'
     year?: string;
     limit?: string;
     offset?: string;
     sort?: 'newest' | 'oldest';
-    caseId?: string;
-    legislationId?: string;
+    
+    // Citation fetch parameters
     citation?: string;
     start_char?: number; // Character slice start position (default 0)
     end_char?: number; // Character slice end position (-1 means end)
     section?: string; // Section number for laws/regulations
     doc_type?: 'cases' | 'laws';
     output_language?: 'en' | 'fr' | 'both';
+    
+    // Other
+    caseId?: string;
+    legislationId?: string;
     type?: 'statute' | 'regulation';
   };
   source?: 'a2aj' | 'canlii' | 'auto';
@@ -130,17 +143,57 @@ export function useLegalData() {
     }
   };
 
-  const searchCases = async (query: string, court?: string, year?: string, sort?: 'newest' | 'oldest') => {
+  const searchCases = async (
+    query: string, 
+    options?: {
+      dataset?: string; // e.g., 'SCC,ONCA,FC'
+      search_type?: 'full_text' | 'name';
+      size?: number;
+      search_language?: 'en' | 'fr';
+      sort_results?: 'default' | 'newest_first' | 'oldest_first';
+      start_date?: string; // YYYY-MM-DD
+      end_date?: string; // YYYY-MM-DD
+    }
+  ) => {
     return fetchLegalData({
       queryType: 'search_cases',
-      params: { query, court, year, sort, limit: '20' }
+      params: { 
+        query, 
+        search_type: options?.search_type || 'full_text',
+        size: options?.size?.toString() || '20',
+        search_language: options?.search_language,
+        sort_results: options?.sort_results,
+        dataset: options?.dataset,
+        start_date: options?.start_date,
+        end_date: options?.end_date
+      }
     });
   };
 
-  const searchLegislation = async (query: string, dataset?: string, sort?: 'newest' | 'oldest') => {
+  const searchLegislation = async (
+    query: string, 
+    options?: {
+      dataset?: string; // e.g., 'LEGISLATION-FED,REGULATIONS-FED'
+      search_type?: 'full_text' | 'name';
+      size?: number;
+      search_language?: 'en' | 'fr';
+      sort_results?: 'default' | 'newest_first' | 'oldest_first';
+      start_date?: string; // YYYY-MM-DD
+      end_date?: string; // YYYY-MM-DD
+    }
+  ) => {
     return fetchLegalData({
       queryType: 'search_legislation',
-      params: { query, dataset, sort, limit: '20' }
+      params: { 
+        query, 
+        search_type: options?.search_type || 'full_text',
+        size: options?.size?.toString() || '20',
+        search_language: options?.search_language,
+        sort_results: options?.sort_results,
+        dataset: options?.dataset,
+        start_date: options?.start_date,
+        end_date: options?.end_date
+      }
     });
   };
 

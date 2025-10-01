@@ -41,21 +41,25 @@ async function handleA2AJRequest(queryType: string, params: any) {
       case 'search_legislation':
         // A2AJ uses a unified /search endpoint for both cases and legislation
         endpoint = `${A2AJ_API_BASE}/search`;
-        if (params.query) queryParams.set('q', params.query);
+        if (params.query) queryParams.set('query', params.query);
+        
+        // Search type: full_text or name
+        if (params.search_type) queryParams.set('search_type', params.search_type);
         
         // Filter by type: cases or legislation
         if (queryType === 'search_cases') {
-          queryParams.set('category', 'case');
+          queryParams.set('doc_type', 'cases');
         } else if (queryType === 'search_legislation') {
-          queryParams.set('category', 'legislation');
+          queryParams.set('doc_type', 'laws');
         }
         
         // Optional filters
-        if (params.court) queryParams.set('dataset', params.court);
-        if (params.year) queryParams.set('year', params.year);
-        if (params.sort) queryParams.set('sort', params.sort); // 'newest', 'oldest', or default (relevance)
-        if (params.limit) queryParams.set('limit', params.limit);
-        if (params.offset) queryParams.set('offset', params.offset);
+        if (params.dataset) queryParams.set('dataset', params.dataset);
+        if (params.size) queryParams.set('size', params.size);
+        if (params.search_language) queryParams.set('search_language', params.search_language);
+        if (params.sort_results) queryParams.set('sort_results', params.sort_results);
+        if (params.start_date) queryParams.set('start_date', params.start_date);
+        if (params.end_date) queryParams.set('end_date', params.end_date);
         break;
 
       case 'get_by_citation':

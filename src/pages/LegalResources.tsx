@@ -29,7 +29,7 @@ const LegalResources: React.FC = () => {
       await searchCases(searchQuery);
     } else {
       const dataset = legislationDataset === "all" ? undefined : legislationDataset;
-      await searchLegislation(searchQuery, dataset);
+      await searchLegislation(searchQuery, { dataset });
     }
   };
 
