@@ -20,6 +20,40 @@ export interface FetchResponse {
   results: any[]; // Can be case or law documents
 }
 
+export interface SearchResultItem {
+  id?: string;
+  name?: string;
+  title?: string;
+  citation?: string;
+  dataset?: string;
+  court?: string;
+  year?: string;
+  date?: string;
+  snippet?: string;
+  url?: string;
+  text?: string;
+  language?: string;
+  decision_date?: string;
+  docket?: string;
+  [key: string]: any; // Allow additional fields
+}
+
+export interface SearchResponse {
+  results: SearchResultItem[];
+  total?: number;
+  query?: string;
+}
+
+export interface ValidationError {
+  loc: (string | number)[];
+  msg: string;
+  type: string;
+}
+
+export interface HTTPValidationError {
+  detail: ValidationError[];
+}
+
 export interface SearchResult {
   name?: string;
   title?: string;
@@ -28,11 +62,6 @@ export interface SearchResult {
   year?: string;
   snippet?: string;
   url?: string;
-}
-
-export interface SearchResponse {
-  results: SearchResult[];
-  total?: number;
 }
 
 interface LegalDataParams {
