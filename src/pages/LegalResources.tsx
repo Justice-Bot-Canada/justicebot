@@ -211,7 +211,7 @@ const LegalResources: React.FC = () => {
                 <CardHeader>
                   <CardTitle>
                     Search Results 
-                    {data.total && <span className="text-muted-foreground text-sm ml-2">({data.total} found)</span>}
+                    {'total' in data && data.total && <span className="text-muted-foreground text-sm ml-2">({data.total} found)</span>}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>

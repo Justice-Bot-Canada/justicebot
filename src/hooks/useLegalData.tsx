@@ -2,6 +2,39 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
+// A2AJ API Response Types
+export interface CoverageItem {
+  dataset: string;
+  description_en: string | null;
+  description_fr: string | null;
+  earliest_document_date: string | null;
+  latest_document_date: string | null;
+  number_of_documents: number;
+}
+
+export interface CoverageResponse {
+  results: CoverageItem[];
+}
+
+export interface FetchResponse {
+  results: any[]; // Can be case or law documents
+}
+
+export interface SearchResult {
+  name?: string;
+  title?: string;
+  citation?: string;
+  dataset?: string;
+  year?: string;
+  snippet?: string;
+  url?: string;
+}
+
+export interface SearchResponse {
+  results: SearchResult[];
+  total?: number;
+}
+
 interface LegalDataParams {
   queryType: 'search_cases' | 'search_legislation' | 'get_case' | 'get_legislation' | 'get_by_citation' | 'get_coverage';
   params: {
@@ -28,7 +61,7 @@ interface LegalDataParams {
 
 export function useLegalData() {
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<SearchResponse | FetchResponse | CoverageResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchLegalData = async ({ queryType, params, source = 'a2aj' }: LegalDataParams) => {
