@@ -84,10 +84,20 @@ const FormSelector = () => {
     if (!venue) return;
     
     try {
+      // Map venue codes to tribunal types
+      const tribunalTypeMap: Record<string, string> = {
+        'ltb': 'Landlord and Tenant Board',
+        'hrto': 'Human Rights Tribunal of Ontario',
+        'small-claims': 'Small Claims Court',
+        'family': 'Family Court'
+      };
+
+      const tribunalType = tribunalTypeMap[venue] || venue;
+      
       const { data, error } = await supabase
         .from('forms')
         .select('*')
-        .eq('tribunal_type', venue)
+        .eq('tribunal_type', tribunalType)
         .eq('is_active', true)
         .order('usage_count', { ascending: false });
 
