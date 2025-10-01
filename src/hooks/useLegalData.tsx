@@ -8,6 +8,7 @@ interface LegalDataParams {
     query?: string;
     jurisdiction?: string;
     court?: string;
+    dataset?: string; // e.g., 'LEGISLATION-FED', 'REGULATIONS-FED'
     year?: string;
     limit?: string;
     offset?: string;
@@ -16,6 +17,7 @@ interface LegalDataParams {
     legislationId?: string;
     citation?: string;
     type?: 'statute' | 'regulation';
+    doc_type?: 'laws' | 'cases';
   };
   source?: 'a2aj' | 'canlii' | 'auto';
 }
@@ -69,10 +71,17 @@ export function useLegalData() {
     });
   };
 
-  const searchLegislation = async (query: string, sort?: 'newest' | 'oldest') => {
+  const searchLegislation = async (query: string, dataset?: string, sort?: 'newest' | 'oldest') => {
     return fetchLegalData({
       queryType: 'search_legislation',
-      params: { query, sort, limit: '20' }
+      params: { query, dataset, sort, limit: '20' }
+    });
+  };
+
+  const getCoverage = async (doc_type?: 'laws' | 'cases', dataset?: string) => {
+    return fetchLegalData({
+      queryType: 'get_coverage' as any,
+      params: { doc_type, dataset }
     });
   };
 
@@ -90,6 +99,7 @@ export function useLegalData() {
     fetchLegalData,
     searchCases,
     searchLegislation,
-    getCaseByCitation
+    getCaseByCitation,
+    getCoverage
   };
 }

@@ -68,6 +68,7 @@ async function handleA2AJRequest(queryType: string, params: any) {
         // Get dataset coverage stats
         endpoint = `${A2AJ_API_BASE}/coverage`;
         if (params.dataset) queryParams.set('dataset', params.dataset);
+        if (params.doc_type) queryParams.set('doc_type', params.doc_type); // 'laws' or 'cases'
         break;
 
       default:
