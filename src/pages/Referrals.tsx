@@ -1,12 +1,18 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ReferralProgram from "@/components/ReferralProgram";
+import SEOHead from "@/components/SEOHead";
 import { Gift, TrendingUp, Users, DollarSign } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 export default function Referrals() {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Referral Program - Give $5, Get $5"
+        description="Help friends get affordable legal help and earn credits. Share Justice-Bot referral link for unlimited earnings. It's a win-win!"
+        keywords="referral program, earn credits, legal help referral, justice-bot rewards, legal tech incentives"
+      />
       <Header />
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">

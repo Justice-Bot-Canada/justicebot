@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import SEOHead from "@/components/SEOHead";
 import { User, Mail, Phone, FileText } from "lucide-react";
 
 export default function Profile() {
@@ -75,6 +76,10 @@ export default function Profile() {
 
   return (
     <div className="container mx-auto py-8 px-4">
+      <SEOHead
+        title="Profile Settings"
+        description="Manage your Justice-Bot account information and preferences. Update your profile details."
+      />
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

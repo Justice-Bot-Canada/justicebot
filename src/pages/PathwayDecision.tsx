@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PathwaySelection from "@/components/PathwaySelection";
+import SEOHead from "@/components/SEOHead";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
@@ -187,6 +188,11 @@ export default function PathwayDecision() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Choose Your Legal Pathway"
+        description="Discover the best legal options for your case. Compare LTB, HRTO, Small Claims Court pathways with success rates, costs, and timelines."
+        keywords="legal pathway, Ontario legal options, LTB, HRTO, small claims court, legal advice"
+      />
       <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-5xl mx-auto">

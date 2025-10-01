@@ -2,12 +2,18 @@ import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TutorialVideos from "@/components/TutorialVideos";
+import SEOHead from "@/components/SEOHead";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayCircle } from "lucide-react";
 
 export default function TutorialLibrary() {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Tutorial Videos - Learn Legal Process Step by Step"
+        description="Free video tutorials for Ontario legal processes. Learn how to file LTB applications, HRTO complaints, Small Claims, and more with expert guidance."
+        keywords="legal tutorials, video guides, LTB tutorial, HRTO tutorial, small claims tutorial, legal help videos"
+      />
       <Header />
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">

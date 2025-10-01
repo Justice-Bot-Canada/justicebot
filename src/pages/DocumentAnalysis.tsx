@@ -1,6 +1,7 @@
 import { DocumentAnalyzer } from '@/components/DocumentAnalyzer';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import SEOHead from '@/components/SEOHead';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
@@ -25,6 +26,11 @@ export default function DocumentAnalysis() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <SEOHead
+        title="AI Document Analyzer"
+        description="Upload legal documents, evidence, or correspondence for instant AI-powered analysis. Extract key information, identify relevant legal issues, and get actionable insights."
+        keywords="document analysis, legal documents, AI analyzer, evidence analysis, legal tech"
+      />
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">

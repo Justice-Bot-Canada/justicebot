@@ -1,12 +1,18 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import DocumentTemplates from "@/components/DocumentTemplates";
+import SEOHead from "@/components/SEOHead";
 import { FileText, Shield, Award } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 export default function TemplateLibrary() {
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Legal Document Templates Library"
+        description="Download professional legal document templates for Ontario tribunals. Free and premium templates for LTB, HRTO, Small Claims Court applications."
+        keywords="legal templates, document templates, LTB forms, HRTO forms, small claims forms, legal documents Ontario"
+      />
       <Header />
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
