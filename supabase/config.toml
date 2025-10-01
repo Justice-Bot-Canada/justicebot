@@ -66,3 +66,6 @@ verify_jwt = false
 
 [functions.fetch-legal-data]
 verify_jwt = true
+
+[functions.analyze-legal-case-ai]
+verify_jwt = true
