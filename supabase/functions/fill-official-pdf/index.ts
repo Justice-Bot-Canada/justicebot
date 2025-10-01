@@ -12,10 +12,33 @@ const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 // Official form URLs mapped to form codes
 const OFFICIAL_FORM_URLS: Record<string, string> = {
+  // LTB (Landlord and Tenant Board)
   'ON-LTB-T2': 'https://tribunalsontario.ca/documents/ltb/Tenant%20Applications%20&%20Instructions/T2.pdf',
   'ON-LTB-T6': 'https://tribunalsontario.ca/documents/ltb/Tenant%20Applications%20&%20Instructions/T6.pdf',
+  'ON-LTB-L1': 'https://tribunalsontario.ca/documents/ltb/Landlord%20Applications%20&%20Instructions/L1.pdf',
+  'ON-LTB-L2': 'https://tribunalsontario.ca/documents/ltb/Landlord%20Applications%20&%20Instructions/L2.pdf',
+  
+  // HRTO (Human Rights Tribunal of Ontario)
   'ON-HRTO-F1': 'https://tribunalsontario.ca/documents/hrto/Application%20Forms/Form%201%20Application.pdf',
-  'FC-T-2062-23': 'https://www.fct-cf.ca/Content/assets/pdf/Forms/T2062%20-%20Statement%20of%20Claim%20(Action).pdf',
+  
+  // Federal Court
+  'FC-T-2062': 'https://www.fct-cf.ca/Content/assets/pdf/Forms/T2062%20-%20Statement%20of%20Claim%20(Action).pdf',
+  'FC-T-2063': 'https://www.fct-cf.ca/Content/assets/pdf/Forms/T2063%20-%20Statement%20of%20Defence.pdf',
+  
+  // Supreme Court of Canada
+  'SCC-ARF': 'https://www.scc-csc.ca/parties/arf-lrf/forms-formulaires/eng/Application-Record-Form.pdf',
+  'SCC-LRF': 'https://www.scc-csc.ca/parties/arf-lrf/forms-formulaires/fre/Formulaire-de-dossier-de-demande.pdf',
+  
+  // Ontario Court of Justice - Criminal
+  'OCJ-CRIM-FORM-9': 'https://www.ontariocourts.ca/ocj/files/forms/criminal/eng/Form9-Appearance-Notice.pdf',
+  'OCJ-CRIM-FORM-10': 'https://www.ontariocourts.ca/ocj/files/forms/criminal/eng/Form10-Promise-to-Appear.pdf',
+  
+  // Small Claims Court
+  'SCC-FORM-7A': 'https://ontariocourtforms.on.ca/static/media/7A.pdf',
+  'SCC-FORM-9A': 'https://ontariocourtforms.on.ca/static/media/9A.pdf',
+  'SCC-FORM-10A': 'https://ontariocourtforms.on.ca/static/media/10A.pdf',
+  'SCC-FORM-11A': 'https://ontariocourtforms.on.ca/static/media/11A.pdf',
+  'SCC-FORM-14A': 'https://ontariocourtforms.on.ca/static/media/14A.pdf',
 };
 
 serve(async (req) => {
@@ -177,23 +200,41 @@ function fillPDFFields(form: any, formCode: string, formData: any) {
   // Generic field mapping - customize per form type
   const fieldMappings: Record<string, string[]> = {
     // Common fields across forms
-    'applicant_name': ['applicantName', 'name', 'fullName', 'appellant_name'],
-    'applicant_address': ['address', 'applicantAddress', 'street_address'],
-    'applicant_phone': ['phone', 'phoneNumber', 'telephone'],
-    'applicant_email': ['email', 'emailAddress', 'e_mail'],
-    'respondent_name': ['respondentName', 'defendant', 'landlordName'],
-    'incident_date': ['incidentDate', 'dateOfIncident', 'event_date'],
-    'description': ['description', 'details', 'particulars'],
+    'applicant_name': ['applicantName', 'name', 'fullName', 'appellant_name', 'plaintiff', 'claimant'],
+    'applicant_address': ['address', 'applicantAddress', 'street_address', 'mailing_address'],
+    'applicant_phone': ['phone', 'phoneNumber', 'telephone', 'contact_number'],
+    'applicant_email': ['email', 'emailAddress', 'e_mail', 'contact_email'],
+    'respondent_name': ['respondentName', 'defendant', 'landlordName', 'accused'],
+    'incident_date': ['incidentDate', 'dateOfIncident', 'event_date', 'offence_date'],
+    'description': ['description', 'details', 'particulars', 'statement_of_claim'],
     
     // LTB-specific
-    'rental_address': ['rentalAddress', 'propertyAddress', 'rental_unit'],
-    'monthly_rent': ['monthlyRent', 'rent', 'rental_amount'],
+    'rental_address': ['rentalAddress', 'propertyAddress', 'rental_unit', 'premises'],
+    'monthly_rent': ['monthlyRent', 'rent', 'rental_amount', 'rent_amount'],
+    'lease_start': ['leaseStart', 'tenancy_start', 'lease_date'],
     
     // HRTO-specific
-    'discrimination_ground': ['discriminationGround', 'ground', 'protected_ground'],
+    'discrimination_ground': ['discriminationGround', 'ground', 'protected_ground', 'basis'],
+    'social_area': ['socialArea', 'area', 'social_context'],
     
     // Federal Court specific
-    'claim_amount': ['claimAmount', 'amount', 'damages_sought'],
+    'claim_amount': ['claimAmount', 'amount', 'damages_sought', 'relief_sought'],
+    'statement_of_claim': ['statementOfClaim', 'claim', 'cause_of_action'],
+    
+    // Supreme Court specific
+    'appeal_from': ['appealFrom', 'lower_court', 'appealed_decision'],
+    'date_of_judgment': ['dateOfJudgment', 'judgment_date', 'decision_date'],
+    
+    // Criminal Court specific
+    'charge': ['charge', 'offence', 'criminal_charge', 'count'],
+    'court_file_number': ['courtFileNumber', 'file_number', 'case_number'],
+    'appearance_date': ['appearanceDate', 'court_date', 'hearing_date'],
+    
+    // Small Claims specific
+    'claim_date': ['claimDate', 'date_of_claim'],
+    'plaintiff': ['plaintiff', 'claimant_name'],
+    'defendant': ['defendant', 'respondent_name'],
+    'amount_claimed': ['amountClaimed', 'claim_amount', 'damages'],
   };
 
   // Try to fill each field in formData

@@ -74,6 +74,154 @@
 }
 ]
 }
-}
-}
+    }
+  },
+  "SmallClaims": {
+    "debt_collection": {
+      "province": "ON",
+      "venue": "SmallClaims",
+      "issueCode": "debt_collection",
+      "confidence": 0.8,
+      "steps": [
+        {
+          "title": "Determine if Small Claims is appropriate",
+          "summary": "Small Claims Court handles claims up to $35,000.",
+          "actions": [
+            "Confirm your claim is $35,000 or less.",
+            "Ensure the defendant is in Ontario or the debt arose in Ontario.",
+            "Check if you have documentation of the debt."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Plaintiff",
+          "venue": "SmallClaims",
+          "deadlineTip": "You have 2 years from when the debt became due to file."
+        },
+        {
+          "title": "File Form 7A - Plaintiff's Claim",
+          "summary": "Start your case by filing a plaintiff's claim.",
+          "actions": [
+            "Complete Form 7A with details of your claim.",
+            "Include all supporting documents and evidence.",
+            "Pay the filing fee (varies by claim amount).",
+            "File at the Small Claims Court office."
+          ],
+          "forms": [
+            {"id": "ON-SCC-7A", "name": "Form 7A - Plaintiff's Claim", "url": "https://ontariocourtforms.on.ca/en/rules-of-the-small-claims-court-forms/"}
+          ],
+          "prereqs": [],
+          "who": "Plaintiff",
+          "venue": "SmallClaims",
+          "deadlineTip": "File within limitation period (usually 2 years)."
+        },
+        {
+          "title": "Serve the defendant",
+          "summary": "The defendant must receive proper notice of your claim.",
+          "actions": [
+            "Serve the defendant personally or by alternative method.",
+            "Keep proof of service.",
+            "File proof of service with the court."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Plaintiff",
+          "venue": "SmallClaims",
+          "deadlineTip": "Serve within 6 months of issuing the claim."
+        },
+        {
+          "title": "Await defendant's response or attend settlement conference",
+          "summary": "The defendant has 20 days to respond, then a settlement conference is scheduled.",
+          "actions": [
+            "Wait for defendant's defence (Form 9A) if filed.",
+            "Attend mandatory settlement conference.",
+            "Bring all documents and be prepared to negotiate."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Both parties",
+          "venue": "SmallClaims",
+          "deadlineTip": "Settlement conference usually within 90 days of defence."
+        }
+      ]
+    }
+  },
+  "Criminal": {
+    "minor_offence": {
+      "province": "ON",
+      "venue": "OCJ",
+      "issueCode": "minor_offence",
+      "confidence": 0.7,
+      "steps": [
+        {
+          "title": "Understand your charges",
+          "summary": "Review the charges and your legal options.",
+          "actions": [
+            "Read your appearance notice or promise to appear carefully.",
+            "Note your first court date.",
+            "Consider contacting duty counsel or a lawyer."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Accused",
+          "venue": "OCJ",
+          "deadlineTip": "Do not miss your first appearance date."
+        },
+        {
+          "title": "Attend first appearance",
+          "summary": "Appear in court on your scheduled date.",
+          "actions": [
+            "Arrive early and check in with court staff.",
+            "Speak with duty counsel if needed.",
+            "Enter your plea or request an adjournment."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Accused",
+          "venue": "OCJ",
+          "deadlineTip": "Failure to appear can result in a warrant."
+        }
+      ]
+    }
+  },
+  "SupremeCourt": {
+    "appeal": {
+      "province": "Federal",
+      "venue": "SCC",
+      "issueCode": "appeal",
+      "confidence": 0.6,
+      "steps": [
+        {
+          "title": "Determine if you can appeal to the Supreme Court",
+          "summary": "Most cases require leave to appeal.",
+          "actions": [
+            "Review if your case involves a constitutional question or significant legal issue.",
+            "Obtain the lower court decision and reasons.",
+            "Consult with an appellate lawyer - SCC cases are complex."
+          ],
+          "forms": [],
+          "prereqs": [],
+          "who": "Appellant",
+          "venue": "SCC",
+          "deadlineTip": "Application must be filed within 60 days of final judgment."
+        },
+        {
+          "title": "File Application for Leave to Appeal",
+          "summary": "Apply for permission to bring your appeal to the SCC.",
+          "actions": [
+            "Complete the Application Record Form.",
+            "Include memorandum of argument (max 40 pages).",
+            "Pay required filing fees.",
+            "Serve all parties."
+          ],
+          "forms": [
+            {"id": "SCC-ARF", "name": "Application Record Form", "url": "https://www.scc-csc.ca/parties/arf-lrf/forms-formulaires/"}
+          ],
+          "prereqs": [],
+          "who": "Appellant",
+          "venue": "SCC",
+          "deadlineTip": "Strict 60-day deadline from final judgment."
+        }
+      ]
+    }
+  }
 }
