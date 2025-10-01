@@ -41,7 +41,7 @@ interface LegalPathway {
   next_steps: any; // JSON field from database
 }
 
-const CaseManager = () => {
+const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) => void }) => {
   const { user } = useAuth();
   const [cases, setCases] = useState<Case[]>([]);
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
@@ -271,7 +271,10 @@ const CaseManager = () => {
                     className={`p-4 border rounded-lg cursor-pointer transition-colors ${
                       selectedCase?.id === case_.id ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'
                     }`}
-                    onClick={() => setSelectedCase(case_)}
+                    onClick={() => {
+                      setSelectedCase(case_);
+                      onCaseSelect?.(case_.id);
+                    }}
                   >
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="font-semibold truncate">{case_.title}</h3>

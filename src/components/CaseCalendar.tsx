@@ -12,22 +12,12 @@ import {
   CheckCircle2,
   Bell
 } from "lucide-react";
-import { format, isBefore, isToday, addDays } from "date-fns";
+import { format, isBefore } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import type { Database } from "@/integrations/supabase/types";
 
-interface CaseEvent {
-  id: string;
-  case_id: string;
-  title: string;
-  description: string;
-  event_date: string;
-  event_type: "filing_deadline" | "court_appearance" | "hearing" | "mediation" | "document_due" | "other";
-  status: "upcoming" | "completed" | "missed";
-  priority: "high" | "medium" | "low";
-  location?: string;
-  reminder_sent?: boolean;
-}
+type CaseEvent = Database['public']['Tables']['case_events']['Row'];
 
 interface CaseCalendarProps {
   caseId: string;

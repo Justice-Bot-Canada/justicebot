@@ -8,6 +8,7 @@ import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import { SkipToContent, useFocusManagement, useKeyboardNavigation } from "@/components/AccessibilityFeatures";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import PathwayDecision from "./pages/PathwayDecision";
 import CaseAssessment from "./pages/CaseAssessment";
 import Pricing from "./pages/Pricing";
 import Admin from "./pages/Admin";
@@ -61,6 +62,7 @@ const AppContent = () => {
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/assessment" element={<ProtectedRoute><CaseAssessment /></ProtectedRoute>} />
+          <Route path="/pathway/:caseId" element={<ProtectedRoute><PathwayDecision /></ProtectedRoute>} />
           <Route path="/triage" element={<Triage />} />
           <Route path="/tribunal-locator" element={<TribunalLocatorPage />} />
           <Route path="/forms/:venue" element={<ProtectedRoute><FormSelector /></ProtectedRoute>} />

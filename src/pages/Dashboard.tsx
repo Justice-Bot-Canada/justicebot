@@ -18,6 +18,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import CaseManager from "@/components/CaseManager";
+import CaseCalendar from "@/components/CaseCalendar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { PremiumGate } from "@/components/PremiumGate";
@@ -26,6 +27,7 @@ const Dashboard = () => {
   const { user } = useAuth();
   const { hasAccess, isFreeUser, userNumber } = usePremiumAccess();
   const [activeTab, setActiveTab] = useState("cases");
+  const [activeCaseId, setActiveCaseId] = useState<string | null>(null);
 
   // Auth check is now handled by ProtectedRoute
 
@@ -53,10 +55,14 @@ const Dashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="cases" className="flex items-center gap-2">
               <Scale className="h-4 w-4" />
               Cases
+            </TabsTrigger>
+            <TabsTrigger value="calendar" className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Calendar
             </TabsTrigger>
             <TabsTrigger value="forms" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
@@ -73,7 +79,20 @@ const Dashboard = () => {
           </TabsList>
 
           <TabsContent value="cases" className="mt-6">
-            <CaseManager />
+            <CaseManager onCaseSelect={setActiveCaseId} />
+          </TabsContent>
+
+          <TabsContent value="calendar" className="mt-6">
+            {activeCaseId ? (
+              <CaseCalendar caseId={activeCaseId} />
+            ) : (
+              <Card>
+                <CardContent className="pt-6 text-center text-muted-foreground">
+                  <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>Select a case to view its timeline and deadlines</p>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           <TabsContent value="forms" className="mt-6">

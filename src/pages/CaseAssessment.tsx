@@ -112,7 +112,9 @@ const CaseAssessment = () => {
       }
 
       toast.success("Case submitted for analysis!");
-      navigate("/dashboard");
+      
+      // Navigate to pathway selection with the case ID and merit score
+      navigate(`/pathway/${data.id}`);
     } catch (error) {
       console.error('Error submitting case:', error);
       toast.error('Failed to submit case');

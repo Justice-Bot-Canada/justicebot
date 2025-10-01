@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      case_events: {
+        Row: {
+          case_id: string
+          created_at: string
+          description: string | null
+          event_date: string
+          event_type: string
+          id: string
+          location: string | null
+          priority: string
+          reminder_sent: boolean | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          case_id: string
+          created_at?: string
+          description?: string | null
+          event_date: string
+          event_type?: string
+          id?: string
+          location?: string | null
+          priority?: string
+          reminder_sent?: boolean | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          case_id?: string
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          event_type?: string
+          id?: string
+          location?: string | null
+          priority?: string
+          reminder_sent?: boolean | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_events_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cases: {
         Row: {
           created_at: string
