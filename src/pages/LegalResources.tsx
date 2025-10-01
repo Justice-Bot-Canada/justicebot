@@ -145,13 +145,13 @@ const LegalResources: React.FC = () => {
                   <div>
                     <CardTitle>Canadian Legal Database</CardTitle>
                     <CardDescription>
-                      Search 116,000+ cases and 5,700+ federal laws
+                      Search 116,000+ cases and 5,700+ federal laws with advanced Boolean search
                     </CardDescription>
                   </div>
                   <Badge variant="secondary">Powered by A2AJ</Badge>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
                 <Tabs value={searchType} onValueChange={(v) => setSearchType(v as "cases" | "legislation")}>
                   <TabsList className="grid w-full grid-cols-2 mb-4">
                     <TabsTrigger value="cases">
@@ -166,7 +166,7 @@ const LegalResources: React.FC = () => {
                   
                   <div className="flex gap-2">
                     <Input
-                      placeholder={searchType === "cases" ? "Search cases by keywords, party names, or topics..." : "Search federal statutes and regulations..."}
+                      placeholder={searchType === "cases" ? "Search cases... (try: discrimination AND employment)" : "Search federal statutes and regulations..."}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -177,6 +177,11 @@ const LegalResources: React.FC = () => {
                     </Button>
                   </div>
                 </Tabs>
+                
+                {/* Search Tips */}
+                <div className="text-xs text-muted-foreground bg-muted p-3 rounded-lg">
+                  <strong>Advanced Search Tips:</strong> Use AND/OR/NOT • "exact phrases" • wildcards* • proximity NEAR/5
+                </div>
               </CardContent>
             </Card>
 
@@ -184,30 +189,47 @@ const LegalResources: React.FC = () => {
             {data && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Search Results</CardTitle>
+                  <CardTitle>
+                    Search Results 
+                    {data.total && <span className="text-muted-foreground text-sm ml-2">({data.total} found)</span>}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {data.results?.length > 0 ? (
                       data.results.map((item: any, index: number) => (
                         <div key={index} className="border-b pb-4 last:border-0">
-                          <h3 className="font-semibold text-lg mb-1">{item.name || item.title}</h3>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {item.citation} • {item.court || item.type} • {item.year}
-                          </p>
-                          {item.summary && (
-                            <p className="text-sm mb-2">{item.summary}</p>
+                          <h3 className="font-semibold text-lg mb-1">
+                            {item.name || item.title || item.citation}
+                          </h3>
+                          <div className="flex flex-wrap gap-2 mb-2">
+                            {item.citation && (
+                              <Badge variant="outline">{item.citation}</Badge>
+                            )}
+                            {item.dataset && (
+                              <Badge variant="secondary">{item.dataset}</Badge>
+                            )}
+                            {item.year && (
+                              <Badge variant="outline">{item.year}</Badge>
+                            )}
+                          </div>
+                          {item.snippet && (
+                            <p className="text-sm mb-2 text-muted-foreground">
+                              {item.snippet}
+                            </p>
                           )}
-                          <Button variant="link" className="p-0 h-auto" asChild>
-                            <a href={item.url} target="_blank" rel="noopener noreferrer">
-                              View Full Document <ExternalLink className="ml-1 h-3 w-3" />
-                            </a>
-                          </Button>
+                          {item.url && (
+                            <Button variant="link" className="p-0 h-auto" asChild>
+                              <a href={item.url} target="_blank" rel="noopener noreferrer">
+                                View Full Document <ExternalLink className="ml-1 h-3 w-3" />
+                              </a>
+                            </Button>
+                          )}
                         </div>
                       ))
                     ) : (
                       <p className="text-center text-muted-foreground py-8">
-                        No results found. Try different keywords.
+                        No results found. Try different keywords or use advanced search operators.
                       </p>
                     )}
                   </div>

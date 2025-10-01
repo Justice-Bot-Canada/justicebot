@@ -10,6 +10,8 @@ interface LegalDataParams {
     court?: string;
     year?: string;
     limit?: string;
+    offset?: string;
+    sort?: 'newest' | 'oldest';
     caseId?: string;
     legislationId?: string;
     citation?: string;
@@ -60,17 +62,17 @@ export function useLegalData() {
     }
   };
 
-  const searchCases = async (query: string, court?: string, year?: string) => {
+  const searchCases = async (query: string, court?: string, year?: string, sort?: 'newest' | 'oldest') => {
     return fetchLegalData({
       queryType: 'search_cases',
-      params: { query, court, year, limit: '20' }
+      params: { query, court, year, sort, limit: '20' }
     });
   };
 
-  const searchLegislation = async (query: string, type?: 'statute' | 'regulation') => {
+  const searchLegislation = async (query: string, sort?: 'newest' | 'oldest') => {
     return fetchLegalData({
       queryType: 'search_legislation',
-      params: { query, type, limit: '20' }
+      params: { query, sort, limit: '20' }
     });
   };
 

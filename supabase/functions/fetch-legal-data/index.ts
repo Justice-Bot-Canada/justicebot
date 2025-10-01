@@ -38,31 +38,36 @@ async function handleA2AJRequest(queryType: string, params: any) {
 
     switch (queryType) {
       case 'search_cases':
-        endpoint = `${A2AJ_API_BASE}/cases/search`;
-        if (params.query) queryParams.set('q', params.query);
-        if (params.jurisdiction) queryParams.set('court', params.jurisdiction);
-        if (params.year) queryParams.set('year', params.year);
-        if (params.limit) queryParams.set('limit', params.limit);
-        break;
-
       case 'search_legislation':
-        endpoint = `${A2AJ_API_BASE}/legislation/search`;
+        // A2AJ uses a unified /search endpoint for both cases and legislation
+        endpoint = `${A2AJ_API_BASE}/search`;
         if (params.query) queryParams.set('q', params.query);
-        if (params.type) queryParams.set('type', params.type); // 'statute' or 'regulation'
+        
+        // Filter by type: cases or legislation
+        if (queryType === 'search_cases') {
+          queryParams.set('category', 'case');
+        } else if (queryType === 'search_legislation') {
+          queryParams.set('category', 'legislation');
+        }
+        
+        // Optional filters
+        if (params.court) queryParams.set('dataset', params.court);
+        if (params.year) queryParams.set('year', params.year);
+        if (params.sort) queryParams.set('sort', params.sort); // 'newest', 'oldest', or default (relevance)
         if (params.limit) queryParams.set('limit', params.limit);
-        break;
-
-      case 'get_case':
-        endpoint = `${A2AJ_API_BASE}/cases/${params.court}/${params.caseId}`;
-        break;
-
-      case 'get_legislation':
-        endpoint = `${A2AJ_API_BASE}/legislation/${params.legislationId}`;
+        if (params.offset) queryParams.set('offset', params.offset);
         break;
 
       case 'get_by_citation':
-        endpoint = `${A2AJ_API_BASE}/citation`;
-        queryParams.set('citation', params.citation);
+        // A2AJ uses /fetch endpoint for citation lookups
+        endpoint = `${A2AJ_API_BASE}/fetch`;
+        if (params.citation) queryParams.set('citation', params.citation);
+        break;
+
+      case 'get_coverage':
+        // Get dataset coverage stats
+        endpoint = `${A2AJ_API_BASE}/coverage`;
+        if (params.dataset) queryParams.set('dataset', params.dataset);
         break;
 
       default:
@@ -79,7 +84,7 @@ async function handleA2AJRequest(queryType: string, params: any) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('A2AJ API error:', response.status, errorText);
-      throw new Error(`A2AJ API error: ${response.status}`);
+      throw new Error(`A2AJ API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
