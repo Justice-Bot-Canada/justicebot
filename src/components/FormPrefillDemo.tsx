@@ -66,7 +66,7 @@ const FormPrefillDemo = () => {
                   id="applicantName" 
                   value={extractedData.applicantName} 
                   readOnly
-                  className="bg-green-50"
+                  className="bg-muted"
                 />
                 <Badge variant="secondary" className="text-xs">
                   Auto-filled
@@ -81,7 +81,7 @@ const FormPrefillDemo = () => {
                   id="respondentName" 
                   value={extractedData.respondentName} 
                   readOnly
-                  className="bg-green-50"
+                  className="bg-muted"
                 />
                 <Badge variant="secondary" className="text-xs">
                   Auto-filled
@@ -96,7 +96,7 @@ const FormPrefillDemo = () => {
                   id="address" 
                   value={extractedData.address} 
                   readOnly
-                  className="bg-green-50"
+                  className="bg-muted"
                 />
                 <Badge variant="secondary" className="text-xs">
                   Auto-filled
@@ -111,7 +111,7 @@ const FormPrefillDemo = () => {
                   id="incidentDate" 
                   value={extractedData.incidentDate} 
                   readOnly
-                  className="bg-green-50"
+                  className="bg-muted"
                 />
                 <Badge variant="secondary" className="text-xs">
                   Auto-filled
@@ -126,7 +126,7 @@ const FormPrefillDemo = () => {
                   id="claimAmount" 
                   value={extractedData.claimAmount} 
                   readOnly
-                  className="bg-green-50"
+                  className="bg-muted"
                 />
                 <Badge variant="secondary" className="text-xs">
                   Auto-filled
@@ -141,7 +141,7 @@ const FormPrefillDemo = () => {
                   id="phoneNumber" 
                   value={extractedData.phoneNumber} 
                   readOnly
-                  className="bg-green-50"
+                  className="bg-muted"
                 />
                 <Badge variant="secondary" className="text-xs">
                   Auto-filled
