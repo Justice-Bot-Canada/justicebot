@@ -10,6 +10,7 @@ import { Upload, FileText, Scale, TrendingUp, AlertCircle, ArrowRight, Target } 
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import LegalPathwayGuide from "./LegalPathwayGuide";
 
 interface Case {
@@ -43,6 +44,7 @@ interface LegalPathway {
 
 const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) => void }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [cases, setCases] = useState<Case[]>([]);
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
   const [evidence, setEvidence] = useState<Evidence[]>([]);
@@ -284,11 +286,24 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
                     </div>
                     <p className="text-sm text-muted-foreground mb-2">{case_.province}</p>
                     {case_.merit_score > 0 && (
-                      <div className="flex items-center gap-2">
-                        <TrendingUp className="h-4 w-4" />
-                        <span className={`font-semibold ${getScoreColor(case_.merit_score)}`}>
-                          {case_.merit_score}% Merit
-                        </span>
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <TrendingUp className="h-4 w-4" />
+                          <span className={`font-semibold ${getScoreColor(case_.merit_score)}`}>
+                            {case_.merit_score}% Merit
+                          </span>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/pathway/${case_.id}`);
+                          }}
+                        >
+                          View Pathways
+                          <ArrowRight className="h-3 w-3 ml-1" />
+                        </Button>
                       </div>
                     )}
                   </div>
