@@ -1,0 +1,75 @@
+{
+  "PoliceAccountability": {
+    "file_complaint_rcmp": {
+      "stepNumber": 1,
+      "title": "File Complaint with RCMP",
+      "description": "Northwest Territories is policed by RCMP. File complaint through RCMP process.",
+      "timeframe": "Within 1 year of incident",
+      "requiredForms": [
+        "RCMP Public Complaint Form"
+      ],
+      "helpfulLinks": [
+        "https://www.rcmp-grc.gc.ca/en/how-make-complaint"
+      ],
+      "contactInfo": {
+        "phone": "867-669-1111 (RCMP G Division)"
+      }
+    },
+    "civilian_review_commission": {
+      "stepNumber": 2,
+      "title": "Appeal to Civilian Review and Complaints Commission",
+      "description": "If unsatisfied with RCMP's response, appeal to federal oversight body.",
+      "timeframe": "Within 60 days of RCMP decision",
+      "requiredForms": [
+        "CRCC Complaint Form"
+      ],
+      "helpfulLinks": [
+        "https://www.crcc-ccetp.gc.ca/en/file-complaint"
+      ],
+      "contactInfo": {
+        "phone": "1-800-665-6878",
+        "email": "complaints@crcc-ccetp.gc.ca"
+      }
+    }
+  },
+  "CAS": {
+    "understanding_child_protection": {
+      "stepNumber": 1,
+      "title": "Understanding NT Child Protection",
+      "description": "Department of Health and Social Services oversees child protection in the Northwest Territories.",
+      "timeframe": "Immediate",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.hss.gov.nt.ca/en/services/child-protection"
+      ]
+    },
+    "internal_complaint": {
+      "stepNumber": 2,
+      "title": "File Internal Complaint",
+      "description": "File complaint with your regional Health and Social Services Authority office.",
+      "timeframe": "As soon as possible",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.hss.gov.nt.ca/en/contact-us"
+      ],
+      "contactInfo": {
+        "phone": "1-800-661-0844 (Child and Family Services)"
+      }
+    },
+    "ombudsperson": {
+      "stepNumber": 3,
+      "title": "Contact NWT Ombud",
+      "description": "Independent office that can investigate complaints about territorial government services.",
+      "timeframe": "After internal complaint",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.ombudsnwt.ca/complaints"
+      ],
+      "contactInfo": {
+        "phone": "867-767-9081",
+        "toll_free": "1-800-661-0837",
+        "email": "info@ombudsnwt.ca"
+      }
+    }
+  }
+}

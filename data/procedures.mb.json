@@ -1,0 +1,105 @@
+{
+  "PoliceAccountability": {
+    "file_complaint_ips": {
+      "stepNumber": 1,
+      "title": "File Complaint with Independent Investigation Unit (IIU)",
+      "description": "IIU investigates serious incidents involving police including death, serious injury, or allegations of a criminal nature.",
+      "timeframe": "Immediate - IIU is automatically notified but you can also report",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.iiumanitoba.ca/"
+      ],
+      "contactInfo": {
+        "phone": "204-945-2666",
+        "toll_free": "1-844-667-6060",
+        "email": "enquiries@iiumanitoba.ca",
+        "emergencyLine": "Available 24/7"
+      }
+    },
+    "file_complaint_police_service": {
+      "stepNumber": 2,
+      "title": "File Complaint with Police Service",
+      "description": "File complaint directly with Winnipeg Police Service or RCMP for conduct issues.",
+      "timeframe": "Within 1 year of incident",
+      "requiredForms": [
+        "Police Complaint Form"
+      ],
+      "helpfulLinks": [
+        "https://www.winnipeg.ca/police/TakeAction/complaint.stm"
+      ]
+    },
+    "law_enforcement_review_agency": {
+      "stepNumber": 3,
+      "title": "Appeal to Law Enforcement Review Agency (LERA)",
+      "description": "If dissatisfied with police service's handling of complaint, appeal to LERA for independent review.",
+      "timeframe": "Within 30 days of receiving police decision",
+      "requiredForms": [
+        "LERA Appeal Form"
+      ],
+      "helpfulLinks": [
+        "https://www.gov.mb.ca/justice/lera/"
+      ],
+      "contactInfo": {
+        "phone": "204-945-0055",
+        "toll_free": "1-800-665-0531",
+        "address": "Law Enforcement Review Agency, 340-155 Carlton Street, Winnipeg, MB R3C 3H8"
+      }
+    }
+  },
+  "CAS": {
+    "understanding_child_protection": {
+      "stepNumber": 1,
+      "title": "Understanding Manitoba Child and Family Services",
+      "description": "Child and Family Services (CFS) agencies provide child protection services in Manitoba.",
+      "timeframe": "Immediate",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.gov.mb.ca/fs/childfam/"
+      ]
+    },
+    "internal_complaint": {
+      "stepNumber": 2,
+      "title": "File Internal Complaint with CFS Agency",
+      "description": "File complaint with your local CFS agency or the agency handling your case.",
+      "timeframe": "As soon as possible",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.gov.mb.ca/fs/childfam/contact.html"
+      ],
+      "contactInfo": {
+        "phone": "204-944-4200 (After Hours Emergency)"
+      }
+    },
+    "children_advocate": {
+      "stepNumber": 3,
+      "title": "Manitoba Advocate for Children and Youth",
+      "description": "Independent office that investigates child welfare concerns and advocates for improvements.",
+      "timeframe": "After internal complaint or immediately if urgent",
+      "requiredForms": [
+        "Request for Advocacy Form"
+      ],
+      "helpfulLinks": [
+        "https://manitobaadvocate.ca/advocacy/"
+      ],
+      "contactInfo": {
+        "phone": "204-988-7440",
+        "toll_free": "1-800-263-7146",
+        "email": "office@manitobaadvocate.ca"
+      }
+    },
+    "ombudsman": {
+      "stepNumber": 4,
+      "title": "Manitoba Ombudsman",
+      "description": "Investigates complaints about provincial government services including child welfare.",
+      "timeframe": "After exhausting internal complaints",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.ombudsman.mb.ca/making-a-complaint.html"
+      ],
+      "contactInfo": {
+        "phone": "204-982-9130",
+        "toll_free": "1-800-665-0531"
+      }
+    }
+  }
+}

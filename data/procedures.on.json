@@ -146,90 +146,223 @@
     }
   },
   "Criminal": {
-    "minor_offence": {
-      "province": "ON",
-      "venue": "OCJ",
-      "issueCode": "minor_offence",
-      "confidence": 0.7,
-      "steps": [
-        {
-          "title": "Understand your charges",
-          "summary": "Review the charges and your legal options.",
-          "actions": [
-            "Read your appearance notice or promise to appear carefully.",
-            "Note your first court date.",
-            "Consider contacting duty counsel or a lawyer.",
-            "Review the Criminal Code sections you're charged under.",
-            "Understand potential penalties (fines, probation, jail)."
-          ],
-          "forms": [],
-          "prereqs": [],
-          "who": "Accused",
-          "venue": "OCJ",
-          "deadlineTip": "Do not miss your first appearance date."
-        },
-        {
-          "title": "Seek legal representation",
-          "summary": "Get legal advice before entering a plea.",
-          "actions": [
-            "Apply for Legal Aid if you qualify financially.",
-            "Speak with duty counsel at courthouse (free).",
-            "Consider hiring a criminal defence lawyer.",
-            "Understand the difference between guilty plea, not guilty, and diversion options."
-          ],
-          "forms": [],
-          "prereqs": [],
-          "who": "Accused",
-          "venue": "OCJ",
-          "deadlineTip": "Get legal advice before your first appearance if possible."
-        },
-        {
-          "title": "Attend first appearance",
-          "summary": "Appear in court on your scheduled date.",
-          "actions": [
-            "Arrive early (at least 30 minutes) and dress appropriately.",
-            "Bring photo ID and court documents.",
-            "Check in with court staff.",
-            "Speak with duty counsel if you don't have a lawyer.",
-            "Enter your plea or request an adjournment to get legal advice.",
-            "Get future court dates in writing."
-          ],
-          "forms": [],
-          "prereqs": [],
-          "who": "Accused",
-          "venue": "OCJ",
-          "deadlineTip": "Failure to appear can result in a warrant for your arrest."
-        },
-        {
-          "title": "Disclosure and Crown meeting",
-          "summary": "Review evidence and discuss with Crown prosecutor.",
-          "actions": [
-            "Request disclosure (police reports, witness statements, evidence).",
-            "Review all disclosure with your lawyer.",
-            "Schedule Crown pre-trial meeting through your lawyer.",
-            "Discuss potential plea deals or trial options."
-          ],
-          "forms": [],
-          "prereqs": [],
-          "who": "Accused",
-          "venue": "OCJ",
-          "deadlineTip": "Review disclosure carefully - it contains the case against you."
-        },
-        {
-          "title": "Trial or resolution",
-          "summary": "Proceed to trial or accept a resolution.",
-          "actions": [
-            "If pleading guilty: understand sentencing range and consequences.",
-            "If going to trial: prepare with lawyer, gather defence evidence.",
-            "Consider diversion programs if eligible (mental health court, drug treatment).",
-            "Attend all scheduled court dates."
-          ],
-          "forms": [],
-          "prereqs": [],
-          "who": "Accused",
-          "venue": "OCJ",
-          "deadlineTip": "Missing court dates can result in additional charges."
-        }
+    "arrest_rights": {
+      "stepNumber": 1,
+      "title": "Know Your Rights Upon Arrest",
+      "description": "You have the right to remain silent, right to counsel, and right to be informed of charges. Exercise these rights immediately.",
+      "timeframe": "Immediate - Upon arrest",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.canada.ca/en/department-justice/programs/criminal-justice-system/arrest-detention.html",
+        "https://www.legalaid.on.ca/legal-clinics/criminal-law/"
+      ],
+      "criticalWarnings": [
+        "NEVER speak to police without a lawyer present - anything you say can be used against you",
+        "Ask for a lawyer immediately and clearly state: 'I want to speak to a lawyer'",
+        "You have the right to call Legal Aid duty counsel 24/7 at 1-800-265-0451"
+      ]
+    },
+    "understanding_charges": {
+      "stepNumber": 2,
+      "title": "Understanding Your Charges & Classification",
+      "description": "Charges are classified as summary (less serious), indictable (serious), or hybrid. This affects maximum penalties and court procedures.",
+      "timeframe": "Within 24 hours of arrest",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.ontario.ca/page/understanding-criminal-charges",
+        "https://www.justice.gc.ca/eng/csj-sjc/ccs-ajc/03.html"
+      ],
+      "details": {
+        "summaryOffences": "Maximum 2 years less a day in jail, $5,000 fine, tried in Provincial Court",
+        "indictableOffences": "More serious crimes, longer sentences, may have preliminary inquiry, can elect trial by judge alone or jury",
+        "hybridOffences": "Crown chooses to proceed summarily or by indictment based on circumstances"
+      }
+    },
+    "bail_hearing": {
+      "stepNumber": 3,
+      "title": "Bail Hearing (Show Cause/Judicial Interim Release)",
+      "description": "Must be brought before a Justice of the Peace or judge within 24 hours. Crown must show why you should be detained unless serious charges.",
+      "timeframe": "Within 24 hours of arrest (or 48-72 hours on weekends)",
+      "requiredForms": [
+        "Form 32 - Recognizance",
+        "Form 12 - Undertaking"
+      ],
+      "helpfulLinks": [
+        "https://www.legalaid.on.ca/services/criminal-law/bail/",
+        "https://www.ontario.ca/page/bail-what-you-need-know"
+      ],
+      "criticalWarnings": [
+        "Have a surety ready - someone willing to supervise you and pledge money",
+        "Bring documents showing ties to community, employment, residence",
+        "Breaching bail conditions is a NEW criminal offence"
+      ]
+    },
+    "legal_representation": {
+      "stepNumber": 4,
+      "title": "Obtain Legal Representation",
+      "description": "Contact Legal Aid Ontario (if eligible) or hire a private criminal defence lawyer. DO NOT represent yourself on criminal charges.",
+      "timeframe": "Immediately after arrest",
+      "requiredForms": [
+        "Legal Aid Ontario Application (if income-eligible)"
+      ],
+      "helpfulLinks": [
+        "https://www.legalaid.on.ca/services/criminal-law/",
+        "https://lso.ca/public-resources/finding-a-lawyer-or-paralegal/law-society-referral-service",
+        "https://www.attorneygeneral.jus.gov.on.ca/english/justice-ont/programs.php"
+      ],
+      "eligibilityInfo": {
+        "legalAidIncome": "Gross family income under $22,720 (single) or $37,128 (couple with no dependents) typically qualifies",
+        "dutyCounsel": "Free advice at court from duty counsel even if you don't qualify for full Legal Aid"
+      }
+    },
+    "first_appearance": {
+      "stepNumber": 5,
+      "title": "First Appearance in Court",
+      "description": "You or your lawyer must appear. Case will be set over for plea, Crown disclosure, and potentially a judicial pre-trial.",
+      "timeframe": "Date on your court documents - NEVER miss this",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.ontario.ca/page/going-court-criminal-matter",
+        "https://www.ontariocourts.ca/ocj/criminal-court/"
+      ],
+      "criticalWarnings": [
+        "Missing court = arrest warrant issued immediately",
+        "Dress appropriately - business casual, no hats, no offensive clothing",
+        "Turn off phone, arrive 30 minutes early"
+      ]
+    },
+    "crown_disclosure": {
+      "stepNumber": 6,
+      "title": "Request and Review Crown Disclosure",
+      "description": "Crown must disclose ALL evidence they have (Stinchcombe disclosure). Review police notes, witness statements, video/audio, forensics.",
+      "timeframe": "Usually provided 4-8 weeks after first appearance",
+      "requiredForms": [
+        "Request for Disclosure (filed by your lawyer)"
+      ],
+      "helpfulLinks": [
+        "https://www.justice.gc.ca/eng/csj-sjc/ccs-ajc/05.html"
+      ],
+      "details": {
+        "whatToExpect": "Police occurrence reports, witness statements, officer notes, video/audio recordings, forensic reports, your criminal record",
+        "timeline": "Crown has ongoing duty to disclose - even after trial starts if new evidence emerges"
+      }
+    },
+    "judicial_pretrial": {
+      "stepNumber": 7,
+      "title": "Judicial Pre-Trial Conference",
+      "description": "Meeting between Crown, defence, and judge to discuss case resolution, narrow issues, estimate trial time.",
+      "timeframe": "Usually 2-4 months after charges laid",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.ontariocourts.ca/ocj/criminal-court/pre-trial-conferences/"
+      ]
+    },
+    "plea_negotiations": {
+      "stepNumber": 8,
+      "title": "Plea Negotiations with Crown",
+      "description": "Defence and Crown may negotiate a plea deal - reduced charges or joint sentencing position in exchange for guilty plea.",
+      "timeframe": "Ongoing until trial",
+      "requiredForms": [],
+      "helpfulLinks": [],
+      "considerations": [
+        "Guilty plea means criminal record - understand consequences for employment, travel, immigration",
+        "Conditional discharge possible for some offences - no conviction if probation completed",
+        "Absolute discharge - finding of guilt but no conviction and no conditions"
+      ]
+    },
+    "preliminary_inquiry": {
+      "stepNumber": 9,
+      "title": "Preliminary Inquiry (Indictable Offences Only)",
+      "description": "For serious indictable offences, a preliminary inquiry determines if there's enough evidence to proceed to trial.",
+      "timeframe": "If requested, usually 4-8 months after charges",
+      "requiredForms": [
+        "Election and Request for Preliminary Inquiry"
+      ],
+      "helpfulLinks": [
+        "https://www.justice.gc.ca/eng/csj-sjc/ccs-ajc/08.html"
+      ],
+      "note": "This step was limited by Bill C-75 - now only available for offences with life imprisonment"
+    },
+    "trial_preparation": {
+      "stepNumber": 10,
+      "title": "Trial Preparation",
+      "description": "Prepare defence strategy, witnesses, cross-examination, Charter arguments, and trial brief.",
+      "timeframe": "2-4 weeks before trial",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.ontariocourts.ca/ocj/criminal-court/trial-management/"
+      ],
+      "keyElements": [
+        "Charter applications (s.8 unreasonable search, s.9 arbitrary detention, s.10 right to counsel, etc.)",
+        "Voir dire hearings to exclude evidence",
+        "Subpoena witnesses if necessary",
+        "Prepare defence witnesses and accused testimony (if testifying)"
+      ]
+    },
+    "trial": {
+      "stepNumber": 11,
+      "title": "Criminal Trial",
+      "description": "Crown presents evidence first (must prove guilt beyond reasonable doubt). Defence may call evidence or rely on Crown's failure to prove case.",
+      "timeframe": "Varies - 1 day to several months depending on complexity",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.justice.gc.ca/eng/csj-sjc/ccs-ajc/09.html"
+      ],
+      "trialStages": [
+        "Crown opening statement",
+        "Crown calls witnesses (you have right to cross-examine)",
+        "Defence may make motion for directed verdict (no case to answer)",
+        "Defence may call evidence (accused NOT required to testify)",
+        "Closing arguments",
+        "Judge's charge to jury (if jury trial) or judge's decision"
+      ]
+    },
+    "verdict": {
+      "stepNumber": 12,
+      "title": "Verdict",
+      "description": "Judge or jury delivers verdict - guilty or not guilty. If not guilty, you are free to go. If guilty, proceeds to sentencing.",
+      "timeframe": "Immediately after trial or reserved decision (judge takes time)",
+      "requiredForms": [],
+      "helpfulLinks": []
+    },
+    "sentencing": {
+      "stepNumber": 13,
+      "title": "Sentencing Hearing",
+      "description": "If found guilty, sentencing hearing determines your punishment. May include pre-sentence report, victim impact statements.",
+      "timeframe": "Usually 2-6 weeks after guilty verdict",
+      "requiredForms": [
+        "Pre-Sentence Report (ordered by judge)"
+      ],
+      "helpfulLinks": [
+        "https://www.justice.gc.ca/eng/csj-sjc/ccs-ajc/10.html"
+      ],
+      "sentencingOptions": [
+        "Absolute or conditional discharge",
+        "Suspended sentence with probation",
+        "Fine",
+        "Conditional sentence (house arrest)",
+        "Intermittent sentence (weekends)",
+        "Imprisonment",
+        "Combinations of the above"
+      ],
+      "aggravatingFactors": "Prior record, violence, breach of trust, hate motivation, vulnerable victim",
+      "mitigatingFactors": "Remorse, early guilty plea, first offence, rehabilitation efforts, mental health issues"
+    },
+    "appeal": {
+      "stepNumber": 14,
+      "title": "Appeal Process",
+      "description": "If convicted, you have the right to appeal to the Court of Appeal for Ontario. Must file within strict timelines.",
+      "timeframe": "30 days to file Notice of Appeal",
+      "requiredForms": [
+        "Form 1 - Notice of Appeal"
+      ],
+      "helpfulLinks": [
+        "https://www.ontariocourts.ca/coa/en/appeals/criminal.htm"
+      ],
+      "criticalWarnings": [
+        "Appeal deadlines are STRICT - 30 days for summary convictions, 30 days for indictable",
+        "Grounds for appeal: legal error, unreasonable verdict, miscarriage of justice, unfit sentence",
+        "Court may increase sentence on Crown appeal - understand the risks"
       ]
     }
   },

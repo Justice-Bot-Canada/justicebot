@@ -1,0 +1,123 @@
+{
+  "PoliceAccountability": {
+    "understanding_complaint_process": {
+      "stepNumber": 1,
+      "title": "Understanding BC Police Complaints Process",
+      "description": "British Columbia has three oversight bodies: Office of the Police Complaint Commissioner (OPCC) for municipal police, Independent Investigations Office (IIO) for serious harm/death, and RCMP Civilian Review and Complaints Commission for RCMP.",
+      "timeframe": "Immediate",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://opcc.bc.ca/",
+        "https://iiobc.ca/",
+        "https://www.crcc-ccetp.gc.ca/"
+      ]
+    },
+    "file_complaint_iio": {
+      "stepNumber": 2,
+      "title": "File with IIO (Serious Incidents)",
+      "description": "IIO investigates incidents involving police where death or serious harm occurred. They are automatically notified by police, but you can also report directly.",
+      "timeframe": "As soon as possible",
+      "requiredForms": [
+        "IIO Incident Report Form"
+      ],
+      "helpfulLinks": [
+        "https://iiobc.ca/report-an-incident/"
+      ],
+      "contactInfo": {
+        "phone": "1-855-446-8477",
+        "email": "contact@iiobc.ca",
+        "emergencyLine": "Available 24/7"
+      }
+    },
+    "file_complaint_opcc": {
+      "stepNumber": 3,
+      "title": "File with OPCC (Municipal Police)",
+      "description": "Complaints about municipal police conduct, service delivery, or internal discipline matters.",
+      "timeframe": "Within 12 months of incident",
+      "requiredForms": [
+        "OPCC Complaint Form"
+      ],
+      "helpfulLinks": [
+        "https://opcc.bc.ca/complaints/make-a-complaint/"
+      ],
+      "contactInfo": {
+        "phone": "1-877-999-8707",
+        "address": "Office of the Police Complaint Commissioner, 5th Floor, 947 Fort Street, Victoria, BC V8V 3K3"
+      }
+    },
+    "file_complaint_rcmp": {
+      "stepNumber": 4,
+      "title": "File RCMP Complaint",
+      "description": "Complaints about RCMP officers must first go through RCMP internal process, then can be reviewed by Civilian Review and Complaints Commission.",
+      "timeframe": "Within 1 year of incident",
+      "requiredForms": [
+        "RCMP Public Complaint Form"
+      ],
+      "helpfulLinks": [
+        "https://www.rcmp-grc.gc.ca/en/how-make-complaint",
+        "https://www.crcc-ccetp.gc.ca/en/file-complaint"
+      ]
+    }
+  },
+  "CAS": {
+    "understanding_child_protection": {
+      "stepNumber": 1,
+      "title": "Understanding BC Child Protection System",
+      "description": "In BC, the Ministry of Children and Family Development oversees child protection. Delegated Aboriginal Agencies also provide services.",
+      "timeframe": "Immediate",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www2.gov.bc.ca/gov/content/safety/public-safety/protecting-children"
+      ]
+    },
+    "internal_complaint": {
+      "stepNumber": 2,
+      "title": "File Internal Complaint with MCFD",
+      "description": "First step is to file a complaint directly with the Ministry of Children and Family Development office handling your case.",
+      "timeframe": "As soon as possible",
+      "requiredForms": [
+        "MCFD Complaint Form"
+      ],
+      "helpfulLinks": [
+        "https://www2.gov.bc.ca/gov/content/safety/public-safety/protecting-children/complaints-concerns"
+      ],
+      "contactInfo": {
+        "phone": "1-800-663-9122",
+        "serviceBC": "Available to help navigate complaints"
+      }
+    },
+    "representative_children_youth": {
+      "stepNumber": 3,
+      "title": "Contact Representative for Children and Youth",
+      "description": "Independent office that can investigate child welfare concerns, conduct reviews, and advocate for improvements.",
+      "timeframe": "After internal complaint or immediately if urgent",
+      "requiredForms": [
+        "RCY Request for Service Form"
+      ],
+      "helpfulLinks": [
+        "https://www.rcybc.ca/make-a-report"
+      ],
+      "contactInfo": {
+        "phone": "1-800-476-3933",
+        "email": "rcy@rcybc.ca",
+        "address": "Representative for Children and Youth, PO Box 9207, Stn Prov Govt, Victoria, BC V8W 9J1"
+      }
+    },
+    "ombudsperson": {
+      "stepNumber": 4,
+      "title": "File Complaint with BC Ombudsperson",
+      "description": "BC Ombudsperson investigates complaints about provincial government agencies including child protection services.",
+      "timeframe": "After exhausting internal complaints",
+      "requiredForms": [
+        "Ombudsperson Complaint Form"
+      ],
+      "helpfulLinks": [
+        "https://bcombudsperson.ca/complaint/"
+      ],
+      "contactInfo": {
+        "phone": "1-800-567-3247",
+        "email": "info@bcombudsperson.ca"
+      }
+    }
+  }
+}

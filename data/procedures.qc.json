@@ -1,0 +1,114 @@
+{
+  "PoliceAccountability": {
+    "understanding_complaint_process": {
+      "stepNumber": 1,
+      "title": "Comprendre le processus de plainte policière au Québec",
+      "description": "Le Bureau des enquêtes indépendantes (BEI) enquête sur les incidents graves impliquant des policiers. Le Commissaire à la déontologie policière traite les plaintes de conduite.",
+      "timeframe": "Immédiat",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.bei.gouv.qc.ca/",
+        "https://deontologie-policiere.gouv.qc.ca/"
+      ]
+    },
+    "file_complaint_bei": {
+      "stepNumber": 2,
+      "title": "Signaler au BEI (Incidents Graves)",
+      "description": "Le BEI enquête automatiquement sur les décès, blessures graves, agressions sexuelles, et incidents impliquant des policiers autochtones.",
+      "timeframe": "Immédiat - Le BEI est notifié automatiquement mais vous pouvez aussi signaler",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.bei.gouv.qc.ca/signaler-un-evenement.html"
+      ],
+      "contactInfo": {
+        "phone": "1-833-DÉN-ONCE (1-833-336-6623)",
+        "urgence": "Disponible 24/7"
+      }
+    },
+    "file_complaint_ethics": {
+      "stepNumber": 3,
+      "title": "Déposer une plainte au Commissaire à la déontologie",
+      "description": "Pour les plaintes de conduite policière inappropriée, abus de pouvoir, ou violation des droits.",
+      "timeframe": "Dans l'année suivant l'incident",
+      "requiredForms": [
+        "Formulaire de plainte déontologique"
+      ],
+      "helpfulLinks": [
+        "https://deontologie-policiere.gouv.qc.ca/porter-plainte/"
+      ],
+      "contactInfo": {
+        "phone": "1-877-237-7544",
+        "address": "Commissaire à la déontologie policière, 2535 boulevard Laurier, bureau 7.04, Québec, QC G1V 4M3"
+      }
+    },
+    "ethics_committee_hearing": {
+      "stepNumber": 4,
+      "title": "Audience devant le Comité de déontologie policière",
+      "description": "Si le Commissaire juge la plainte fondée, elle est portée devant le Comité de déontologie pour audience.",
+      "timeframe": "Plusieurs mois après le dépôt",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://comitedisciplinairedespoliciersduquebec.ca/"
+      ]
+    }
+  },
+  "CAS": {
+    "understanding_child_protection": {
+      "stepNumber": 1,
+      "title": "Comprendre le système de protection de la jeunesse",
+      "description": "La Direction de la protection de la jeunesse (DPJ) est responsable de la protection des enfants au Québec.",
+      "timeframe": "Immédiat",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.quebec.ca/famille-et-soutien-aux-personnes/enfance/protection-de-la-jeunesse"
+      ]
+    },
+    "internal_complaint": {
+      "stepNumber": 2,
+      "title": "Plainte interne à la DPJ",
+      "description": "Déposer une plainte auprès du directeur de la protection de la jeunesse de votre région.",
+      "timeframe": "Dès que possible",
+      "requiredForms": [
+        "Formulaire de plainte DPJ"
+      ],
+      "helpfulLinks": [
+        "https://www.cisss-bsl.gouv.qc.ca/services-offerts/jeunesse-et-famille/protection-de-la-jeunesse"
+      ],
+      "contactInfo": {
+        "urgence": "1-800-463-9188 (Signalement 24/7)"
+      }
+    },
+    "commission_review": {
+      "stepNumber": 3,
+      "title": "Révision par la Commission des droits de la personne",
+      "description": "La Commission peut enquêter sur les violations des droits des enfants dans le système de protection.",
+      "timeframe": "Après plainte interne",
+      "requiredForms": [
+        "Formulaire de plainte CDPDJ"
+      ],
+      "helpfulLinks": [
+        "https://www.cdpdj.qc.ca/fr/formulaires/porter-plainte"
+      ],
+      "contactInfo": {
+        "phone": "1-800-361-6477",
+        "email": "information@cdpdj.qc.ca"
+      }
+    },
+    "protecteur_citoyen": {
+      "stepNumber": 4,
+      "title": "Plainte au Protecteur du citoyen",
+      "description": "Le Protecteur du citoyen enquête sur les plaintes concernant les services gouvernementaux dont la DPJ.",
+      "timeframe": "Après épuisement des recours internes",
+      "requiredForms": [
+        "Formulaire de demande d'intervention"
+      ],
+      "helpfulLinks": [
+        "https://protecteurducitoyen.qc.ca/faire-une-demande"
+      ],
+      "contactInfo": {
+        "phone": "1-800-463-5070",
+        "address": "800, place D'Youville, 19e étage, Québec, QC G1R 3P4"
+      }
+    }
+  }
+}

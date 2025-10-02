@@ -1,0 +1,104 @@
+{
+  "PoliceAccountability": {
+    "serious_incident_response_team": {
+      "stepNumber": 1,
+      "title": "Serious Incident Response Team (SIRT-NL)",
+      "description": "SIRT-NL investigates serious incidents involving police including death, serious injury, sexual assault, and domestic violence.",
+      "timeframe": "Immediate - SIRT-NL is automatically notified but you can also report",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.gov.nl.ca/sirt-nl/"
+      ],
+      "contactInfo": {
+        "phone": "709-729-2830",
+        "toll_free": "1-877-720-7378",
+        "email": "SIRTNL@gov.nl.ca",
+        "emergencyLine": "Available 24/7"
+      }
+    },
+    "file_complaint_rnc_rcmp": {
+      "stepNumber": 2,
+      "title": "File Complaint with RNC or RCMP",
+      "description": "File complaint with Royal Newfoundland Constabulary (RNC) or RCMP for conduct issues.",
+      "timeframe": "Within 1 year of incident",
+      "requiredForms": [
+        "Police Complaint Form"
+      ],
+      "helpfulLinks": [
+        "https://www.rnc.gov.nl.ca/contact-us/complaints/"
+      ]
+    },
+    "royal_newfoundland_review": {
+      "stepNumber": 3,
+      "title": "Royal Newfoundland Constabulary Public Complaints Commission",
+      "description": "Independent review of RNC conduct complaints if unsatisfied with internal investigation.",
+      "timeframe": "Within 30 days of RNC decision",
+      "requiredForms": [
+        "RNC PCC Appeal Form"
+      ],
+      "helpfulLinks": [
+        "https://www.gov.nl.ca/justice/public-safety/rnc-pcc/"
+      ],
+      "contactInfo": {
+        "phone": "709-729-0222",
+        "address": "RNC Public Complaints Commission, PO Box 8700, St. John's, NL A1B 4J6"
+      }
+    }
+  },
+  "CAS": {
+    "understanding_child_protection": {
+      "stepNumber": 1,
+      "title": "Understanding NL Child Protection",
+      "description": "Department of Children, Seniors and Social Development oversees child protection.",
+      "timeframe": "Immediate",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.gov.nl.ca/cssd/childcare/reporting-child-abuse/"
+      ]
+    },
+    "internal_complaint": {
+      "stepNumber": 2,
+      "title": "File Internal Complaint",
+      "description": "File complaint with regional Child Protection Services office.",
+      "timeframe": "As soon as possible",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.gov.nl.ca/cssd/contact/"
+      ],
+      "contactInfo": {
+        "phone": "1-877-753-7888 (After Hours Child Protection)"
+      }
+    },
+    "child_youth_advocate": {
+      "stepNumber": 3,
+      "title": "Office of the Child and Youth Advocate",
+      "description": "Independent office that investigates child welfare concerns and advocates for children's rights.",
+      "timeframe": "After internal complaint or immediately if urgent",
+      "requiredForms": [
+        "Request for Assistance Form"
+      ],
+      "helpfulLinks": [
+        "https://www.childandyouthadvocate.nl.ca/complaints"
+      ],
+      "contactInfo": {
+        "phone": "709-753-3888",
+        "toll_free": "1-877-753-3888",
+        "email": "office@ocya.nl.ca"
+      }
+    },
+    "citizens_representative": {
+      "stepNumber": 4,
+      "title": "Office of the Citizens' Representative (Ombudsman)",
+      "description": "Investigates complaints about provincial government services.",
+      "timeframe": "After exhausting internal complaints",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.citizensrep.nl.ca/making-a-complaint/"
+      ],
+      "contactInfo": {
+        "phone": "709-729-7647",
+        "toll_free": "1-800-559-0079"
+      }
+    }
+  }
+}

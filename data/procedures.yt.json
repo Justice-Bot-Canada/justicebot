@@ -1,0 +1,91 @@
+{
+  "PoliceAccountability": {
+    "file_complaint_rcmp": {
+      "stepNumber": 1,
+      "title": "File Complaint with RCMP",
+      "description": "Yukon is policed by RCMP. File complaint through RCMP process.",
+      "timeframe": "Within 1 year of incident",
+      "requiredForms": [
+        "RCMP Public Complaint Form"
+      ],
+      "helpfulLinks": [
+        "https://www.rcmp-grc.gc.ca/en/how-make-complaint"
+      ],
+      "contactInfo": {
+        "phone": "867-667-5555 (RCMP M Division)"
+      }
+    },
+    "civilian_review_commission": {
+      "stepNumber": 2,
+      "title": "Appeal to Civilian Review and Complaints Commission",
+      "description": "If unsatisfied with RCMP's response, appeal to federal oversight body.",
+      "timeframe": "Within 60 days of RCMP decision",
+      "requiredForms": [
+        "CRCC Complaint Form"
+      ],
+      "helpfulLinks": [
+        "https://www.crcc-ccetp.gc.ca/en/file-complaint"
+      ],
+      "contactInfo": {
+        "phone": "1-800-665-6878",
+        "email": "complaints@crcc-ccetp.gc.ca"
+      }
+    }
+  },
+  "CAS": {
+    "understanding_child_protection": {
+      "stepNumber": 1,
+      "title": "Understanding Yukon Child Protection",
+      "description": "Department of Health and Social Services, Family and Children's Services oversees child protection.",
+      "timeframe": "Immediate",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://yukon.ca/en/health-and-wellness/family-and-childrens-services"
+      ]
+    },
+    "internal_complaint": {
+      "stepNumber": 2,
+      "title": "File Internal Complaint",
+      "description": "File complaint with Family and Children's Services office.",
+      "timeframe": "As soon as possible",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://yukon.ca/en/health-and-wellness/family-and-childrens-services/child-protection"
+      ],
+      "contactInfo": {
+        "phone": "867-667-3002",
+        "emergency": "867-667-8500 (After Hours)"
+      }
+    },
+    "child_youth_advocate": {
+      "stepNumber": 3,
+      "title": "Yukon Child and Youth Advocate",
+      "description": "Independent office that advocates for children and youth receiving government services.",
+      "timeframe": "After internal complaint or immediately if urgent",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://yukonadvocate.ca/contact-us/"
+      ],
+      "contactInfo": {
+        "phone": "867-456-5575",
+        "toll_free": "1-800-661-0408 ext. 5575",
+        "email": "ycao@gov.yk.ca"
+      }
+    },
+    "ombudsman": {
+      "stepNumber": 4,
+      "title": "Yukon Ombudsman",
+      "description": "Investigates complaints about territorial government departments.",
+      "timeframe": "After exhausting internal complaints",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://yukonombud.ca/making-a-complaint/"
+      ],
+      "contactInfo": {
+        "phone": "867-667-8468",
+        "toll_free": "1-800-661-0408 ext. 8468",
+        "email": "ombudsman@yukonombud.ca"
+      }
+    }
+  }
+}

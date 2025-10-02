@@ -1,0 +1,73 @@
+{
+  "PoliceAccountability": {
+    "file_complaint_police_service": {
+      "stepNumber": 1,
+      "title": "File Complaint with Police Service",
+      "description": "File complaint with municipal police (Charlottetown, Summerside, Kensington) or RCMP.",
+      "timeframe": "Within 1 year of incident",
+      "requiredForms": [
+        "Police Complaint Form"
+      ],
+      "helpfulLinks": [
+        "https://www.charlottetownpolice.com/contact-us"
+      ]
+    },
+    "serious_incident_investigation": {
+      "stepNumber": 2,
+      "title": "Serious Incident Investigation",
+      "description": "Serious incidents involving police are typically investigated by out-of-province police services.",
+      "timeframe": "Automatic notification",
+      "requiredForms": [],
+      "helpfulLinks": []
+    },
+    "independent_review": {
+      "stepNumber": 3,
+      "title": "Request Independent Review",
+      "description": "Contact PEI Department of Justice for independent review of serious complaints.",
+      "timeframe": "After police service decision",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.princeedwardisland.ca/en/information/justice-and-public-safety"
+      ],
+      "contactInfo": {
+        "phone": "902-368-4580"
+      }
+    }
+  },
+  "CAS": {
+    "understanding_child_protection": {
+      "stepNumber": 1,
+      "title": "Understanding PEI Child Protection",
+      "description": "Child and Family Services operates under Department of Social Development and Housing.",
+      "timeframe": "Immediate",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.princeedwardisland.ca/en/information/child-protection"
+      ]
+    },
+    "internal_complaint": {
+      "stepNumber": 2,
+      "title": "File Internal Complaint",
+      "description": "File complaint with Child Protection Services office handling your case.",
+      "timeframe": "As soon as possible",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.princeedwardisland.ca/en/service/report-child-need-protection"
+      ],
+      "contactInfo": {
+        "phone": "902-368-5930 (After Hours Child Protection)"
+      }
+    },
+    "office_of_child_youth": {
+      "stepNumber": 3,
+      "title": "Contact Office of Child and Youth",
+      "description": "Independent office that reviews child welfare concerns.",
+      "timeframe": "After internal complaint",
+      "requiredForms": [],
+      "helpfulLinks": [],
+      "contactInfo": {
+        "phone": "902-368-4530"
+      }
+    }
+  }
+}

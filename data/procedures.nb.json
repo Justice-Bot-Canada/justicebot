@@ -1,0 +1,95 @@
+{
+  "PoliceAccountability": {
+    "file_complaint_police_service": {
+      "stepNumber": 1,
+      "title": "File Complaint with Police Force",
+      "description": "File complaint with municipal police force or RCMP detachment in New Brunswick.",
+      "timeframe": "Within 1 year of incident",
+      "requiredForms": [
+        "Police Complaint Form"
+      ],
+      "helpfulLinks": [
+        "https://www2.gnb.ca/content/gnb/en/departments/public-safety/policing.html"
+      ]
+    },
+    "serious_incident_investigation": {
+      "stepNumber": 2,
+      "title": "Serious Incident Investigation",
+      "description": "Serious incidents are investigated by out-of-province police services as NB does not have an independent police oversight body.",
+      "timeframe": "Automatic notification",
+      "requiredForms": [],
+      "helpfulLinks": []
+    },
+    "police_commission": {
+      "stepNumber": 3,
+      "title": "Appeal to New Brunswick Police Commission",
+      "description": "Review of municipal police conduct complaints if unsatisfied with internal investigation.",
+      "timeframe": "Within 30 days of decision",
+      "requiredForms": [
+        "Police Commission Appeal Form"
+      ],
+      "helpfulLinks": [
+        "https://www2.gnb.ca/content/gnb/en/departments/public-safety/policing/content/policecommission.html"
+      ],
+      "contactInfo": {
+        "phone": "506-453-2069",
+        "address": "New Brunswick Police Commission, PO Box 6000, Fredericton, NB E3B 5H1"
+      }
+    }
+  },
+  "CAS": {
+    "understanding_child_protection": {
+      "stepNumber": 1,
+      "title": "Understanding NB Child Protection Services",
+      "description": "Department of Social Development oversees child protection in New Brunswick.",
+      "timeframe": "Immediate",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www2.gnb.ca/content/gnb/en/departments/social_development/families_children.html"
+      ]
+    },
+    "internal_complaint": {
+      "stepNumber": 2,
+      "title": "File Internal Complaint",
+      "description": "File complaint with local Social Development office handling your case.",
+      "timeframe": "As soon as possible",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www2.gnb.ca/content/gnb/en/contacts/dept_renderer.197.html"
+      ],
+      "contactInfo": {
+        "phone": "1-866-444-8838 (After Hours Child Protection)"
+      }
+    },
+    "child_youth_advocate": {
+      "stepNumber": 3,
+      "title": "Contact Child and Youth Advocate",
+      "description": "Independent office that reviews child welfare complaints and advocates for improvements.",
+      "timeframe": "After internal complaint or immediately if urgent",
+      "requiredForms": [
+        "Request for Assistance Form"
+      ],
+      "helpfulLinks": [
+        "https://www.cyanb.ca/contact-us/"
+      ],
+      "contactInfo": {
+        "phone": "1-888-465-1100",
+        "email": "advocate@gnb.ca"
+      }
+    },
+    "ombudsman": {
+      "stepNumber": 4,
+      "title": "File Complaint with NB Ombudsman",
+      "description": "Investigates complaints about provincial government departments.",
+      "timeframe": "After exhausting internal complaints",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.ombudnb.ca/site/index.php/en/how-to-make-a-complaint"
+      ],
+      "contactInfo": {
+        "phone": "1-888-465-1100",
+        "email": "nb.ombud@gnb.ca"
+      }
+    }
+  }
+}

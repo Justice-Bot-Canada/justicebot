@@ -1,0 +1,75 @@
+{
+  "PoliceAccountability": {
+    "file_complaint_rcmp": {
+      "stepNumber": 1,
+      "title": "File Complaint with RCMP",
+      "description": "Nunavut is policed by RCMP. File complaint through RCMP process.",
+      "timeframe": "Within 1 year of incident",
+      "requiredForms": [
+        "RCMP Public Complaint Form"
+      ],
+      "helpfulLinks": [
+        "https://www.rcmp-grc.gc.ca/en/how-make-complaint"
+      ],
+      "contactInfo": {
+        "phone": "867-979-1111 (RCMP V Division)"
+      }
+    },
+    "civilian_review_commission": {
+      "stepNumber": 2,
+      "title": "Appeal to Civilian Review and Complaints Commission",
+      "description": "If unsatisfied with RCMP's response, appeal to federal oversight body.",
+      "timeframe": "Within 60 days of RCMP decision",
+      "requiredForms": [
+        "CRCC Complaint Form"
+      ],
+      "helpfulLinks": [
+        "https://www.crcc-ccetp.gc.ca/en/file-complaint"
+      ],
+      "contactInfo": {
+        "phone": "1-800-665-6878",
+        "email": "complaints@crcc-ccetp.gc.ca"
+      }
+    }
+  },
+  "CAS": {
+    "understanding_child_protection": {
+      "stepNumber": 1,
+      "title": "Understanding Nunavut Child Protection",
+      "description": "Department of Family Services oversees child protection in Nunavut.",
+      "timeframe": "Immediate",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.gov.nu.ca/family-services/information/child-and-family-services"
+      ]
+    },
+    "internal_complaint": {
+      "stepNumber": 2,
+      "title": "File Internal Complaint",
+      "description": "File complaint with your regional Family Services office.",
+      "timeframe": "As soon as possible",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.gov.nu.ca/family-services/information/contact-us"
+      ],
+      "contactInfo": {
+        "phone": "1-800-567-7224 (Child Protection Line)"
+      }
+    },
+    "representative_children_youth": {
+      "stepNumber": 3,
+      "title": "Nunavut Representative for Children and Youth",
+      "description": "Independent office that reviews child welfare concerns and advocates for children's rights.",
+      "timeframe": "After internal complaint or immediately if urgent",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.rcynu.ca/contact"
+      ],
+      "contactInfo": {
+        "phone": "867-975-5090",
+        "toll_free": "1-844-896-5437",
+        "email": "rcyo@gov.nu.ca"
+      }
+    }
+  }
+}

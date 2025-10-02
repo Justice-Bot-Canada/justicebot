@@ -1,0 +1,97 @@
+{
+  "PoliceAccountability": {
+    "serious_incident_response_team": {
+      "stepNumber": 1,
+      "title": "Serious Incident Response Team (SiRT)",
+      "description": "SiRT investigates all serious incidents involving police in Nova Scotia including death, serious injury, sexual assault, and domestic violence.",
+      "timeframe": "Immediate - SiRT is automatically notified but you can also report",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://sirt.novascotia.ca/"
+      ],
+      "contactInfo": {
+        "phone": "902-424-8400",
+        "toll_free": "1-855-450-2010",
+        "email": "sirt@novascotia.ca",
+        "emergencyLine": "Available 24/7"
+      }
+    },
+    "file_complaint_police_service": {
+      "stepNumber": 2,
+      "title": "File Complaint with Police Service",
+      "description": "File complaint with municipal police service or RCMP for conduct issues.",
+      "timeframe": "Within 1 year of incident",
+      "requiredForms": [
+        "Police Complaint Form"
+      ],
+      "helpfulLinks": [
+        "https://police.halifax.ca/about-us/contact-us/public-complaints"
+      ]
+    },
+    "police_review_board": {
+      "stepNumber": 3,
+      "title": "Appeal to Police Review Board",
+      "description": "Independent review of municipal police conduct complaints if unsatisfied with internal investigation.",
+      "timeframe": "Within 30 days of police decision",
+      "requiredForms": [
+        "Police Review Board Appeal Form"
+      ],
+      "helpfulLinks": [
+        "https://novascotia.ca/just/police_review_board/"
+      ],
+      "contactInfo": {
+        "phone": "902-424-3246",
+        "address": "Police Review Board, PO Box 3003, Halifax, NS B3J 3G6"
+      }
+    }
+  },
+  "CAS": {
+    "understanding_child_protection": {
+      "stepNumber": 1,
+      "title": "Understanding NS Child Welfare",
+      "description": "Department of Community Services oversees child protection through local offices.",
+      "timeframe": "Immediate",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://novascotia.ca/coms/families/childprotection/"
+      ]
+    },
+    "internal_complaint": {
+      "stepNumber": 2,
+      "title": "File Internal Complaint",
+      "description": "File complaint with your local Community Services office.",
+      "timeframe": "As soon as possible",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://novascotia.ca/coms/contact/"
+      ],
+      "contactInfo": {
+        "phone": "1-877-424-1177 (After Hours Child Protection)"
+      }
+    },
+    "youth_services_review": {
+      "stepNumber": 3,
+      "title": "Provincial Youth Services Review",
+      "description": "Reviews child welfare cases and makes recommendations for improvements.",
+      "timeframe": "After internal complaint",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://novascotia.ca/coms/department/reports.html"
+      ]
+    },
+    "ombudsman": {
+      "stepNumber": 4,
+      "title": "Nova Scotia Ombudsman",
+      "description": "Investigates complaints about provincial government services including child welfare.",
+      "timeframe": "After exhausting internal complaints",
+      "requiredForms": [],
+      "helpfulLinks": [
+        "https://www.novascotia.ca/ombu/complaints/"
+      ],
+      "contactInfo": {
+        "phone": "902-424-6780",
+        "toll_free": "1-800-670-1111"
+      }
+    }
+  }
+}
