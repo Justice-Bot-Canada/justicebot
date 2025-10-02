@@ -47,11 +47,6 @@ const FormPrefillDemo = () => {
               {isExtracting ? "Analyzing..." : "Upload & Analyze"}
             </Button>
           </div>
-          
-          <div className="flex items-center gap-2 text-sm text-green-600">
-            <CheckCircle className="w-4 h-4" />
-            Using free Hugging Face AI models
-          </div>
         </CardContent>
       </Card>
 
