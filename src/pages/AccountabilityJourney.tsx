@@ -1,19 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
-import { Shield, Users, ArrowRight } from "lucide-react";
+import { Shield, Users, Building2, ArrowRight, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const AccountabilityJourney = () => {
   const navigate = useNavigate();
+  const [selectedProvince, setSelectedProvince] = useState<string>("ON");
+
+  const provinces = [
+    { code: "ON", name: "Ontario" },
+    { code: "BC", name: "British Columbia" },
+    { code: "AB", name: "Alberta" },
+    { code: "SK", name: "Saskatchewan" },
+    { code: "MB", name: "Manitoba" },
+    { code: "QC", name: "Quebec" },
+    { code: "NB", name: "New Brunswick" },
+    { code: "NS", name: "Nova Scotia" },
+    { code: "PE", name: "Prince Edward Island" },
+    { code: "NL", name: "Newfoundland and Labrador" },
+    { code: "NT", name: "Northwest Territories" },
+    { code: "YT", name: "Yukon" },
+    { code: "NU", name: "Nunavut" }
+  ];
 
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": "Government Accountability - Police & CAS Matters",
-    "description": "Choose your government accountability issue: Police complaints (SIU/OIPRD) or Children's Aid Society (CAS) matters"
+    "description": "Choose your government accountability issue: Police complaints or Children's Aid Society (CAS) matters across Canada"
   };
 
   const breadcrumbs = [
@@ -25,20 +43,29 @@ const AccountabilityJourney = () => {
     {
       id: "police",
       title: "Police Accountability",
-      description: "File complaints about police conduct through SIU or OIPRD",
+      description: "File complaints about police conduct (SIU, SIRT, IIO, ASIRT, etc.)",
       icon: Shield,
       color: "from-orange-500 to-orange-600",
       examples: ["Excessive force", "Unlawful arrest", "Police misconduct", "Serious injury by police"],
-      route: "/police-accountability-journey"
+      route: `/accountability/${selectedProvince.toLowerCase()}/police`
     },
     {
       id: "cas",
-      title: "Children's Aid Society (CAS)",
-      description: "Navigate CAS involvement and child protection proceedings",
+      title: "Child Protection Services",
+      description: "Navigate CAS/CFS involvement and child protection proceedings",
       icon: Users,
       color: "from-pink-500 to-pink-600",
-      examples: ["CAS investigation", "Child apprehension", "Family court proceedings", "Access visits"],
-      route: "/cas-journey"
+      examples: ["CAS/CFS investigation", "Child apprehension", "Family court proceedings", "Access visits"],
+      route: `/accountability/${selectedProvince.toLowerCase()}/cas`
+    },
+    {
+      id: "government",
+      title: "Other Government Bodies",
+      description: "Complaints about provincial/territorial government services",
+      icon: Building2,
+      color: "from-blue-500 to-blue-600",
+      examples: ["Service denial", "Unfair treatment", "Systemic issues", "Policy complaints"],
+      route: `/accountability/${selectedProvince.toLowerCase()}/government`
     }
   ];
 
@@ -54,16 +81,42 @@ const AccountabilityJourney = () => {
       />
       <div className="min-h-screen bg-background py-12">
         <div className="container mx-auto px-4 max-w-5xl">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-foreground mb-4">
               Government Accountability
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Choose your situation to get step-by-step guidance for holding government agencies accountable
+              Choose your province and type of complaint to get step-by-step guidance
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <Card className="mb-8 border-2 border-primary/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MapPin className="w-5 h-5" />
+                Select Your Province/Territory
+              </CardTitle>
+              <CardDescription>
+                Complaint procedures vary by province. Choose your location first.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Select value={selectedProvince} onValueChange={setSelectedProvince}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select your province or territory" />
+                </SelectTrigger>
+                <SelectContent>
+                  {provinces.map((province) => (
+                    <SelectItem key={province.code} value={province.code}>
+                      {province.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </CardContent>
+          </Card>
+
+          <div className="grid md:grid-cols-3 gap-6">
             {accountabilityTypes.map((type) => {
               const Icon = type.icon;
               return (
@@ -106,7 +159,21 @@ const AccountabilityJourney = () => {
             })}
           </div>
 
-          <Card className="mt-12 border-orange-200 bg-orange-50">
+          <Card className="mt-8 border-blue-200 bg-blue-50">
+            <CardContent className="pt-6">
+              <div className="flex items-start gap-4">
+                <Shield className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">Province-Specific Processes</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Each province has different oversight bodies and complaint procedures. The forms, timelines, and contact information are specific to <strong>{provinces.find(p => p.code === selectedProvince)?.name}</strong>.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mt-4 border-orange-200 bg-orange-50">
             <CardContent className="pt-6">
               <div className="flex items-start gap-4">
                 <Shield className="w-6 h-6 text-orange-600 mt-1 flex-shrink-0" />

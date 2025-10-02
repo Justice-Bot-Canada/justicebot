@@ -41,6 +41,7 @@ import CASJourney from "./pages/CASJourney";
 import LabourBoardJourney from "./pages/LabourBoardJourney";
 import ImmigrationJourney from "./pages/ImmigrationJourney";
 import AccountabilityJourney from "./pages/AccountabilityJourney";
+import ProvincialAccountabilityJourney from "./pages/ProvincialAccountabilityJourney";
 import LegalChat from "./pages/LegalChat";
 import DocumentAnalysis from "./pages/DocumentAnalysis";
 import TutorialLibrary from "./pages/TutorialLibrary";
@@ -73,6 +74,7 @@ const AppContent = () => {
         <Route path="/family-journey" element={<FamilyJourney />} />
         <Route path="/superior-court-journey" element={<SuperiorCourtJourney />} />
         <Route path="/accountability-journey" element={<AccountabilityJourney />} />
+          <Route path="/accountability/:province/:type" element={<ProvincialAccountabilityJourney />} />
           <Route path="/police-accountability-journey" element={<PoliceAccountabilityJourney />} />
           <Route path="/cas-journey" element={<CASJourney />} />
           <Route path="/labour-journey" element={<LabourBoardJourney />} />

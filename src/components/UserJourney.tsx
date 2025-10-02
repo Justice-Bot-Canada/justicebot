@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import ProgressIndicator from "@/components/ProgressIndicator";
 import { LoadingSpinner, StatusIndicator, LoadingOverlay } from "@/components/LoadingStates";
 import { ErrorHandler, useErrorHandler } from "@/components/ErrorHandler";
+import { useProvincialProcedures } from "@/hooks/useProvincialProcedures";
 import { LiveRegion } from "@/components/AccessibilityFeatures";
 
 interface JourneyStep {
@@ -40,6 +41,8 @@ interface UserJourneyProps {
   userSituation?: string;
   incidentDate?: Date;
   onStepComplete?: (stepId: string) => void;
+  province?: string;
+  accountabilityType?: string;
 }
 
 const getJourneyData = (venue: string) => {
@@ -848,11 +851,60 @@ const getJourneyData = (venue: string) => {
   }
 };
 
+// Convert provincial procedures to journey data format
+const convertProceduresToJourneyData = (procedures: any, province?: string, type?: string) => {
+  if (!procedures) {
+    return {
+      title: "Accountability Journey",
+      subtitle: "Step-by-step guidance",
+      criticalWarning: null,
+      helpfulLinks: [],
+      steps: []
+    };
+  }
+
+  const provinceNames: Record<string, string> = {
+    'ON': 'Ontario', 'BC': 'British Columbia', 'AB': 'Alberta',
+    'SK': 'Saskatchewan', 'MB': 'Manitoba', 'QC': 'Quebec',
+    'NB': 'New Brunswick', 'NS': 'Nova Scotia', 'PE': 'Prince Edward Island',
+    'NL': 'Newfoundland and Labrador', 'NT': 'Northwest Territories',
+    'YT': 'Yukon', 'NU': 'Nunavut'
+  };
+
+  const typeNames: Record<string, string> = {
+    'police': 'Police Accountability',
+    'cas': 'Child Protection Services',
+    'government': 'Government Services'
+  };
+
+  const steps: JourneyStep[] = Object.entries(procedures).map(([key, stepData]: [string, any]) => {
+    return {
+      id: key,
+      title: stepData.title || 'Step',
+      description: stepData.description || '',
+      timeEstimate: stepData.timeframe || 'Varies',
+      priority: stepData.criticalWarnings ? 'critical' as const : 'medium' as const,
+    };
+  });
+
+  return {
+    title: `${typeNames[type || 'police'] || 'Accountability'} Journey - ${provinceNames[province || 'ON'] || 'Ontario'}`,
+    subtitle: `Provincial-specific guidance for ${typeNames[type || 'police']?.toLowerCase()}`,
+    criticalWarning: steps.some(s => s.priority === 'critical') 
+      ? '⚠️ IMPORTANT: Follow all timelines and requirements specific to your province.' 
+      : null,
+    helpfulLinks: Object.values(procedures).flatMap((step: any) => step.helpfulLinks || []),
+    steps
+  };
+};
+
 export const UserJourney: React.FC<UserJourneyProps> = ({
   venue,
   userSituation,
   incidentDate,
-  onStepComplete
+  onStepComplete,
+  province,
+  accountabilityType
 }) => {
   const navigate = useNavigate();
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
@@ -860,7 +912,18 @@ export const UserJourney: React.FC<UserJourneyProps> = ({
   const [loadingMessage, setLoadingMessage] = useState('');
   const [liveMessage, setLiveMessage] = useState('');
   const { errors, addError, dismissError } = useErrorHandler();
-  const journeyData = getJourneyData(venue);
+  
+  // Load provincial procedures if this is an accountability journey
+  const { procedures: provincialProcedures, loading: proceduresLoading } = useProvincialProcedures(
+    venue === 'accountability' ? province : undefined,
+    venue === 'accountability' ? accountabilityType : undefined
+  );
+  
+  // Use provincial procedures if available, otherwise use default journey data
+  const baseJourneyData = getJourneyData(venue);
+  const journeyData = venue === 'accountability' && provincialProcedures 
+    ? convertProceduresToJourneyData(provincialProcedures, province, accountabilityType)
+    : baseJourneyData;
 
   // Enhanced step completion with loading states
   const handleStepComplete = async (stepId: string) => {
