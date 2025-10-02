@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PerformanceMetrics {
   pageLoadTime: number;
@@ -12,12 +13,38 @@ interface PerformanceMetrics {
 class PerformanceTracker {
   private static instance: PerformanceTracker;
   private metrics: PerformanceMetrics | null = null;
+  private sessionId: string;
+
+  private constructor() {
+    this.sessionId = this.generateSessionId();
+  }
 
   public static getInstance(): PerformanceTracker {
     if (!PerformanceTracker.instance) {
       PerformanceTracker.instance = new PerformanceTracker();
     }
     return PerformanceTracker.instance;
+  }
+
+  private generateSessionId(): string {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  private async saveToDatabase(eventType: string, metrics: any): Promise<void> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      await supabase.from('analytics_events').insert({
+        event_type: eventType,
+        page_url: window.location.pathname,
+        user_id: user?.id || null,
+        session_id: this.sessionId,
+        metrics: metrics,
+        user_agent: navigator.userAgent
+      });
+    } catch (error) {
+      console.error('Failed to save analytics:', error);
+    }
   }
 
   public collectMetrics(): void {
@@ -36,11 +63,12 @@ class PerformanceTracker {
     
     // Log performance metrics in development
     if (process.env.NODE_ENV === 'development') {
-      console.group('🚀 Performance Metrics');
       console.log('Page Load Time:', `${this.metrics.pageLoadTime}ms`);
       console.log('DOM Content Loaded:', `${this.metrics.domContentLoadedTime}ms`);
-      console.groupEnd();
     }
+
+    // Save to database
+    this.saveToDatabase('page_load', this.metrics);
   }
 
   private collectWebVitals(): void {

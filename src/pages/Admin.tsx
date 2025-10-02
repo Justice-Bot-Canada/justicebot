@@ -113,6 +113,18 @@ const Admin = () => {
     try {
       setLoading(true);
       
+      // Load analytics events for today
+      const analyticsToday = new Date();
+      analyticsToday.setHours(0, 0, 0, 0);
+      
+      const { data: analyticsData } = await supabase
+        .from('analytics_events')
+        .select('*')
+        .gte('created_at', analyticsToday.toISOString());
+
+      // Count unique sessions today
+      const uniqueSessions = new Set(analyticsData?.map(e => e.session_id) || []).size;
+      
       // Load all users using admin function
       const { data: usersData, error: usersError } = await supabase
         .rpc('get_all_users_admin');
@@ -196,12 +208,14 @@ const Admin = () => {
         });
       }
 
-      // Load engagement statistics
-      const todaySignIns = allUsers.filter(u => {
-        if (!u.last_sign_in_at) return false;
-        const signInDate = new Date(u.last_sign_in_at);
-        return signInDate >= today;
-      }).length;
+      // Load engagement statistics using real analytics data
+      const pageLoadEvents = analyticsData?.filter(e => e.event_type === 'page_load') || [];
+      const avgLoadTime = pageLoadEvents.length > 0
+        ? pageLoadEvents.reduce((sum, e) => {
+            const metrics = typeof e.metrics === 'object' ? e.metrics as any : {};
+            return sum + (metrics.pageLoadTime || 0);
+          }, 0) / pageLoadEvents.length
+        : 0;
 
       const { data: formUsageData } = await supabase
         .from('form_usage')
@@ -227,8 +241,8 @@ const Admin = () => {
           : 0;
 
         setEngagementStats({
-          activeUsersToday: todaySignIns,
-          averageSessionTime: Math.round(avgSessionTime),
+          activeUsersToday: uniqueSessions,
+          averageSessionTime: Math.round(avgLoadTime / 1000), // Convert to seconds
           formCompletionRate: Math.round(completionRate * 10) / 10,
           userRetentionRate: Math.round(retentionRate * 10) / 10
         });
