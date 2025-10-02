@@ -22,6 +22,7 @@ import NotFound from "./pages/NotFound";
 import Welcome from "./pages/Welcome";
 import Triage from "./pages/Triage";
 import FormSelector from "./pages/FormSelector";
+import Forms from "./pages/Forms";
 import FormBuilder from "./pages/FormBuilder";
 import TribunalLocatorPage from "./pages/TribunalLocatorPage";
 import Profile from "./pages/Profile";
@@ -98,6 +99,7 @@ const AppContent = () => {
           <Route path="/pathway/:caseId" element={<ProtectedRoute><PathwayDecision /></ProtectedRoute>} />
           <Route path="/triage" element={<Triage />} />
           <Route path="/tribunal-locator" element={<TribunalLocatorPage />} />
+          <Route path="/forms" element={<Forms />} />
           <Route path="/forms/:venue" element={<ProtectedRoute><FormSelector /></ProtectedRoute>} />
           <Route path="/form/:formId" element={<ProtectedRoute><FormBuilder /></ProtectedRoute>} />
           <Route path="/pricing" element={<Pricing />} />
