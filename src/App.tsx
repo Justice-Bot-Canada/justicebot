@@ -50,6 +50,15 @@ import TemplateLibrary from "./pages/TemplateLibrary";
 import Referrals from "./pages/Referrals";
 import ErrorBoundary from "./components/ErrorBoundary";
 import LiveSupportWidget from "./components/LiveSupportWidget";
+import Disclaimer from "./pages/Disclaimer";
+import About from "./pages/About";
+import Troubleshooting from "./pages/Troubleshooting";
+import MediaInquiries from "./pages/MediaInquiries";
+import GovernmentInquiries from "./pages/GovernmentInquiries";
+import LegalUpdates from "./pages/LegalUpdates";
+import CourtInformation from "./pages/CourtInformation";
+import Explain from "./pages/Explain";
+import Evidence from "./pages/Evidence";
 
 const queryClient = new QueryClient();
 
@@ -104,6 +113,15 @@ const AppContent = () => {
           <Route path="/tutorials" element={<TutorialLibrary />} />
           <Route path="/templates" element={<TemplateLibrary />} />
           <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>} />
+          <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/troubleshooting" element={<Troubleshooting />} />
+          <Route path="/media-inquiries" element={<MediaInquiries />} />
+          <Route path="/government-inquiries" element={<GovernmentInquiries />} />
+          <Route path="/legal-updates" element={<LegalUpdates />} />
+          <Route path="/court" element={<CourtInformation />} />
+          <Route path="/explain" element={<Explain />} />
+          <Route path="/evidence" element={<ProtectedRoute><Evidence /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
