@@ -57,13 +57,15 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     setIsLoading(true);
 
     try {
+      const redirectUrl = window.location.origin.includes('localhost')
+        ? 'https://justice-bot.lovable.app/welcome'
+        : `${window.location.origin}/welcome`;
+      
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: window.location.origin.includes('localhost') 
-            ? 'https://justice-bot.lovable.app/' 
-            : `${window.location.origin}/`,
+          emailRedirectTo: redirectUrl,
         },
       });
 

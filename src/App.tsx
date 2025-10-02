@@ -19,6 +19,7 @@ import Terms from "./pages/Terms";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
 import NotFound from "./pages/NotFound";
+import Welcome from "./pages/Welcome";
 import Triage from "./pages/Triage";
 import FormSelector from "./pages/FormSelector";
 import FormBuilder from "./pages/FormBuilder";
@@ -64,6 +65,7 @@ const AppContent = () => {
         <LiveSupportWidget />
       <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/welcome" element={<Welcome />} />
           <Route path="/hrto-help" element={<HRTOHelp />} />
           <Route path="/ltb-help" element={<LTBHelp />} />
           <Route path="/small-claims-court" element={<SmallClaimsCourt />} />
