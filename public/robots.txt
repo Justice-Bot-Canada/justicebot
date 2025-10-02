@@ -80,6 +80,9 @@ Disallow: /profile
 Disallow: /admin
 Disallow: /payment-success
 Disallow: /payment-cancel
+Disallow: /config.json
+Disallow: /frontend/
+Disallow: /*.json$
 
 # Sitemap location
 Sitemap: https://justice-bot.com/sitemap.xml

@@ -59,6 +59,7 @@ import LegalUpdates from "./pages/LegalUpdates";
 import CourtInformation from "./pages/CourtInformation";
 import Explain from "./pages/Explain";
 import Evidence from "./pages/Evidence";
+import LegalResources from "./pages/LegalResources";
 
 const queryClient = new QueryClient();
 
@@ -122,6 +123,10 @@ const AppContent = () => {
           <Route path="/court" element={<CourtInformation />} />
           <Route path="/explain" element={<Explain />} />
           <Route path="/evidence" element={<ProtectedRoute><Evidence /></ProtectedRoute>} />
+          <Route path="/legal-resources" element={<LegalResources />} />
+          <Route path="/journey" element={<LegalResources />} />
+          <Route path="/generate" element={<ProtectedRoute><FormSelector /></ProtectedRoute>} />
+          <Route path="/download" element={<ProtectedRoute><TemplateLibrary /></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

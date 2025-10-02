@@ -1,4 +1,13 @@
+# Static files
 /sitemap.xml   /sitemap.xml   200
 /robots.txt    /robots.txt    200
 /dev           /dev.html      200
+
+# Redirects for alternate URLs
+/terms-of-use  /terms         301
+/account       /profile       301
+/signup        /              301
+/login         /              301
+
+# SPA fallback (must be last)
 /*             /index.html    200
