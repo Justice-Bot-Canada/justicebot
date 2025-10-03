@@ -24,7 +24,7 @@ export default function TutorialLibrary() {
         description="Watch step-by-step video tutorials for Ontario legal processes. Learn how to file LTB applications, HRTO complaints, Small Claims Court documents, and represent yourself effectively."
         keywords="legal tutorials, video guides, LTB tutorial, HRTO tutorial, small claims tutorial, legal help videos, self-representation videos, court procedure videos"
         canonicalUrl="https://justice-bot.com/tutorials"
-        ogImage="https://justice-bot.com/how-it-works-thumbnail.jpg"
+        ogImage="/how-it-works-thumbnail.jpg"
         structuredData={structuredData}
       />
       <Header />

@@ -29,10 +29,11 @@ export const AppDemoVideo = () => {
       <VideoSchema
         name="Justice-Bot Tutorial Videos - Legal Help for HRTO, Small Claims, LTB"
         description="Watch video tutorials showing how to use Justice-Bot for Human Rights Tribunal, Small Claims Court, and Landlord Tenant Board cases in Ontario."
-        thumbnailUrl="https://justice-bot.com/how-it-works-thumbnail.jpg"
+        thumbnailUrl="https://img.youtube.com/vi/jDpTN7oKdsc/maxresdefault.jpg"
         uploadDate="2025-10-03"
         duration="PT5M"
         contentUrl="https://justice-bot.com/demo-video"
+        embedUrl="https://www.youtube.com/watch?v=jDpTN7oKdsc"
       />
       
       <section className="py-16 bg-gradient-to-b from-muted/50 to-background">
