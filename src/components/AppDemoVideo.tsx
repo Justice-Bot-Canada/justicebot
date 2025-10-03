@@ -75,10 +75,26 @@ export const AppDemoVideo = () => {
             </Tabs>
           </Card>
 
-          <div className="text-center mt-8">
+          <div className="text-center mt-8 space-y-4">
             <p className="text-sm text-muted-foreground">
               Ready to start your own case? It takes less than 5 minutes.
             </p>
+            <div className="pt-4 border-t">
+              <p className="text-sm font-medium mb-2">Want to learn more about your rights in Ontario?</p>
+              <a 
+                href="https://youtube.com/@ongov?si=MuJIB3XqRpfokXuW"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-primary hover:underline"
+              >
+                Visit Ontario Government's YouTube Channel
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </a>
+            </div>
           </div>
         </div>
       </section>
