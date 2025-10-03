@@ -3,6 +3,18 @@
 /robots.txt    /robots.txt    200
 /dev           /dev.html      200
 
+# Explicit routes for SEO and crawling
+/privacy              /index.html    200
+/disclaimer           /index.html    200
+/troubleshooting      /index.html    200
+/media-inquiries      /index.html    200
+/court                /index.html    200
+/explain              /index.html    200
+/dashboard            /index.html    200
+/government-inquiries /index.html    200
+/legal-updates        /index.html    200
+/about                /index.html    200
+
 # Redirects for alternate URLs
 /terms-of-use  /terms         301
 /account       /profile       301
