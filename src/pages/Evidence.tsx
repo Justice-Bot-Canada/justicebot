@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
 import EvidenceBuilder from "@/components/EvidenceBuilder";
 import { PremiumGate } from "@/components/PremiumGate";
 
@@ -48,6 +49,12 @@ const Evidence = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Evidence Management - Build Your Book of Documents | Justice Bot"
+        description="Organize and manage evidence for your legal case. Build a comprehensive Book of Documents with our evidence management tool."
+        keywords="evidence management, book of documents, legal evidence, case documents"
+        canonicalUrl="https://justice-bot.com/evidence"
+      />
       <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">

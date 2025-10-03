@@ -15,11 +15,14 @@
 /legal-updates        /index.html    200
 /about                /index.html    200
 
-# Redirects for alternate URLs
-/terms-of-use  /terms         301
-/account       /profile       301
-/signup        /              301
-/login         /              301
+# Redirects for alternate URLs (301 = permanent redirect, prevents duplicate content)
+/terms-of-use       /terms              301
+/account            /profile            301
+/signup             /                   301
+/login              /                   301
+/generate           /forms              301
+/download           /templates          301
+/journey            /legal-resources    301
 
 # SPA fallback (must be last)
 /*             /index.html    200
