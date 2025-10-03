@@ -3,12 +3,45 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Scale, Building, Users, FileText, ArrowRight } from "lucide-react";
+import courthouseImg from "@/assets/courthouse.jpg";
 
 const CourtInformation = () => {
   const navigate = useNavigate();
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is Small Claims Court?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Small Claims Court handles monetary claims up to $35,000 in Ontario. It features simplified procedures, lower court costs, and is designed for self-representation."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "When should I use Superior Court?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Superior Court handles larger claims over the small claims limit, complex legal matters, and appeals from lower courts with more formal procedures."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What types of tribunals exist in Canada?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Specialized tribunals include Human Rights Tribunal, Landlord-Tenant Board, Labour Relations Board, and Immigration and Refugee Board, each handling specific areas of law."
+        }
+      }
+    ]
+  };
 
   const courtTypes = [
     {
@@ -64,15 +97,32 @@ const CourtInformation = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Court & Tribunal Information - Justice Bot"
-        description="Learn about different courts and tribunals in Canada. Find the right venue for your legal matter and understand court procedures."
-        keywords="courts, tribunals, legal venues, small claims court, superior court, family court, tribunal information"
+        title="Courts & Tribunals Information - Find Your Legal Venue"
+        description="Complete guide to Canadian courts and tribunals. Learn about Small Claims Court, Superior Court, Family Court, and specialized tribunals. Find the right venue for your case."
+        keywords="courts Canada, tribunals Ontario, small claims court, superior court, family court, legal venues, tribunal information, court procedures"
+        canonicalUrl="https://justice-bot.com/court"
+        ogImage="https://justice-bot.com/courthouse.jpg"
+        structuredData={structuredData}
       />
       
       <Header />
       
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
+          <Breadcrumbs items={[
+            { label: "Courts & Tribunals" }
+          ]} />
+
+          {/* Hero Image */}
+          <div className="mb-12 rounded-lg overflow-hidden">
+            <img 
+              src={courthouseImg} 
+              alt="Canadian courthouse - courts and tribunals information" 
+              className="w-full h-64 md:h-96 object-cover"
+              loading="eager"
+            />
+          </div>
+          
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold mb-4">Courts & Tribunals</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">

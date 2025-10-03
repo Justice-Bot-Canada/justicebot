@@ -3,12 +3,60 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { HelpCircle, BookOpen, Brain, FileText, MessageSquare, ArrowRight } from "lucide-react";
+import aiLegalHelpImg from "@/assets/ai-legal-help.jpg";
 
 const Explain = () => {
   const navigate = useNavigate();
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Use Justice Bot for Legal Help",
+    "description": "Step-by-step guide to using Justice Bot's AI-powered legal assistance platform for self-representation in Canadian courts and tribunals.",
+    "image": "https://justice-bot.com/ai-legal-help.jpg",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Create Your Account",
+        "text": "Sign up for free access to Justice Bot's AI legal tools. First 800 users get lifetime free access.",
+        "position": 1
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Answer Assessment Questions",
+        "text": "Our AI asks targeted questions about your legal issue to understand your situation and determine the best pathway forward.",
+        "position": 2
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Get Your Merit Score",
+        "text": "Receive an AI-generated assessment of your case strength with specific recommendations for next steps.",
+        "position": 3
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Follow Your Customized Pathway",
+        "text": "Access step-by-step guidance tailored to your province, legal venue, and specific situation with deadline tracking.",
+        "position": 4
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Prepare Legal Documents",
+        "text": "Use our AI form-filling tools to generate court-ready documents with automatic prefilling from your case details.",
+        "position": 5
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Track Your Progress",
+        "text": "Monitor important deadlines, organize evidence, and manage your case through our comprehensive dashboard.",
+        "position": 6
+      }
+    ]
+  };
 
   const features = [
     {
@@ -36,15 +84,33 @@ const Explain = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="How Justice Bot Works - AI Legal Assistance Explained"
-        description="Learn how Justice Bot helps self-represented litigants navigate Canadian courts and tribunals using AI-powered analysis, document preparation, and step-by-step guidance."
-        keywords="how Justice Bot works, AI legal assistance, self-representation guide, legal tech explained, Canadian legal system"
+        title="How Justice Bot Works - AI Legal Assistant for Self-Representation"
+        description="Comprehensive guide to using Justice Bot's AI-powered legal platform. Learn how we help Canadians navigate courts, prepare documents, and understand legal procedures step-by-step."
+        keywords="how Justice Bot works, AI legal assistance, self-representation Canada, legal tech platform, court navigation, automated legal forms, case assessment"
+        canonicalUrl="https://justice-bot.com/explain"
+        ogImage="https://justice-bot.com/ai-legal-help.jpg"
+        structuredData={structuredData}
+        articleSection="Legal Technology"
       />
       
       <Header />
       
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
+          <Breadcrumbs items={[
+            { label: "How It Works" }
+          ]} />
+
+          {/* Hero Image */}
+          <div className="mb-12 rounded-lg overflow-hidden shadow-lg">
+            <img 
+              src={aiLegalHelpImg} 
+              alt="AI-powered legal assistance - Justice Bot helping Canadians with legal matters" 
+              className="w-full h-64 md:h-96 object-cover"
+              loading="eager"
+            />
+          </div>
+          
           <div className="text-center mb-12">
             <HelpCircle className="h-16 w-16 text-primary mx-auto mb-4" />
             <h1 className="text-4xl font-bold mb-4">How Justice Bot Works</h1>

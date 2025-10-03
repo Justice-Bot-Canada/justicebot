@@ -4,7 +4,7 @@ const Footer = () => {
   return (
     <footer id="footer" className="bg-foreground text-background py-16">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-8 mb-8">
+        <div className="grid md:grid-cols-5 gap-8 mb-8">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-8 h-8 bg-background rounded-lg">
@@ -24,12 +24,24 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold mb-4">Services</h3>
             <ul className="space-y-2 text-sm text-background/80">
-              <li><a href="#triage" className="hover:text-background transition-colors">Smart Triage</a></li>
-              <li><a href="#locator" className="hover:text-background transition-colors">Court Locator</a></li>
-              <li><a href="#forms" className="hover:text-background transition-colors">Form Builder</a></li>
-              <li><a href="#merit" className="hover:text-background transition-colors">Merit Score</a></li>
+              <li><a href="/triage" className="hover:text-background transition-colors">Smart Triage</a></li>
+              <li><a href="/tribunal-locator" className="hover:text-background transition-colors">Court Locator</a></li>
+              <li><a href="/forms" className="hover:text-background transition-colors">Legal Forms</a></li>
+              <li><a href="/assessment" className="hover:text-background transition-colors">Merit Score</a></li>
               <li><a href="/pricing" className="hover:text-background transition-colors">Pricing</a></li>
               <li><a href="/low-income" className="hover:text-background transition-colors">Low-Income Program</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-semibold mb-4">Popular Guides</h3>
+            <ul className="space-y-2 text-sm text-background/80">
+              <li><a href="/ltb-journey" className="hover:text-background transition-colors">LTB Applications</a></li>
+              <li><a href="/hrto-journey" className="hover:text-background transition-colors">HRTO Complaints</a></li>
+              <li><a href="/small-claims-journey" className="hover:text-background transition-colors">Small Claims Court</a></li>
+              <li><a href="/tutorials" className="hover:text-background transition-colors">Video Tutorials</a></li>
+              <li><a href="/templates" className="hover:text-background transition-colors">Document Templates</a></li>
+              <li><a href="/explain" className="hover:text-background transition-colors">How It Works</a></li>
             </ul>
           </div>
 

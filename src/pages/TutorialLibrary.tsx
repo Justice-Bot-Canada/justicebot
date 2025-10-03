@@ -3,20 +3,37 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TutorialVideos from "@/components/TutorialVideos";
 import SEOHead from "@/components/SEOHead";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayCircle } from "lucide-react";
 
 export default function TutorialLibrary() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "VideoGallery",
+    "name": "Justice Bot Legal Tutorial Videos",
+    "description": "Free video tutorials teaching Canadians how to navigate legal processes including LTB applications, HRTO complaints, Small Claims Court, and more.",
+    "url": "https://justice-bot.com/tutorials",
+    "image": "https://justice-bot.com/how-it-works-thumbnail.jpg"
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Tutorial Videos - Learn Legal Process Step by Step"
-        description="Free video tutorials for Ontario legal processes. Learn how to file LTB applications, HRTO complaints, Small Claims, and more with expert guidance."
-        keywords="legal tutorials, video guides, LTB tutorial, HRTO tutorial, small claims tutorial, legal help videos"
+        title="Free Legal Tutorial Videos - LTB, HRTO, Small Claims Guide"
+        description="Watch step-by-step video tutorials for Ontario legal processes. Learn how to file LTB applications, HRTO complaints, Small Claims Court documents, and represent yourself effectively."
+        keywords="legal tutorials, video guides, LTB tutorial, HRTO tutorial, small claims tutorial, legal help videos, self-representation videos, court procedure videos"
+        canonicalUrl="https://justice-bot.com/tutorials"
+        ogImage="https://justice-bot.com/how-it-works-thumbnail.jpg"
+        structuredData={structuredData}
       />
       <Header />
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
+          <Breadcrumbs items={[
+            { label: "Tutorial Videos" }
+          ]} />
+          
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-2 mb-4">
               <PlayCircle className="w-5 h-5 text-primary" />

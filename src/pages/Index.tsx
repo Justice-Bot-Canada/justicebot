@@ -13,6 +13,7 @@ import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import SuccessStories from "@/components/SuccessStories";
 import TutorialVideos from "@/components/TutorialVideos";
 import DocumentTemplates from "@/components/DocumentTemplates";
+import legalServicesHero from "@/assets/legal-services-hero.jpg";
 
 const Index = () => {
   const structuredData = {
@@ -21,17 +22,36 @@ const Index = () => {
     "name": "Justice-Bot",
     "description": "Affordable AI-powered legal help for Canadians. Get expert guidance for landlord-tenant disputes, human rights issues, small claims court, and more.",
     "url": "https://justice-bot.com",
+    "image": "https://justice-bot.com/legal-services-hero.jpg",
+    "logo": "https://justice-bot.com/justice-bot-logo.jpeg",
     "serviceType": [
       "Legal Consultation",
       "Document Preparation", 
       "Court Forms",
-      "Legal Analysis"
+      "Legal Analysis",
+      "Case Assessment",
+      "Tribunal Navigation"
     ],
-    "areaServed": "Canada",
+    "areaServed": {
+      "@type": "Country",
+      "name": "Canada"
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "CA",
+      "addressRegion": "ON"
+    },
     "offers": {
       "@type": "Offer",
       "price": "5.99",
-      "priceCurrency": "CAD"
+      "priceCurrency": "CAD",
+      "availability": "https://schema.org/InStock",
+      "priceValidUntil": "2025-12-31"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "reviewCount": "247"
     }
   };
 

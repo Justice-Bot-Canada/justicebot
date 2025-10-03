@@ -15,8 +15,11 @@ import {
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import legalFormsImg from "@/assets/legal-forms-feature.jpg";
 
 interface FormCategory {
   id: string;
@@ -63,6 +66,38 @@ const Forms = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("forms");
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "Legal Forms & Court Documents",
+    "description": "AI-powered legal form filling service for LTB, HRTO, and Small Claims Court. Automated document preparation with intelligent pre-filling.",
+    "provider": {
+      "@type": "Organization",
+      "name": "Justice-Bot"
+    },
+    "serviceType": "Legal Document Preparation",
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "LTB Forms",
+        "price": "5.99",
+        "priceCurrency": "CAD"
+      },
+      {
+        "@type": "Offer",
+        "name": "HRTO Forms",
+        "price": "5.99",
+        "priceCurrency": "CAD"
+      },
+      {
+        "@type": "Offer",
+        "name": "Small Claims Forms",
+        "price": "5.99",
+        "priceCurrency": "CAD"
+      }
+    ]
+  };
+
   const handlePurchase = (category: FormCategory) => {
     if (!user) {
       toast.error("Please sign in to purchase forms");
@@ -91,10 +126,32 @@ const Forms = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Legal Forms - LTB, HRTO, Small Claims Court Documents"
+        description="Access and purchase AI-powered legal forms for Ontario tribunals and courts. Automated form filling for LTB applications, HRTO complaints, and Small Claims Court documents starting at $5.99."
+        keywords="legal forms Canada, LTB application forms, HRTO complaint forms, small claims forms, court documents, automated legal forms, Ontario legal forms"
+        canonicalUrl="https://justice-bot.com/forms"
+        ogImage="https://justice-bot.com/legal-forms-feature.jpg"
+        structuredData={structuredData}
+      />
       <Header />
       
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
+          <Breadcrumbs items={[
+            { label: "Legal Forms" }
+          ]} />
+
+          {/* Feature Image */}
+          <div className="mb-8 rounded-lg overflow-hidden">
+            <img 
+              src={legalFormsImg} 
+              alt="Legal forms and court documents - automated form filling service" 
+              className="w-full h-48 object-cover"
+              loading="eager"
+            />
+          </div>
+
           {/* Navigation Tabs */}
           <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-8">
             <TabsList className="grid w-full grid-cols-4">
