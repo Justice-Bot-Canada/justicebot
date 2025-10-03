@@ -1,18 +1,30 @@
 # SEO-optimized robots.txt for Justice-Bot
-# Updated: 2025-01-27
+# Updated: 2025-10-03
 
-# Primary search engines - full access
+# Googlebot - full access (Note: Googlebot ignores Crawl-delay)
 User-agent: Googlebot
 Allow: /
-Crawl-delay: 1
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /admin
+Disallow: /payment-success
+Disallow: /payment-cancel
 
+# Bingbot
 User-agent: Bingbot
 Allow: /
 Crawl-delay: 1
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /admin
 
+# Yahoo
 User-agent: Slurp
 Allow: /
 Crawl-delay: 2
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /admin
 
 # Social media crawlers
 User-agent: Twitterbot
@@ -24,27 +36,26 @@ Allow: /
 User-agent: LinkedInBot
 Allow: /
 
-# AI training bots - controlled access
+# AI crawlers
 User-agent: ChatGPT-User
 Allow: /
 
 User-agent: GPTBot
 Allow: /
-Crawl-delay: 5
 
 User-agent: Google-Extended
 Allow: /
-Crawl-delay: 10
 
 User-agent: anthropic-ai
 Allow: /
-Crawl-delay: 5
 
 User-agent: Claude-Web
 Allow: /
-Crawl-delay: 5
 
-# Block aggressive crawlers
+User-agent: PerplexityBot
+Allow: /
+
+# Block aggressive SEO crawlers
 User-agent: AhrefsBot
 Disallow: /
 
@@ -57,23 +68,14 @@ Disallow: /
 User-agent: DotBot
 Disallow: /
 
-# Block AI scrapers that don't respect content
-User-agent: PerplexityBot
-Allow: /
-Crawl-delay: 10
-
 # Default rule for all other bots
 User-agent: *
 Allow: /
-Crawl-delay: 2
 Disallow: /dashboard
 Disallow: /profile
 Disallow: /admin
 Disallow: /payment-success
 Disallow: /payment-cancel
-Disallow: /config.json
-Disallow: /frontend/
-Disallow: /*.json$
 
 # Sitemap location
 Sitemap: https://justice-bot.com/sitemap.xml
