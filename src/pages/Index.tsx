@@ -2,8 +2,7 @@ import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import TriageSection from "@/components/TriageSection";
 import FeaturesSection from "@/components/FeaturesSection";
-import MeritScoreDemo from "@/components/MeritScoreDemo";
-import FormPrefillDemo from "@/components/FormPrefillDemo";
+import { AppDemoVideo } from "@/components/AppDemoVideo";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import InteractiveTutorial from "@/components/InteractiveTutorial";
@@ -150,10 +149,7 @@ const Index = () => {
         </section>
         
         <FeaturesSection />
-        <section id="merit" aria-labelledby="merit-heading">
-          <MeritScoreDemo />
-        </section>
-        <FormPrefillDemo />
+        <AppDemoVideo />
       </main>
       <Footer />
       <AccessibilityPanel />
