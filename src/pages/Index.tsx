@@ -3,6 +3,7 @@ import HeroSection from "@/components/HeroSection";
 import TriageSection from "@/components/TriageSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import { AppDemoVideo } from "@/components/AppDemoVideo";
+import { ExplainerVideo } from "@/components/ExplainerVideo";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import InteractiveTutorial from "@/components/InteractiveTutorial";
@@ -104,6 +105,7 @@ const Index = () => {
       </div>
       <main id="main-content" tabIndex={-1}>
         <HeroSection />
+        <ExplainerVideo />
         
         {/* Interactive Tutorial Section */}
         <section id="tutorials" className="py-16 bg-muted/30">
