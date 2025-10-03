@@ -36,10 +36,6 @@ User-agent: Google-Extended
 Allow: /
 Crawl-delay: 10
 
-User-agent: CCBot
-Allow: /
-Crawl-delay: 10
-
 User-agent: anthropic-ai
 Allow: /
 Crawl-delay: 5
@@ -62,11 +58,6 @@ User-agent: DotBot
 Disallow: /
 
 # Block AI scrapers that don't respect content
-User-agent: CCBot
-Disallow: /dashboard
-Disallow: /profile
-Disallow: /admin
-
 User-agent: PerplexityBot
 Allow: /
 Crawl-delay: 10

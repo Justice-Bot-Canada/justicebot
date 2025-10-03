@@ -1,0 +1,27 @@
+{
+  "name": "Justice-Bot - Affordable Legal Help",
+  "short_name": "Justice-Bot",
+  "description": "Affordable AI-powered legal help for Canadians",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#CF1124",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/justice-bot-logo.jpeg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["legal", "business", "productivity"],
+  "lang": "en-CA",
+  "dir": "ltr"
+}

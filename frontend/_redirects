@@ -1,4 +1,15 @@
 /sitemap.xml   /sitemap.xml   200
 /robots.txt    /robots.txt    200
 /dev           /dev.html      200
+
+# Redirect old paths to canonical URLs
+/terms-of-use  /terms         301!
+/account       /profile       301!
+/signup        /welcome       301!
+/login         /welcome       301!
+/generate      /forms         301!
+/download      /templates     301!
+/journey       /legal-resources 301!
+
+# 404 catchall
 /*             /index.html    200

@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.png" type="image/png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="/manifest.json">
     <title>Justice-Bot • Build a stronger case, step by step</title>
     <meta name="description" content="Guided triage, document prep, and filing help for Canadians. Clear steps, solid documents, and rights-aware guidance." />
     <link rel="canonical" href="https://justice-bot.com/">
@@ -73,8 +74,12 @@
     }
     </script>
     
-    <link rel="preconnect" href="https://vkzquzjtewqhcisvhsvg.supabase.co">
-    <link rel="preconnect" href="https://js.stripe.com">
+    <!-- Performance Optimization -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://vkzquzjtewqhcisvhsvg.supabase.co" crossorigin>
+    <link rel="dns-prefetch" href="https://vkzquzjtewqhcisvhsvg.supabase.co">
+    <link rel="dns-prefetch" href="https://js.stripe.com">
     
     <!-- Additional Meta Tags for Marketing -->
     <meta name="author" content="Justice-Bot Technologies Inc." />
@@ -88,6 +93,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/src/main.tsx" defer></script>
   </body>
 </html>
