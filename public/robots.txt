@@ -9,6 +9,11 @@ Disallow: /profile
 Disallow: /admin
 Disallow: /payment-success
 Disallow: /payment-cancel
+Disallow: /config.json
+Disallow: /*.json$
+Disallow: /favicon.ico
+Disallow: /dev.html
+Disallow: /dev/
 
 # Bingbot
 User-agent: Bingbot
@@ -76,6 +81,11 @@ Disallow: /profile
 Disallow: /admin
 Disallow: /payment-success
 Disallow: /payment-cancel
+Disallow: /config.json
+Disallow: /*.json$
+Disallow: /favicon.ico
+Disallow: /dev.html
+Disallow: /dev/
 
 # Sitemap location
 Sitemap: https://justice-bot.com/sitemap.xml
