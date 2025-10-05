@@ -61,6 +61,7 @@ import CourtInformation from "./pages/CourtInformation";
 import Explain from "./pages/Explain";
 import Evidence from "./pages/Evidence";
 import LegalResources from "./pages/LegalResources";
+import Journey from "./pages/Journey";
 
 const queryClient = new QueryClient();
 
@@ -126,6 +127,7 @@ const AppContent = () => {
           <Route path="/explain" element={<Explain />} />
           <Route path="/evidence" element={<ProtectedRoute><Evidence /></ProtectedRoute>} />
           <Route path="/legal-resources" element={<LegalResources />} />
+          <Route path="/journey" element={<Journey />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

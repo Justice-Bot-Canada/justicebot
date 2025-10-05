@@ -22,7 +22,6 @@
 /login              /                   301
 /generate           /forms              301
 /download           /templates          301
-/journey            /legal-resources    301
 
 # SPA fallback (must be last)
 /*             /index.html    200

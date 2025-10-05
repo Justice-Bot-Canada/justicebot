@@ -9,7 +9,6 @@
 /login         /welcome       301!
 /generate      /forms         301!
 /download      /templates     301!
-/journey       /legal-resources 301!
 
 # 404 catchall
 /*             /index.html    200
