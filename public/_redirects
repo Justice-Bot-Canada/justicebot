@@ -4,6 +4,7 @@
 /dev           /dev.html      200
 
 # Explicit routes for SEO and crawling
+/journey              /index.html    200
 /privacy              /index.html    200
 /disclaimer           /index.html    200
 /troubleshooting      /index.html    200
