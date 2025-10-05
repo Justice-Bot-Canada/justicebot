@@ -79,6 +79,7 @@ export default function Profile() {
       <SEOHead
         title="Profile Settings"
         description="Manage your Justice-Bot account information and preferences. Update your profile details."
+        canonicalUrl="https://justice-bot.com/profile"
       />
       <Card className="max-w-2xl mx-auto">
         <CardHeader>

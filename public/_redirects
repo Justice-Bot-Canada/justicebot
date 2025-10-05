@@ -24,5 +24,12 @@
 /generate           /forms              301
 /download           /templates          301
 
+# Return 404 for non-existent pages (prevents duplicate content issues)
+/payments/*         /404                404
+/entitlements       /404                404
+/foo/bar            /404                404
+/path/to/ref        /404                404
+/founders-story     /404                404
+
 # SPA fallback (must be last)
 /*             /index.html    200

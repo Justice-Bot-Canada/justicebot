@@ -81,6 +81,7 @@ const Index = () => {
         title="Affordable Legal Help Canada - AI-Powered Legal Services"
         description="Get affordable legal help for landlord-tenant disputes, human rights issues, small claims court, and employment law. AI-powered legal services starting at $5.99. No expensive lawyers needed."
         keywords="cheap lawyer Canada, affordable legal help, landlord tenant board, human rights tribunal, small claims court, legal advice, AI legal services"
+        canonicalUrl="https://justice-bot.com/"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
         faqData={faqData}

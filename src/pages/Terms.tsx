@@ -1,9 +1,15 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import EnhancedSEO from "@/components/EnhancedSEO";
 
 const Terms = () => {
   return (
     <div className="min-h-screen bg-background">
+      <EnhancedSEO
+        title="Terms of Service"
+        description="Justice-Bot Terms of Service - Legal disclaimers, service description, and user agreements for our AI-powered legal assistance platform."
+        canonicalUrl="https://justice-bot.com/terms"
+      />
       <Header />
       <main className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto prose prose-lg">

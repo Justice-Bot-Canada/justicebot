@@ -10,5 +10,12 @@
 /generate      /forms         301!
 /download      /templates     301!
 
+# Return 404 for non-existent pages
+/payments/*    /404           404!
+/entitlements  /404           404!
+/foo/bar       /404           404!
+/path/to/ref   /404           404!
+/founders-story /404          404!
+
 # 404 catchall
 /*             /index.html    200
