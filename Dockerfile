@@ -1,65 +1,47 @@
-# ===============================
-# 1) Build the frontend (Vite)
-# ===============================
-FROM node:20-alpine AS web
-WORKDIR /web
+# ---- Stage 1: Build frontend ----
+FROM node:20-alpine AS frontend-builder
+WORKDIR /frontend
 
-# Install deps (cache-friendly)
-COPY frontend/package*.json ./frontend/
-RUN cd frontend && npm ci
+# Copy frontend files
+COPY frontend/package*.json ./
+RUN npm install
 
-# Copy source and build
-COPY frontend ./frontend
-RUN cd frontend && npm run build
-# Output: /web/frontend/dist
+# Copy everything else and build
+COPY frontend/ .
+RUN npm run build
 
-# ===============================
-# 2) Build the Go backend
-# ===============================
-FROM golang:1.22-alpine AS go-build
-WORKDIR /src
-
-# Certs for TLS during build if needed
-RUN apk add --no-cache ca-certificates
-
-# Modules first for cache
-COPY go.mod ./
-# COPY go.sum ./  # uncomment if present
-RUN go mod download
-
-# Copy the rest of the backend source
-COPY . .
-
-# Build static binary
-ENV CGO_ENABLED=1
-RUN go build -o /out/server ./main.go
-
-# ===============================
-# 3) Final runtime image
-# ===============================
-FROM alpine:3.20
+# ---- Stage 2: Build Go backend ----
+FROM golang:1.22-alpine AS backend-builder
 WORKDIR /app
 
-# Minimal runtime deps
-RUN apk add --no-cache ca-certificates
+# Copy Go modules
+COPY go.mod go.sum ./
+RUN go mod download
 
-# Copy Go server
-COPY --from=go-build /out/server /app/server
+# Copy backend source
+COPY . .
 
-# Copy built frontend
-COPY --from=web /web/frontend/dist /app/frontend/dist
+# Copy built frontend from previous stage
+COPY --from=frontend-builder /frontend/dist ./frontend/dist
 
-# (Optional) gated PDFs for /api/docs/* if you use them
-# COPY docs /docs
+# Build Go app
+RUN go build -o main .
 
-# App config: serve SPA from this dir; Railway provides PORT
-ENV STATIC_DIR=/app/frontend/dist
-ENV PORT=8080
+# ---- Stage 3: Final image ----
+FROM alpine:3.19
+WORKDIR /app
 
+# Copy compiled binary and static files
+COPY --from=backend-builder /app/main .
+COPY --from=backend-builder /app/frontend/dist ./frontend/dist
+COPY --from=backend-builder /app/docs ./docs
+
+# Expose port
 EXPOSE 8080
 
-# (Optional) Healthcheck (Go handler at /api/health)
-HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:${PORT}/api/health || exit 1
+# Set environment variables
+ENV PORT=8080
+ENV PAYPAL_ENV=sandbox
 
-CMD ["/app/server"]
+# Run the server
+CMD ["./main"]
