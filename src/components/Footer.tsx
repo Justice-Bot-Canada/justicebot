@@ -2,9 +2,9 @@ import justiceBotLogo from "@/assets/justice-bot-logo.jpeg";
 
 const Footer = () => {
   return (
-    <footer id="footer" className="bg-foreground text-background py-16">
+    <footer id="footer" className="bg-foreground text-background py-16" role="contentinfo" aria-label="Site footer">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-5 gap-8 mb-8">
+        <div className="grid md:grid-cols-5 gap-8 mb-8" role="navigation" aria-label="Footer navigation">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-8 h-8 bg-background rounded-lg">
@@ -21,38 +21,38 @@ const Footer = () => {
             </p>
           </div>
 
-          <div>
-            <h3 className="font-semibold mb-4">Services</h3>
+          <nav aria-labelledby="services-heading">
+            <h3 id="services-heading" className="font-semibold mb-4">Services</h3>
             <ul className="space-y-2 text-sm text-background/80">
-              <li><a href="/triage" className="hover:text-background transition-colors">Smart Triage</a></li>
-              <li><a href="/tribunal-locator" className="hover:text-background transition-colors">Court Locator</a></li>
-              <li><a href="/forms" className="hover:text-background transition-colors">Legal Forms</a></li>
-              <li><a href="/assessment" className="hover:text-background transition-colors">Merit Score</a></li>
-              <li><a href="/pricing" className="hover:text-background transition-colors">Pricing</a></li>
-              <li><a href="/low-income" className="hover:text-background transition-colors">Low-Income Program</a></li>
+              <li><a href="/triage" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Smart Triage</a></li>
+              <li><a href="/tribunal-locator" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Court Locator</a></li>
+              <li><a href="/forms" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Legal Forms</a></li>
+              <li><a href="/assessment" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Merit Score</a></li>
+              <li><a href="/pricing" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Pricing</a></li>
+              <li><a href="/low-income" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Low-Income Program</a></li>
             </ul>
-          </div>
+          </nav>
 
-          <div>
-            <h3 className="font-semibold mb-4">Popular Guides</h3>
+          <nav aria-labelledby="guides-heading">
+            <h3 id="guides-heading" className="font-semibold mb-4">Popular Guides</h3>
             <ul className="space-y-2 text-sm text-background/80">
-              <li><a href="/ltb-journey" className="hover:text-background transition-colors">LTB Applications</a></li>
-              <li><a href="/hrto-journey" className="hover:text-background transition-colors">HRTO Complaints</a></li>
-              <li><a href="/small-claims-journey" className="hover:text-background transition-colors">Small Claims Court</a></li>
-              <li><a href="/tutorials" className="hover:text-background transition-colors">Video Tutorials</a></li>
-              <li><a href="/templates" className="hover:text-background transition-colors">Document Templates</a></li>
-              <li><a href="/explain" className="hover:text-background transition-colors">How It Works</a></li>
+              <li><a href="/ltb-journey" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">LTB Applications</a></li>
+              <li><a href="/hrto-journey" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">HRTO Complaints</a></li>
+              <li><a href="/small-claims-journey" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Small Claims Court</a></li>
+              <li><a href="/tutorials" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Video Tutorials</a></li>
+              <li><a href="/templates" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Document Templates</a></li>
+              <li><a href="/explain" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">How It Works</a></li>
             </ul>
-          </div>
+          </nav>
 
-          <div>
-            <h3 className="font-semibold mb-4">Legal</h3>
+          <nav aria-labelledby="legal-heading">
+            <h3 id="legal-heading" className="font-semibold mb-4">Legal</h3>
             <ul className="space-y-2 text-sm text-background/80">
-              <li><a href="/liability" className="hover:text-background transition-colors text-red-300">⚠️ Legal Liability</a></li>
-              <li><a href="/terms" className="hover:text-background transition-colors">Terms of Service</a></li>
-              <li><a href="/privacy" className="hover:text-background transition-colors">Privacy Policy</a></li>
+              <li><a href="/liability" className="hover:text-background transition-colors text-red-300 focus:outline-none focus:ring-2 focus:ring-background/50 rounded" aria-label="Legal liability and disclaimers">⚠️ Legal Liability</a></li>
+              <li><a href="/terms" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Terms of Service</a></li>
+              <li><a href="/privacy" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Privacy Policy</a></li>
             </ul>
-          </div>
+          </nav>
 
           <div>
             <h3 className="font-semibold mb-4">Coverage</h3>

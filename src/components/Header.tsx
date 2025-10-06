@@ -144,38 +144,60 @@ const Header = () => {
                   variant="ghost" 
                   onClick={() => window.location.href = "/profile"}
                   className="hidden md:inline-flex"
+                  aria-label="View and edit your profile"
                 >
-                  <User className="w-4 h-4 mr-2" />
+                  <User className="w-4 h-4 mr-2" aria-hidden="true" />
                   Profile
                 </Button>
                 <Button 
                   variant="ghost" 
                   onClick={() => window.location.href = "/dashboard"}
                   className="hidden md:inline-flex"
+                  aria-label="Go to dashboard"
                 >
                   Dashboard
                 </Button>
-                <span className="text-sm text-muted-foreground hidden md:inline">
+                <span className="text-sm text-muted-foreground hidden md:inline" aria-live="polite">
                   {user.email}
                 </span>
-                <Button variant="ghost" onClick={handleSignOut} className="hidden md:inline-flex">
-                  <LogOut className="w-4 h-4 mr-2" />
+                <Button 
+                  variant="ghost" 
+                  onClick={handleSignOut} 
+                  className="hidden md:inline-flex"
+                  aria-label="Sign out of your account"
+                >
+                  <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
                   Sign Out
                 </Button>
               </div>
             ) : (
-              <Button variant="ghost" className="hidden md:inline-flex" onClick={handleSignIn}>
+              <Button 
+                variant="ghost" 
+                className="hidden md:inline-flex" 
+                onClick={handleSignIn}
+                aria-label="Sign in to your account"
+              >
                 Sign In
               </Button>
             )}
             
             {/* Always show sign out on mobile if user exists */}
             {user && (
-              <Button variant="ghost" size="sm" onClick={handleSignOut} className="md:hidden">
-                <LogOut className="w-4 h-4" />
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleSignOut} 
+                className="md:hidden"
+                aria-label="Sign out"
+              >
+                <LogOut className="w-4 h-4" aria-hidden="true" />
               </Button>
             )}
-            <Button variant="cta" onClick={handleGetStarted}>
+            <Button 
+              variant="cta" 
+              onClick={handleGetStarted}
+              aria-label={user ? "Start a new case" : "Get started with Justice-Bot"}
+            >
               {user ? "Start Case" : "Get Started"}
             </Button>
             <Button 

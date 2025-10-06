@@ -168,12 +168,12 @@ const Journey = () => {
 
       <main className="container mx-auto px-4 py-12">
         {/* Hero Section */}
-        <section className="text-center mb-12">
+        <section className="text-center mb-12" aria-labelledby="journey-heading">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-6">
-            <MapPin className="h-4 w-4" />
+            <MapPin className="h-4 w-4" aria-hidden="true" />
             <span className="text-sm font-medium">Your Guided Legal Journey</span>
           </div>
-          <h1 className="text-5xl font-bold mb-4">Choose Your Legal Journey</h1>
+          <h1 id="journey-heading" className="text-5xl font-bold mb-4">Choose Your Legal Journey</h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             Select the court or tribunal that matches your legal matter. We'll guide you through 
             every step with clear instructions, required forms, and deadlines.
@@ -181,29 +181,29 @@ const Journey = () => {
         </section>
 
         {/* Journey Cards Grid */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12" aria-label="Available legal journeys">
           {journeys.map((journey, index) => {
             const IconComponent = journey.icon;
             return (
               <Card key={index} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <div className={`w-12 h-12 rounded-lg ${journey.bgColor} flex items-center justify-center mb-4`}>
+                  <div className={`w-12 h-12 rounded-lg ${journey.bgColor} flex items-center justify-center mb-4`} aria-hidden="true">
                     <IconComponent className={`h-6 w-6 ${journey.color}`} />
                   </div>
                   <CardTitle className="text-xl">{journey.title}</CardTitle>
                   <CardDescription>{journey.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2" role="list" aria-label={`${journey.title} topics`}>
                     {journey.topics.map((topic, idx) => (
-                      <Badge key={idx} variant="secondary" className="text-xs">
+                      <Badge key={idx} variant="secondary" className="text-xs" role="listitem">
                         {topic}
                       </Badge>
                     ))}
                   </div>
                   <Button asChild className="w-full">
-                    <Link to={journey.path}>
-                      Start Journey <ArrowRight className="ml-2 h-4 w-4" />
+                    <Link to={journey.path} aria-label={`Start ${journey.title} journey`}>
+                      Start Journey <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
                     </Link>
                   </Button>
                 </CardContent>
@@ -213,8 +213,8 @@ const Journey = () => {
         </section>
 
         {/* Additional Resources */}
-        <section className="bg-muted/30 rounded-lg p-8">
-          <h2 className="text-3xl font-bold mb-6 text-center">Not Sure Where to Start?</h2>
+        <section className="bg-muted/30 rounded-lg p-8" aria-labelledby="resources-heading">
+          <h2 id="resources-heading" className="text-3xl font-bold mb-6 text-center">Not Sure Where to Start?</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <Card>
               <CardHeader>

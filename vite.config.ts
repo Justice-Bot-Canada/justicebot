@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => ({
       },
     },
     cssCodeSplit: true,
-    sourcemap: false,
+    sourcemap: true, // Enable source maps for better debugging
     chunkSizeWarningLimit: 1000,
   },
 }));
