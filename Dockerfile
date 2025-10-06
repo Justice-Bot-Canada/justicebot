@@ -1,47 +1,31 @@
-# ---- Stage 1: Build frontend ----
-FROM node:20-alpine AS frontend-builder
-WORKDIR /frontend
-
-# Copy frontend files
-COPY frontend/package*.json ./
-RUN npm install
-
-# Copy everything else and build
-COPY frontend/ .
-RUN npm run build
-
-# ---- Stage 2: Build Go backend ----
-FROM golang:1.22-alpine AS backend-builder
-WORKDIR /app
-
-# Copy Go modules
-COPY go.mod go.sum ./
+# Build the Go backend
+FROM golang:1.22-alpine AS go-build
+WORKDIR /src
+RUN apk add --no-cache ca-certificates
+COPY go.mod ./
+# COPY go.sum ./   # uncomment if present
 RUN go mod download
-
-# Copy backend source
 COPY . .
+ENV CGO_ENABLED=1
+RUN go build -o /out/server ./main.go
 
-# Copy built frontend from previous stage
-COPY --from=frontend-builder /frontend/dist ./frontend/dist
-
-# Build Go app
-RUN go build -o main .
-
-# ---- Stage 3: Final image ----
-FROM alpine:3.19
+# Final runtime
+FROM alpine:3.20
 WORKDIR /app
+RUN apk add --no-cache ca-certificates
+COPY --from=go-build /out/server /app/server
 
-# Copy compiled binary and static files
-COPY --from=backend-builder /app/main .
-COPY --from=backend-builder /app/frontend/dist ./frontend/dist
-COPY --from=backend-builder /app/docs ./docs
+# Copy your static site (adjust includes as needed)
+# If your static files live at repo root:
+COPY index.html /app/frontend/dist/index.html
+COPY script.js   /app/frontend/dist/script.js
+# If you have a 'dev' or 'public' folder with assets, include it:
+# COPY dev /app/frontend/dist/dev
+# COPY public /app/frontend/dist
 
-# Expose port
-EXPOSE 8080
-
-# Set environment variables
+ENV STATIC_DIR=/app/frontend/dist
 ENV PORT=8080
-ENV PAYPAL_ENV=sandbox
-
-# Run the server
-CMD ["./main"]
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:${PORT}/api/health || exit 1
+CMD ["/app/server"]
