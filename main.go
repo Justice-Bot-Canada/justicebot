@@ -166,6 +166,51 @@ func hasEntitlement(userID, productID string) (bool, error) {
 	return len(rows) > 0, nil
 }
 
+// ---------- STATIC (serve frontend / SPA) ----------
+
+// pickStaticDir chooses a directory to serve for the web UI.
+// Priority: STATIC_DIR env -> frontend/dist -> public -> current dir if index.html exists.
+func pickStaticDir() string {
+	candidates := []string{
+		envOr("STATIC_DIR", ""),
+		"frontend/dist",
+		"public",
+		".",
+	}
+	for _, d := range candidates {
+		if d == "" {
+			continue
+		}
+		if fi, err := os.Stat(filepath.Join(d, "index.html")); err == nil && !fi.IsDir() {
+			return d
+		}
+	}
+	return "" // no UI found; API-only
+}
+
+// spaHandler serves files from dir; if path doesn't exist, it serves index.html (SPA fallback).
+// Any /api/* paths are left to other handlers (return 404 here so mux tries other routes).
+func spaHandler(dir string) http.HandlerFunc {
+	index := filepath.Join(dir, "index.html")
+	return func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/api/") {
+			http.NotFound(w, r)
+			return
+		}
+		// sanitize
+		p := filepath.Clean(r.URL.Path)
+		if p == "/" {
+			p = "/index.html"
+		}
+		fp := filepath.Join(dir, p)
+		if fi, err := os.Stat(fp); err == nil && !fi.IsDir() {
+			http.ServeFile(w, r, fp)
+			return
+		}
+		http.ServeFile(w, r, index)
+	}
+}
+
 // ---------- HTTP handlers ----------
 func main() {
 	port := envOr("PORT", "8080")
@@ -190,7 +235,7 @@ func main() {
 		var in struct {
 			ProductID string `json:"productId"`
 		}
-		json.NewDecoder(r.Body).Decode(&in)
+		_ = json.NewDecoder(r.Body).Decode(&in)
 		price, ok := productCatalog[in.ProductID]
 		if !ok {
 			http.Error(w, "unknown product", http.StatusBadRequest)
@@ -199,7 +244,7 @@ func main() {
 
 		access, err := paypalToken()
 		if err != nil {
-			http.Error(w, "paypal oauth: "+err.Error(), 502)
+			http.Error(w, "paypal oauth: "+err.Error(), http.StatusBadGateway)
 			return
 		}
 
@@ -225,15 +270,15 @@ func main() {
 		req.Header.Set("Content-Type", "application/json")
 		res, err := httpc.Do(req)
 		if err != nil {
-			http.Error(w, err.Error(), 502); return
+			http.Error(w, err.Error(), http.StatusBadGateway)
+			return
 		}
 		defer res.Body.Close()
 		body, _ := io.ReadAll(res.Body)
 		if res.StatusCode >= 300 {
-			http.Error(w, fmt.Sprintf("paypal create %d: %s", res.StatusCode, string(body)), 502)
+			http.Error(w, fmt.Sprintf("paypal create %d: %s", res.StatusCode, string(body)), http.StatusBadGateway)
 			return
 		}
-		// Return entire PayPal response; frontend needs id
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(body)
 	}))
@@ -244,7 +289,7 @@ func main() {
 			OrderID   string `json:"orderId"`
 			ProductID string `json:"productId"`
 		}
-		json.NewDecoder(r.Body).Decode(&in)
+		_ = json.NewDecoder(r.Body).Decode(&in)
 		price, ok := productCatalog[in.ProductID]
 		if !ok || in.OrderID == "" {
 			http.Error(w, "bad request", http.StatusBadRequest)
@@ -253,7 +298,7 @@ func main() {
 
 		access, err := paypalToken()
 		if err != nil {
-			http.Error(w, "paypal oauth: "+err.Error(), 502)
+			http.Error(w, "paypal oauth: "+err.Error(), http.StatusBadGateway)
 			return
 		}
 
@@ -262,21 +307,25 @@ func main() {
 		req.Header.Set("Content-Type", "application/json")
 		res, err := httpc.Do(req)
 		if err != nil {
-			http.Error(w, err.Error(), 502); return
+			http.Error(w, err.Error(), http.StatusBadGateway)
+			return
 		}
 		defer res.Body.Close()
 		var out map[string]any
 		if err := json.NewDecoder(res.Body).Decode(&out); err != nil {
-			http.Error(w, "paypal decode: "+err.Error(), 502); return
+			http.Error(w, "paypal decode: "+err.Error(), http.StatusBadGateway)
+			return
 		}
 		if res.StatusCode >= 300 {
-			writeJSON(w, 502, out); return
+			writeJSON(w, http.StatusBadGateway, out)
+			return
 		}
 
 		// very basic verification (amount + COMPLETED)
 		status, _ := out["status"].(string)
 		if status != "COMPLETED" {
-			writeJSON(w, 400, out); return
+			writeJSON(w, http.StatusBadRequest, out)
+			return
 		}
 		// dig amount from captures
 		okAmount := false
@@ -291,15 +340,17 @@ func main() {
 			}
 		}
 		if !okAmount {
-			http.Error(w, "amount mismatch", http.StatusBadRequest); return
+			http.Error(w, "amount mismatch", http.StatusBadRequest)
+			return
 		}
 
 		// grant entitlement
 		userID := r.Header.Get("X-User-Sub")
 		if err := grantEntitlement(userID, in.ProductID); err != nil {
-			http.Error(w, "entitlement: "+err.Error(), 500); return
+			http.Error(w, "entitlement: "+err.Error(), http.StatusInternalServerError)
+			return
 		}
-		writeJSON(w, 200, map[string]any{"ok": true, "order": out})
+		writeJSON(w, http.StatusOK, map[string]any{"ok": true, "order": out})
 	}))
 
 	// List entitlements for current user
@@ -309,11 +360,15 @@ func main() {
 		req, _ := http.NewRequest("GET", url, nil)
 		supaAuthHeaders(req.Header)
 		res, err := httpc.Do(req)
-		if err != nil { http.Error(w, err.Error(), 502); return }
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadGateway)
+			return
+		}
 		defer res.Body.Close()
 		if res.StatusCode >= 300 {
 			b, _ := io.ReadAll(res.Body)
-			http.Error(w, fmt.Sprintf("supabase %d: %s", res.StatusCode, string(b)), 502); return
+			http.Error(w, fmt.Sprintf("supabase %d: %s", res.StatusCode, string(b)), http.StatusBadGateway)
+			return
 		}
 		io.Copy(w, res.Body)
 	}))
@@ -323,7 +378,8 @@ func main() {
 		// path: /api/docs/<slug>/download
 		parts := strings.Split(strings.TrimPrefix(r.URL.Path, "/api/docs/"), "/")
 		if len(parts) != 2 || parts[1] != "download" {
-			http.NotFound(w, r); return
+			http.NotFound(w, r)
+			return
 		}
 		slug := parts[0]
 
@@ -336,24 +392,46 @@ func main() {
 			}
 		}
 		if productID == "" {
-			http.NotFound(w, r); return
+			http.NotFound(w, r)
+			return
 		}
 
 		ok, err := hasEntitlement(r.Header.Get("X-User-Sub"), productID)
 		if err != nil || !ok {
-			http.Error(w, "no entitlement", http.StatusForbidden); return
+			http.Error(w, "no entitlement", http.StatusForbidden)
+			return
 		}
 
 		// serve file from /docs inside container
 		path := filepath.Join("/docs", filename)
 		f, err := os.Open(path)
-		if err != nil { http.NotFound(w, r); return }
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
 		defer f.Close()
 
 		w.Header().Set("Content-Type", "application/pdf")
 		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filename))
 		io.Copy(w, f)
 	}))
+
+	// --- attach static UI last so /api/* stays owned by the API handlers ---
+	if dir := pickStaticDir(); dir != "" {
+		log.Printf("serving UI from %s (SPA)", dir)
+		mux.HandleFunc("/", spaHandler(dir))
+	} else {
+		// no UI found; respond with a friendly message at /
+		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			if strings.HasPrefix(r.URL.Path, "/api/") {
+				http.NotFound(w, r)
+				return
+			}
+			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("Justice-Bot API is running. Build your frontend and set STATIC_DIR or place index.html."))
+		})
+	}
 
 	log.Printf("listening on :%s", port)
 	log.Fatal(http.ListenAndServe(":"+port, mux))
