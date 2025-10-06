@@ -1,35 +1,65 @@
-# syntax=docker/dockerfile:1
+# ===============================
+# 1) Build the frontend (Vite)
+# ===============================
+FROM node:20-alpine AS web
+WORKDIR /web
 
-########################
-# Build stage (Go)
-########################
-FROM golang:1.22-alpine AS build
+# Install deps (cache-friendly)
+COPY frontend/package*.json ./frontend/
+RUN cd frontend && npm ci
+
+# Copy source and build
+COPY frontend ./frontend
+RUN cd frontend && npm run build
+# Output: /web/frontend/dist
+
+# ===============================
+# 2) Build the Go backend
+# ===============================
+FROM golang:1.22-alpine AS go-build
 WORKDIR /src
 
-# Copy everything (Go code + docs) and tidy modules
+# Certs for TLS during build if needed
+RUN apk add --no-cache ca-certificates
+
+# Modules first for cache
+COPY go.mod ./
+# COPY go.sum ./  # uncomment if present
+RUN go mod download
+
+# Copy the rest of the backend source
 COPY . .
-RUN go mod tidy
 
-# Make sure /src/docs exists even if repo has none yet
-RUN mkdir -p /src/docs
+# Build static binary
+ENV CGO_ENABLED=1
+RUN go build -o /out/server ./main.go
 
-# Build a static linux binary
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-    go build -ldflags="-s -w" -o /out/server .
+# ===============================
+# 3) Final runtime image
+# ===============================
+FROM alpine:3.20
+WORKDIR /app
 
-########################
-# Run stage (tiny, with CA certs)
-########################
-FROM gcr.io/distroless/base-debian12
+# Minimal runtime deps
+RUN apk add --no-cache ca-certificates
+
+# Copy Go server
+COPY --from=go-build /out/server /app/server
+
+# Copy built frontend
+COPY --from=web /web/frontend/dist /app/frontend/dist
+
+# (Optional) gated PDFs for /api/docs/* if you use them
+# COPY docs /docs
+
+# App config: serve SPA from this dir; Railway provides PORT
+ENV STATIC_DIR=/app/frontend/dist
 ENV PORT=8080
-USER nonroot:nonroot
-
-# App binary
-COPY --from=build /out/server /server
-
-# Gated files (safe if empty; we created the folder in build stage)
-COPY --from=build /src/docs /docs
 
 EXPOSE 8080
-ENTRYPOINT ["/server"]
 
+# (Optional) Healthcheck (Go handler at /api/health)
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:${PORT}/api/health || exit 1
+
+CMD ["/app/server"]
