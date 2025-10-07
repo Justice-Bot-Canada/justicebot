@@ -5,11 +5,11 @@ FROM node:20-alpine AS web
 WORKDIR /web
 
 # install deps (cache-friendly)
-COPY frontend/package*.json ./frontend/
+COPY src/frontend/package*.json ./frontend/
 RUN cd frontend && npm ci
 
 # copy source and build
-COPY frontend ./frontend
+COPY src/frontend ./frontend
 RUN cd frontend && npm run build
 # output: /web/frontend/dist
 
@@ -22,14 +22,14 @@ RUN apk add --no-cache ca-certificates
 
 # modules first for cache
 COPY go.mod ./
-# If you have go.sum, uncomment the next line:
+# If you have go.sum, uncomment this:
 # COPY go.sum ./
 RUN go mod download
 
 # copy backend source
 COPY . .
 
-# bring built frontend into the backend image tree
+# bring built frontend into the backend tree
 COPY --from=web /web/frontend/dist ./frontend/dist
 
 # build the server
@@ -43,14 +43,10 @@ FROM alpine:3.20
 WORKDIR /app
 RUN apk add --no-cache ca-certificates wget
 
-# copy server and static site
+# copy built server and static files
 COPY --from=go-build /out/server /app/server
 COPY --from=go-build /src/frontend/dist /app/frontend/dist
 
-# optional: gated PDFs if you use them
-# COPY docs /docs
-
-# explicit so main.go serves the SPA
 ENV STATIC_DIR=/app/frontend/dist
 ENV PORT=8080
 
