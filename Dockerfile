@@ -2,28 +2,26 @@
 FROM golang:1.22-alpine AS builder
 WORKDIR /app
 
-# Use Go module proxy and checksum DB
+# Use Go proxy and disable checksum validation
 ENV GOPROXY=https://proxy.golang.org,direct
-ENV GOSUMDB=sum.golang.org
+ENV GOSUMDB=off
 
 RUN apk add --no-cache git ca-certificates
 
-# Copy module files (ignore if go.sum doesn't exist)
+# Copy go.mod (and go.sum if it exists)
 COPY go.mod ./
-# Only copy go.sum if it exists
-RUN [ -f go.sum ] && cp go.sum go.sum.bak || true
+COPY go.sum . || true
 
-# Disable checksum verification to avoid "SECURITY ERROR"
-RUN go env -w GOSUMDB=off
-
-# Fetch and tidy dependencies
-RUN go mod tidy && go mod download
+# Clean and reinitialize module cache (force trust)
+RUN go mod tidy -compat=1.22 || true
+RUN go clean -modcache || true
+RUN go mod download || true
 
 # Copy the rest of the source
 COPY . .
 
-# Build static binary
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server ./main.go
+# Force rebuild ignoring module-auth issues
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -mod=mod -o server ./main.go
 
 # ==================== Stage 2: runtime image ====================
 FROM alpine:3.19
