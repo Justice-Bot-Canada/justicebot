@@ -6,16 +6,17 @@ WORKDIR /app
 ENV GOPROXY=https://proxy.golang.org,direct
 ENV GOSUMDB=sum.golang.org
 
-RUN apk add --no-cache ca-certificates
+# Tools for HTTPS & (occasionally) fetching modules
+RUN apk add --no-cache ca-certificates git
 
-# Copy mod file first (cache-friendly)
+# Copy mod files first (cache-friendly)
 COPY go.mod ./
-# do NOT copy go.sum; it's optional and will be (re)generated as needed
+# If you have go.sum, you can copy it too (optional):
+# COPY go.sum ./
 
-# Pull modules
-# Refresh deps and rewrite go.sum if needed
+# Prefetch deps (tidy will create/refresh go.sum if needed)
 RUN go mod tidy
-# Verify modules; don't fail the build on checksum warning
+# Don’t fail the build if verify only warns about sums
 RUN go mod verify || true
 
 # Copy the rest of the repo
@@ -27,18 +28,20 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server ./main.go
 # ==================== Stage 2: minimal runtime image ====================
 FROM alpine:3.19
 WORKDIR /app
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates && update-ca-certificates
 
 # Backend binary
 COPY --from=builder /app/server .
 
-# Static frontend (no npm step)
-COPY ./frontend /app/public
-# If you have gated docs, uncomment:
-# COPY ./docs /app/docs
+# Static frontend (no npm step). Your index.html is in /frontend.
+# We serve it from /app/public to match the server's public/ option.
+COPY --from=builder /app/frontend /app/public
+
+# PDFs (uncomment if you use the gated downloads)
+# COPY --from=builder /app/docs /app/docs
 
 ENV PORT=8080
-# ENV STATIC_DIR=/app/public  # optional if your server auto-detects
-
+ENV STATIC_DIR=/app/public
 EXPOSE 8080
+
 CMD ["./server"]
