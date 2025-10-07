@@ -1,44 +1,32 @@
-# ===============================
-# 1) Build Go backend
-# ===============================
+# ============== Stage 1: build Go ==============
 FROM golang:1.22-alpine AS builder
 WORKDIR /app
 RUN apk add --no-cache ca-certificates
 
-# Copy Go dependencies and download
+# Copy only go.mod first (you don't have go.sum yet)
 COPY go.mod ./
-# If you have go.sum, include it too
-COPY go.sum ./
 RUN go mod download
 
-# Make sure the missing JWT module is fetched
-RUN go mod download github.com/golang-jwt/jwt/v5
-
-# Copy backend source code
+# Now copy the rest of the backend
 COPY . .
 
-# Build Go binary
-RUN go build -o server ./main.go
+# Build the binary
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server ./main.go
 
-# ===============================
-# 2) Final runtime image
-# ===============================
-FROM alpine:3.20
+# ============== Stage 2: runtime image ==============
+FROM alpine:3.19
 WORKDIR /app
-RUN apk add --no-cache ca-certificates wget
+RUN apk add --no-cache ca-certificates
 
-# Copy the compiled Go server
+# Copy the compiled binary
 COPY --from=builder /app/server .
 
-# Copy your static frontend directly
+# Copy your static site and docs exactly as they exist in the repo root
 COPY frontend ./frontend
+COPY docs ./docs
 
-# Environment setup
-ENV STATIC_DIR=/app/frontend
+# App config
 ENV PORT=8080
 EXPOSE 8080
-
-HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:${PORT}/api/health || exit 1
 
 CMD ["./server"]
