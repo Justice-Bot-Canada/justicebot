@@ -1,47 +1,61 @@
-# ---- Stage 1: Build frontend ----
-FROM node:20-alpine AS frontend-builder
-WORKDIR /frontend
+# ===============================
+# 1) Build the frontend (Vite)
+# ===============================
+FROM node:20-alpine AS web
+WORKDIR /web
 
-# Copy frontend files (use src instead of frontend)
-COPY src/package*.json ./
-RUN npm install
+# install deps (cache-friendly)
+COPY frontend/package*.json ./frontend/
+RUN cd frontend && npm ci
 
-# Copy everything else and build
-COPY src/ .
-RUN npm run build
+# copy source and build
+COPY frontend ./frontend
+RUN cd frontend && npm run build
+# output: /web/frontend/dist
 
-# ---- Stage 2: Build Go backend ----
-FROM golang:1.22-alpine AS backend-builder
-WORKDIR /app
+# ===============================
+# 2) Build the Go backend
+# ===============================
+FROM golang:1.22-alpine AS go-build
+WORKDIR /src
+RUN apk add --no-cache ca-certificates
 
-# Copy Go modules
-COPY go.mod go.sum ./
+# modules first for cache
+COPY go.mod ./
+# If you have go.sum, uncomment the next line:
+# COPY go.sum ./
 RUN go mod download
 
-# Copy backend source
+# copy backend source
 COPY . .
 
-# Copy built frontend from previous stage
-COPY --from=frontend-builder /frontend/dist ./frontend/dist
+# bring built frontend into the backend image tree
+COPY --from=web /web/frontend/dist ./frontend/dist
 
-# Build Go app
-RUN go build -o main .
+# build the server
+ENV CGO_ENABLED=1
+RUN go build -o /out/server ./main.go
 
-# ---- Stage 3: Final image ----
-FROM alpine:3.19
+# ===============================
+# 3) Final runtime image
+# ===============================
+FROM alpine:3.20
 WORKDIR /app
+RUN apk add --no-cache ca-certificates wget
 
-# Copy compiled binary and static files
-COPY --from=backend-builder /app/main .
-COPY --from=backend-builder /app/frontend/dist ./frontend/dist
-COPY --from=backend-builder /app/docs ./docs
+# copy server and static site
+COPY --from=go-build /out/server /app/server
+COPY --from=go-build /src/frontend/dist /app/frontend/dist
 
-# Expose port
-EXPOSE 8080
+# optional: gated PDFs if you use them
+# COPY docs /docs
 
-# Set environment variables
+# explicit so main.go serves the SPA
+ENV STATIC_DIR=/app/frontend/dist
 ENV PORT=8080
-ENV PAYPAL_ENV=sandbox
 
-# Run the server
-CMD ["./main"]
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:${PORT}/api/health || exit 1
+
+CMD ["/app/server"]
