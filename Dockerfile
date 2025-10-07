@@ -26,10 +26,8 @@ RUN go env -w GOPROXY=https://proxy.golang.org,direct \
  && go clean -modcache
 
 # Copy module files first (better Docker cache)
-COPY go.mod ./
-# If you have go.sum in the repo, copy it; otherwise this is fine too.
-# (go mod tidy below will recreate it deterministically.)
-COPY go.sum .  || true
+# Copy go.sum only if it exists (prevents build errors)
+RUN if [ -f go.sum ]; then cp go.sum .; fi
 
 # Prime the module cache (will also recreate go.sum as needed)
 RUN go mod tidy && go mod download
