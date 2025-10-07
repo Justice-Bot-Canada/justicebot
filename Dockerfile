@@ -1,58 +1,44 @@
-# ========================
-# Stage 1: Build frontend
-# ========================
-FROM node:20-alpine AS web
-WORKDIR /frontend
-
-# Install deps (cache-friendly)
-COPY frontend/package*.json ./ 
-RUN npm install
-# Copy source and build
-COPY frontend/. .
-RUN npm run build
-
-# ========================
-# Stage 2: Build Go (API)
-# ========================
+# ==================== Stage 1: Build Go backend ====================
 FROM golang:1.22-alpine AS builder
 WORKDIR /app
 
-# Tools needed by 'go' in Alpine
-RUN apk add --no-cache git ca-certificates
+# System deps (certs for HTTPS)
+RUN apk add --no-cache ca-certificates
 
-# Make Go use the official proxy/sumdb and wipe any cached modules
-RUN go env -w GOPROXY=https://proxy.golang.org,direct \
- && go env -w GOSUMDB=sum.golang.org \
- && go clean -modcache
+# Go modules first (better cache). We don't require go.sum here.
+COPY go.mod ./
+RUN go mod download
 
-# Copy module files first (better Docker cache)
-# Copy go.sum only if it exists (prevents build errors)
-RUN if [ -f go.sum ]; then cp go.sum .; fi
-
-# Prime the module cache (will also recreate go.sum as needed)
-RUN go mod tidy && go mod download
-
-# Copy the rest of the backend
+# Copy the rest of the backend source
 COPY . .
 
-# Bring in the built frontend to be served by Go
-COPY --from=web /frontend/dist ./frontend/dist
+# Tidy modules (creates/updates go.sum deterministically)
+RUN go mod tidy
 
 # Build static binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server ./main.go
 
-# ========================
-# Stage 3: Runtime image
-# ========================
-FROM alpine:3.20
+# ==================== Stage 2: Final runtime image ====================
+FROM alpine:3.19
 WORKDIR /app
-RUN apk add --no-cache ca-certificates && update-ca-certificates
 
-# Copy server & static files
+# Certs for HTTPS
+RUN apk add --no-cache ca-certificates
+
+# Copy the compiled server
 COPY --from=builder /app/server .
-COPY --from=builder /app/frontend/dist ./frontend/dist
-COPY --from=builder /app/docs ./docs
 
+# Copy static frontend (no npm build — just serve the files)
+# We place them under /app/public so main.go will find it (pickStaticDir checks "public").
+COPY ./frontend /app/public
+
+# (Optional) gated docs if you have them
+# COPY ./docs /app/docs
+
+# App config
 ENV PORT=8080
+# In case you want to be explicit:
+# ENV STATIC_DIR=/app/public
+
 EXPOSE 8080
 CMD ["./server"]
