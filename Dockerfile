@@ -6,8 +6,7 @@ WORKDIR /frontend
 
 # Install deps (cache-friendly)
 COPY frontend/package*.json ./ 
-RUN npm ci
-
+RUN npm install
 # Copy source and build
 COPY frontend/. .
 RUN npm run build
