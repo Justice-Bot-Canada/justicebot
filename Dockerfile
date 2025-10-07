@@ -1,34 +1,61 @@
-# ============== Stage 1: build Go ==============
+# ========================
+# Stage 1: Build frontend
+# ========================
+FROM node:20-alpine AS web
+WORKDIR /frontend
+
+# Install deps (cache-friendly)
+COPY frontend/package*.json ./ 
+RUN npm ci
+
+# Copy source and build
+COPY frontend/. .
+RUN npm run build
+
+# ========================
+# Stage 2: Build Go (API)
+# ========================
 FROM golang:1.22-alpine AS builder
 WORKDIR /app
-RUN apk add --no-cache ca-certificates
 
-# Copy only go.mod first (you don't have go.sum yet)
+# Tools needed by 'go' in Alpine
+RUN apk add --no-cache git ca-certificates
+
+# Make Go use the official proxy/sumdb and wipe any cached modules
+RUN go env -w GOPROXY=https://proxy.golang.org,direct \
+ && go env -w GOSUMDB=sum.golang.org \
+ && go clean -modcache
+
+# Copy module files first (better Docker cache)
 COPY go.mod ./
-RUN go mod download
+# If you have go.sum in the repo, copy it; otherwise this is fine too.
+# (go mod tidy below will recreate it deterministically.)
+COPY go.sum .  || true
 
-# Now copy the rest of the backend
+# Prime the module cache (will also recreate go.sum as needed)
+RUN go mod tidy && go mod download
+
+# Copy the rest of the backend
 COPY . .
 
-# Build Go binary
-RUN go mod tidy
-RUN go mod download
+# Bring in the built frontend to be served by Go
+COPY --from=web /frontend/dist ./frontend/dist
+
+# Build static binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server ./main.go
 
-# ============== Stage 2: runtime image ==============
-FROM alpine:3.19
+# ========================
+# Stage 3: Runtime image
+# ========================
+FROM alpine:3.20
 WORKDIR /app
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates && update-ca-certificates
 
-# Copy the compiled binary
+# Copy server & static files
 COPY --from=builder /app/server .
+COPY --from=builder /app/frontend/dist ./frontend/dist
+COPY --from=builder /app/docs ./docs
 
-# Copy your static site and docs exactly as they exist in the repo root
-COPY frontend ./frontend
-COPY docs ./docs
-
-# App config
 ENV PORT=8080
 EXPOSE 8080
-
 CMD ["./server"]
