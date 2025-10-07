@@ -11,19 +11,18 @@ RUN apk add --no-cache ca-certificates git
 # Copy go.mod first (skip go.sum)
 COPY go.mod ./
 
-# Retry-friendly mod fetch
-RUN --mount=type=cache,target=/go/pkg/mod \
-    go mod download || \
+# Download modules (retry if needed)
+RUN go mod download || \
     (sleep 2 && go mod download) || \
     (GOPROXY=direct go mod download)
 
-# Copy everything else
+# Copy the rest of the repo
 COPY . .
 
-# Ensure modules are tidy
-RUN go mod tidy
+# Clean up and ensure deps are tidy
+RUN rm -f go.sum || true && go mod tidy
 
-# Build static binary
+# Build the static binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server ./main.go
 
 # ==================== Stage 2: runtime ====================
@@ -31,7 +30,10 @@ FROM alpine:3.19
 WORKDIR /app
 RUN apk add --no-cache ca-certificates
 
+# Copy backend binary
 COPY --from=builder /app/server .
+
+# Copy static frontend and docs
 COPY ./frontend /app/public
 COPY ./docs /app/docs
 
