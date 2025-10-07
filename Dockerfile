@@ -10,7 +10,9 @@ RUN go mod download
 # Now copy the rest of the backend
 COPY . .
 
-# Build the binary
+# Build Go binary
+RUN go mod tidy
+RUN go mod download
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server ./main.go
 
 # ============== Stage 2: runtime image ==============
