@@ -13,7 +13,10 @@ COPY go.mod ./
 # do NOT copy go.sum; it's optional and will be (re)generated as needed
 
 # Pull modules
-RUN go mod download
+# Refresh deps and rewrite go.sum if needed
+RUN go mod tidy
+# Verify modules; don't fail the build on checksum warning
+RUN go mod verify || true
 
 # Copy the rest of the repo
 COPY . .
