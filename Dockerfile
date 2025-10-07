@@ -7,9 +7,12 @@ RUN apk add --no-cache ca-certificates
 
 # Copy Go dependencies and download
 COPY go.mod ./
-# If you have go.sum, uncomment:
-# COPY go.sum ./
+# If you have go.sum, include it too
+COPY go.sum ./
 RUN go mod download
+
+# Make sure the missing JWT module is fetched
+RUN go mod download github.com/golang-jwt/jwt/v5
 
 # Copy backend source code
 COPY . .
@@ -27,7 +30,7 @@ RUN apk add --no-cache ca-certificates wget
 # Copy the compiled Go server
 COPY --from=builder /app/server .
 
-# Copy your static frontend directly (no npm build)
+# Copy your static frontend directly
 COPY frontend ./frontend
 
 # Environment setup
