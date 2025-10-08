@@ -1,4 +1,4 @@
-# ==================== Stage 1: build Go backend ====================
+# # ==================== Stage 1: build Go backend ====================
 FROM golang:1.22-alpine AS builder
 WORKDIR /app
 
@@ -19,8 +19,8 @@ RUN go mod download || \
 # Copy the rest of the repo
 COPY . .
 
-# Clean up and ensure deps are tidy
-RUN rm -f go.sum || true && go mod tidy
+# Ensure deps are tidy (recreates go.sum deterministically)
+RUN go mod tidy
 
 # Build the static binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server ./main.go
@@ -38,5 +38,6 @@ COPY ./frontend /app/public
 COPY ./docs /app/docs
 
 ENV PORT=8080
+ENV STATIC_DIR=/app/public
 EXPOSE 8080
 CMD ["./server"]
