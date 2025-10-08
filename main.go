@@ -17,18 +17,16 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var httpc = &http.Client{Timeout: 15 * time.Second}
+var httpc = &http.Client{Timeout: 15 * time.Second }
 
 // ---------- config & helpers ----------
 type money struct{ Currency, Value string }
 
 var productCatalog = map[string]money{
-	// edit/extend as you like
 	"doc_small": {Currency: "CAD", Value: "5.00"},
 	"doc_pro":   {Currency: "CAD", Value: "19.00"},
 }
 
-// maps product -> local file under /docs inside the container
 var productFile = map[string]string{
 	"doc_small": "small-guide.pdf",
 	"doc_pro":   "pro-pack.pdf",
@@ -104,7 +102,6 @@ func requireSupabase(next http.HandlerFunc) http.HandlerFunc {
 			http.Error(w, "invalid token", http.StatusUnauthorized)
 			return
 		}
-		// stash for downstream handlers via headers (simple for MVP)
 		claims := token.Claims.(*supaClaims)
 		r.Header.Set("X-User-Sub", claims.Subject)
 		r.Header.Set("X-User-Email", claims.Email)
@@ -119,14 +116,6 @@ func supaAuthHeaders(h http.Header) {
 	h.Set("apikey", svc)
 	h.Set("Authorization", "Bearer "+svc)
 }
-
-// ensure SQL table exists in Supabase:
-//   create table if not exists entitlements(
-//     user_id uuid not null,
-//     product_id text not null,
-//     granted_at timestamptz not null default now(),
-//     primary key (user_id, product_id)
-//   );
 
 func grantEntitlement(userID, productID string) error {
 	body, _ := json.Marshal([]map[string]any{{"user_id": userID, "product_id": productID}})
@@ -168,14 +157,14 @@ func hasEntitlement(userID, productID string) (bool, error) {
 
 // ---------- STATIC (serve frontend / SPA) ----------
 
-// pickStaticDir chooses a directory to serve for the web UI.
-// Priority: STATIC_DIR env -> frontend/dist -> public -> current dir if index.html exists.
 func pickStaticDir() string {
+	// WORKDIR is /app in Dockerfile. We copy your Loveable static to ./public.
 	candidates := []string{
 		envOr("STATIC_DIR", ""),
-		"frontend/dist",
-		"public",
-		".",
+		"public",         // <- our default (Dockerfile copies ./frontend -> /app/public)
+		"frontend/dist",  // typical Vite/Next static build
+		"frontend",       // raw folder with index.html
+		".",              // repo root, if index.html is there
 	}
 	for _, d := range candidates {
 		if d == "" {
@@ -185,19 +174,25 @@ func pickStaticDir() string {
 			return d
 		}
 	}
-	return "" // no UI found; API-only
+	return ""
 }
 
-// spaHandler serves files from dir; if path doesn't exist, it serves index.html (SPA fallback).
-// Any /api/* paths are left to other handlers (return 404 here so mux tries other routes).
 func spaHandler(dir string) http.HandlerFunc {
 	index := filepath.Join(dir, "index.html")
 	return func(w http.ResponseWriter, r *http.Request) {
+		// keep /api/* for the API
 		if strings.HasPrefix(r.URL.Path, "/api/") {
 			http.NotFound(w, r)
 			return
 		}
-		// sanitize
+		// /dev convenience: serve dev.html if present
+		if r.URL.Path == "/dev" {
+			if _, err := os.Stat(filepath.Join(dir, "dev.html")); err == nil {
+				http.ServeFile(w, r, filepath.Join(dir, "dev.html"))
+				return
+			}
+		}
+		// sanitize & try exact file
 		p := filepath.Clean(r.URL.Path)
 		if p == "/" {
 			p = "/index.html"
@@ -207,6 +202,7 @@ func spaHandler(dir string) http.HandlerFunc {
 			http.ServeFile(w, r, fp)
 			return
 		}
+		// SPA fallback
 		http.ServeFile(w, r, index)
 	}
 }
@@ -216,13 +212,19 @@ func main() {
 	port := envOr("PORT", "8080")
 	mux := http.NewServeMux()
 
-	// Health
+	// bare health for LB checks
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
+
+	// API health
 	mux.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok"))
 	})
 
-	// Who am I (auth required)
+	// whoami
 	mux.HandleFunc("/api/whoami", requireSupabase(func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 200, map[string]string{
 			"sub":   r.Header.Get("X-User-Sub"),
@@ -230,24 +232,20 @@ func main() {
 		})
 	}))
 
-	// Create PayPal order for a *server-defined* product
+	// Create PayPal order
 	mux.HandleFunc("/api/payments/create-order", requireSupabase(func(w http.ResponseWriter, r *http.Request) {
-		var in struct {
-			ProductID string `json:"productId"`
-		}
+		var in struct{ ProductID string `json:"productId"` }
 		_ = json.NewDecoder(r.Body).Decode(&in)
 		price, ok := productCatalog[in.ProductID]
 		if !ok {
 			http.Error(w, "unknown product", http.StatusBadRequest)
 			return
 		}
-
 		access, err := paypalToken()
 		if err != nil {
 			http.Error(w, "paypal oauth: "+err.Error(), http.StatusBadGateway)
 			return
 		}
-
 		payload := map[string]any{
 			"intent": "CAPTURE",
 			"purchase_units": []map[string]any{{
@@ -263,7 +261,6 @@ func main() {
 				"user_action":         "PAY_NOW",
 			},
 		}
-
 		b, _ := json.Marshal(payload)
 		req, _ := http.NewRequest("POST", paypalBase()+"/v2/checkout/orders", bytes.NewReader(b))
 		req.Header.Set("Authorization", "Bearer "+access)
@@ -283,7 +280,7 @@ func main() {
 		w.Write(body)
 	}))
 
-	// Capture order, verify amount, grant entitlement
+	// Capture -> verify -> grant entitlement
 	mux.HandleFunc("/api/payments/capture-order", requireSupabase(func(w http.ResponseWriter, r *http.Request) {
 		var in struct {
 			OrderID   string `json:"orderId"`
@@ -295,13 +292,11 @@ func main() {
 			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
-
 		access, err := paypalToken()
 		if err != nil {
 			http.Error(w, "paypal oauth: "+err.Error(), http.StatusBadGateway)
 			return
 		}
-
 		req, _ := http.NewRequest("POST", paypalBase()+"/v2/checkout/orders/"+in.OrderID+"/capture", nil)
 		req.Header.Set("Authorization", "Bearer "+access)
 		req.Header.Set("Content-Type", "application/json")
@@ -320,14 +315,11 @@ func main() {
 			writeJSON(w, http.StatusBadGateway, out)
 			return
 		}
-
-		// very basic verification (amount + COMPLETED)
 		status, _ := out["status"].(string)
 		if status != "COMPLETED" {
 			writeJSON(w, http.StatusBadRequest, out)
 			return
 		}
-		// dig amount from captures
 		okAmount := false
 		if pu, ok := out["purchase_units"].([]any); ok && len(pu) > 0 {
 			x := pu[0].(map[string]any)
@@ -343,8 +335,6 @@ func main() {
 			http.Error(w, "amount mismatch", http.StatusBadRequest)
 			return
 		}
-
-		// grant entitlement
 		userID := r.Header.Get("X-User-Sub")
 		if err := grantEntitlement(userID, in.ProductID); err != nil {
 			http.Error(w, "entitlement: "+err.Error(), http.StatusInternalServerError)
@@ -353,7 +343,7 @@ func main() {
 		writeJSON(w, http.StatusOK, map[string]any{"ok": true, "order": out})
 	}))
 
-	// List entitlements for current user
+	// List entitlements
 	mux.HandleFunc("/api/entitlements", requireSupabase(func(w http.ResponseWriter, r *http.Request) {
 		userID := r.Header.Get("X-User-Sub")
 		url := supaURL(fmt.Sprintf("/rest/v1/entitlements?user_id=eq.%s&select=product_id,granted_at", userID))
@@ -373,17 +363,14 @@ func main() {
 		io.Copy(w, res.Body)
 	}))
 
-	// Gated download: /api/docs/{slug}/download
+	// Gated download
 	mux.HandleFunc("/api/docs/", requireSupabase(func(w http.ResponseWriter, r *http.Request) {
-		// path: /api/docs/<slug>/download
 		parts := strings.Split(strings.TrimPrefix(r.URL.Path, "/api/docs/"), "/")
 		if len(parts) != 2 || parts[1] != "download" {
 			http.NotFound(w, r)
 			return
 		}
 		slug := parts[0]
-
-		// find which product unlocks this slug
 		var productID, filename string
 		for pid, fn := range productFile {
 			if strings.TrimSuffix(fn, filepath.Ext(fn)) == slug {
@@ -395,14 +382,11 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
-
 		ok, err := hasEntitlement(r.Header.Get("X-User-Sub"), productID)
 		if err != nil || !ok {
 			http.Error(w, "no entitlement", http.StatusForbidden)
 			return
 		}
-
-		// serve file from /docs inside container
 		path := filepath.Join("/docs", filename)
 		f, err := os.Open(path)
 		if err != nil {
@@ -410,18 +394,16 @@ func main() {
 			return
 		}
 		defer f.Close()
-
 		w.Header().Set("Content-Type", "application/pdf")
 		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filename))
 		io.Copy(w, f)
 	}))
 
-	// --- attach static UI last so /api/* stays owned by the API handlers ---
+	// Static UI
 	if dir := pickStaticDir(); dir != "" {
 		log.Printf("serving UI from %s (SPA)", dir)
 		mux.HandleFunc("/", spaHandler(dir))
 	} else {
-		// no UI found; respond with a friendly message at /
 		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			if strings.HasPrefix(r.URL.Path, "/api/") {
 				http.NotFound(w, r)
