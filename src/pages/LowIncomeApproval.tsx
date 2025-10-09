@@ -69,7 +69,7 @@ const LowIncomeApproval = () => {
       const filePath = `income-proof/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('legal-docs')
+        .from('income-proof')
         .upload(filePath, selectedFile);
 
       if (uploadError) throw uploadError;

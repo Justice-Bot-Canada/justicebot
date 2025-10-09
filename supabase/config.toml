@@ -56,13 +56,13 @@ gcp_jwt_path = "supabase/gcp.json"
 verify_jwt = true
 
 [functions.legal-chat]
-verify_jwt = false
+verify_jwt = true
 
 [functions.analyze-document]
-verify_jwt = false
+verify_jwt = true
 
 [functions.send-notification]
-verify_jwt = false
+verify_jwt = true
 
 [functions.fetch-legal-data]
 verify_jwt = true
