@@ -158,23 +158,25 @@ func hasEntitlement(userID, productID string) (bool, error) {
 // ---------- STATIC (serve frontend / SPA) ----------
 
 func pickStaticDir() string {
-	// WORKDIR is /app in Dockerfile. We copy your Loveable static to ./public.
-	candidates := []string{
-		envOr("STATIC_DIR", ""),
-		"public",         // <- our default (Dockerfile copies ./frontend -> /app/public)
-		"frontend/dist",  // typical Vite/Next static build
-		"frontend",       // raw folder with index.html
-		".",              // repo root, if index.html is there
-	}
-	for _, d := range candidates {
-		if d == "" {
-			continue
-		}
-		if fi, err := os.Stat(filepath.Join(d, "index.html")); err == nil && !fi.IsDir() {
-			return d
-		}
-	}
-	return ""
+    // WORKDIR is /app. Dockerfile copies ./frontend -> /app/public
+    candidates := []string{
+        "/app/public",          // <- add this absolute path first
+        envOr("STATIC_DIR", ""),
+        "public",
+        "frontend/dist",
+        "frontend",
+        ".",
+    }
+    for _, d := range candidates {
+        if d == "" {
+            continue
+        }
+        if fi, err := os.Stat(filepath.Join(d, "index.html")); err == nil && !fi.IsDir() {
+            return d
+        }
+    }
+    return ""
+}
 }
 
 func spaHandler(dir string) http.HandlerFunc {
