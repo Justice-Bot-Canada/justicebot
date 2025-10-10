@@ -102,16 +102,33 @@ const Admin = () => {
   const [cases, setCases] = useState<Case[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [lastFetch, setLastFetch] = useState<number>(0);
+  const RATE_LIMIT_MS = 5000; // 5 seconds between fetches
 
   useEffect(() => {
     if (user) {
-      loadAdminData();
+      const now = Date.now();
+      const timeSinceLastFetch = now - lastFetch;
+      
+      // Rate limit: only fetch if 5 seconds have passed
+      if (lastFetch === 0 || timeSinceLastFetch >= RATE_LIMIT_MS) {
+        loadAdminData();
+        setLastFetch(now);
+      }
     }
   }, [user]);
 
   const loadAdminData = async () => {
     try {
       setLoading(true);
+      
+      // Check rate limit before making expensive RPC call
+      const currentTime = Date.now();
+      if (lastFetch > 0 && (currentTime - lastFetch) < RATE_LIMIT_MS) {
+        console.log('Rate limit: skipping data fetch');
+        setLoading(false);
+        return;
+      }
       
       // Load analytics events for today
       const analyticsToday = new Date();

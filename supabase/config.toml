@@ -72,3 +72,6 @@ verify_jwt = true
 
 [functions.fill-official-pdf]
 verify_jwt = true
+
+[functions.submit-contact]
+verify_jwt = false

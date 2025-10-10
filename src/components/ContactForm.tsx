@@ -49,11 +49,22 @@ export const ContactForm = ({ className }: ContactFormProps) => {
     setIsSubmitting(true);
     
     try {
-      // Here you would typically send to your backend/edge function
-      console.log("Contact form submission:", data);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch(
+        `https://vkzquzjtewqhcisvhsvg.supabase.co/functions/v1/submit-contact`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to submit contact form');
+      }
+
+      const result = await response.json();
       
       toast({
         title: "Message sent successfully!",
@@ -65,7 +76,7 @@ export const ContactForm = ({ className }: ContactFormProps) => {
       console.error("Error submitting contact form:", error);
       toast({
         title: "Error sending message",
-        description: "Please try again later or email us directly.",
+        description: "Please try again later or email us directly at contact@justice-bot.ca",
         variant: "destructive",
       });
     } finally {
