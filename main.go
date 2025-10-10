@@ -17,7 +17,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var httpc = &http.Client{Timeout: 15 * time.Second }
+var httpc = &http.Client{Timeout: 15 * time.Second}
 
 // ---------- config & helpers ----------
 type money struct{ Currency, Value string }
@@ -27,6 +27,7 @@ var productCatalog = map[string]money{
 	"doc_pro":   {Currency: "CAD", Value: "19.00"},
 }
 
+// maps product -> filename under ./docs
 var productFile = map[string]string{
 	"doc_small": "small-guide.pdf",
 	"doc_pro":   "pro-pack.pdf",
@@ -64,7 +65,9 @@ func paypalToken() (string, error) {
 		b, _ := io.ReadAll(res.Body)
 		return "", fmt.Errorf("paypal oauth %d: %s", res.StatusCode, string(b))
 	}
-	var out struct{ AccessToken string `json:"access_token"` }
+	var out struct {
+		AccessToken string `json:"access_token"`
+	}
 	if err := json.NewDecoder(res.Body).Decode(&out); err != nil {
 		return "", err
 	}
@@ -111,6 +114,7 @@ func requireSupabase(next http.HandlerFunc) http.HandlerFunc {
 
 // ---------- Supabase REST for entitlements ----------
 func supaURL(path string) string { return strings.TrimRight(os.Getenv("SUPABASE_URL"), "/") + path }
+
 func supaAuthHeaders(h http.Header) {
 	svc := os.Getenv("SUPABASE_SERVICE_ROLE")
 	h.Set("apikey", svc)
@@ -156,38 +160,36 @@ func hasEntitlement(userID, productID string) (bool, error) {
 }
 
 // ---------- STATIC (serve frontend / SPA) ----------
-
 func pickStaticDir() string {
-    // WORKDIR is /app. Dockerfile copies ./frontend -> /app/public
-    candidates := []string{
-        "/app/public",          // <- add this absolute path first
-        envOr("STATIC_DIR", ""),
-        "public",
-        "frontend/dist",
-        "frontend",
-        ".",
-    }
-    for _, d := range candidates {
-        if d == "" {
-            continue
-        }
-        if fi, err := os.Stat(filepath.Join(d, "index.html")); err == nil && !fi.IsDir() {
-            return d
-        }
-    }
-    return ""
-}
+	// WORKDIR is /app in Dockerfile. We copy your Loveable static to /app/public.
+	candidates := []string{
+		"/app/public",        // absolute path inside container (Dockerfile copies here)
+		envOr("STATIC_DIR", ""),
+		"public",
+		"frontend/dist",
+		"frontend",
+		".",
+	}
+	for _, d := range candidates {
+		if d == "" {
+			continue
+		}
+		if fi, err := os.Stat(filepath.Join(d, "index.html")); err == nil && !fi.IsDir() {
+			return d
+		}
+	}
+	return ""
 }
 
 func spaHandler(dir string) http.HandlerFunc {
 	index := filepath.Join(dir, "index.html")
 	return func(w http.ResponseWriter, r *http.Request) {
 		// keep /api/* for the API
-		if strings.HasPrefix(r.URL.Path, "/api/") {
+	 if strings.HasPrefix(r.URL.Path, "/api/") {
 			http.NotFound(w, r)
 			return
 		}
-		// /dev convenience: serve dev.html if present
+		// optional /dev page
 		if r.URL.Path == "/dev" {
 			if _, err := os.Stat(filepath.Join(dir, "dev.html")); err == nil {
 				http.ServeFile(w, r, filepath.Join(dir, "dev.html"))
@@ -214,19 +216,17 @@ func main() {
 	port := envOr("PORT", "8080")
 	mux := http.NewServeMux()
 
-	// bare health for LB checks
+	// Health
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok"))
 	})
-
-	// API health
 	mux.HandleFunc("/api/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("ok"))
 	})
 
-	// whoami
+	// Who am I (auth required)
 	mux.HandleFunc("/api/whoami", requireSupabase(func(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, 200, map[string]string{
 			"sub":   r.Header.Get("X-User-Sub"),
@@ -365,52 +365,49 @@ func main() {
 		io.Copy(w, res.Body)
 	}))
 
-// Gated download (auth required): /api/docs/{slug}/download
-mux.HandleFunc("/api/docs/", requireSupabase(func(w http.ResponseWriter, r *http.Request) {
-    // path pattern: /api/docs/<slug>/download
-    parts := strings.Split(strings.TrimPrefix(r.URL.Path, "/api/docs/"), "/")
-    if len(parts) != 2 || parts[1] != "download" {
-        http.NotFound(w, r)
-        return
-    }
-    slug := parts[0]
+	// Gated download (auth required): /api/docs/{slug}/download
+	mux.HandleFunc("/api/docs/", requireSupabase(func(w http.ResponseWriter, r *http.Request) {
+		parts := strings.Split(strings.TrimPrefix(r.URL.Path, "/api/docs/"), "/")
+		if len(parts) != 2 || parts[1] != "download" {
+			http.NotFound(w, r)
+			return
+		}
+		slug := parts[0]
 
-    // map slug -> product/file from productFile
-    var productID, filename string
-    for pid, fn := range productFile {
-        if strings.TrimSuffix(fn, filepath.Ext(fn)) == slug {
-            productID, filename = pid, fn
-            break
-        }
-    }
-    if productID == "" {
-        http.NotFound(w, r)
-        return
-    }
+		// slug -> product/file
+		var productID, filename string
+		for pid, fn := range productFile {
+			if strings.TrimSuffix(fn, filepath.Ext(fn)) == slug {
+				productID, filename = pid, fn
+				break
+			}
+		}
+		if productID == "" {
+			http.NotFound(w, r)
+			return
+		}
 
-    // entitlement check
-    ok, err := hasEntitlement(r.Header.Get("X-User-Sub"), productID)
-    if err != nil || !ok {
-        http.Error(w, "no entitlement", http.StatusForbidden)
-        return
-    }
+		ok, err := hasEntitlement(r.Header.Get("X-User-Sub"), productID)
+		if err != nil || !ok {
+			http.Error(w, "no entitlement", http.StatusForbidden)
+			return
+		}
 
-    // ✅ IMPORTANT: use RELATIVE path (no leading slash)
-    path := filepath.Join("docs", filename) // was: filepath.Join("/docs", filename)
+		// relative path inside the image
+		path := filepath.Join("docs", filename)
+		f, err := os.Open(path)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		defer f.Close()
 
-    f, err := os.Open(path)
-    if err != nil {
-        http.NotFound(w, r)
-        return
-    }
-    defer f.Close()
+		w.Header().Set("Content-Type", "application/pdf")
+		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filename))
+		_, _ = io.Copy(w, f)
+	}))
 
-    w.Header().Set("Content-Type", "application/pdf")
-    w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filename))
-    _, _ = io.Copy(w, f)
-}))
-
-	// Static UI
+	// Static UI (SPA)
 	if dir := pickStaticDir(); dir != "" {
 		log.Printf("serving UI from %s (SPA)", dir)
 		mux.HandleFunc("/", spaHandler(dir))
