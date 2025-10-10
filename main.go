@@ -363,41 +363,50 @@ func main() {
 		io.Copy(w, res.Body)
 	}))
 
-	// Gated download
-	mux.HandleFunc("/api/docs/", requireSupabase(func(w http.ResponseWriter, r *http.Request) {
-		parts := strings.Split(strings.TrimPrefix(r.URL.Path, "/api/docs/"), "/")
-		if len(parts) != 2 || parts[1] != "download" {
-			http.NotFound(w, r)
-			return
-		}
-		slug := parts[0]
-		var productID, filename string
-		for pid, fn := range productFile {
-			if strings.TrimSuffix(fn, filepath.Ext(fn)) == slug {
-				productID, filename = pid, fn
-				break
-			}
-		}
-		if productID == "" {
-			http.NotFound(w, r)
-			return
-		}
-		ok, err := hasEntitlement(r.Header.Get("X-User-Sub"), productID)
-		if err != nil || !ok {
-			http.Error(w, "no entitlement", http.StatusForbidden)
-			return
-		}
-		path := filepath.Join("/docs", filename)
-		f, err := os.Open(path)
-		if err != nil {
-			http.NotFound(w, r)
-			return
-		}
-		defer f.Close()
-		w.Header().Set("Content-Type", "application/pdf")
-		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filename))
-		io.Copy(w, f)
-	}))
+// Gated download (auth required): /api/docs/{slug}/download
+mux.HandleFunc("/api/docs/", requireSupabase(func(w http.ResponseWriter, r *http.Request) {
+    // path pattern: /api/docs/<slug>/download
+    parts := strings.Split(strings.TrimPrefix(r.URL.Path, "/api/docs/"), "/")
+    if len(parts) != 2 || parts[1] != "download" {
+        http.NotFound(w, r)
+        return
+    }
+    slug := parts[0]
+
+    // map slug -> product/file from productFile
+    var productID, filename string
+    for pid, fn := range productFile {
+        if strings.TrimSuffix(fn, filepath.Ext(fn)) == slug {
+            productID, filename = pid, fn
+            break
+        }
+    }
+    if productID == "" {
+        http.NotFound(w, r)
+        return
+    }
+
+    // entitlement check
+    ok, err := hasEntitlement(r.Header.Get("X-User-Sub"), productID)
+    if err != nil || !ok {
+        http.Error(w, "no entitlement", http.StatusForbidden)
+        return
+    }
+
+    // ✅ IMPORTANT: use RELATIVE path (no leading slash)
+    path := filepath.Join("docs", filename) // was: filepath.Join("/docs", filename)
+
+    f, err := os.Open(path)
+    if err != nil {
+        http.NotFound(w, r)
+        return
+    }
+    defer f.Close()
+
+    w.Header().Set("Content-Type", "application/pdf")
+    w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filename))
+    _, _ = io.Copy(w, f)
+}))
 
 	// Static UI
 	if dir := pickStaticDir(); dir != "" {
