@@ -5,8 +5,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies (use install instead of ci for flexibility)
-RUN npm install
+# Install dependencies with legacy peer deps to handle version conflicts
+RUN npm install --legacy-peer-deps
 
 # Copy all necessary files for build
 COPY tsconfig*.json ./
