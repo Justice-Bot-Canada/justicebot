@@ -20,8 +20,7 @@ test/
 *.swp
 *.swo
 
-# Documentation (optional - remove if you want docs deployed)
-docs/
+# Documentation - keep deployment guide
 *.md
 !RAILWAY_DEPLOY.md
 

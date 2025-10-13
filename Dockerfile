@@ -58,8 +58,8 @@ COPY --from=backend-builder /app/server .
 # Copy built frontend from frontend-builder stage
 COPY --from=frontend-builder /app/dist /app/public
 
-# Copy docs
-COPY ./docs /app/docs
+# Copy docs (if they exist)
+COPY ./docs /app/docs 2>/dev/null || true
 
 ENV PORT=8080
 ENV STATIC_DIR=/app/public
