@@ -1,5 +1,21 @@
-# # ==================== Stage 1: build Go backend ====================
-FROM golang:1.22-alpine AS builder
+# ==================== Stage 1: Build Frontend ====================
+FROM node:20-alpine AS frontend-builder
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Copy source files
+COPY . .
+
+# Build the React app
+RUN npm run build
+
+# ==================== Stage 2: Build Go Backend ====================
+FROM golang:1.22-alpine AS backend-builder
 WORKDIR /app
 
 # Fallback to direct GitHub fetch if proxy fails
@@ -25,16 +41,18 @@ RUN go mod tidy
 # Build the static binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server ./main.go
 
-# ==================== Stage 2: runtime ====================
+# ==================== Stage 3: Runtime ====================
 FROM alpine:3.19
 WORKDIR /app
 RUN apk add --no-cache ca-certificates
 
 # Copy backend binary
-COPY --from=builder /app/server .
+COPY --from=backend-builder /app/server .
 
-# Copy static frontend and docs
-COPY ./frontend /app/public
+# Copy built frontend from frontend-builder stage
+COPY --from=frontend-builder /app/dist /app/public
+
+# Copy docs
 COPY ./docs /app/docs
 
 ENV PORT=8080
