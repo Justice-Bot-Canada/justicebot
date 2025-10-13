@@ -5,11 +5,17 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci
+# Install dependencies (use install instead of ci for flexibility)
+RUN npm install
 
-# Copy source files
-COPY . .
+# Copy all necessary files for build
+COPY tsconfig*.json ./
+COPY vite.config.ts ./
+COPY tailwind.config.ts ./
+COPY postcss.config.js ./
+COPY index.html ./
+COPY src/ ./src/
+COPY public/ ./public/
 
 # Build the React app
 RUN npm run build
