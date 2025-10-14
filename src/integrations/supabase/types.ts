@@ -944,6 +944,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_agreements: {
+        Row: {
+          agreed_to_disclaimer: boolean
+          agreed_to_liability: boolean
+          agreed_to_privacy: boolean
+          agreed_to_terms: boolean
+          agreement_date: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          agreed_to_disclaimer?: boolean
+          agreed_to_liability?: boolean
+          agreed_to_privacy?: boolean
+          agreed_to_terms?: boolean
+          agreement_date?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          agreed_to_disclaimer?: boolean
+          agreed_to_liability?: boolean
+          agreed_to_privacy?: boolean
+          agreed_to_terms?: boolean
+          agreement_date?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_credits: {
         Row: {
           amount: number
