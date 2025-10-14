@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admins: {
+        Row: {
+          email: string
+          granted_at: string
+          granted_by: string | null
+          notes: string | null
+          revoked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          email: string
+          granted_at?: string
+          granted_by?: string | null
+          notes?: string | null
+          revoked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          email?: string
+          granted_at?: string
+          granted_by?: string | null
+          notes?: string | null
+          revoked_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       analytics_events: {
         Row: {
           created_at: string
@@ -1091,6 +1118,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      ensure_admin_bypass_policies: {
+        Args: { target_schemas?: string[] }
+        Returns: undefined
+      }
       get_all_users_admin: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1114,13 +1145,17 @@ export type Database = {
         Args: { form_id: string }
         Returns: undefined
       }
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       make_user_admin: {
-        Args: { _email: string }
+        Args: { p_email: string }
         Returns: undefined
       }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role: "admin" | "moderator" | "user" | "owner"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1248,7 +1283,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["admin", "moderator", "user", "owner"],
     },
   },
 } as const
