@@ -30,20 +30,19 @@ export const PremiumGate = ({ children, feature, fallback, showUpgrade = true }:
       <Card className="mx-auto max-w-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Gift className="w-5 h-5 text-green-500" />
-            Free Access Available!
+            <Lock className="w-5 h-5 text-amber-500" />
+            Sign In Required
           </CardTitle>
         </CardHeader>
         <CardContent className="text-center space-y-4">
           <p className="text-muted-foreground">
-            Sign up now and get FREE access - limited to first 800 users
+            Sign in to access premium features
           </p>
           <Button 
             onClick={() => window.location.href = '/auth'} 
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-primary hover:bg-primary/90"
           >
-            <Users className="w-4 h-4 mr-2" />
-            Sign Up for FREE
+            Sign In
           </Button>
         </CardContent>
       </Card>
@@ -51,24 +50,7 @@ export const PremiumGate = ({ children, feature, fallback, showUpgrade = true }:
   }
 
   if (hasAccess) {
-    return (
-      <div>
-        {isFreeUser && userNumber && (
-          <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-            <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-              <Gift className="w-4 h-4" />
-              <Badge variant="outline" className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200">
-                FREE User #{userNumber}
-              </Badge>
-            </div>
-            <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-              You're one of the first 800 users with lifetime free access!
-            </p>
-          </div>
-        )}
-        {children}
-      </div>
-    );
+    return <>{children}</>;
   }
 
   if (fallback) {

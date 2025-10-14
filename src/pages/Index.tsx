@@ -58,7 +58,7 @@ const Index = () => {
   const faqData = [
     {
       question: "How much does Justice-Bot cost?",
-      answer: "Justice-Bot offers affordable legal guidance starting at $5.99 CAD. We also provide free access to the first 800 users and have special programs for low-income individuals."
+      answer: "Justice-Bot offers affordable legal guidance with subscription plans starting at $5.99 CAD per month. We have special programs for low-income individuals."
     },
     {
       question: "Can Justice-Bot replace a lawyer?",

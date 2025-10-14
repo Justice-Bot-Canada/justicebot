@@ -22,7 +22,7 @@ const Explain = () => {
       {
         "@type": "HowToStep",
         "name": "Create Your Account",
-        "text": "Sign up for free access to Justice Bot's AI legal tools. First 800 users get lifetime free access.",
+        "text": "Sign up to access Justice Bot's AI legal tools with affordable subscription plans.",
         "position": 1
       },
       {

@@ -86,20 +86,6 @@ const Pricing = () => {
 
   const plans = [
     {
-      name: "Free",
-      description: "Limited time - First 800 users only!",
-      price: "$0",
-      period: "forever",
-      isFree: true,
-      features: [
-        "Basic legal case analysis",
-        "Merit score assessment", 
-        "Access to all forms",
-        "Standard recommendations",
-        "Community support"
-      ],
-    },
-    {
       name: "Premium Monthly",
       description: "Full access to all premium features",
       price: "$19.99",
@@ -153,19 +139,6 @@ const Pricing = () => {
       <main className="container mx-auto px-4 py-16">
         {/* Hero Banner */}
         <div className="text-center mb-12">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-6 rounded-lg mb-8 mx-auto max-w-2xl">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Users className="w-5 h-5" />
-              <span className="font-bold">LIMITED TIME OFFER</span>
-            </div>
-            <p className="text-lg">
-              FREE access for the first 800 users! 🎉
-            </p>
-            <p className="text-sm opacity-90">
-              No credit card required - Just sign up and start using all features
-            </p>
-          </div>
-
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Choose Your Plan
           </h1>
@@ -194,16 +167,11 @@ const Pricing = () => {
               key={plan.name} 
               className={`relative ${
                 plan.popular ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800' : ''
-              } ${plan.isFree ? 'border-green-500 ring-2 ring-green-200 dark:ring-green-800' : ''}`}
+              }`}
             >
               {plan.popular && (
                 <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-blue-600">
                   Most Popular
-                </Badge>
-              )}
-              {plan.isFree && (
-                <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-green-600">
-                  Limited Time
                 </Badge>
               )}
               {plan.badge && (
@@ -245,26 +213,7 @@ const Pricing = () => {
                 </ul>
 
                 <div className="space-y-2">
-                  {plan.isFree ? (
-                    <div className="text-center">
-                      {isFreeUser ? (
-                        <Badge variant="default" className="bg-green-600 text-white">
-                          ✅ You qualify for FREE access!
-                        </Badge>
-                      ) : user ? (
-                        <Badge variant="secondary">
-                          Free tier full - Premium plans available
-                        </Badge>
-                      ) : (
-                        <Button 
-                          className="w-full bg-green-600 hover:bg-green-700"
-                          onClick={() => window.location.href = '/auth'}
-                        >
-                          Sign Up - Get FREE Access
-                        </Button>
-                      )}
-                    </div>
-                  ) : plan.requiresApproval ? (
+                  {plan.requiresApproval ? (
                     <Button 
                       className="w-full" 
                       variant="outline"
