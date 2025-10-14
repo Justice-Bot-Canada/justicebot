@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 // PayPal Plan IDs - You need to create these in PayPal Dashboard
 // https://www.paypal.com/businessmanage/account/subscriptions
 const PAYPAL_PLANS = {
-  monthly: "P-XXXXXXXXXXXXXXXXXX", // Replace with your actual monthly plan ID
+  monthly: "P-4A5259923D5955645NDW6GKI",
   yearly: "P-YYYYYYYYYYYYYYYYYY",  // Replace with your actual yearly plan ID
 };
 
