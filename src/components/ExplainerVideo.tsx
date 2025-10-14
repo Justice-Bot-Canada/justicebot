@@ -26,14 +26,14 @@ export const ExplainerVideo = () => {
 
           <Card className="max-w-4xl mx-auto overflow-hidden shadow-2xl">
             <div className="relative aspect-[9/16] md:aspect-video bg-black">
-              <iframe
-                src="https://www.youtube.com/embed/qhgRFgnANn4"
-                title="How Justice-Bot Works - AI Legal Help"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
+              <video
+                controls
                 className="w-full h-full"
-                loading="lazy"
-              />
+                poster="/how-it-works-thumbnail.jpg"
+              >
+                <source src="/promo-video.mov" type="video/quicktime" />
+                Your browser does not support the video tag.
+              </video>
             </div>
             <div className="p-6 bg-card">
               <div className="flex items-start gap-4">
