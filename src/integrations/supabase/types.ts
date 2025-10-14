@@ -1084,39 +1084,7 @@ export type Database = {
       }
     }
     Views: {
-      public_feedback: {
-        Row: {
-          admin_response: string | null
-          created_at: string | null
-          feedback_type: string | null
-          id: string | null
-          is_resolved: boolean | null
-          message: string | null
-          rating: number | null
-          subject: string | null
-        }
-        Insert: {
-          admin_response?: string | null
-          created_at?: string | null
-          feedback_type?: string | null
-          id?: string | null
-          is_resolved?: boolean | null
-          message?: string | null
-          rating?: number | null
-          subject?: string | null
-        }
-        Update: {
-          admin_response?: string | null
-          created_at?: string | null
-          feedback_type?: string | null
-          id?: string | null
-          is_resolved?: boolean | null
-          message?: string | null
-          rating?: number | null
-          subject?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       check_free_tier_eligibility: {
