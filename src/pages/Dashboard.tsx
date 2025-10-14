@@ -274,7 +274,7 @@ const Dashboard = () => {
                 <CardContent className="space-y-4">
                   <div>
                     <label className="text-sm font-medium">Email</label>
-                    <p className="text-sm text-muted-foreground">{user.email}</p>
+                    <p className="text-sm text-muted-foreground">{user?.email || 'N/A'}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium">Account Type</label>
@@ -283,7 +283,7 @@ const Dashboard = () => {
                   <div>
                     <label className="text-sm font-medium">Member Since</label>
                     <p className="text-sm text-muted-foreground">
-                      {new Date(user.created_at).toLocaleDateString()}
+                      {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
                     </p>
                   </div>
                 </CardContent>

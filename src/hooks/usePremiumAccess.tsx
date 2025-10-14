@@ -52,7 +52,7 @@ export function usePremiumAccess(): PremiumAccess {
         .eq('user_id', user.id)
         .not('user_number', 'is', null)
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (caseData?.user_number) {
         setUserNumber(caseData.user_number);
