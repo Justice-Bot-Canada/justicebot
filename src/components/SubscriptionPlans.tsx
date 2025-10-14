@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 // https://www.paypal.com/businessmanage/account/subscriptions
 const PAYPAL_PLANS = {
   monthly: "P-4A5259923D5955645NDW6GKI",
-  yearly: "P-YYYYYYYYYYYYYYYYYY",  // Replace with your actual yearly plan ID
+  yearly: "P-9AX658241M042612XM7XYWQA",
 };
 
 interface PlanCardProps {
