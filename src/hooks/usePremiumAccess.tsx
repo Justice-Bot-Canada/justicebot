@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useRole } from '@/hooks/useRole';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface PremiumAccess {
@@ -13,6 +14,7 @@ export interface PremiumAccess {
 
 export function usePremiumAccess(): PremiumAccess {
   const { user } = useAuth();
+  const { isAdmin, loading: roleLoading } = useRole();
   const [isPremium, setIsPremium] = useState(false);
   const [isFreeUser, setIsFreeUser] = useState(false);
   const [userNumber, setUserNumber] = useState<number>();
@@ -68,13 +70,14 @@ export function usePremiumAccess(): PremiumAccess {
     checkAccess();
   }, [user]);
 
-  const hasAccess = isPremium || isFreeUser;
+  // Grant full access to admins automatically
+  const hasAccess = isAdmin || isPremium || isFreeUser;
 
   return {
     hasAccess,
-    isPremium,
+    isPremium: isAdmin || isPremium, // Admins treated as premium
     isFreeUser,
-    loading,
+    loading: loading || roleLoading,
     userNumber,
     refetch: checkAccess,
   };

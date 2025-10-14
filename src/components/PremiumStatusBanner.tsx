@@ -1,14 +1,35 @@
 import { usePremiumAccess } from '@/hooks/usePremiumAccess';
 import { useAuth } from '@/hooks/useAuth';
+import { useRole } from '@/hooks/useRole';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Crown, Gift, Lock } from 'lucide-react';
+import { Crown, Gift, Lock, Shield } from 'lucide-react';
 
 export const PremiumStatusBanner = () => {
   const { user } = useAuth();
+  const { isAdmin, loading: roleLoading } = useRole();
   const { hasAccess, isPremium, isFreeUser, userNumber, loading } = usePremiumAccess();
 
-  if (loading || !user) return null;
+  if (loading || roleLoading || !user) return null;
+
+  // Don't show banner for admins
+  if (isAdmin) {
+    return (
+      <div className="bg-purple-50 dark:bg-purple-900/20 border-b border-purple-200 dark:border-purple-800 py-2 px-4">
+        <div className="container mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Shield className="w-4 h-4 text-purple-600" />
+            <Badge variant="outline" className="bg-purple-100 dark:bg-purple-800 text-purple-800 dark:text-purple-200">
+              Admin Access
+            </Badge>
+            <span className="text-sm text-purple-700 dark:text-purple-300">
+              Full system access
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (hasAccess && isPremium) {
     return (
