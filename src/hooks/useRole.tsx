@@ -10,13 +10,13 @@ export function useRole() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
+    if (user?.id) {
       fetchUserRoles();
     } else {
       setUserRoles([]);
       setLoading(false);
     }
-  }, [user]);
+  }, [user?.id]); // Only re-fetch when user ID changes
 
   const fetchUserRoles = async () => {
     try {

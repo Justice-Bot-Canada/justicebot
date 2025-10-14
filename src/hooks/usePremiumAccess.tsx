@@ -67,8 +67,10 @@ export function usePremiumAccess(): PremiumAccess {
   };
 
   useEffect(() => {
-    checkAccess();
-  }, [user?.id]); // Use user.id instead of user to prevent unnecessary rerenders
+    if (!roleLoading) {
+      checkAccess();
+    }
+  }, [user?.id, roleLoading]); // Wait for role to load before checking access
 
   // Grant full access to admins automatically
   const hasAccess = isAdmin || isPremium || isFreeUser;
