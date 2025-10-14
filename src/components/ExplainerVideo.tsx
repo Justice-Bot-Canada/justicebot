@@ -31,7 +31,7 @@ export const ExplainerVideo = () => {
                 className="w-full h-full"
                 poster="/how-it-works-thumbnail.jpg"
               >
-                <source src="/promo-video.mov" type="video/quicktime" />
+                <source src="/promo-video.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>
