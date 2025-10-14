@@ -1122,6 +1122,18 @@ export type Database = {
         Args: { target_schemas?: string[] }
         Returns: undefined
       }
+      get_all_admins: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          email: string
+          granted_at: string
+          granted_by: string
+          is_active: boolean
+          notes: string
+          revoked_at: string
+          user_id: string
+        }[]
+      }
       get_all_users_admin: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -1133,6 +1145,14 @@ export type Database = {
           id: string
           last_sign_in_at: string
         }[]
+      }
+      get_platform_analytics: {
+        Args: { end_date?: string; start_date?: string }
+        Returns: Json
+      }
+      grant_admin_role: {
+        Args: { admin_notes?: string; target_user_id: string }
+        Returns: undefined
       }
       has_role: {
         Args: {
@@ -1151,6 +1171,10 @@ export type Database = {
       }
       make_user_admin: {
         Args: { p_email: string }
+        Returns: undefined
+      }
+      revoke_admin_role: {
+        Args: { revoke_reason?: string; target_user_id: string }
         Returns: undefined
       }
     }

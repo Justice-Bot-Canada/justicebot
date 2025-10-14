@@ -4,6 +4,25 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useRole } from "@/hooks/useRole";
 import { supabase } from "@/integrations/supabase/client";
@@ -22,7 +41,12 @@ import {
   Shield,
   BarChart3,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  UserPlus,
+  UserMinus,
+  Activity,
+  CheckCircle,
+  XCircle
 } from "lucide-react";
 
 interface UserStats {
@@ -59,6 +83,18 @@ interface User {
   created_at: string;
   last_sign_in_at: string;
   email_confirmed_at: string;
+  display_name?: string;
+  cases_count?: number;
+}
+
+interface AdminUser {
+  user_id: string;
+  email: string;
+  granted_by: string | null;
+  granted_at: string;
+  revoked_at: string | null;
+  notes: string | null;
+  is_active: boolean;
 }
 
 interface Case {
@@ -100,10 +136,20 @@ const Admin = () => {
   });
   const [users, setUsers] = useState<User[]>([]);
   const [cases, setCases] = useState<Case[]>([]);
+  const [admins, setAdmins] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [lastFetch, setLastFetch] = useState<number>(0);
   const RATE_LIMIT_MS = 5000; // 5 seconds between fetches
+  
+  // Role management state
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showGrantDialog, setShowGrantDialog] = useState(false);
+  const [showRevokeDialog, setShowRevokeDialog] = useState(false);
+  const [adminNotes, setAdminNotes] = useState("");
+  const [revokeReason, setRevokeReason] = useState("");
+  const [selectedUserDetails, setSelectedUserDetails] = useState<User | null>(null);
+  const [showUserDetailsDialog, setShowUserDetailsDialog] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -169,15 +215,25 @@ const Admin = () => {
         newUsersThisMonth
       });
 
-      // Format users data with real emails
+      // Format users data with real emails and display names
       const formattedUsers = allUsers.map(u => ({
         id: u.id,
         email: u.email,
         created_at: u.created_at,
         last_sign_in_at: u.last_sign_in_at || '',
-        email_confirmed_at: u.email_confirmed_at || ''
+        email_confirmed_at: u.email_confirmed_at || '',
+        display_name: u.display_name,
+        cases_count: u.cases_count || 0
       }));
       setUsers(formattedUsers);
+
+      // Load admin users
+      const { data: adminsData, error: adminsError } = await supabase
+        .rpc('get_all_admins');
+
+      if (!adminsError && adminsData) {
+        setAdmins(adminsData);
+      }
 
       // Load case statistics
       const { data: casesData } = await supabase
@@ -219,7 +275,7 @@ const Admin = () => {
 
         setRevenueStats({
           totalRevenue,
-          monthlyRecurring: monthlySubscriptions.length * 59.99, // Rough estimate
+          monthlyRecurring: monthlySubscriptions.length * 59.99,
           averageOrderValue: avgOrderValue,
           conversionRate: Math.round(conversionRate * 10) / 10
         });
@@ -259,7 +315,7 @@ const Admin = () => {
 
         setEngagementStats({
           activeUsersToday: uniqueSessions,
-          averageSessionTime: Math.round(avgLoadTime / 1000), // Convert to seconds
+          averageSessionTime: Math.round(avgLoadTime / 1000),
           formCompletionRate: Math.round(completionRate * 10) / 10,
           userRetentionRate: Math.round(retentionRate * 10) / 10
         });
@@ -270,6 +326,55 @@ const Admin = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGrantAdmin = async () => {
+    if (!selectedUser) return;
+
+    try {
+      const { error } = await supabase.rpc('grant_admin_role', {
+        target_user_id: selectedUser.id,
+        admin_notes: adminNotes || null
+      });
+
+      if (error) throw error;
+
+      toast.success(`Admin access granted to ${selectedUser.email}`);
+      setShowGrantDialog(false);
+      setSelectedUser(null);
+      setAdminNotes("");
+      loadAdminData();
+    } catch (error: any) {
+      console.error('Error granting admin:', error);
+      toast.error(error.message || 'Failed to grant admin access');
+    }
+  };
+
+  const handleRevokeAdmin = async () => {
+    if (!selectedUser) return;
+
+    try {
+      const { error } = await supabase.rpc('revoke_admin_role', {
+        target_user_id: selectedUser.id,
+        revoke_reason: revokeReason || null
+      });
+
+      if (error) throw error;
+
+      toast.success(`Admin access revoked from ${selectedUser.email}`);
+      setShowRevokeDialog(false);
+      setSelectedUser(null);
+      setRevokeReason("");
+      loadAdminData();
+    } catch (error: any) {
+      console.error('Error revoking admin:', error);
+      toast.error(error.message || 'Failed to revoke admin access');
+    }
+  };
+
+  const handleViewUserDetails = (user: User) => {
+    setSelectedUserDetails(user);
+    setShowUserDetailsDialog(true);
   };
 
   // Simple admin check - in production, you'd want proper role-based auth
@@ -357,9 +462,10 @@ const Admin = () => {
           </div>
         ) : (
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full lg:w-96 grid-cols-4">
+            <TabsList className="grid w-full lg:w-[600px] grid-cols-5">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
+              <TabsTrigger value="roles">Roles</TabsTrigger>
               <TabsTrigger value="cases">Cases</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
@@ -550,9 +656,14 @@ const Admin = () => {
                 <CardContent>
                   <div className="space-y-4">
                     {filteredUsers.map((user) => (
-                      <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="space-y-1">
-                          <p className="font-medium">{user.email}</p>
+                      <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                        <div className="space-y-1 flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">{user.email}</p>
+                            {user.display_name && (
+                              <Badge variant="outline" className="text-xs">{user.display_name}</Badge>
+                            )}
+                          </div>
                           <p className="text-sm text-muted-foreground">
                             Joined: {new Date(user.created_at).toLocaleDateString()}
                           </p>
@@ -561,17 +672,148 @@ const Admin = () => {
                               Last seen: {new Date(user.last_sign_in_at).toLocaleDateString()}
                             </p>
                           )}
+                          {user.cases_count !== undefined && (
+                            <p className="text-xs text-muted-foreground">
+                              Cases: {user.cases_count}
+                            </p>
+                          )}
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge variant={user.email_confirmed_at ? "default" : "secondary"}>
                             {user.email_confirmed_at ? "Verified" : "Unverified"}
                           </Badge>
-                          <Button variant="ghost" size="sm">
+                          {admins.some(a => a.user_id === user.id && a.is_active) && (
+                            <Badge variant="destructive">Admin</Badge>
+                          )}
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleViewUserDetails(user)}
+                          >
                             <Eye className="w-4 h-4" />
                           </Button>
+                          {!admins.some(a => a.user_id === user.id && a.is_active) ? (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                setSelectedUser(user);
+                                setShowGrantDialog(true);
+                              }}
+                            >
+                              <UserPlus className="w-4 h-4 mr-1" />
+                              Grant Admin
+                            </Button>
+                          ) : user.id !== user?.id && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                setSelectedUser(user);
+                                setShowRevokeDialog(true);
+                              }}
+                            >
+                              <UserMinus className="w-4 h-4 mr-1" />
+                              Revoke
+                            </Button>
+                          )}
                         </div>
                       </div>
                     ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="roles" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Shield className="w-5 h-5" />
+                        Admin Role Management
+                      </CardTitle>
+                      <CardDescription>Manage admin privileges and permissions</CardDescription>
+                    </div>
+                    <Badge variant="outline" className="text-lg px-3">
+                      {admins.filter(a => a.is_active).length} Active Admins
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {/* Active Admins */}
+                    <div>
+                      <h3 className="font-semibold mb-3 flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        Active Admins
+                      </h3>
+                      <div className="space-y-3">
+                        {admins.filter(a => a.is_active).map((admin) => (
+                          <div key={admin.user_id} className="flex items-center justify-between p-4 border rounded-lg bg-green-50 dark:bg-green-900/10">
+                            <div className="space-y-1 flex-1">
+                              <p className="font-medium">{admin.email}</p>
+                              <p className="text-sm text-muted-foreground">
+                                Granted: {new Date(admin.granted_at).toLocaleDateString()}
+                              </p>
+                              {admin.notes && (
+                                <p className="text-xs text-muted-foreground italic">
+                                  Note: {admin.notes}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="default">Active</Badge>
+                              {admin.user_id !== user?.id && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => {
+                                    const adminUser = users.find(u => u.id === admin.user_id);
+                                    if (adminUser) {
+                                      setSelectedUser(adminUser);
+                                      setShowRevokeDialog(true);
+                                    }
+                                  }}
+                                >
+                                  <UserMinus className="w-4 h-4 mr-1" />
+                                  Revoke
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Revoked Admins */}
+                    {admins.filter(a => !a.is_active).length > 0 && (
+                      <div>
+                        <h3 className="font-semibold mb-3 flex items-center gap-2">
+                          <XCircle className="w-4 h-4 text-red-600" />
+                          Revoked Admins
+                        </h3>
+                        <div className="space-y-3">
+                          {admins.filter(a => !a.is_active).map((admin) => (
+                            <div key={admin.user_id} className="flex items-center justify-between p-4 border rounded-lg bg-red-50 dark:bg-red-900/10">
+                              <div className="space-y-1 flex-1">
+                                <p className="font-medium line-through opacity-70">{admin.email}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  Revoked: {admin.revoked_at ? new Date(admin.revoked_at).toLocaleDateString() : 'N/A'}
+                                </p>
+                                {admin.notes && (
+                                  <p className="text-xs text-muted-foreground italic">
+                                    {admin.notes}
+                                  </p>
+                                )}
+                              </div>
+                              <Badge variant="destructive">Revoked</Badge>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -675,6 +917,163 @@ const Admin = () => {
           </Tabs>
         )}
       </div>
+
+      {/* Grant Admin Dialog */}
+      <Dialog open={showGrantDialog} onOpenChange={setShowGrantDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Grant Admin Access</DialogTitle>
+            <DialogDescription>
+              Grant administrator privileges to {selectedUser?.email}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Notes (Optional)</label>
+              <Textarea
+                placeholder="Reason for granting admin access..."
+                value={adminNotes}
+                onChange={(e) => setAdminNotes(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded border border-yellow-200 dark:border-yellow-800">
+              <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                ⚠️ Admin users have full access to all user data, analytics, and can grant/revoke admin privileges to other users.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowGrantDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleGrantAdmin}>
+              <Shield className="w-4 h-4 mr-2" />
+              Grant Admin Access
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Revoke Admin Dialog */}
+      <AlertDialog open={showRevokeDialog} onOpenChange={setShowRevokeDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Revoke Admin Access</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to revoke admin privileges from {selectedUser?.email}?
+              This action can be reversed by granting admin access again.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2 py-4">
+            <label className="text-sm font-medium">Reason for Revocation (Optional)</label>
+            <Textarea
+              placeholder="Explain why admin access is being revoked..."
+              value={revokeReason}
+              onChange={(e) => setRevokeReason(e.target.value)}
+              rows={3}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleRevokeAdmin}>
+              Revoke Admin Access
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* User Details Dialog */}
+      <Dialog open={showUserDetailsDialog} onOpenChange={setShowUserDetailsDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>User Details</DialogTitle>
+            <DialogDescription>
+              Complete registration and activity information
+            </DialogDescription>
+          </DialogHeader>
+          {selectedUserDetails && (
+            <div className="space-y-6 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">Email</p>
+                  <p className="text-sm font-mono">{selectedUserDetails.email}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">User ID</p>
+                  <p className="text-sm font-mono text-xs">{selectedUserDetails.id}</p>
+                </div>
+                {selectedUserDetails.display_name && (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">Display Name</p>
+                    <p className="text-sm">{selectedUserDetails.display_name}</p>
+                  </div>
+                )}
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">Account Status</p>
+                  <Badge variant={selectedUserDetails.email_confirmed_at ? "default" : "secondary"}>
+                    {selectedUserDetails.email_confirmed_at ? "Verified" : "Unverified"}
+                  </Badge>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">Joined</p>
+                  <p className="text-sm">{new Date(selectedUserDetails.created_at).toLocaleString()}</p>
+                </div>
+                {selectedUserDetails.last_sign_in_at && (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">Last Sign In</p>
+                    <p className="text-sm">{new Date(selectedUserDetails.last_sign_in_at).toLocaleString()}</p>
+                  </div>
+                )}
+                {selectedUserDetails.email_confirmed_at && (
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">Email Confirmed</p>
+                    <p className="text-sm">{new Date(selectedUserDetails.email_confirmed_at).toLocaleString()}</p>
+                  </div>
+                )}
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">Total Cases</p>
+                  <p className="text-sm">{selectedUserDetails.cases_count || 0}</p>
+                </div>
+              </div>
+
+              {admins.some(a => a.user_id === selectedUserDetails.id) && (
+                <div className="p-4 bg-accent rounded border">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Shield className="w-5 h-5 text-primary" />
+                    <p className="font-medium">Admin Status</p>
+                  </div>
+                  {admins
+                    .filter(a => a.user_id === selectedUserDetails.id)
+                    .map((admin, idx) => (
+                      <div key={idx} className="space-y-1 text-sm">
+                        <p>Status: <Badge variant={admin.is_active ? "default" : "destructive"}>
+                          {admin.is_active ? "Active" : "Revoked"}
+                        </Badge></p>
+                        <p className="text-muted-foreground">
+                          Granted: {new Date(admin.granted_at).toLocaleString()}
+                        </p>
+                        {admin.revoked_at && (
+                          <p className="text-muted-foreground">
+                            Revoked: {new Date(admin.revoked_at).toLocaleString()}
+                          </p>
+                        )}
+                        {admin.notes && (
+                          <p className="text-muted-foreground italic">{admin.notes}</p>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowUserDetailsDialog(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>
