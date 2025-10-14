@@ -19,6 +19,7 @@ export function usePremiumAccess(): PremiumAccess {
   const [isFreeUser, setIsFreeUser] = useState(false);
   const [userNumber, setUserNumber] = useState<number>();
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   const checkAccess = async () => {
     if (!user) {
@@ -67,8 +68,12 @@ export function usePremiumAccess(): PremiumAccess {
   };
 
   useEffect(() => {
-    checkAccess();
-  }, [user]);
+    // Only run once role loading is complete
+    if (!roleLoading && !initialized) {
+      checkAccess();
+      setInitialized(true);
+    }
+  }, [user, roleLoading, initialized]);
 
   // Grant full access to admins automatically
   const hasAccess = isAdmin || isPremium || isFreeUser;
