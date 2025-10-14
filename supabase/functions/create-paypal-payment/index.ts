@@ -11,8 +11,12 @@ const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const paypalClientId = Deno.env.get('PAYPAL_CLIENT_ID')!;
 const paypalClientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET')!;
 
-// PayPal API Base URLs
-const PAYPAL_BASE_URL = 'https://api-m.sandbox.paypal.com'; // Use 'https://api-m.paypal.com' for production
+// Auto-detect PayPal environment based on credentials
+// Sandbox IDs start with 'AZ' or 'sb-', production IDs start with 'A' followed by other characters
+const isProduction = paypalClientId && !paypalClientId.startsWith('sb-') && !paypalClientId.startsWith('AZ');
+const PAYPAL_BASE_URL = isProduction ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
+
+console.log(`PayPal Mode: ${isProduction ? 'PRODUCTION' : 'SANDBOX'}, URL: ${PAYPAL_BASE_URL}`);
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -22,7 +26,7 @@ serve(async (req) => {
   try {
     const { planType, amount, caseId } = await req.json();
     
-    console.log('Creating PayPal payment:', { planType, amount, caseId });
+    console.log('Creating PayPal payment:', { planType, amount, caseId, environment: isProduction ? 'PRODUCTION' : 'SANDBOX' });
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
@@ -69,8 +73,8 @@ serve(async (req) => {
 
     if (!paymentResponse.ok) {
       const errorData = await paymentResponse.text();
-      console.error('PayPal API Error:', errorData);
-      throw new Error(`PayPal API Error: ${paymentResponse.status}`);
+      console.error('PayPal API Error:', { status: paymentResponse.status, errorData, url: PAYPAL_BASE_URL });
+      throw new Error(`PayPal payment creation failed: ${paymentResponse.status}. ${errorData.substring(0, 200)}`);
     }
 
     const payment = await paymentResponse.json();
@@ -147,8 +151,14 @@ async function getPayPalAccessToken(): Promise<string> {
 
   if (!response.ok) {
     const errorData = await response.text();
-    console.error('PayPal Auth Error:', errorData);
-    throw new Error(`PayPal authentication failed: ${response.status}`);
+    console.error('PayPal Auth Error:', { 
+      status: response.status, 
+      error: errorData,
+      clientIdPrefix: paypalClientId?.substring(0, 6),
+      environment: isProduction ? 'PRODUCTION' : 'SANDBOX',
+      url: PAYPAL_BASE_URL
+    });
+    throw new Error(`PayPal auth failed (${response.status}). Check credentials match environment (${isProduction ? 'PRODUCTION' : 'SANDBOX'}). ${errorData.substring(0, 100)}`);
   }
 
   const data = await response.json();

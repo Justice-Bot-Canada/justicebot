@@ -6,6 +6,14 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Auto-detect PayPal environment
+const paypalClientId = Deno.env.get("PAYPAL_CLIENT_ID") ?? "";
+const paypalClientSecret = Deno.env.get("PAYPAL_CLIENT_SECRET") ?? "";
+const isProduction = paypalClientId && !paypalClientId.startsWith('sb-') && !paypalClientId.startsWith('AZ');
+const PAYPAL_BASE_URL = isProduction ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
+
+console.log(`PayPal Subscription Mode: ${isProduction ? 'PRODUCTION' : 'SANDBOX'}, URL: ${PAYPAL_BASE_URL}`);
+
 interface SubscriptionRequest {
   planId: string; // PayPal plan ID (monthly or yearly)
 }
@@ -43,10 +51,7 @@ serve(async (req) => {
     const { planId }: SubscriptionRequest = await req.json();
     if (!planId) throw new Error("Plan ID is required");
 
-    logStep("Creating PayPal subscription", { planId });
-
-    const paypalClientId = Deno.env.get("PAYPAL_CLIENT_ID");
-    const paypalClientSecret = Deno.env.get("PAYPAL_CLIENT_SECRET");
+    logStep("Creating PayPal subscription", { planId, environment: isProduction ? 'PRODUCTION' : 'SANDBOX' });
 
     if (!paypalClientId || !paypalClientSecret) {
       throw new Error("PayPal credentials not configured");
@@ -54,7 +59,7 @@ serve(async (req) => {
 
     // Get PayPal access token
     const authResponse = await fetch(
-      "https://api-m.paypal.com/v1/oauth2/token",
+      `${PAYPAL_BASE_URL}/v1/oauth2/token`,
       {
         method: "POST",
         headers: {
@@ -66,7 +71,9 @@ serve(async (req) => {
     );
 
     if (!authResponse.ok) {
-      throw new Error("Failed to get PayPal access token");
+      const errorData = await authResponse.text();
+      logStep("PayPal Auth Error", { status: authResponse.status, error: errorData });
+      throw new Error(`PayPal authentication failed (${authResponse.status}). Check credentials match ${isProduction ? 'PRODUCTION' : 'SANDBOX'} environment.`);
     }
 
     const { access_token } = await authResponse.json();
@@ -74,7 +81,7 @@ serve(async (req) => {
 
     // Create subscription
     const subscriptionResponse = await fetch(
-      "https://api-m.paypal.com/v1/billing/subscriptions",
+      `${PAYPAL_BASE_URL}/v1/billing/subscriptions`,
       {
         method: "POST",
         headers: {
@@ -95,8 +102,8 @@ serve(async (req) => {
 
     if (!subscriptionResponse.ok) {
       const error = await subscriptionResponse.text();
-      logStep("PayPal subscription creation failed", { error });
-      throw new Error(`Failed to create subscription: ${error}`);
+      logStep("PayPal subscription creation failed", { status: subscriptionResponse.status, error });
+      throw new Error(`Failed to create subscription (${subscriptionResponse.status}): ${error.substring(0, 200)}`);
     }
 
     const subscription = await subscriptionResponse.json();
