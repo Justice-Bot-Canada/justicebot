@@ -88,4 +88,4 @@ Disallow: /dev.html
 Disallow: /dev/
 
 # Sitemap location
-Sitemap: https://justice-bot.com/sitemap.xml
+Sitemap: https://www.justice-bot.com/sitemap.xml
