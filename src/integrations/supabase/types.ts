@@ -1111,7 +1111,57 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      legal_pathways_admin_view: {
+        Row: {
+          case_id: string | null
+          confidence_score: number | null
+          created_at: string | null
+          id: string | null
+          next_steps: Json | null
+          pathway_type: string | null
+          relevant_laws: Json | null
+        }
+        Insert: {
+          case_id?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string | null
+          next_steps?: Json | null
+          pathway_type?: string | null
+          relevant_laws?: Json | null
+        }
+        Update: {
+          case_id?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string | null
+          next_steps?: Json | null
+          pathway_type?: string | null
+          relevant_laws?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_pathways_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      legal_pathways_monthly_analytics: {
+        Row: {
+          active_users: number | null
+          avg_merit_score: number | null
+          completed_documents: number | null
+          conversion_rate_pct: number | null
+          month: string | null
+          pathway_type: string | null
+          total_cases: number | null
+          total_revenue: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       check_free_tier_eligibility: {
@@ -1155,10 +1205,9 @@ export type Database = {
         Returns: undefined
       }
       has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
+        Args:
+          | { _role: Database["public"]["Enums"]["app_role"] }
+          | { _role: Database["public"]["Enums"]["app_role"]; _user_id: string }
         Returns: boolean
       }
       increment_form_usage: {
@@ -1166,6 +1215,10 @@ export type Database = {
         Returns: undefined
       }
       is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_owner: {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
