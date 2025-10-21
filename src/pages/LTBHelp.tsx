@@ -18,6 +18,7 @@ import Footer from "@/components/Footer";
 import AuthDialog from "@/components/AuthDialog";
 import SEOHead from "@/components/SEOHead";
 import { useAuth } from "@/hooks/useAuth";
+import { LegalServiceSchema } from "@/components/LegalServiceSchema";
 
 const LTBHelp = () => {
   const navigate = useNavigate();
@@ -52,6 +53,18 @@ const LTBHelp = () => {
         description="Need help with LTB applications? Get affordable legal assistance for eviction disputes, rent increases, repairs, and landlord-tenant issues in Ontario. Expert guidance starting at $5.99."
         keywords="LTB help, Landlord Tenant Board Ontario, eviction help, rent increase dispute, landlord tenant lawyer, tenant rights, LTB application"
         structuredData={structuredData}
+      />
+      <LegalServiceSchema
+        serviceName="Landlord & Tenant Board (LTB) Legal Help"
+        description="AI-powered assistance for Ontario LTB applications, disputes, and hearings. Expert guidance for tenant rights, eviction defense, rent disputes, and maintenance issues."
+        serviceType={[
+          "Tenant Rights Assistance",
+          "Eviction Defense",
+          "Rent Dispute Resolution",
+          "LTB Application Filing",
+          "Hearing Preparation"
+        ]}
+        venue="Landlord and Tenant Board (LTB)"
       />
       
       <Header />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,7 +13,8 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
-  Gift
+  Gift,
+  MessageSquare
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
@@ -24,12 +25,42 @@ import CaseProgressTracker from "@/components/CaseProgressTracker";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { PremiumGate } from "@/components/PremiumGate";
+import { LegalChatbot } from "@/components/LegalChatbot";
+import { supabase } from "@/integrations/supabase/client";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { hasAccess, isFreeUser, userNumber } = usePremiumAccess();
-  const [activeTab, setActiveTab] = useState("cases");
+  const [activeTab, setActiveTab] = useState("triage");
   const [activeCaseId, setActiveCaseId] = useState<string | null>(null);
+  const [hasExistingCases, setHasExistingCases] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // Check if user has existing cases to show appropriate default tab
+  useEffect(() => {
+    const checkExistingCases = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('cases')
+          .select('id')
+          .eq('user_id', user.id)
+          .limit(1);
+
+        if (!error && data && data.length > 0) {
+          setHasExistingCases(true);
+          setActiveTab("cases");
+        }
+      } catch (error) {
+        console.error('Error checking cases:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkExistingCases();
+  }, [user]);
 
   // Auth check is now handled by ProtectedRoute
 
@@ -57,7 +88,11 @@ const Dashboard = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
+            <TabsTrigger value="triage" className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              AI Triage
+            </TabsTrigger>
             <TabsTrigger value="cases" className="flex items-center gap-2">
               <Scale className="h-4 w-4" />
               Cases
@@ -83,6 +118,25 @@ const Dashboard = () => {
               Profile
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="triage" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5" />
+                  AI Legal Assistant - Start Here
+                </CardTitle>
+                <CardDescription>
+                  {hasExistingCases 
+                    ? "Get help with your legal questions and explore new cases" 
+                    : "Tell me about your legal issue and I'll guide you through the right pathway"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <LegalChatbot />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="cases" className="mt-6">
             {activeCaseId ? (

@@ -16,6 +16,8 @@ import { format, isBefore } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
+import { CalendarExportButton } from "./CalendarExportButton";
+import type { CalendarEvent } from "@/utils/calendarExport";
 
 type CaseEvent = Database['public']['Tables']['case_events']['Row'];
 
@@ -88,6 +90,16 @@ export default function CaseCalendar({ caseId }: CaseCalendarProps) {
 
   const eventDates = events.map(e => new Date(e.event_date));
 
+  // Convert events for calendar export
+  const calendarEvents: CalendarEvent[] = events.map(event => ({
+    id: event.id,
+    title: event.title,
+    description: event.description || '',
+    location: event.location || undefined,
+    startDate: new Date(event.event_date),
+    priority: (event.priority as 'high' | 'medium' | 'low') || 'medium'
+  }));
+
   return (
     <div className="space-y-6">
       <Card>
@@ -100,10 +112,16 @@ export default function CaseCalendar({ caseId }: CaseCalendarProps) {
               </CardTitle>
               <CardDescription>Track important dates and deadlines for your case</CardDescription>
             </div>
-            <Button size="sm">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Event
-            </Button>
+            <div className="flex gap-2">
+              <CalendarExportButton 
+                events={calendarEvents}
+                caseName={`Case ${caseId.slice(0, 8)}`}
+              />
+              <Button size="sm">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Event
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -183,12 +201,21 @@ export default function CaseCalendar({ caseId }: CaseCalendarProps) {
                 const daysUntil = Math.ceil((eventDate.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
                 const isUrgent = daysUntil <= 7;
 
+                const singleEventData: CalendarEvent = {
+                  id: event.id,
+                  title: event.title,
+                  description: event.description || '',
+                  location: event.location || undefined,
+                  startDate: new Date(event.event_date),
+                  priority: (event.priority as 'high' | 'medium' | 'low') || 'medium'
+                };
+
                 return (
                   <div 
                     key={event.id}
                     className={`p-4 rounded-lg border ${isUrgent ? 'border-red-200 bg-red-50 dark:bg-red-900/10' : 'border-border'}`}
                   >
-                    <div className="flex items-start justify-between">
+                    <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-3 flex-1">
                         <div className={`p-2 rounded-full ${getEventTypeColor(event.event_type)}`}>
                           {getEventTypeIcon(event.event_type)}
@@ -199,10 +226,15 @@ export default function CaseCalendar({ caseId }: CaseCalendarProps) {
                             {getPriorityBadge(event.priority)}
                           </div>
                           <p className="text-sm text-muted-foreground mb-2">{event.description}</p>
-                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-4 text-xs text-muted-foreground mb-3">
                             <span>📅 {format(eventDate, 'MMM d, yyyy')}</span>
                             {event.location && <span>📍 {event.location}</span>}
                           </div>
+                          <CalendarExportButton 
+                            events={[]}
+                            caseName={event.title}
+                            singleEvent={singleEventData}
+                          />
                         </div>
                       </div>
                       <div className="text-right">
