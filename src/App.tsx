@@ -18,6 +18,7 @@ import Liability from "./pages/Liability";
 import Terms from "./pages/Terms";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
+import ThankYou from "./pages/ThankYou";
 import NotFound from "./pages/NotFound";
 import Welcome from "./pages/Welcome";
 import Triage from "./pages/Triage";
@@ -112,6 +113,7 @@ const AppContent = () => {
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
           <Route path="/payment-cancel" element={<ProtectedRoute><PaymentCancel /></ProtectedRoute>} />
+          <Route path="/thank-you" element={<ThankYou />} />
           <Route path="/legal-chat" element={<LegalChat />} />
           <Route path="/document-analysis" element={<ProtectedRoute><DocumentAnalysis /></ProtectedRoute>} />
           <Route path="/tutorials" element={<TutorialLibrary />} />
