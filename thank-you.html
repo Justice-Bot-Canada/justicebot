@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thank You | Justice-Bot</title>
+  <meta name="robots" content="noindex" />
+
+  <!-- HARD fallback redirect (works even if JS is disabled) -->
+  <meta http-equiv="refresh" content="10; url=https://justice-bot.com/dashboard" />
+
+  <style>
+    :root { --brand:#c62828; --brandDark:#a61e1e; --ink:#222; --bg:#f7f7f7; }
+    * { box-sizing:border-box }
+    body {
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: var(--bg); color: var(--ink);
+      display:flex; min-height:100svh; align-items:center; justify-content:center; padding:24px;
+    }
+    .card {
+      width:100%; max-width:640px; background:#fff; border-radius:12px; padding:28px;
+      box-shadow:0 10px 30px rgba(0,0,0,.08);
+    }
+    h1 { margin:0 0 8px; color:var(--brand); font-size: clamp(22px, 3vw, 28px); }
+    .muted { color:#555; margin:6px 0 0 }
+    .row { display:flex; gap:12px; flex-wrap:wrap; margin-top:22px }
+    .kpi { flex:1 1 180px; background:#fafafa; border:1px solid #eee; border-radius:10px; padding:14px }
+    .kpi .label { font-size:12px; color:#777; text-transform:uppercase; letter-spacing:.04em }
+    .kpi .value { margin-top:6px; font-weight:600 }
+
+    .cta { display:flex; gap:12px; flex-wrap:wrap; margin-top:26px }
+    .btn {
+      display:inline-block; padding:12px 16px; border-radius:8px; text-decoration:none; font-weight:600;
+      border:2px solid transparent; cursor:pointer; text-align:center; flex:1 1 220px;
+    }
+    .btn-primary { background:var(--brand); color:#fff }
+    .btn-primary:hover { background:var(--brandDark) }
+    .btn-outline { background:#fff; color:var(--brand); border-color:var(--brand) }
+    .btn-outline:hover { background:#fff5f5 }
+
+    .help { margin-top:18px; font-size:14px; color:#555 }
+    .countdown { font-weight:700 }
+    .fine { font-size:12px; color:#777; margin-top:14px }
+
+    .logo { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+    .logo img { width:40px; height:40px; object-fit:contain }
+    .logo span { font-weight:800; letter-spacing:.2px }
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="thanksTitle">
+    <div class="logo" aria-hidden="true">
+      <!-- Swap src with your actual logo path -->
+      <img src="/assets/logo.png" alt="" />
+      <span>Justice-Bot</span>
+    </div>
+
+    <h1 id="thanksTitle">🎉 Thank you — your purchase is confirmed.</h1>
+    <p class="muted">You now have access to your Justice-Bot tools. A receipt and next steps have been sent to <span id="emailSpan">your email</span>.</p>
+
+    <section class="row" aria-label="Purchase details">
+      <div class="kpi" aria-live="polite">
+        <div class="label">Order ID</div>
+        <div class="value" id="orderId">—</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Plan / Product</div>
+        <div class="value" id="product">—</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Next</div>
+        <div class="value">Redirecting to your dashboard in <span class="countdown" id="count">10</span>s</div>
+      </div>
+    </section>
+
+    <section class="cta" aria-label="Actions">
+      <!-- Immediate access button (adjust target if needed) -->
+      <a class="btn btn-primary" id="accessBtn" href="https://justice-bot.com/documents">Access your forms & tools</a>
+
+      <!-- Manual dashboard button -->
+      <a class="btn btn-outline" id="dashBtn" href="https://justice-bot.com/dashboard">Go to Dashboard now</a>
+    </section>
+
+    <p class="help">
+      Need help? Email <a href="mailto:support@justice-bot.com">support@justice-bot.com</a>.
+    </p>
+    <p class="fine">If you’re not redirected, click “Go to Dashboard now.” This page also redirects automatically even if JavaScript is disabled.</p>
+  </main>
+
+  <script>
+    (function () {
+      // ---- CONFIG YOU CAN EDIT FAST ----
+      const DASHBOARD_URL = "https://justice-bot.com/dashboard";
+      // If your “documents/tools” URL is different, change it here:
+      const DEFAULT_ACCESS_URL = "https://justice-bot.com/documents";
+      const SECONDS = 10;
+      const PRODUCT_MAP = {
+        "Monthly": DEFAULT_ACCESS_URL,
+        "Yearly": DEFAULT_ACCESS_URL,
+        "One-Time Document": DEFAULT_ACCESS_URL,
+        "Low-Income": DEFAULT_ACCESS_URL
+        // Add: "Your Plan Name": "https://justice-bot.com/your/path"
+      };
+      // -----------------------------------
+
+      const qs = new URLSearchParams(location.search);
+      const orderId = qs.get("orderId") || qs.get("token") || "Pending";
+      const product = qs.get("product") || "Subscription / Document Access";
+      const email = qs.get("email") || "your email";
+
+      document.getElementById("orderId").textContent = orderId;
+      document.getElementById("product").textContent = product;
+      document.getElementById("emailSpan").textContent = email;
+
+      // Store a lightweight flag for downstream UX (optional)
+      try {
+        sessionStorage.setItem("jb_last_order_id", orderId);
+        sessionStorage.setItem("jb_last_product", product);
+      } catch (_) {}
+
+      // Countdown + redirect
+      let t = SECONDS;
+      const el = document.getElementById("count");
+      const timer = setInterval(() => {
+        t -= 1; el.textContent = t;
+        if (t <= 0) {
+          clearInterval(timer);
+          location.assign(DASHBOARD_URL);
+        }
+      }, 1000);
+
+      // Access button routing by plan
+      const accessBtn = document.getElementById("accessBtn");
+      accessBtn.href = PRODUCT_MAP[product] || DEFAULT_ACCESS_URL;
+    })();
+  </script>
+</body>
+</html>
