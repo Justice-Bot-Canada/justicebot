@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Checkout | Justice-Bot</title>
+</head>
+<body>
+  <h1>Justice-Bot Checkout</h1>
+  <p>Choose your plan and complete payment below.</p>
+
+  <!-- Where PayPal renders the button -->
+  <div id="paypal-button-container"></div>
+
+  <!-- 1) Load the PayPal SDK: swap YOUR-CLIENT-ID and currency/amounts as needed -->
+  <script src="https://www.paypal.com/sdk/js?client-id=YOUR-CLIENT-ID&currency=CAD"></script>
+
+  <!-- 2) Initialize the button (this is the part you were asking about) -->
+  <script>
+    // If you show multiple plans, set this from your UI.
+    const selectedPlanName = "Monthly";
+    const amount = "59.99"; // change per plan
+
+    paypal.Buttons({
+      createOrder: (data, actions) => {
+        return actions.order.create({
+          purchase_units: [{ amount: { value: amount } }]
+        });
+      },
+
+      // ⬇️ THIS is the onApprove you asked about
+      onApprove: async (data, actions) => {
+        const details = await actions.order.capture();
+        const orderId = details.id;
+        const email = details.payer?.email_address || "";
+        const product = selectedPlanName;
+
+        // Send buyer to your Thank You page (you already have it)
+        window.location.href =
+          `https://justice-bot.com/thank-you.html?orderId=${encodeURIComponent(orderId)}&product=${encodeURIComponent(product)}&email=${encodeURIComponent(email)}`;
+      },
+
+      onError: (err) => {
+        console.error("PayPal error:", err);
+        alert("Payment failed. Please try again or contact support@justice-bot.com");
+      }
+    }).render('#paypal-button-container');
+  </script>
+</body>
+</html>
