@@ -11,7 +11,9 @@ const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const paypalClientId = Deno.env.get('PAYPAL_CLIENT_ID')!;
 const paypalClientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET')!;
 
-const PAYPAL_BASE_URL = 'https://api-m.sandbox.paypal.com'; // Use 'https://api-m.paypal.com' for production
+// Auto-detect PayPal environment based on credentials
+const isProduction = paypalClientId && !paypalClientId.startsWith('sb-') && !paypalClientId.startsWith('AZ');
+const PAYPAL_BASE_URL = isProduction ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {

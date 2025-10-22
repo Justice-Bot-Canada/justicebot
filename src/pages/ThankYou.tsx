@@ -1,20 +1,31 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { CheckCircle, FileText, Calendar, ArrowRight } from "lucide-react";
+import { CheckCircle, FileText, Calendar, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const ThankYou = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [countdown, setCountdown] = useState(10);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const orderId = searchParams.get("orderId") || searchParams.get("token") || "Pending";
+  const token = searchParams.get("token"); // PayPal order ID
+  const payerId = searchParams.get("PayerID");
+  const orderId = searchParams.get("orderId") || token || "Pending";
   const product = searchParams.get("product") || "Subscription / Document Access";
   const email = searchParams.get("email") || "your email";
 
   useEffect(() => {
+    // If PayPal redirect, verify and capture payment
+    if (token && payerId && !isProcessing) {
+      capturePayPalPayment(token, payerId);
+    }
+
     // Store order info in session storage
     try {
       sessionStorage.setItem("jb_last_order_id", orderId);
@@ -36,7 +47,40 @@ const ThankYou = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [orderId, product, navigate]);
+  }, [token, payerId, orderId, product, navigate, isProcessing]);
+
+  const capturePayPalPayment = async (paymentId: string, payerId: string) => {
+    setIsProcessing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('verify-paypal-payment', {
+        body: { paymentId, payerId }
+      });
+
+      if (error) throw error;
+
+      if (data?.success) {
+        toast({
+          title: "Payment Confirmed!",
+          description: "Your premium access has been activated.",
+        });
+      } else {
+        toast({
+          title: "Payment Verification Failed",
+          description: "Please contact support if you were charged.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Payment capture error:', error);
+      toast({
+        title: "Payment Processing Error",
+        description: "We're verifying your payment. Check your email for confirmation.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   const getAccessUrl = () => {
     if (product.toLowerCase().includes("document") || product.toLowerCase().includes("form")) {
@@ -50,21 +94,32 @@ const ThankYou = () => {
       <Card className="max-w-2xl w-full shadow-2xl">
         <CardHeader className="text-center space-y-4 pb-4">
           <div className="flex justify-center">
-            <div className="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-              <CheckCircle className="w-12 h-12 text-green-600 dark:text-green-400" />
-            </div>
+            {isProcessing ? (
+              <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                <Loader2 className="w-12 h-12 text-blue-600 dark:text-blue-400 animate-spin" />
+              </div>
+            ) : (
+              <div className="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-12 h-12 text-green-600 dark:text-green-400" />
+              </div>
+            )}
           </div>
           
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              🎉 Thank You - Purchase Confirmed!
+              {isProcessing ? "🔄 Processing Payment..." : "🎉 Thank You - Purchase Confirmed!"}
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
-              You now have access to your Justice-Bot tools.
+              {isProcessing 
+                ? "Please wait while we confirm your payment with PayPal..."
+                : "You now have access to your Justice-Bot tools."
+              }
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              A receipt and next steps have been sent to <strong>{email}</strong>
-            </p>
+            {!isProcessing && (
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                A receipt and next steps have been sent to <strong>{email}</strong>
+              </p>
+            )}
           </div>
         </CardHeader>
 
@@ -100,26 +155,28 @@ const ThankYou = () => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button
-              onClick={() => navigate(getAccessUrl())}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
-              size="lg"
-            >
-              <FileText className="w-4 h-4 mr-2" />
-              Access Your Tools Now
-            </Button>
-            
-            <Button
-              onClick={() => navigate("/dashboard")}
-              variant="outline"
-              className="flex-1"
-              size="lg"
-            >
-              <ArrowRight className="w-4 h-4 mr-2" />
-              Go to Dashboard
-            </Button>
-          </div>
+          {!isProcessing && (
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button
+                onClick={() => navigate(getAccessUrl())}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                size="lg"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Access Your Tools Now
+              </Button>
+              
+              <Button
+                onClick={() => navigate("/dashboard")}
+                variant="outline"
+                className="flex-1"
+                size="lg"
+              >
+                <ArrowRight className="w-4 h-4 mr-2" />
+                Go to Dashboard
+              </Button>
+            </div>
+          )}
 
           {/* What's Next */}
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">

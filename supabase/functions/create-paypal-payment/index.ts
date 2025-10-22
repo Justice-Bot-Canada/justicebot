@@ -54,7 +54,7 @@ serve(async (req) => {
         reference_id: `${planType}_${Date.now()}`
       }],
       application_context: {
-        return_url: `${req.headers.get('origin')}/payment-success`,
+        return_url: `${req.headers.get('origin')}/thank-you?product=${encodeURIComponent(planType)}`,
         cancel_url: `${req.headers.get('origin')}/payment-cancel`,
         brand_name: 'Justice Bot',
         landing_page: 'BILLING',
