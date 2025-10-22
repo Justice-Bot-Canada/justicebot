@@ -1,10 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schema
+const VerifyPaymentSchema = z.object({
+  paymentId: z.string().min(1).max(255),
+  payerId: z.string().min(1).max(255).optional()
+});
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -21,7 +28,21 @@ serve(async (req) => {
   }
 
   try {
-    const { paymentId, payerId } = await req.json();
+    // Validate input
+    const requestBody = await req.json();
+    const validation = VerifyPaymentSchema.safeParse(requestBody);
+    
+    if (!validation.success) {
+      return new Response(JSON.stringify({ 
+        error: 'Invalid request data',
+        details: validation.error.issues 
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { paymentId, payerId } = validation.data;
     
     console.log('Verifying PayPal payment:', { paymentId, payerId });
 

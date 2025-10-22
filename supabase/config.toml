@@ -1,52 +1,11 @@
 project_id = "vkzquzjtewqhcisvhsvg"
 
-[functions.analyze-document]
-verify_jwt = false
-
-[functions.analyze-legal-case-ai]
-verify_jwt = false
-
-[functions.analyze-legal-case]
-verify_jwt = false
-
-[functions.check-paypal-subscription]
-verify_jwt = false
-
-[functions.create-form-payment]
-verify_jwt = false
-
-[functions.create-paypal-payment]
-verify_jwt = false
-
-[functions.create-paypal-subscription]
-verify_jwt = false
-
-[functions.fetch-legal-data]
-verify_jwt = false
-
-[functions.fill-official-pdf]
-verify_jwt = false
-
-[functions.generate-pdf]
-verify_jwt = false
-
-[functions.legal-chat]
-verify_jwt = false
-
-[functions.send-notification]
-verify_jwt = false
-
-[functions.send-deadline-notifications]
-verify_jwt = false
+# JWT verification is ENABLED by default for all functions
+# Only public contact forms should bypass authentication
 
 [functions.submit-contact]
 verify_jwt = false
 
-[functions.submit-feedback]
-verify_jwt = false
-
-[functions.verify-paypal-payment]
-verify_jwt = false
-
-[functions.verify-paypal-subscription]
+[functions.send-deadline-notifications]
+# Scheduled function triggered by Supabase cron, not by users
 verify_jwt = false

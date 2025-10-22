@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,11 +13,28 @@ const paypalClientId = Deno.env.get('PAYPAL_CLIENT_ID')!;
 const paypalClientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET')!;
 
 // Auto-detect PayPal environment based on credentials
-// Sandbox IDs start with 'AZ' or 'sb-', production IDs start with 'A' followed by other characters
 const isProduction = paypalClientId && !paypalClientId.startsWith('sb-') && !paypalClientId.startsWith('AZ');
 const PAYPAL_BASE_URL = isProduction ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
 
-console.log(`PayPal Mode: ${isProduction ? 'PRODUCTION' : 'SANDBOX'}, URL: ${PAYPAL_BASE_URL}`);
+// Server-side price validation
+const VALID_PRICES: Record<string, number> = {
+  'premium_monthly': 19.99,
+  'Premium Monthly': 19.99,
+  'premium_yearly': 99.99,
+  'Premium Yearly': 99.99,
+  'low_income': 2.99,
+  'Low-Income': 2.99,
+  'Low Income': 2.99,
+  'one_time_document': 9.99,
+  'One-Time Document': 9.99
+};
+
+// Input validation schema
+const PaymentRequestSchema = z.object({
+  planType: z.string().min(1).max(100),
+  amount: z.string().regex(/^\d+\.?\d{0,2}$/),
+  caseId: z.string().uuid().optional()
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -24,19 +42,79 @@ serve(async (req) => {
   }
 
   try {
-    const { planType, amount, caseId } = await req.json();
-    
-    console.log('Creating PayPal payment:', { planType, amount, caseId, environment: isProduction ? 'PRODUCTION' : 'SANDBOX' });
-
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Get authenticated user
     const authHeader = req.headers.get('Authorization');
-    if (!authHeader) throw new Error('No authorization header');
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: 'Authentication required' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
     
     const token = authHeader.replace('Bearer ', '');
     const { data: userData, error: userError } = await supabase.auth.getUser(token);
-    if (userError || !userData.user) throw new Error('User not authenticated');
+    
+    if (userError || !userData.user) {
+      return new Response(JSON.stringify({ error: 'Invalid authentication' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Validate input
+    const requestBody = await req.json();
+    const validation = PaymentRequestSchema.safeParse(requestBody);
+    
+    if (!validation.success) {
+      return new Response(JSON.stringify({ 
+        error: 'Invalid request data',
+        details: validation.error.issues 
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { planType, amount, caseId } = validation.data;
+
+    // Validate price matches plan type
+    const expectedAmount = VALID_PRICES[planType];
+    if (!expectedAmount) {
+      return new Response(JSON.stringify({ error: 'Invalid plan type' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const submittedAmount = parseFloat(amount);
+    if (Math.abs(submittedAmount - expectedAmount) > 0.01) {
+      return new Response(JSON.stringify({ 
+        error: 'Invalid payment amount for plan type',
+        expected: expectedAmount,
+        received: submittedAmount
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // If caseId provided, verify user owns the case
+    if (caseId) {
+      const { data: caseData, error: caseError } = await supabase
+        .from('cases')
+        .select('user_id')
+        .eq('id', caseId)
+        .single();
+      
+      if (caseError || !caseData || caseData.user_id !== userData.user.id) {
+        return new Response(JSON.stringify({ error: 'Case not found or unauthorized' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
 
     // Get PayPal access token
     const accessToken = await getPayPalAccessToken();
