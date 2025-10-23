@@ -24,6 +24,9 @@ const HeroSection = () => {
                 <br />
                 <span className="text-primary">without the noise</span>
               </h1>
+              <p className="text-lg font-semibold text-foreground max-w-lg mb-2">
+                Free plain-language legal help for Ontario tenants, families & human rights issues.
+              </p>
               <p className="text-xl text-muted-foreground leading-relaxed max-w-lg">
                 Describe your legal situation in plain language and get smart guidance, 
                 auto-filled forms, and step-by-step help navigating Ontario's courts and tribunals.
@@ -50,14 +53,15 @@ const HeroSection = () => {
               ))}
             </ul>
 
-            <div className="flex flex-col sm:flex-row gap-4" role="group" aria-label="Main actions">
+            <div className="flex flex-col items-center sm:items-start gap-4" role="group" aria-label="Main actions">
               <Button 
                 variant="cta" 
                 size="lg" 
-                className="group"
+                className="group w-full sm:w-auto text-lg px-8 py-6"
+                onClick={() => window.location.href = '/triage'}
                 aria-describedby="cta-description"
               >
-                Start Your Case Assessment
+                Start Your Case
                 <ArrowRight 
                   className="w-5 h-5 group-hover:translate-x-1 transition-transform" 
                   aria-hidden="true"
@@ -69,14 +73,14 @@ const HeroSection = () => {
               <Button 
                 variant="outline" 
                 size="lg"
+                className="w-full sm:w-auto"
                 onClick={() => {
-                  // Demo modal would open here with accessible video player
-                  const demoSection = document.getElementById('merit');
-                  demoSection?.scrollIntoView({ behavior: 'smooth' });
+                  const videoSection = document.querySelector('[id*="explainer"]') || document.getElementById('merit');
+                  videoSection?.scrollIntoView({ behavior: 'smooth' });
                 }}
                 aria-describedby="demo-description"
               >
-                Watch Demo
+                Watch How It Works (60 sec)
                 <span id="demo-description" className="sr-only">
                   View demonstration of Justice-Bot features and merit scoring system
                 </span>

@@ -45,12 +45,24 @@ const Footer = () => {
             </ul>
           </nav>
 
+          <nav aria-labelledby="company-heading">
+            <h3 id="company-heading" className="font-semibold mb-4">Company</h3>
+            <ul className="space-y-2 text-sm text-background/80">
+              <li><a href="/about" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">About Us</a></li>
+              <li><a href="/faq" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">FAQ</a></li>
+              <li><a href="/what-we-do" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">What We Do</a></li>
+              <li><a href="/partners" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Partner With Us</a></li>
+              <li><a href="/contact" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Contact</a></li>
+            </ul>
+          </nav>
+
           <nav aria-labelledby="legal-heading">
             <h3 id="legal-heading" className="font-semibold mb-4">Legal</h3>
             <ul className="space-y-2 text-sm text-background/80">
-              <li><a href="/liability" className="hover:text-background transition-colors text-red-300 focus:outline-none focus:ring-2 focus:ring-background/50 rounded" aria-label="Legal liability and disclaimers">⚠️ Legal Liability</a></li>
+              <li><a href="/liability" className="hover:text-background transition-colors text-red-300 focus:outline-none focus:ring-2 focus:ring-background/50 rounded" aria-label="Legal liability and disclaimers">⚠️ Legal Disclaimer</a></li>
               <li><a href="/terms" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Terms of Service</a></li>
               <li><a href="/privacy" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Privacy Policy</a></li>
+              <li><a href="/disclaimer" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Accessibility</a></li>
             </ul>
           </nav>
 

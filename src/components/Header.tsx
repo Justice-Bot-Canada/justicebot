@@ -61,78 +61,62 @@ const Header = () => {
             </a>
           </div>
           
-            <nav id="main-navigation" className="hidden md:flex items-center gap-6" role="navigation" aria-label="Main navigation">
-              <a 
-                href="#merit" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
-              >
-                Merit Score
-                <ScreenReaderOnly>Assess the strength of your legal case</ScreenReaderOnly>
-              </a>
-              <a 
-                href="/pricing" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
-              >
+            <nav id="main-navigation" className="hidden lg:flex items-center gap-6" role="navigation" aria-label="Main navigation">
+              <div className="relative group">
+                <button className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1">
+                  Housing
+                </button>
+                <div className="absolute left-0 top-full mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                  <a href="/ltb-journey" className="block px-4 py-2 text-sm hover:bg-muted">Landlord-Tenant Board</a>
+                  <a href="/small-claims-journey" className="block px-4 py-2 text-sm hover:bg-muted">Eviction Defense</a>
+                </div>
+              </div>
+              
+              <div className="relative group">
+                <button className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1">
+                  Family
+                </button>
+                <div className="absolute left-0 top-full mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                  <a href="/family-journey" className="block px-4 py-2 text-sm hover:bg-muted">Family Court</a>
+                  <a href="/cas-journey" className="block px-4 py-2 text-sm hover:bg-muted">CAS Issues</a>
+                </div>
+              </div>
+              
+              <div className="relative group">
+                <button className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1">
+                  Human Rights
+                </button>
+                <div className="absolute left-0 top-full mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                  <a href="/hrto-journey" className="block px-4 py-2 text-sm hover:bg-muted">HRTO Claims</a>
+                  <a href="/labour-board-journey" className="block px-4 py-2 text-sm hover:bg-muted">Labour Board</a>
+                </div>
+              </div>
+              
+              <div className="relative group">
+                <button className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1">
+                  Support
+                </button>
+                <div className="absolute left-0 top-full mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                  <a href="/about" className="block px-4 py-2 text-sm hover:bg-muted">About Us</a>
+                  <a href="/faq" className="block px-4 py-2 text-sm hover:bg-muted">FAQ</a>
+                  <a href="/tutorials" className="block px-4 py-2 text-sm hover:bg-muted">Tutorials</a>
+                  <a href="/contact" className="block px-4 py-2 text-sm hover:bg-muted">Contact</a>
+                </div>
+              </div>
+              
+              <a href="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1">
                 Pricing
               </a>
-              <a 
-                href="/feedback" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
-              >
-                Feedback
-              </a>
-              <a 
-                href="/contact" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
-              >
-                Contact
-              </a>
-              <a 
-                href="/legal-chat" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
-              >
-                AI Assistant
-              </a>
-              <a 
-                href="/document-analysis" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
-              >
-                Document Analyzer
-              </a>
-              <a 
-                href="/tutorials" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
-              >
-                Tutorials
-              </a>
-              <a 
-                href="/templates" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
-              >
-                Templates
-              </a>
-              <a 
-                href="/referrals" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
-              >
-                Referrals
-              </a>
+              
               {isAdmin && (
                 <a 
                   href="/admin" 
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
-                  aria-label="Admin console - Administrative functions"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+                  aria-label="Admin console"
                 >
                   Admin
                 </a>
               )}
-              <a 
-                href="/liability" 
-                className="text-sm text-warning hover:text-warning/80 transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 rounded-md px-2 py-1"
-                aria-label="Legal disclaimer - Important legal information"
-              >
-                ⚠️ Legal Disclaimer
-              </a>
               <HighContrastToggle />
             </nav>
 
