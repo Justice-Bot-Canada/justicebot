@@ -1,0 +1,8 @@
+{
+  "SUPABASE_URL": "https://YOURPROJECT.supabase.co",
+  "ANON_KEY": eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrenF1emp0ZXdxaGNpc3Zoc3ZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1OTYwODEsImV4cCI6MjA3NDE3MjA4MX0.g2NbpEw7MXx1p7ipGhtEVfkbtEwfd9Ebuw2nO44F584
+  "SUPABASE_URL": "https://YOURPROJECT.supabase.co",
+  "API_BASE_URL": "https://justice-bot.com/api",
+  "PAYPAL_CLIENT_ID": "AS7gni64FdKWkeMYxUGCFStgDXhtyG0SooKeyMu-NwVDwFzrRC8iMfPmesMmSrGXZUQqYz69EsiQ9ril",
+  "SUPPORT_EMAIL": "admint@justice-bot.com"
+}
