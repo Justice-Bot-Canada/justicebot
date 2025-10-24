@@ -14,26 +14,48 @@ const HeroSection = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
             <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-2 mb-2">
+                <span className="text-sm font-semibold text-primary">🍁 Ontario, Canada</span>
+              </div>
               <h1 
                 id="hero-heading" 
                 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight"
                 role="heading"
                 aria-level={1}
               >
-                <span className="text-foreground">Legal clarity</span>
+                <span className="text-foreground">Affordable Legal Help</span>
                 <br />
-                <span className="text-primary">without the noise</span>
+                <span className="text-primary">for Ontario</span>
               </h1>
               <p className="text-lg font-semibold text-foreground max-w-lg mb-2">
                 Free plain-language legal help for Ontario tenants, families & human rights issues.
               </p>
               <p className="text-xl text-muted-foreground leading-relaxed max-w-lg">
-                Describe your legal situation in plain language and get smart guidance, 
-                auto-filled forms, and step-by-step help navigating Ontario's courts and tribunals.
+                Self-represented? We help you navigate tribunals and courts with confidence—step by step.
               </p>
-              <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground text-sm mt-4">
-                "Everyone has the right to life, liberty and security of the person and the right not to be deprived thereof except in accordance with the principles of fundamental justice." — Charter of Rights and Freedoms, Section 7
-              </blockquote>
+              
+              {/* What You'll Get Box */}
+              <div className="bg-card/80 backdrop-blur-sm rounded-xl p-4 border border-primary/20 mt-4">
+                <h2 className="text-sm font-bold mb-3 text-center">What You'll Get:</h2>
+                <div className="grid grid-cols-2 gap-3 text-left text-sm">
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                    <span className="text-foreground">Court-ready PDFs</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                    <span className="text-foreground">Step-by-step guides</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                    <span className="text-foreground">Timeline tracker</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                    <span className="text-foreground">24/7 AI assistant</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <ul className="space-y-3" role="list" aria-label="Key features">

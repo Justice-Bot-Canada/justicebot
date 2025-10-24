@@ -51,6 +51,7 @@ const Footer = () => {
               <li><a href="/team" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Our Team</a></li>
               <li><a href="/about" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">About</a></li>
               <li><a href="/blog" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Blog</a></li>
+              <li><a href="/roadmap" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Roadmap</a></li>
               <li><a href="/partners" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Partners</a></li>
               <li><a href="/contact" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Contact</a></li>
             </ul>
@@ -62,7 +63,8 @@ const Footer = () => {
               <li><a href="/liability" className="hover:text-background transition-colors text-red-300 focus:outline-none focus:ring-2 focus:ring-background/50 rounded" aria-label="Legal liability and disclaimers">⚠️ Legal Disclaimer</a></li>
               <li><a href="/terms" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Terms of Service</a></li>
               <li><a href="/privacy" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Privacy Policy</a></li>
-              <li><a href="/disclaimer" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Accessibility</a></li>
+              <li><a href="/accessibility" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Accessibility</a></li>
+              <li><a href="/payment-policy" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Payment & Refunds</a></li>
             </ul>
           </nav>
 

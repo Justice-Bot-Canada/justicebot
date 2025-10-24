@@ -60,6 +60,9 @@ import Partners from "./pages/Partners";
 import Team from "./pages/Team";
 import Blog from "./pages/Blog";
 import Scope from "./pages/Scope";
+import Accessibility from "./pages/Accessibility";
+import PaymentPolicy from "./pages/PaymentPolicy";
+import Roadmap from "./pages/Roadmap";
 import Troubleshooting from "./pages/Troubleshooting";
 import MediaInquiries from "./pages/MediaInquiries";
 import GovernmentInquiries from "./pages/GovernmentInquiries";
@@ -128,8 +131,12 @@ const AppContent = () => {
           <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/about" element={<About />} />
         <Route path="/faq" element={<FAQ />} />
-        <Route path="/what-we-do" element={<WhatWeDo />} />
-        <Route path="/partners" element={<Partners />} />
+          <Route path="/what-we-do" element={<WhatWeDo />} />
+          <Route path="/partners" element={<Partners />} />
+          <Route path="/accessibility" element={<Accessibility />} />
+          <Route path="/payment-policy" element={<PaymentPolicy />} />
+          <Route path="/roadmap" element={<Roadmap />} />
+          <Route path="/scope" element={<Scope />} />
         <Route path="/team" element={<Team />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/scope" element={<Scope />} />
