@@ -48,10 +48,10 @@ const Footer = () => {
           <nav aria-labelledby="company-heading">
             <h3 id="company-heading" className="font-semibold mb-4">Company</h3>
             <ul className="space-y-2 text-sm text-background/80">
-              <li><a href="/about" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">About Us</a></li>
-              <li><a href="/faq" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">FAQ</a></li>
-              <li><a href="/what-we-do" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">What We Do</a></li>
-              <li><a href="/partners" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Partner With Us</a></li>
+              <li><a href="/team" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Our Team</a></li>
+              <li><a href="/about" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">About</a></li>
+              <li><a href="/blog" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Blog</a></li>
+              <li><a href="/partners" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Partners</a></li>
               <li><a href="/contact" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Contact</a></li>
             </ul>
           </nav>

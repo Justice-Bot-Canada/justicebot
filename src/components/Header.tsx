@@ -97,7 +97,10 @@ const Header = () => {
                   Support
                 </button>
                 <div className="absolute left-0 top-full mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                  <a href="/about" className="block px-4 py-2 text-sm hover:bg-muted">About Us</a>
+                  <a href="/team" className="block px-4 py-2 text-sm hover:bg-muted">Our Team</a>
+                  <a href="/about" className="block px-4 py-2 text-sm hover:bg-muted">About</a>
+                  <a href="/blog" className="block px-4 py-2 text-sm hover:bg-muted">Blog</a>
+                  <a href="/scope" className="block px-4 py-2 text-sm hover:bg-muted">What We Help With</a>
                   <a href="/faq" className="block px-4 py-2 text-sm hover:bg-muted">FAQ</a>
                   <a href="/tutorials" className="block px-4 py-2 text-sm hover:bg-muted">Tutorials</a>
                   <a href="/contact" className="block px-4 py-2 text-sm hover:bg-muted">Contact</a>

@@ -57,6 +57,9 @@ import About from "./pages/About";
 import FAQ from "./pages/FAQ";
 import WhatWeDo from "./pages/WhatWeDo";
 import Partners from "./pages/Partners";
+import Team from "./pages/Team";
+import Blog from "./pages/Blog";
+import Scope from "./pages/Scope";
 import Troubleshooting from "./pages/Troubleshooting";
 import MediaInquiries from "./pages/MediaInquiries";
 import GovernmentInquiries from "./pages/GovernmentInquiries";
@@ -124,9 +127,12 @@ const AppContent = () => {
           <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>} />
           <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/about" element={<About />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/what-we-do" element={<WhatWeDo />} />
-          <Route path="/partners" element={<Partners />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/what-we-do" element={<WhatWeDo />} />
+        <Route path="/partners" element={<Partners />} />
+        <Route path="/team" element={<Team />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/scope" element={<Scope />} />
           <Route path="/troubleshooting" element={<Troubleshooting />} />
           <Route path="/media-inquiries" element={<MediaInquiries />} />
           <Route path="/government-inquiries" element={<GovernmentInquiries />} />
