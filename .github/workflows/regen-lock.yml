@@ -1,0 +1,39 @@
+name: Regenerate package-lock.json
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  regen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Recreate lockfile
+        run: |
+          rm -f package-lock.json
+          npm install
+
+      - name: Commit lockfile if changed
+        run: |
+          if ! git diff --quiet package-lock.json; then
+            git config user.name "github-actions"
+            git config user.email "actions@github.com"
+            git add package-lock.json
+            git commit -m "chore: regenerate package-lock.json to match deps"
+            git push
+          else
+            echo "No lockfile changes."
+          fi
