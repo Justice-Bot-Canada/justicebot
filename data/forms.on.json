@@ -13,5 +13,19 @@
 "id": "ON-HRTO-F1",
 "name": "HRTO — Form 1 (Application)",
 "url": "https://tribunalsontario.ca/hrto/forms-and-filing/#otherforms"
+},
+"ON-HRTO-F2": {
+"id": "ON-HRTO-F2",
+"name": "HRTO Form 2 - Response",
+"category": "human_rights",
+"url": "https://tribunalsontario.ca/hrto/forms-and-filing/",
+"description": "Response to human rights application"
+},
+"ON-HRTO-SCHEDULE-A": {
+"id": "ON-HRTO-SCHEDULE-A",
+"name": "HRTO Schedule A - Details of Application",
+"category": "human_rights",
+"url": "https://tribunalsontario.ca/hrto/forms-and-filing/",
+"description": "Detailed description of discrimination allegations"
 }
 }

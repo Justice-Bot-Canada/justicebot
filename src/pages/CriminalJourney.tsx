@@ -10,13 +10,18 @@ const CriminalJourney = () => {
     "name": "How to Navigate Criminal Court Proceedings in Ontario",
     "description": "Step-by-step guidance for navigating criminal charges and court proceedings in Ontario",
     "totalTime": "P180D",
-    "supply": ["Legal documentation", "Evidence", "Character references"],
-    "tool": ["Court forms", "Legal representation"],
+    "supply": ["Legal documentation", "Evidence", "Character references", "Form 5.1", "Form 11", "Form 32"],
+    "tool": ["Court forms", "Legal representation", "Bail documents"],
     "step": [
       {
         "@type": "HowToStep",
         "name": "Understand Charges",
         "text": "Review and understand the criminal charges laid against you"
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Handle Bail Release",
+        "text": "If released on bail, you may sign Form 5.1 (Undertaking to Police Officer), Form 11 (Recognizance), or Form 32. Understand all conditions before signing."
       },
       {
         "@type": "HowToStep",
@@ -38,8 +43,20 @@ const CriminalJourney = () => {
 
   const faqData = [
     {
+      question: "What is Form 5.1 (Undertaking)?",
+      answer: "Form 5.1 (Undertaking Given to Peace Officer) is a promise you make to police when released from custody. It includes bail conditions you must follow. Breaching these conditions is a separate criminal offence."
+    },
+    {
+      question: "What's the difference between Form 11 and Form 32?",
+      answer: "Form 11 is a Recognizance entered before an officer in charge for release from custody. Form 32 is a general Recognizance used for various bail situations under different sections of the Criminal Code, including peace bonds."
+    },
+    {
       question: "Do I need a lawyer for criminal charges?",
       answer: "Yes, it's strongly recommended to have legal representation for criminal charges as the consequences can be severe. Legal aid may be available if you qualify financially."
+    },
+    {
+      question: "What happens if I breach my bail conditions?",
+      answer: "Breaching bail conditions (Form 5.1, Form 11, or Form 32) is a separate criminal offence that can result in additional charges, jail time, and difficulty getting bail in the future."
     },
     {
       question: "What happens at my first court appearance?",

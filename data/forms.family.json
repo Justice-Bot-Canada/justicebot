@@ -1,0 +1,86 @@
+{
+  "ON-FLR-8": {
+    "id": "ON-FLR-8",
+    "name": "Form 8 - Application (General)",
+    "category": "family",
+    "url": "https://ontariocourtforms.on.ca/en/family-law-rules-forms/8/",
+    "description": "General application form for starting most family law cases"
+  },
+  "ON-FLR-8A": {
+    "id": "ON-FLR-8A",
+    "name": "Form 8A - Application (Divorce)",
+    "category": "family_divorce",
+    "url": "https://ontariocourtforms.on.ca/en/family-law-rules-forms/8a/",
+    "description": "Application to start a divorce case"
+  },
+  "ON-FLR-8B": {
+    "id": "ON-FLR-8B",
+    "name": "Form 8B - Application (Child, Spousal or Family Support)",
+    "category": "family_support",
+    "url": "https://ontariocourtforms.on.ca/en/family-law-rules-forms/8b/",
+    "description": "Application for child or spousal support"
+  },
+  "ON-FLR-8B1": {
+    "id": "ON-FLR-8B1",
+    "name": "Form 8B.1 - Application (Child Protection)",
+    "category": "child_protection",
+    "url": "https://ontariocourtforms.on.ca/en/family-law-rules-forms/8b1/",
+    "description": "Application for child protection matters (CAS cases)"
+  },
+  "ON-FLR-10": {
+    "id": "ON-FLR-10",
+    "name": "Form 10 - Answer",
+    "category": "family",
+    "url": "https://ontariocourtforms.on.ca/en/family-law-rules-forms/10/",
+    "description": "Response to a family law application"
+  },
+  "ON-FLR-13": {
+    "id": "ON-FLR-13",
+    "name": "Form 13 - Financial Statement (Support Claims)",
+    "category": "family_financial",
+    "url": "https://ontariocourtforms.on.ca/en/family-law-rules-forms/13/",
+    "description": "Financial disclosure for support claims under $150k income"
+  },
+  "ON-FLR-13-1": {
+    "id": "ON-FLR-13-1",
+    "name": "Form 13.1 - Financial Statement (Property & Support Claims)",
+    "category": "family_financial",
+    "url": "https://ontariocourtforms.on.ca/en/family-law-rules-forms/131/",
+    "description": "Financial disclosure for property and support claims"
+  },
+  "ON-FLR-35-1": {
+    "id": "ON-FLR-35-1",
+    "name": "Form 35.1 - Affidavit (Decision-Making, Parenting Time, Contact)",
+    "category": "family_custody",
+    "url": "https://ontariocourtforms.on.ca/en/family-law-rules-forms/351/",
+    "description": "Affidavit for custody and access matters"
+  },
+  "ON-FLR-36": {
+    "id": "ON-FLR-36",
+    "name": "Form 36 - Affidavit for Divorce",
+    "category": "family_divorce",
+    "url": "https://ontariocourtforms.on.ca/en/family-law-rules-forms/36/",
+    "description": "Sworn statement of facts for divorce application"
+  },
+  "ON-FLR-25A": {
+    "id": "ON-FLR-25A",
+    "name": "Form 25A - Divorce Order",
+    "category": "family_divorce",
+    "url": "https://ontariocourtforms.on.ca/en/family-law-rules-forms/25a/",
+    "description": "Final divorce order"
+  },
+  "ON-FLR-34L": {
+    "id": "ON-FLR-34L",
+    "name": "Form 34L - Application (Change/Terminate Openness Order)",
+    "category": "child_protection",
+    "url": "https://ontariocourtforms.on.ca/en/family-law-rules-forms/34l/",
+    "description": "Application to change or end openness order in adoption"
+  },
+  "ON-OCL-001": {
+    "id": "ON-OCL-001",
+    "name": "OCL Intake Form - Custody/Access",
+    "category": "child_protection",
+    "url": "https://ontariocourtforms.on.ca/en/office-of-the-childrens-lawyer-forms/",
+    "description": "Intake form when judge orders Children's Lawyer involvement"
+  }
+}

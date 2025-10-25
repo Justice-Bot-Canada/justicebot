@@ -20,6 +20,26 @@ const OFFICIAL_FORM_URLS: Record<string, string> = {
   
   // HRTO (Human Rights Tribunal of Ontario)
   'ON-HRTO-F1': 'https://tribunalsontario.ca/documents/hrto/Application%20Forms/Form%201%20Application.pdf',
+  'ON-HRTO-F2': 'https://tribunalsontario.ca/documents/hrto/Application%20Forms/Form%202%20-%20Response.pdf',
+  'ON-HRTO-SCHEDULE-A': 'https://tribunalsontario.ca/documents/hrto/Application%20Forms/Schedule%20A.pdf',
+  
+  // Family Law Forms (Ontario)
+  'ON-FLR-8': 'https://ontariocourtforms.on.ca/static/media/uploads/courtforms/family/8/flr-8-apr24-en-fil.docx',
+  'ON-FLR-8A': 'https://ontariocourtforms.on.ca/static/media/uploads/courtforms/family/8a/flr-8a-apr24-en-fil.docx',
+  'ON-FLR-8B': 'https://ontariocourtforms.on.ca/static/media/uploads/courtforms/family/8b/flr-8b-apr24-en-fil.docx',
+  'ON-FLR-8B1': 'https://ontariocourtforms.on.ca/static/media/uploads/courtforms/family/8b1/flr-8b1-sept21-en-fil.docx',
+  'ON-FLR-10': 'https://ontariocourtforms.on.ca/static/media/uploads/courtforms/family/10/flr-10-apr24-en-fil.docx',
+  'ON-FLR-13': 'https://ontariocourtforms.on.ca/static/media/uploads/courtforms/family/13/flr-13-apr24-en-fil.docx',
+  'ON-FLR-13-1': 'https://ontariocourtforms.on.ca/static/media/uploads/courtforms/family/13_1/flr-13-1-sept21-en-fil.docx',
+  'ON-FLR-35-1': 'https://ontariocourtforms.on.ca/static/media/uploads/courtforms/family/35_1/flr-35-1-0921-en.docx',
+  'ON-FLR-36': 'https://ontariocourtforms.on.ca/static/media/uploads/courtforms/family/36/flr-36-apr24-en-fil.docx',
+  'ON-FLR-25A': 'https://ontariocourtforms.on.ca/static/media/uploads/courtforms/family/25a/flr-25a-apr24-en-fil.docx',
+  'ON-FLR-34L': 'https://ontariocourtforms.on.ca/static/media/uploads/courtforms/family/34l/flr-34l-sept21-en-fil.docx',
+  
+  // Criminal Forms (Ontario)
+  'ON-CRIM-5-1': 'https://ontariocourtforms.on.ca/static/media/uploads/courtforms/bail_act/5_1/form-5-1-en.pdf',
+  'ON-CRIM-11': 'https://ontariocourtforms.on.ca/static/media/uploads/courtforms/bail_act/11/form-11-en.pdf',
+  'ON-CRIM-32': 'https://ontariocourtforms.on.ca/static/media/uploads/courtforms/bail_act/32/form-32-en.pdf',
   
   // Federal Court
   'FC-T-2062': 'https://www.fct-cf.ca/Content/assets/pdf/Forms/T2062%20-%20Statement%20of%20Claim%20(Action).pdf',
@@ -32,8 +52,14 @@ const OFFICIAL_FORM_URLS: Record<string, string> = {
   // Ontario Court of Justice - Criminal
   'OCJ-CRIM-FORM-9': 'https://www.ontariocourts.ca/ocj/files/forms/criminal/eng/Form9-Appearance-Notice.pdf',
   'OCJ-CRIM-FORM-10': 'https://www.ontariocourts.ca/ocj/files/forms/criminal/eng/Form10-Promise-to-Appear.pdf',
+  'OCJ-FORM-9': 'https://www.ontariocourts.ca/ocj/files/forms/criminal/eng/Form9-Appearance-Notice.pdf',
+  'OCJ-FORM-10': 'https://www.ontariocourts.ca/ocj/files/forms/criminal/eng/Form10-Promise-to-Appear.pdf',
   
   // Small Claims Court
+  'ON-SCC-7A': 'https://ontariocourtforms.on.ca/static/media/7A.pdf',
+  'ON-SCC-9A': 'https://ontariocourtforms.on.ca/static/media/9A.pdf',
+  'ON-SCC-10A': 'https://ontariocourtforms.on.ca/static/media/10A.pdf',
+  'ON-SCC-14A': 'https://ontariocourtforms.on.ca/static/media/14A.pdf',
   'SCC-FORM-7A': 'https://ontariocourtforms.on.ca/static/media/7A.pdf',
   'SCC-FORM-9A': 'https://ontariocourtforms.on.ca/static/media/9A.pdf',
   'SCC-FORM-10A': 'https://ontariocourtforms.on.ca/static/media/10A.pdf',
@@ -204,7 +230,7 @@ function fillPDFFields(form: any, formCode: string, formData: any) {
     'applicant_address': ['address', 'applicantAddress', 'street_address', 'mailing_address'],
     'applicant_phone': ['phone', 'phoneNumber', 'telephone', 'contact_number'],
     'applicant_email': ['email', 'emailAddress', 'e_mail', 'contact_email'],
-    'respondent_name': ['respondentName', 'defendant', 'landlordName', 'accused'],
+    'respondent_name': ['respondentName', 'defendant', 'landlordName', 'accused', 'other_party'],
     'incident_date': ['incidentDate', 'dateOfIncident', 'event_date', 'offence_date'],
     'description': ['description', 'details', 'particulars', 'statement_of_claim'],
     
@@ -216,6 +242,26 @@ function fillPDFFields(form: any, formCode: string, formData: any) {
     // HRTO-specific
     'discrimination_ground': ['discriminationGround', 'ground', 'protected_ground', 'basis'],
     'social_area': ['socialArea', 'area', 'social_context'],
+    
+    // Family Law specific
+    'spouse_name': ['spouseName', 'other_party_name', 'respondent', 'applicant'],
+    'marriage_date': ['marriageDate', 'date_of_marriage', 'wedding_date'],
+    'separation_date': ['separationDate', 'date_of_separation', 'separated_since'],
+    'children_names': ['childrenNames', 'children', 'child_names', 'minors'],
+    'children_birthdates': ['childrenBirthdates', 'birthdates', 'dates_of_birth'],
+    'matrimonial_home': ['matrimonialHome', 'family_home', 'home_address'],
+    'annual_income': ['annualIncome', 'gross_income', 'yearly_income', 'income'],
+    'support_amount': ['supportAmount', 'child_support', 'spousal_support', 'monthly_support'],
+    'custody_arrangement': ['custodyArrangement', 'parenting_time', 'access', 'custody'],
+    'assets': ['assets', 'property', 'net_family_property'],
+    'debts': ['debts', 'liabilities', 'loans'],
+    
+    // Child Protection specific
+    'child_name': ['childName', 'minor_name', 'child'],
+    'child_dob': ['childDob', 'date_of_birth', 'birthdate'],
+    'cas_worker': ['casWorker', 'worker_name', 'social_worker'],
+    'protection_concerns': ['protectionConcerns', 'concerns', 'allegations', 'risks'],
+    'current_placement': ['currentPlacement', 'where_child_lives', 'residence'],
     
     // Federal Court specific
     'claim_amount': ['claimAmount', 'amount', 'damages_sought', 'relief_sought'],
@@ -229,6 +275,8 @@ function fillPDFFields(form: any, formCode: string, formData: any) {
     'charge': ['charge', 'offence', 'criminal_charge', 'count'],
     'court_file_number': ['courtFileNumber', 'file_number', 'case_number'],
     'appearance_date': ['appearanceDate', 'court_date', 'hearing_date'],
+    'bail_conditions': ['bailConditions', 'conditions', 'undertaking_terms'],
+    'surety_name': ['suretyName', 'surety', 'guarantor'],
     
     // Small Claims specific
     'claim_date': ['claimDate', 'date_of_claim'],

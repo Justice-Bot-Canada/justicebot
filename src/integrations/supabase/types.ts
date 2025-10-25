@@ -315,7 +315,7 @@ export type Database = {
       evidence: {
         Row: {
           case_id: string
-          content_tsvector: unknown | null
+          content_tsvector: unknown
           description: string | null
           file_name: string
           file_path: string
@@ -330,7 +330,7 @@ export type Database = {
         }
         Insert: {
           case_id: string
-          content_tsvector?: unknown | null
+          content_tsvector?: unknown
           description?: string | null
           file_name: string
           file_path: string
@@ -345,7 +345,7 @@ export type Database = {
         }
         Update: {
           case_id?: string
-          content_tsvector?: unknown | null
+          content_tsvector?: unknown
           description?: string | null
           file_name?: string
           file_path?: string
@@ -472,6 +472,7 @@ export type Database = {
           instructions: string | null
           is_active: boolean
           price_cents: number
+          purchasable: boolean | null
           title: string
           tribunal_type: string
           updated_at: string
@@ -488,6 +489,7 @@ export type Database = {
           instructions?: string | null
           is_active?: boolean
           price_cents?: number
+          purchasable?: boolean | null
           title: string
           tribunal_type: string
           updated_at?: string
@@ -504,6 +506,7 @@ export type Database = {
           instructions?: string | null
           is_active?: boolean
           price_cents?: number
+          purchasable?: boolean | null
           title?: string
           tribunal_type?: string
           updated_at?: string
@@ -699,48 +702,63 @@ export type Database = {
       payments: {
         Row: {
           amount: number
+          amount_cents: number | null
           captured_at: string | null
           case_id: string | null
           created_at: string
           currency: string
+          form_id: string | null
           id: string
+          metadata: Json | null
           payer_id: string | null
           payment_id: string
           payment_provider: string
           paypal_response: Json | null
           plan_type: string
+          provider: string | null
+          provider_order_id: string | null
           status: string
           updated_at: string
           user_id: string
         }
         Insert: {
           amount: number
+          amount_cents?: number | null
           captured_at?: string | null
           case_id?: string | null
           created_at?: string
           currency?: string
+          form_id?: string | null
           id?: string
+          metadata?: Json | null
           payer_id?: string | null
           payment_id: string
           payment_provider?: string
           paypal_response?: Json | null
           plan_type: string
+          provider?: string | null
+          provider_order_id?: string | null
           status?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           amount?: number
+          amount_cents?: number | null
           captured_at?: string | null
           case_id?: string | null
           created_at?: string
           currency?: string
+          form_id?: string | null
           id?: string
+          metadata?: Json | null
           payer_id?: string | null
           payment_id?: string
           payment_provider?: string
           paypal_response?: Json | null
           plan_type?: string
+          provider?: string | null
+          provider_order_id?: string | null
           status?: string
           updated_at?: string
           user_id?: string
@@ -751,6 +769,13 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
             referencedColumns: ["id"]
           },
         ]
@@ -1164,16 +1189,13 @@ export type Database = {
       }
     }
     Functions: {
-      check_free_tier_eligibility: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      check_free_tier_eligibility: { Args: never; Returns: boolean }
       ensure_admin_bypass_policies: {
         Args: { target_schemas?: string[] }
         Returns: undefined
       }
       get_all_admins: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           email: string
           granted_at: string
@@ -1185,7 +1207,7 @@ export type Database = {
         }[]
       }
       get_all_users_admin: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           cases_count: number
           created_at: string
@@ -1204,28 +1226,22 @@ export type Database = {
         Args: { admin_notes?: string; target_user_id: string }
         Returns: undefined
       }
-      has_role: {
-        Args:
-          | { _role: Database["public"]["Enums"]["app_role"] }
-          | { _role: Database["public"]["Enums"]["app_role"]; _user_id: string }
-        Returns: boolean
-      }
-      increment_form_usage: {
-        Args: { form_id: string }
-        Returns: undefined
-      }
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_owner: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      make_user_admin: {
-        Args: { p_email: string }
-        Returns: undefined
-      }
+      has_role:
+        | {
+            Args: { _role: Database["public"]["Enums"]["app_role"] }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              _role: Database["public"]["Enums"]["app_role"]
+              _user_id: string
+            }
+            Returns: boolean
+          }
+      increment_form_usage: { Args: { form_id: string }; Returns: undefined }
+      is_admin: { Args: never; Returns: boolean }
+      is_owner: { Args: never; Returns: boolean }
+      make_user_admin: { Args: { p_email: string }; Returns: undefined }
       revoke_admin_role: {
         Args: { revoke_reason?: string; target_user_id: string }
         Returns: undefined

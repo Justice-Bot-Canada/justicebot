@@ -34,6 +34,41 @@
     "name": "Form 10 - Promise to Appear (Criminal)",
     "url": "https://www.ontariocourts.ca/ocj/criminal-court/criminal-court-forms/"
   },
+  "ON-CRIM-5-1": {
+    "id": "ON-CRIM-5-1",
+    "name": "Form 5.1 - Undertaking Given to Peace Officer",
+    "category": "criminal_bail",
+    "url": "https://ontariocourtforms.on.ca/en/bail-act-forms/",
+    "description": "Promise to police officer regarding bail conditions"
+  },
+  "ON-CRIM-11": {
+    "id": "ON-CRIM-11",
+    "name": "Form 11 - Recognizance (Officer in Charge)",
+    "category": "criminal_bail",
+    "url": "https://ontariocourtforms.on.ca/en/bail-act-forms/",
+    "description": "Bail recognizance entered before officer in charge"
+  },
+  "ON-CRIM-32": {
+    "id": "ON-CRIM-32",
+    "name": "Form 32 - Recognizance",
+    "category": "criminal_bail",
+    "url": "https://ontariocourtforms.on.ca/en/bail-act-forms/",
+    "description": "General recognizance for various Criminal Code sections"
+  },
+  "ON-CR-OCJ": {
+    "id": "ON-CR-OCJ",
+    "name": "Criminal Rules Forms (Ontario Court of Justice)",
+    "category": "criminal",
+    "url": "https://ontariocourtforms.on.ca/en/forms-under-the-criminal-rules-of-the-ontario-court-of-justice/",
+    "description": "Various criminal procedure forms for OCJ"
+  },
+  "ON-CR-SCJ": {
+    "id": "ON-CR-SCJ",
+    "name": "Criminal Proceedings Rules Forms (Superior Court)",
+    "category": "criminal",
+    "url": "https://ontariocourtforms.on.ca/en/forms-under-the-criminal-proceedings-rules-of-the-superior-court-of-justice/",
+    "description": "Criminal procedure forms for Superior Court"
+  },
   "FC-T-2062": {
     "id": "FC-T-2062",
     "name": "T-2062 - Statement of Claim (Federal Court)",

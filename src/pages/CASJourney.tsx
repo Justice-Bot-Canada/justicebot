@@ -10,7 +10,7 @@ const CASJourney = () => {
     "name": "How to Navigate CAS Involvement and Child Protection Proceedings",
     "description": "Step-by-step guidance for parents dealing with Children's Aid Society (CAS) investigations and child protection court proceedings",
     "totalTime": "P365D",
-    "supply": ["Legal representation", "Medical records", "Character references", "Parenting assessment results"],
+    "supply": ["Legal representation", "Medical records", "Character references", "Parenting assessment results", "Form 8B.1", "Form 34L"],
     "tool": ["Family lawyer", "Legal aid", "Court forms", "Support services"],
     "step": [
       {
@@ -25,6 +25,11 @@ const CASJourney = () => {
       },
       {
         "@type": "HowToStep",
+        "name": "Complete Form 8B.1",
+        "text": "If CAS files in court, you may need to respond or file your own Form 8B.1 Application for Child Protection proceedings"
+      },
+      {
+        "@type": "HowToStep",
         "name": "Comply and Document",
         "text": "Cooperate with CAS, follow safety plans, attend required services, and document all interactions"
       },
@@ -32,6 +37,11 @@ const CASJourney = () => {
         "@type": "HowToStep",
         "name": "Court Proceedings",
         "text": "Attend all court dates, present evidence of changes made, and work toward reunification or alternative plan"
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Openness Orders",
+        "text": "If adoption occurs, use Form 34L to request or modify openness orders for ongoing contact"
       }
     ]
   };
@@ -51,12 +61,20 @@ const CASJourney = () => {
       answer: "CAS can apprehend children without a court order only if they believe the child is at immediate risk of harm. They must bring the case to court within 5 days for a hearing."
     },
     {
+      question: "What forms do I need for child protection court?",
+      answer: "Key forms include Form 8B.1 (Application for Child Protection), Form 35.1 (Affidavit for Parenting), and potentially Form 34L (for openness orders in adoption). Your lawyer will help you determine which forms you need."
+    },
+    {
       question: "How do I get my children back from CAS?",
       answer: "Work with your lawyer to address the concerns raised, complete required programs (parenting, counseling, etc.), demonstrate changes, and present evidence at court hearings. The process takes time."
     },
     {
       question: "Do I qualify for legal aid in a CAS case?",
       answer: "Yes! Legal aid is available for parents involved in child protection proceedings regardless of income. This is one of the few areas where legal aid is broadly accessible."
+    },
+    {
+      question: "What is an openness order?",
+      answer: "An openness order (Form 34L) allows ongoing contact between adopted children and their birth family. It can include visits, calls, letters, or other communication as determined by the court."
     },
     {
       question: "What happens at a child protection court hearing?",
