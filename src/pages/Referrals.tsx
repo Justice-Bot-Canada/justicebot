@@ -57,8 +57,51 @@ export default function Referrals() {
 
           <ReferralProgram />
 
+          {/* Eligibility Section */}
+          <Card className="p-8 mt-12 border-primary/20">
+            <h2 className="text-2xl font-bold mb-6 text-center">Eligibility & Program Details</h2>
+            <div className="space-y-4 mb-8">
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <h3 className="font-semibold mb-2 flex items-center gap-2">
+                  <span className="text-primary">✓</span> Who Can Participate?
+                </h3>
+                <ul className="text-sm text-muted-foreground space-y-1 ml-6">
+                  <li>• All registered Justice-Bot users in good standing</li>
+                  <li>• Both free and paid subscribers eligible to refer</li>
+                  <li>• No minimum account age required</li>
+                </ul>
+              </div>
+              
+              <div className="bg-muted/50 p-4 rounded-lg">
+                <h3 className="font-semibold mb-2 flex items-center gap-2">
+                  <span className="text-primary">✓</span> Referral Standards
+                </h3>
+                <p className="text-sm text-muted-foreground mb-2">
+                  We maintain high standards for our referral program:
+                </p>
+                <ul className="text-sm text-muted-foreground space-y-1 ml-6">
+                  <li>• Referrals must be genuine — spam or fake accounts will result in credit forfeiture</li>
+                  <li>• Credits earned through fraudulent means will be revoked and may result in account suspension</li>
+                  <li>• We reserve the right to audit referrals and adjust credits if terms are violated</li>
+                  <li>• Referrals should be to people who would genuinely benefit from Justice-Bot services</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="border-t pt-6">
+              <h3 className="font-semibold mb-3 text-center">Affiliate Disclosure</h3>
+              <p className="text-sm text-muted-foreground text-center max-w-2xl mx-auto">
+                Justice-Bot's referral program provides monetary credits as an incentive for users to share our service. 
+                Credits earned through referrals are applied to your Justice-Bot account and can be used toward any paid 
+                features or subscriptions. This is a performance-based program where you earn credits only when referred 
+                users complete their first payment. We are transparent about this relationship and ensure all users 
+                understand the terms before participating.
+              </p>
+            </div>
+          </Card>
+
           {/* FAQ Section */}
-          <Card className="p-8 mt-12">
+          <Card className="p-8 mt-8">
             <h2 className="text-2xl font-bold mb-6 text-center">Frequently Asked Questions</h2>
             <div className="space-y-6">
               <div>
@@ -85,6 +128,12 @@ export default function Referrals() {
                 <h3 className="font-semibold mb-2">Can I refer someone who already has an account?</h3>
                 <p className="text-sm text-muted-foreground">
                   No, the referral program is only for new users who sign up using your unique referral link.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2">What happens if my referral violates terms?</h3>
+                <p className="text-sm text-muted-foreground">
+                  Fraudulent referrals or spam activity will result in credit forfeiture. Repeated violations may lead to account suspension.
                 </p>
               </div>
             </div>

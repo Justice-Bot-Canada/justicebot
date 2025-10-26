@@ -2,6 +2,9 @@ import React from "react";
 import { UserJourney } from "@/components/UserJourney";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
+import { JourneyHeader } from "@/components/JourneyHeader";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const FamilyJourney = () => {
   const structuredData = {
@@ -73,8 +76,8 @@ const FamilyJourney = () => {
     <>
       <PerformanceMonitor />
       <EnhancedSEO 
-        title="Family Law Journey - Justice Bot"
-        description="Step-by-step guidance for divorce, custody, child protection, and family court matters in Ontario"
+        title="Family Law Journey Ontario - Divorce, Custody & Child Support"
+        description="Step-by-step guidance for divorce, custody, child protection, and family court matters in Ontario. Get help with Forms 8, 13, 13.1, 35.1, and 36."
         keywords="family law, divorce, custody, child protection, family court, Ontario family law"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
@@ -87,13 +90,40 @@ const FamilyJourney = () => {
           tags: ["Family Law", "Divorce", "Custody", "Ontario", "Legal Process"]
         }}
       />
-      <div className="min-h-screen bg-background py-8">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <UserJourney 
-            venue="family"
-            userSituation="family law matter"
-          />
-        </div>
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main id="main-content" className="container mx-auto px-4 py-8" tabIndex={-1}>
+          <div className="max-w-4xl mx-auto">
+            <JourneyHeader
+              title="Family Law Journey"
+              description="Your complete guide to navigating family court matters in Ontario"
+              whoIsItFor="Anyone dealing with divorce, custody/access, child support, spousal support, property division, or child protection matters in Ontario"
+              whatYouGet={[
+                "Step-by-step guidance for your specific family law matter",
+                "Help completing required forms (8, 8A, 8B, 13, 13.1, 35.1, 36)",
+                "Financial statement preparation guidance",
+                "Custody and parenting plan assistance",
+                "Timeline tracking and deadline management"
+              ]}
+              timeToComplete="1-2 hours for initial forms, ongoing support throughout your case"
+              whatYouNeed={[
+                "Marriage certificate (for divorce)",
+                "Financial documents (pay stubs, tax returns, assets/debts)",
+                "Details about children (for custody/support)",
+                "Separation date and circumstances",
+                "Property and debt information (if applicable)"
+              ]}
+              ctaText="Start Family Law Journey"
+              ctaLink="/triage"
+            />
+            
+            <UserJourney 
+              venue="family"
+              userSituation="family law matter"
+            />
+          </div>
+        </main>
+        <Footer />
       </div>
     </>
   );

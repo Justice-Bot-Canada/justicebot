@@ -75,8 +75,8 @@ const LTBJourney = () => {
     <div className="min-h-screen bg-background">
       <PerformanceMonitor />
       <EnhancedSEO
-        title="LTB Step-by-Step Journey - File Your Landlord Tenant Board Application"
-        description="Complete guide to filing an LTB application. Get step-by-step instructions, forms, deadlines, and expert tips for your landlord-tenant dispute in Ontario."
+        title="LTB Journey Ontario - File Your Landlord Tenant Board Application"
+        description="Complete guide to filing an LTB application in Ontario. Get step-by-step instructions, forms, deadlines, and expert tips for your landlord-tenant dispute."
         keywords="LTB journey, landlord tenant board steps, LTB application guide, tenant rights process, Ontario LTB"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}

@@ -6,6 +6,7 @@ import { useRole } from "@/hooks/useRole";
 import AuthDialog from "@/components/AuthDialog";
 import { HighContrastToggle, ScreenReaderOnly } from "@/components/AccessibilityFeatures";
 import { PremiumStatusBanner } from "@/components/PremiumStatusBanner";
+import { SkipToContent } from "@/components/SkipToContent";
 import justiceBotLogo from "@/assets/justice-bot-logo.jpeg";
 import NotificationBell from "./NotificationBell";
 
@@ -38,6 +39,8 @@ const Header = () => {
 
   return (
     <>
+      <SkipToContent />
+      <PremiumStatusBanner />
       <header className="bg-background border-b border-border sticky top-0 z-50" role="banner">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
@@ -347,7 +350,6 @@ const Header = () => {
         )}
       </div>
     </header>
-    <PremiumStatusBanner />
     <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </>
   );

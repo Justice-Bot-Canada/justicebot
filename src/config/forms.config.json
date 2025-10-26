@@ -1,0 +1,97 @@
+{
+  "ltb": {
+    "T2": {
+      "name": "T2 Application - Tenant Rights",
+      "url": "https://tribunalsontario.ca/documents/ltb/Tenant%20Applications%20&%20Instructions/T2.pdf",
+      "description": "Application about tenant rights - maintenance, vital services, harassment, or illegal entry"
+    },
+    "T6": {
+      "name": "T6 Application - Maintenance",
+      "url": "https://tribunalsontario.ca/documents/ltb/Tenant%20Applications%20&%20Instructions/T6.pdf",
+      "description": "Application about maintenance issues affecting health, safety, housing standards"
+    },
+    "L1": {
+      "name": "L1 Application - Rent Arrears",
+      "url": "https://tribunalsontario.ca/documents/ltb/Landlord%20Applications%20&%20Instructions/L1_Instructions_20170116.pdf",
+      "description": "Application to evict a tenant for non-payment of rent and to collect rent owed"
+    },
+    "L2": {
+      "name": "L2 Application - Other Reasons",
+      "url": "https://tribunalsontario.ca/documents/ltb/Landlord%20Applications%20&%20Instructions/L2_Instructions_20170116.pdf",
+      "description": "Application to end a tenancy and evict a tenant based on reasons other than non-payment"
+    }
+  },
+  "hrto": {
+    "Form1": {
+      "name": "Form 1 - Application",
+      "url": "http://www.sjto.ca/documents/hrto/Application%20Forms/Application%20(Form%201).pdf",
+      "description": "Human Rights Tribunal of Ontario Application to file a complaint"
+    },
+    "ScheduleA": {
+      "name": "Schedule A - Details of Application",
+      "url": "http://www.sjto.ca/documents/hrto/Application%20Forms/Schedule%20A%20-%20Details%20of%20Application.pdf",
+      "description": "Detailed information about your human rights complaint"
+    },
+    "Form2": {
+      "name": "Form 2 - Response",
+      "url": "http://www.sjto.ca/documents/hrto/Response%20Forms/Response%20(Form%202).pdf",
+      "description": "Response to an HRTO application (for respondents)"
+    }
+  },
+  "smallClaims": {
+    "Form7A": {
+      "name": "Form 7A - Plaintiff's Claim",
+      "url": "https://ontariocourtforms.on.ca/static/media/7a-e.pdf",
+      "description": "Plaintiff's claim form for Small Claims Court"
+    },
+    "Form9A": {
+      "name": "Form 9A - Defence",
+      "url": "https://ontariocourtforms.on.ca/static/media/9a-e.pdf",
+      "description": "Defence form for Small Claims Court"
+    },
+    "Form11A": {
+      "name": "Form 11A - Affidavit of Service",
+      "url": "https://ontariocourtforms.on.ca/static/media/11a-e.pdf",
+      "description": "Affidavit proving documents were properly served"
+    },
+    "Form14B": {
+      "name": "Form 14B - Motion on Notice",
+      "url": "https://ontariocourtforms.on.ca/static/media/14b-e.pdf",
+      "description": "Motion on notice for Small Claims Court"
+    }
+  },
+  "family": {
+    "Form8": {
+      "name": "Form 8 - Application",
+      "url": "https://ontariocourtforms.on.ca/static/media/8-e.pdf",
+      "description": "General application form for family court"
+    },
+    "Form13": {
+      "name": "Form 13 - Financial Statement",
+      "url": "https://ontariocourtforms.on.ca/static/media/13-e.pdf",
+      "description": "Financial statement for family law cases (under $150k income)"
+    },
+    "Form13_1": {
+      "name": "Form 13.1 - Financial Statement",
+      "url": "https://ontariocourtforms.on.ca/static/media/13-1-e.pdf",
+      "description": "Financial statement for family law cases (over $150k income)"
+    },
+    "Form35_1": {
+      "name": "Form 35.1 - Affidavit in Support",
+      "url": "https://ontariocourtforms.on.ca/static/media/35-1-e.pdf",
+      "description": "Affidavit in support of motion to change child support"
+    }
+  },
+  "criminal": {
+    "Form5_1": {
+      "name": "Form 5.1 - Information",
+      "url": "https://laws-lois.justice.gc.ca/eng/regulations/SOR-2009-295/page-6.html#h-1006586",
+      "description": "Information to lay a criminal charge (rare - usually done by police/crown)"
+    },
+    "BailReview": {
+      "name": "Bail Review Application",
+      "url": "https://www.ontariocourts.ca/ocj/criminal-court/",
+      "description": "Application to review bail conditions (contact court directly)"
+    }
+  }
+}

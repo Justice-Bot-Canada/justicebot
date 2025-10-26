@@ -81,8 +81,8 @@ const HRTOJourney = () => {
     <div className="min-h-screen bg-background">
       <PerformanceMonitor />
       <EnhancedSEO
-        title="HRTO Step-by-Step Journey - File Your Human Rights Complaint"
-        description="Complete guide to filing an HRTO application. Get step-by-step instructions, deadlines, forms, and pro tips for your human rights complaint in Ontario."
+        title="HRTO Journey Ontario - File Your Human Rights Complaint"
+        description="Complete guide to filing an HRTO application in Ontario. Get step-by-step instructions, deadlines, forms, and pro tips for your human rights complaint."
         keywords="HRTO journey, human rights complaint steps, HRTO application guide, discrimination complaint process, Ontario human rights"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}

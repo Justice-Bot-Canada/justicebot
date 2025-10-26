@@ -70,8 +70,8 @@ const SmallClaimsJourney = () => {
     <div className="min-h-screen bg-background">
       <PerformanceMonitor />
       <EnhancedSEO
-        title="Small Claims Court Journey - File Your Claim Under $35,000"
-        description="Complete guide to filing a small claims court action. Get step-by-step instructions, forms, deadlines, and strategies for your monetary dispute in Ontario."
+        title="Small Claims Court Journey Ontario - File Your Claim Under $35,000"
+        description="Complete guide to filing a small claims court action in Ontario. Get step-by-step instructions, forms, deadlines, and strategies for your monetary dispute."
         keywords="small claims court journey, small claims process, court claim steps, Ontario small claims, lawsuit under 35000"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}

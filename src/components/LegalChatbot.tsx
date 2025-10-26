@@ -228,7 +228,7 @@ export function LegalChatbot() {
           </Button>
         </div>
         <p className="text-xs text-muted-foreground mt-2">
-          This provides general information, not legal advice. Consult a lawyer for your specific situation.
+          ⚠️ <strong>Not legal advice.</strong> Information only, not a law firm. Ontario-focused guidance. Consult a qualified lawyer for specific advice.
         </p>
       </form>
     </Card>
