@@ -8,11 +8,11 @@ export const ExplainerVideo = () => {
       <VideoSchema
         name="How Justice-Bot Works - AI Legal Help for Canadians"
         description="Watch this quick explainer to see how Justice-Bot provides affordable AI-powered legal assistance for Ontario tribunals, courts, and legal issues."
-        thumbnailUrl="https://img.youtube.com/vi/qhgRFgnANn4/maxresdefault.jpg"
+        thumbnailUrl="https://justice-bot.com/how-it-works-thumbnail.jpg"
         uploadDate="2025-10-03"
-        duration="PT1M"
-        contentUrl="https://justice-bot.com"
-        embedUrl="https://www.youtube.com/watch?v=qhgRFgnANn4"
+        duration="PT2M"
+        contentUrl="https://justice-bot.com/justice-bot-explainer.mp4"
+        embedUrl="https://justice-bot.com/justice-bot-explainer.mp4"
       />
       
       <section className="py-16 bg-gradient-to-b from-background to-muted/30">
@@ -26,13 +26,15 @@ export const ExplainerVideo = () => {
 
           <Card className="max-w-4xl mx-auto overflow-hidden shadow-2xl">
             <div className="relative aspect-video bg-black">
-              <iframe
+              <video
                 className="w-full h-full"
-                src="https://www.youtube.com/embed/qhgRFgnANn4"
-                title="How Justice-Bot Works - AI Legal Help for Canadians"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+                controls
+                preload="metadata"
+                poster="/how-it-works-thumbnail.jpg"
+              >
+                <source src="/justice-bot-explainer.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
             </div>
             <div className="p-6 bg-card">
               <div className="flex items-start gap-4">

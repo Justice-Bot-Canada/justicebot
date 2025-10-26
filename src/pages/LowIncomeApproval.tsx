@@ -153,10 +153,25 @@ const LowIncomeApproval = () => {
             <CardHeader>
               <CardTitle>Application Form</CardTitle>
               <CardDescription>
-                Please provide accurate information and proof of income for verification
+                Please provide accurate information and proof of income for verification. 
+                <strong className="block mt-2 text-primary">Review Time: 3-5 business days</strong>
               </CardDescription>
             </CardHeader>
             <CardContent>
+              <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-lg">
+                <h3 className="font-semibold mb-2">What You'll Get When Approved:</h3>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>✓ Access to ALL legal forms ($25/year instead of $5.99 per form)</li>
+                  <li>✓ Unlimited document generation and downloads</li>
+                  <li>✓ AI-powered legal analysis and guidance</li>
+                  <li>✓ Case tracking and deadline reminders</li>
+                  <li>✓ Priority customer support</li>
+                </ul>
+                <p className="text-xs text-muted-foreground mt-3">
+                  <strong>Refund Policy:</strong> If your application is denied, any payment will be fully refunded. 
+                  <a href="/payment-policy" className="text-primary hover:underline ml-1">View full policy</a>
+                </p>
+              </div>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
@@ -268,13 +283,17 @@ const LowIncomeApproval = () => {
                 </div>
 
                 <div className="text-sm text-muted-foreground p-4 bg-muted rounded">
-                  <strong>Eligibility Guidelines:</strong>
+                  <strong>Eligibility Criteria:</strong>
                   <ul className="mt-2 space-y-1">
-                    <li>• Individual: Annual income under $30,000 CAD</li>
-                    <li>• Family of 2: Annual income under $45,000 CAD</li>
-                    <li>• Family of 3+: Annual income under $60,000 CAD</li>
-                    <li>• Students, unemployed, or receiving government assistance may qualify</li>
+                    <li>• <strong>Individual:</strong> Annual income under $30,000 CAD</li>
+                    <li>• <strong>Family of 2:</strong> Annual income under $45,000 CAD</li>
+                    <li>• <strong>Family of 3+:</strong> Annual income under $60,000 CAD</li>
+                    <li>• Students, unemployed, or receiving Ontario Works/ODSP may qualify</li>
                   </ul>
+                  <p className="mt-3 text-xs">
+                    <strong>Accepted Documentation:</strong> Recent tax return (Notice of Assessment), pay stubs (last 3 months), 
+                    benefit statements (OW/ODSP), student financial aid confirmation, or Employment Insurance statements.
+                  </p>
                 </div>
 
                 <Button type="submit" className="w-full" disabled={loading}>

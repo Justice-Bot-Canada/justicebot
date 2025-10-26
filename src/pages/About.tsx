@@ -52,10 +52,16 @@ export default function About() {
             <p className="text-muted-foreground mb-4">
               We work closely with legal experts to ensure our guidance aligns with current law and procedure. All our content references official sources from the Landlord and Tenant Board, Human Rights Tribunal of Ontario, and Ontario courts.
             </p>
-            <p className="text-muted-foreground font-semibold">
+            <p className="text-muted-foreground font-semibold mb-4">
               <Shield className="inline w-5 h-5 mr-2" />
               Important: Justice-Bot is not a law firm and does not provide legal advice. We are a self-help tool designed to assist you in preparing your case and understanding your options.
             </p>
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded p-3">
+              <p className="text-sm text-yellow-900 dark:text-yellow-200">
+                <strong>⚠️ Brand Disclaimer:</strong> Justice-Bot (Canada) is an independent platform focused on Ontario legal help. 
+                We are not affiliated with justicebot.org or any other "JusticeBot" services operating internationally.
+              </p>
+            </div>
           </div>
 
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-8">

@@ -112,9 +112,17 @@ const Footer = () => {
             </div>
           </div>
 
+          {/* Brand Disambiguation */}
+          <div className="mb-4 p-3 bg-background/10 rounded-lg border border-background/20">
+            <p className="text-xs text-background/80 text-center">
+              <strong>⚠️ Not affiliated with justicebot.org</strong> — Justice-Bot (Canada) is an independent Canadian platform 
+              providing AI-powered legal help for Ontario tribunals and courts. We are not associated with any other "JusticeBot" services.
+            </p>
+          </div>
+
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-sm text-background/80">
-              © 2024 Justice-Bot Technologies Inc. All rights reserved.
+              © 2024 Justice-Bot Technologies Inc. All rights reserved. | Ontario, Canada
             </div>
             <div className="flex gap-6 text-sm text-background/80">
               <a href="/liability" className="hover:text-background transition-colors text-red-300 font-semibold">⚠️ Liability & Disclaimers</a>
