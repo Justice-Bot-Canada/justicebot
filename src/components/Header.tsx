@@ -35,7 +35,7 @@ const Header = () => {
   };
 
   // Debug logging
-  console.log('Header - User:', user?.email, 'IsAdmin:', isAdmin);
+  console.log('Header - User:', user?.id, 'IsAdmin:', isAdmin);
 
   return (
     <>

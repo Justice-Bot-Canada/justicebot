@@ -3,7 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { PDFDocument, StandardFonts, rgb } from 'https://cdn.skypack.dev/pdf-lib@1.17.1';
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://justice-bot.com',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
@@ -110,7 +110,7 @@ serve(async (req) => {
       }
     }
 
-    // Get form template
+    // Get form template with PDF URL from database
     const { data: formTemplate } = await supabase
       .from('forms')
       .select('*')
@@ -121,8 +121,8 @@ serve(async (req) => {
       throw new Error('Form template not found');
     }
 
-    // Get official PDF URL
-    const pdfUrl = OFFICIAL_FORM_URLS[formCode];
+    // Get PDF URL from database first, fallback to hardcoded registry
+    const pdfUrl = formTemplate.pdf_url || OFFICIAL_FORM_URLS[formCode];
     
     if (!pdfUrl) {
       console.log('No official PDF found for', formCode, '- falling back to custom generation');

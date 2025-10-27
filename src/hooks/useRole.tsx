@@ -21,7 +21,7 @@ export function useRole() {
   const fetchUserRoles = async () => {
     try {
       setLoading(true);
-      console.log('Fetching roles for user:', user?.email);
+      console.log('Fetching roles for user:', user?.id);
       
       const { data, error } = await supabase
         .from('user_roles')

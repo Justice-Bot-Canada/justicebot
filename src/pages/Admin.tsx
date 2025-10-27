@@ -869,6 +869,18 @@ const Admin = () => {
             </TabsContent>
 
             <TabsContent value="analytics" className="space-y-6">
+              <Card className="mb-6">
+                <CardHeader>
+                  <CardTitle>System Tools</CardTitle>
+                  <CardDescription>Administrative utilities</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button onClick={syncOntarioForms} disabled={syncingForms}>
+                    <Download className="w-4 h-4 mr-2" />
+                    {syncingForms ? 'Syncing...' : 'Sync Ontario Forms'}
+                  </Button>
+                </CardContent>
+              </Card>
               <div className="grid gap-6 md:grid-cols-2">
                 <Card>
                   <CardHeader>

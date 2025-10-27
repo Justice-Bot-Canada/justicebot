@@ -471,6 +471,7 @@ export type Database = {
           id: string
           instructions: string | null
           is_active: boolean
+          pdf_url: string | null
           price_cents: number
           purchasable: boolean | null
           title: string
@@ -488,6 +489,7 @@ export type Database = {
           id?: string
           instructions?: string | null
           is_active?: boolean
+          pdf_url?: string | null
           price_cents?: number
           purchasable?: boolean | null
           title: string
@@ -505,12 +507,52 @@ export type Database = {
           id?: string
           instructions?: string | null
           is_active?: boolean
+          pdf_url?: string | null
           price_cents?: number
           purchasable?: boolean | null
           title?: string
           tribunal_type?: string
           updated_at?: string
           usage_count?: number | null
+        }
+        Relationships: []
+      }
+      forms_catalog: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          jurisdiction: string
+          last_checked_at: string | null
+          last_status: number | null
+          official_url: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          jurisdiction: string
+          last_checked_at?: string | null
+          last_status?: number | null
+          official_url: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          jurisdiction?: string
+          last_checked_at?: string | null
+          last_status?: number | null
+          official_url?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -876,6 +918,24 @@ export type Database = {
           referred_user_id?: string
           referrer_user_id?: string
           status?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
         }
         Relationships: []
       }
