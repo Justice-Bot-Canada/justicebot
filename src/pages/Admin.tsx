@@ -150,6 +150,7 @@ const Admin = () => {
   const [revokeReason, setRevokeReason] = useState("");
   const [selectedUserDetails, setSelectedUserDetails] = useState<User | null>(null);
   const [showUserDetailsDialog, setShowUserDetailsDialog] = useState(false);
+  const [syncingForms, setSyncingForms] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -375,6 +376,23 @@ const Admin = () => {
   const handleViewUserDetails = (user: User) => {
     setSelectedUserDetails(user);
     setShowUserDetailsDialog(true);
+  };
+
+  const syncOntarioForms = async () => {
+    try {
+      setSyncingForms(true);
+      const { data, error } = await supabase.functions.invoke('sync-ontario-forms');
+      
+      if (error) throw error;
+      
+      toast.success(data?.message || 'Ontario forms synced successfully');
+      console.log('Sync results:', data);
+    } catch (error: any) {
+      console.error('Error syncing forms:', error);
+      toast.error(error.message || 'Failed to sync Ontario forms');
+    } finally {
+      setSyncingForms(false);
+    }
   };
 
   // Simple admin check - in production, you'd want proper role-based auth
