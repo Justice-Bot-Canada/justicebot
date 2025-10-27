@@ -19,7 +19,7 @@ export const AppDemoVideo = () => {
     {
       id: "ltb",
       title: "LTB - Landlord Tenant Board",
-      embedUrl: "https://www.youtube.com/embed/lllrAC7yfLE",
+      embedUrl: "https://www.youtube.com/embed/Ds97LCuSX1U",
       description: "Navigate the Landlord and Tenant Board process"
     }
   ];
