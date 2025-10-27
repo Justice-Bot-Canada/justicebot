@@ -7,13 +7,13 @@ export const AppDemoVideo = () => {
     {
       id: "hrto",
       title: "HRTO - Human Rights Tribunal",
-      embedUrl: "https://www.youtube.com/embed/jDpTN7oKdsc",
+      embedUrl: "https://www.youtube.com/embed/eZt0_SZ8dCw",
       description: "Learn how to file a human rights complaint with the HRTO"
     },
     {
       id: "small-claims",
       title: "Small Claims Court",
-      embedUrl: "https://www.youtube.com/embed/NTaiMtqsE7c",
+      embedUrl: "https://www.youtube.com/embed/-M_p6-6d_48",
       description: "Step-by-step guide to filing in Small Claims Court"
     },
     {
