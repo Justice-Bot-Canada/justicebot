@@ -1,20 +1,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://justice-bot.com',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface ContactRequest {
-  name: string;
-  email: string;
-  organization: string;
-  phone?: string;
-  inquiryType: 'media' | 'partnership' | 'government';
-  subject: string;
-  message: string;
-}
+// Input validation schema
+const ContactSchema = z.object({
+  name: z.string().trim().min(1).max(100),
+  email: z.string().trim().email().max(255),
+  organization: z.string().trim().min(1).max(200),
+  phone: z.string().trim().max(20).optional(),
+  inquiryType: z.enum(['media', 'partnership', 'government']),
+  subject: z.string().trim().min(1).max(200),
+  message: z.string().trim().min(1).max(5000),
+});
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -43,16 +45,22 @@ serve(async (req) => {
       userId = user?.id || null;
     }
 
-    const contactData: ContactRequest = await req.json();
-
-    // Validate required fields
-    if (!contactData.name || !contactData.email || !contactData.organization || 
-        !contactData.inquiryType || !contactData.subject || !contactData.message) {
+    const requestBody = await req.json();
+    
+    // Validate input with Zod
+    const validationResult = ContactSchema.safeParse(requestBody);
+    if (!validationResult.success) {
+      console.error('Validation error:', validationResult.error.errors);
       return new Response(
-        JSON.stringify({ error: 'Missing required fields' }),
+        JSON.stringify({ 
+          error: 'Invalid input',
+          details: validationResult.error.errors.map(e => e.message).join(', ')
+        }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    const contactData = validationResult.data;
 
     // Create support ticket with contact inquiry
     const { data: ticket, error: ticketError } = await supabase
@@ -102,8 +110,7 @@ ${contactData.message}
 
     console.log('Contact form submitted successfully:', {
       ticketId: ticket.id,
-      inquiryType: contactData.inquiryType,
-      email: contactData.email,
+      inquiryType: contactData.inquiryType
     });
 
     return new Response(

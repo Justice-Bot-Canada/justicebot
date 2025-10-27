@@ -1,14 +1,29 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Define allowed form prices (in cents) - server-side source of truth
+const FORM_PRICES: Record<string, number> = {
+  'basic_form': 599,      // $5.99
+  'standard_form': 999,   // $9.99
+  'premium_form': 1999,   // $19.99
+  'tribunal_package': 4999, // $49.99
+};
+
+const FormPaymentSchema = z.object({
+  formId: z.string().min(1).max(100),
+  amount: z.number().int().positive().max(100000), // max $1000
+  currency: z.string().length(3).optional().default('CAD'),
+});
+
 interface FormPaymentRequest {
   formId: string;
-  amount: number; // in cents
+  amount: number;
   currency?: string;
 }
 
@@ -66,10 +81,32 @@ serve(async (req) => {
 
     logStep("User authenticated", { userId: user.id });
 
-    const { formId, amount, currency = "CAD" }: FormPaymentRequest = await req.json();
+    const requestBody = await req.json();
     
-    if (!formId || !amount) {
-      throw new Error("Form ID and amount are required");
+    // Validate input with Zod
+    const validationResult = FormPaymentSchema.safeParse(requestBody);
+    if (!validationResult.success) {
+      logStep("Validation error", { errors: validationResult.error.errors });
+      throw new Error(`Invalid request: ${validationResult.error.errors.map(e => e.message).join(', ')}`);
+    }
+
+    const { formId, amount, currency } = validationResult.data;
+    
+    // CRITICAL: Verify amount matches server-side price
+    const expectedAmount = FORM_PRICES[formId];
+    if (!expectedAmount) {
+      logStep("Invalid form ID", { formId });
+      throw new Error("Invalid form ID");
+    }
+    
+    if (amount !== expectedAmount) {
+      logStep("Price manipulation detected", { 
+        providedAmount: amount, 
+        expectedAmount,
+        formId,
+        userId: user.id 
+      });
+      throw new Error("Invalid payment amount");
     }
 
     logStep("Creating form payment", { formId, amount, currency });

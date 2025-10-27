@@ -3,7 +3,13 @@ project_id = "vkzquzjtewqhcisvhsvg"
 # JWT verification is ENABLED by default for all functions
 # Only public contact forms should bypass authentication
 
+[functions.analyze-legal-case-ai]
+verify_jwt = true  # SECURITY FIX: Now requires authentication
+
 [functions.submit-contact]
+verify_jwt = false
+
+[functions.submit-feedback]
 verify_jwt = false
 
 [functions.send-deadline-notifications]

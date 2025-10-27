@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Check, CreditCard, FileText, Zap, Mail, DollarSign, Users } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -135,6 +136,12 @@ const Pricing = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Affordable Legal Help Pricing - Plans from $2.99/month"
+        description="Justice-Bot pricing plans for Canadians. Premium legal forms and document services from $19.99/month. Low-income plans available at $2.99/month. Ontario legal help made affordable."
+        keywords="legal services pricing Canada, affordable legal help Ontario, legal document pricing, law help subscription, Canadian legal services cost"
+        canonicalUrl="https://justice-bot.com/pricing"
+      />
       <Header />
       <main className="container mx-auto px-4 py-16">
         {/* Hero Banner */}
