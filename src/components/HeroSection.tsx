@@ -92,21 +92,6 @@ const HeroSection = () => {
                   Begin your legal case assessment process
                 </span>
               </Button>
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="w-full sm:w-auto"
-                onClick={() => {
-                  const videoSection = document.querySelector('[id*="explainer"]') || document.getElementById('merit');
-                  videoSection?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                aria-describedby="demo-description"
-              >
-                Watch How It Works (60 sec)
-                <span id="demo-description" className="sr-only">
-                  View demonstration of Justice-Bot features and merit scoring system
-                </span>
-              </Button>
             </div>
 
             <div 
