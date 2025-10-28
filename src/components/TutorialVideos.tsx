@@ -92,9 +92,12 @@ export default function TutorialVideos({ pathwayType, category }: TutorialVideos
 
   if (videos.length === 0) {
     return (
-      <Card className="p-8 text-center">
-        <Play className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-        <p className="text-muted-foreground">No tutorial videos available yet</p>
+      <Card className="p-12 text-center border-dashed">
+        <Play className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+        <h3 className="text-xl font-semibold mb-2">Coming Soon</h3>
+        <p className="text-muted-foreground max-w-md mx-auto">
+          We're currently producing high-quality video tutorials to help you through every step of your legal journey. Check back soon!
+        </p>
       </Card>
     );
   }
@@ -109,10 +112,15 @@ export default function TutorialVideos({ pathwayType, category }: TutorialVideos
     return acc;
   }, {} as Record<string, TutorialVideo[]>);
 
+  // Filter out empty categories
+  const nonEmptyCategories = Object.entries(videosByCategory).filter(
+    ([_, categoryVideos]) => categoryVideos.length > 0
+  );
+
   return (
     <>
       <div className="space-y-12">
-        {Object.entries(videosByCategory).map(([category, categoryVideos]) => (
+        {nonEmptyCategories.map(([category, categoryVideos]) => (
           <div key={category}>
             <h2 className="text-2xl font-bold mb-6 text-primary">{category}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
