@@ -18,3 +18,12 @@ verify_jwt = false
 
 [functions.sync-ontario-forms]
 verify_jwt = true  # Admin-only function
+
+[functions.ai-legal-triage]
+verify_jwt = false  # Public chatbot
+
+[functions.generate-seo-pages]
+verify_jwt = true  # Admin only
+
+[functions.send-email-notification]
+verify_jwt = true  # System function
