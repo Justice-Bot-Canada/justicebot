@@ -9,6 +9,9 @@
 /login              /welcome            301!
 /generate           /forms              301!
 /download           /templates          301!
+/timeline           /dashboard          301!
+/small-claims       /small-claims-journey 301!
+/demo-video         /                   301!
 
 # Block sensitive config files
 /config.json        /404                404

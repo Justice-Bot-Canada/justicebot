@@ -49,6 +49,21 @@
   to = "/templates"
   status = 301
 
+[[redirects]]
+  from = "/timeline"
+  to = "/dashboard"
+  status = 301
+
+[[redirects]]
+  from = "/small-claims"
+  to = "/small-claims-journey"
+  status = 301
+
+[[redirects]]
+  from = "/demo-video"
+  to = "/"
+  status = 301
+
 # 404 for non-existent pages
 [[redirects]]
   from = "/payments/*"
