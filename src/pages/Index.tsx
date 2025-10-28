@@ -103,38 +103,6 @@ const Index = () => {
         <TrustSignals />
         <SuccessStories />
         
-        {/* Tutorial Videos Preview */}
-        <section className="py-16 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">Step-by-Step Video Guides</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
-                Watch detailed tutorials showing you exactly how to file forms, gather evidence, and present your case effectively.
-              </p>
-              <a href="/tutorials" className="inline-flex items-center gap-2 text-primary hover:underline">
-                View All Tutorials →
-              </a>
-            </div>
-            <TutorialVideos />
-          </div>
-        </section>
-
-        {/* Document Templates Preview */}
-        <section className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">Professional Document Templates</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto mb-6">
-                Download ready-to-use templates for letters, evidence organization, witness statements, and more.
-              </p>
-              <a href="/templates" className="inline-flex items-center gap-2 text-primary hover:underline">
-                Browse All Templates →
-              </a>
-            </div>
-            <DocumentTemplates />
-          </div>
-        </section>
-        
         <FeaturesSection />
         <AppDemoVideo />
       </main>
