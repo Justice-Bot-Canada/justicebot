@@ -2,14 +2,24 @@ import { ContactForm } from "@/components/ContactForm";
 import SEOHead from "@/components/SEOHead";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { ArticleSchema } from "@/components/ArticleSchema";
 
 const Contact = () => {
   return (
     <>
       <SEOHead
-        title="Contact Us - Media, Partnership & Government Inquiries | Justice Bot"
-        description="Get in touch with Justice Bot for media inquiries, business partnerships, and government collaboration opportunities. Contact our team today."
+        title="Contact Us - Media, Partnership & Government Inquiries"
+        description="Get in touch with Justice Bot for media inquiries, business partnerships, and government collaboration. Multiple contact options including email and contact form available."
         keywords="contact justice bot, media inquiries, business partnerships, government collaboration, legal tech contact"
+        canonicalUrl="https://justice-bot.com/contact"
+      />
+      <ArticleSchema
+        headline="Contact Justice Bot - Get in Touch"
+        description="Contact Justice Bot for media inquiries, partnerships, government relations, and general support. We're here to help make legal services more accessible."
+        image="https://justice-bot.com/justice-bot-logo.jpeg"
+        datePublished="2025-01-15T00:00:00Z"
+        dateModified={new Date().toISOString()}
+        url="https://justice-bot.com/contact"
       />
       
       <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background">

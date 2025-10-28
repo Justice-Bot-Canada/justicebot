@@ -9,6 +9,9 @@ Disallow: /profile
 Disallow: /admin
 Disallow: /payment-success
 Disallow: /payment-cancel
+Disallow: /evidence
+Disallow: /referrals
+Disallow: /low-income
 Disallow: /config.json
 Disallow: /*.json$
 Disallow: /favicon.ico
@@ -87,5 +90,5 @@ Disallow: /favicon.ico
 Disallow: /dev.html
 Disallow: /dev/
 
-# Sitemap location
-Sitemap: https://www.justice-bot.com/sitemap.xml
+# Sitemap location (use non-www for consistency)
+Sitemap: https://justice-bot.com/sitemap.xml

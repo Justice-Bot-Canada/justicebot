@@ -1,35 +1,19 @@
-# Static files
+# Static files - serve as-is
 /sitemap.xml   /sitemap.xml   200
 /robots.txt    /robots.txt    200
-/dev           /dev.html      200
 
-# Explicit routes for SEO and crawling
-/journey              /index.html    200
-/privacy              /index.html    200
-/disclaimer           /index.html    200
-/troubleshooting      /index.html    200
-/media-inquiries      /index.html    200
-/court                /index.html    200
-/explain              /index.html    200
-/dashboard            /index.html    200
-/government-inquiries /index.html    200
-/legal-updates        /index.html    200
-/about                /index.html    200
+# 301 Redirects - permanent redirects for SEO (prevents duplicate content)
+/terms-of-use       /terms              301!
+/account            /profile            301!
+/signup             /welcome            301!
+/login              /welcome            301!
+/generate           /forms              301!
+/download           /templates          301!
 
-# Redirects for alternate URLs (301 = permanent redirect, prevents duplicate content)
-/terms-of-use       /terms              301
-/account            /profile            301
-/signup             /                   301
-/login              /                   301
-/generate           /forms              301
-/download           /templates          301
+# Return 404 for truly non-existent pages
+/payments/*         /                   404
+/entitlements       /                   404
+/founders-story     /                   404
 
-# Return 404 for non-existent pages (prevents duplicate content issues)
-/payments/*         /404                404
-/entitlements       /404                404
-/foo/bar            /404                404
-/path/to/ref        /404                404
-/founders-story     /404                404
-
-# SPA fallback (must be last)
-/*             /index.html    200
+# SPA fallback - must be last, handles all React Router routes
+/*                  /index.html         200

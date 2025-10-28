@@ -1,8 +1,8 @@
+# Static files
 /sitemap.xml   /sitemap.xml   200
 /robots.txt    /robots.txt    200
-/dev           /dev.html      200
 
-# Redirect old paths to canonical URLs
+# 301 Redirects for old URLs
 /terms-of-use  /terms         301!
 /account       /profile       301!
 /signup        /welcome       301!
@@ -11,11 +11,9 @@
 /download      /templates     301!
 
 # Return 404 for non-existent pages
-/payments/*    /404           404!
-/entitlements  /404           404!
-/foo/bar       /404           404!
-/path/to/ref   /404           404!
-/founders-story /404          404!
+/payments/*    /                404
+/entitlements  /                404
+/founders-story /               404
 
-# 404 catchall
+# SPA fallback
 /*             /index.html    200

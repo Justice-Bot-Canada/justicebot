@@ -2,6 +2,7 @@ import React from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
+import { ArticleSchema } from "@/components/ArticleSchema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle } from "lucide-react";
 
@@ -9,9 +10,18 @@ const Disclaimer = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Legal Disclaimer - Justice Bot"
-        description="Important legal disclaimers and notices about using Justice Bot's legal assistance platform."
-        keywords="legal disclaimer, terms of use, legal notices, Justice Bot"
+        title="Legal Disclaimer & Terms of Use"
+        description="Important legal disclaimers for Justice Bot users. Understand our service limitations, liability terms, and AI-generated content notices. Not a substitute for legal advice."
+        keywords="legal disclaimer, terms of use, AI disclaimer, legal notices, service limitations, liability terms"
+        canonicalUrl="https://justice-bot.com/disclaimer"
+      />
+      <ArticleSchema
+        headline="Justice Bot Legal Disclaimer"
+        description="Legal disclaimers and important notices for Justice Bot users. Understand our service scope, limitations, and user responsibilities."
+        image="https://justice-bot.com/justice-bot-logo.jpeg"
+        datePublished="2025-01-10T00:00:00Z"
+        dateModified={new Date().toISOString()}
+        url="https://justice-bot.com/disclaimer"
       />
       
       <Header />

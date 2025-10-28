@@ -2,6 +2,7 @@ import React from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
+import { ArticleSchema } from "@/components/ArticleSchema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { HelpCircle, Mail, MessageSquare } from "lucide-react";
@@ -14,9 +15,18 @@ const Troubleshooting = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Troubleshooting & Help - Justice Bot"
-        description="Get help with common issues and questions about using Justice Bot. Find solutions to technical problems and learn how to use our features."
-        keywords="troubleshooting, help, support, FAQ, Justice Bot issues, technical support"
+        title="Troubleshooting & Help"
+        description="Get help with common Justice Bot issues. Solutions for login problems, case analysis, document uploads, payments, and form prefilling. Support available 24/7."
+        keywords="troubleshooting, help, support, FAQ, Justice Bot issues, technical support, login help, payment issues"
+        canonicalUrl="https://justice-bot.com/troubleshooting"
+      />
+      <ArticleSchema
+        headline="Troubleshooting Guide - Justice Bot Help Center"
+        description="Comprehensive troubleshooting guide for Justice Bot users. Find solutions to common technical issues and get help when you need it."
+        image="https://justice-bot.com/justice-bot-logo.jpeg"
+        datePublished="2025-01-20T00:00:00Z"
+        dateModified={new Date().toISOString()}
+        url="https://justice-bot.com/troubleshooting"
       />
       
       <Header />
