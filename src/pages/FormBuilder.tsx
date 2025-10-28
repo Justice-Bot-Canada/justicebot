@@ -87,9 +87,15 @@ const FormBuilder = () => {
         .from('forms')
         .select('*')
         .eq('id', formId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
+      
+      if (!data) {
+        toast.error("Form not found");
+        navigate('/forms');
+        return;
+      }
       
       setForm(data);
       
@@ -161,24 +167,51 @@ const FormBuilder = () => {
     if (!prefillData || autoFilling) return;
     
     setAutoFilling(true);
+    toast.loading("AI is pre-filling your form...");
+    
     try {
-      // Simple auto-fill logic - in production, use AI
-      const updatedData = { ...formData };
-      
-      if (fields.find(f => f.name === 'issue_description')) {
-        updatedData.issue_description = prefillData;
-      }
-      if (fields.find(f => f.name === 'incident_description')) {
-        updatedData.incident_description = prefillData;
-      }
-      if (fields.find(f => f.name === 'case_description')) {
-        updatedData.case_description = prefillData;
-      }
+      // Get user profile for additional context
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user?.id)
+        .maybeSingle();
 
-      setFormData(updatedData);
-      toast.success("Form auto-filled with your case details!");
-    } catch (error) {
+      // Call AI pre-fill edge function
+      const { data, error } = await supabase.functions.invoke('prefill-form', {
+        body: {
+          triageData: prefillData,
+          formFields: fields.map(f => ({
+            id: f.id,
+            name: f.name,
+            label: f.label,
+            type: f.type,
+            options: f.options
+          })),
+          userProfile: profile
+        }
+      });
+
+      if (error) throw error;
+
+      if (data?.success && data.prefilled_data) {
+        // Map AI prefilled data to form fields
+        const updatedData = { ...formData };
+        Object.entries(data.prefilled_data).forEach(([fieldId, value]) => {
+          const field = fields.find(f => f.id === fieldId || f.name === fieldId);
+          if (field) {
+            updatedData[field.name] = value;
+          }
+        });
+        
+        setFormData(updatedData);
+        toast.success("Form pre-filled with AI! Review and edit as needed.");
+      } else {
+        throw new Error("Failed to pre-fill form");
+      }
+    } catch (error: any) {
       console.error('Auto-fill error:', error);
+      toast.error(error.message || "Failed to pre-fill form. You can fill it manually.");
     } finally {
       setAutoFilling(false);
     }
@@ -218,6 +251,67 @@ const FormBuilder = () => {
       return;
     }
 
+    // Check if form requires payment
+    if (form.price_cents > 0) {
+      // Check if user has purchased this form
+      const { data: purchases, error: purchaseError } = await supabase
+        .from('payments')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('form_id', form.id)
+        .eq('status', 'completed')
+        .maybeSingle();
+
+      if (purchaseError) {
+        console.error('Purchase check error:', purchaseError);
+      }
+
+      if (!purchases) {
+        // Show payment required message
+        toast.error(`Payment required: $${(form.price_cents / 100).toFixed(2)} CAD`);
+        
+        // Navigate to payment
+        try {
+          const { data: paymentData, error: paymentCreateError } = await supabase
+            .from('payments')
+            .insert({
+              user_id: user.id,
+              form_id: form.id,
+              amount: form.price_cents / 100,
+              amount_cents: form.price_cents,
+              currency: 'CAD',
+              plan_type: 'form_purchase',
+              status: 'pending',
+              payment_id: `form_${form.id}_${Date.now()}`,
+              payment_provider: 'paypal'
+            })
+            .select()
+            .single();
+
+          if (paymentCreateError) throw paymentCreateError;
+
+          // Call payment function
+          const { data: sessionData, error: sessionError } = await supabase.functions.invoke('create-form-payment', {
+            body: {
+              formId: form.id,
+              paymentId: paymentData.id
+            }
+          });
+
+          if (sessionError) throw sessionError;
+
+          if (sessionData?.url) {
+            window.open(sessionData.url, '_blank');
+            toast.success("Complete payment to download your form");
+          }
+        } catch (error: any) {
+          console.error('Payment error:', error);
+          toast.error('Failed to process payment');
+        }
+        return;
+      }
+    }
+
     try {
       toast.loading("Generating official PDF form...");
       
@@ -244,6 +338,7 @@ const FormBuilder = () => {
             }
           }
         });
+
 
         if (fallbackError) throw fallbackError;
         
