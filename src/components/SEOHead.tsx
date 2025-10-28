@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { useLocation } from "react-router-dom";
 
 interface SEOHeadProps {
   title: string;
@@ -25,8 +26,12 @@ const SEOHead = ({
   modifiedTime,
   articleSection
 }: SEOHeadProps) => {
+  const location = useLocation();
   const fullTitle = `${title} | Justice-Bot - Affordable Legal Help`;
-  const currentUrl = canonicalUrl || window.location.href;
+  
+  // Build clean canonical URL - no query params, no trailing slash, always https://justice-bot.com
+  const cleanCanonical = canonicalUrl || `https://justice-bot.com${location.pathname.replace(/\/$/, '')}`;
+  const currentUrl = cleanCanonical;
 
   return (
     <Helmet>

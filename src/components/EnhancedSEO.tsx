@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { useLocation } from "react-router-dom";
 
 interface EnhancedSEOProps {
   title: string;
@@ -35,8 +36,12 @@ const EnhancedSEO = ({
   breadcrumbs,
   faqData
 }: EnhancedSEOProps) => {
+  const location = useLocation();
   const fullTitle = `${title} | Justice-Bot - Affordable Legal Help`;
-  const currentUrl = canonicalUrl || (typeof window !== 'undefined' ? window.location.href : '');
+  
+  // Build clean canonical URL - no query params, no trailing slash
+  const cleanCanonical = canonicalUrl || `https://justice-bot.com${location.pathname.replace(/\/$/, '')}`;
+  const currentUrl = cleanCanonical;
 
   // Generate Organization Schema
   const organizationSchema = {
