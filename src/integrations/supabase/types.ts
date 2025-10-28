@@ -373,6 +373,7 @@ export type Database = {
           order_index: number | null
           page_count: number | null
           redacted_regions: Json | null
+          search_vector: unknown
           tags: string[] | null
           upload_date: string
         }
@@ -388,6 +389,7 @@ export type Database = {
           order_index?: number | null
           page_count?: number | null
           redacted_regions?: Json | null
+          search_vector?: unknown
           tags?: string[] | null
           upload_date?: string
         }
@@ -403,6 +405,7 @@ export type Database = {
           order_index?: number | null
           page_count?: number | null
           redacted_regions?: Json | null
+          search_vector?: unknown
           tags?: string[] | null
           upload_date?: string
         }
@@ -412,6 +415,146 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evidence_links: {
+        Row: {
+          confidence: number | null
+          created_at: string | null
+          evidence_id: string | null
+          form_id: string | null
+          id: string
+          note: string | null
+          section_key: string | null
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string | null
+          evidence_id?: string | null
+          form_id?: string | null
+          id?: string
+          note?: string | null
+          section_key?: string | null
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string | null
+          evidence_id?: string | null
+          form_id?: string | null
+          id?: string
+          note?: string | null
+          section_key?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evidence_links_evidence_id_fkey"
+            columns: ["evidence_id"]
+            isOneToOne: false
+            referencedRelation: "evidence"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evidence_links_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evidence_metadata: {
+        Row: {
+          category: string | null
+          confidence_score: number | null
+          created_at: string | null
+          dates: Json | null
+          doc_type: string | null
+          evidence_id: string
+          extracted_text: string | null
+          flags: Json | null
+          parties: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          dates?: Json | null
+          doc_type?: string | null
+          evidence_id: string
+          extracted_text?: string | null
+          flags?: Json | null
+          parties?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          dates?: Json | null
+          doc_type?: string | null
+          evidence_id?: string
+          extracted_text?: string | null
+          flags?: Json | null
+          parties?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evidence_metadata_evidence_id_fkey"
+            columns: ["evidence_id"]
+            isOneToOne: true
+            referencedRelation: "evidence"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exhibits: {
+        Row: {
+          case_id: string | null
+          created_at: string | null
+          evidence_id: string | null
+          id: string
+          label: string
+          order_index: number | null
+          page_end: number | null
+          page_start: number | null
+        }
+        Insert: {
+          case_id?: string | null
+          created_at?: string | null
+          evidence_id?: string | null
+          id?: string
+          label: string
+          order_index?: number | null
+          page_end?: number | null
+          page_start?: number | null
+        }
+        Update: {
+          case_id?: string | null
+          created_at?: string | null
+          evidence_id?: string | null
+          id?: string
+          label?: string
+          order_index?: number | null
+          page_end?: number | null
+          page_start?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exhibits_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exhibits_evidence_id_fkey"
+            columns: ["evidence_id"]
+            isOneToOne: false
+            referencedRelation: "evidence"
             referencedColumns: ["id"]
           },
         ]

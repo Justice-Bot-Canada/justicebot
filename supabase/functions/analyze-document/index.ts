@@ -66,17 +66,23 @@ serve(async (req) => {
 
     console.log("Analyzing document:", fileName);
 
-    const systemPrompt = `You are a legal document analyzer specializing in Canadian law. Analyze documents and extract:
-1. Document Type (e.g., lease agreement, correspondence, evidence photo, etc.)
-2. Key Parties Involved (names, roles)
-3. Important Dates (deadlines, incidents, agreements)
-4. Relevant Legal Issues (rental disputes, discrimination, contract breaches, etc.)
-5. Key Facts & Events (summarize main points)
-6. Potential Evidence Value (High/Medium/Low with reasoning)
-7. Recommended Actions (what to do with this information)
-8. Related Laws/Regulations (mention relevant Ontario laws if applicable)
+    const systemPrompt = `You are a legal document analyzer specializing in Canadian law. Analyze documents and extract structured metadata.
 
-Be thorough but concise. Format your response in clear sections.`;
+Return a JSON object with these fields:
+{
+  "doc_type": "photo|receipt|email|letter|report|agreement|notice|other",
+  "category": "PestControl|Rent|Accommodation|Safety|Discrimination|Maintenance|Notice|Communication|Financial|Other",
+  "parties": {"landlord": "name", "tenant": "name", "other": ["names"]},
+  "dates": {"captured": "YYYY-MM-DD", "incident": "YYYY-MM-DD", "deadline": "YYYY-MM-DD"},
+  "extracted_summary": "Brief 1-2 sentence summary",
+  "evidence_value": "high|medium|low",
+  "legal_issues": ["issue1", "issue2"],
+  "suggested_forms": ["T2", "T6", "HRTO_F1", etc],
+  "section_mappings": {"form_type": "section_key"},
+  "confidence": 0.85
+}
+
+Be precise and concise. All fields should be populated even if empty.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -90,9 +96,10 @@ Be thorough but concise. Format your response in clear sections.`;
           { role: "system", content: systemPrompt },
           { 
             role: "user", 
-            content: `Analyze this document:\n\nFile: ${fileName}\n\nContent:\n${fileContent.substring(0, 50000)}` 
+            content: `Analyze this document and return structured JSON:\n\nFile: ${fileName}\n\nContent:\n${fileContent.substring(0, 50000)}` 
           },
         ],
+        response_format: { type: "json_object" }
       }),
     });
 
@@ -118,14 +125,28 @@ Be thorough but concise. Format your response in clear sections.`;
     }
 
     const data = await response.json();
-    const analysis = data.choices?.[0]?.message?.content;
+    const analysisContent = data.choices?.[0]?.message?.content;
+    
+    let metadata;
+    try {
+      metadata = JSON.parse(analysisContent);
+    } catch (e) {
+      console.error("Failed to parse AI response as JSON:", e);
+      metadata = {
+        doc_type: "other",
+        category: "Other",
+        extracted_summary: analysisContent,
+        confidence: 0.5
+      };
+    }
 
-    console.log("Document analysis complete");
+    console.log("Document analysis complete, metadata extracted");
 
     return new Response(
       JSON.stringify({ 
         success: true,
-        analysis,
+        analysis: analysisContent,
+        metadata,
         fileName,
         caseId
       }),
