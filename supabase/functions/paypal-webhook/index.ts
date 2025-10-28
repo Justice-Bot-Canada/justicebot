@@ -94,7 +94,33 @@ serve(async (req: Request) => {
         console.error('Error queueing email:', emailError);
       }
 
-      // 4) Create payment audit entry
+      // 4) Trigger document generation
+      try {
+        const { data: caseDetails } = await supabase
+          .from('cases')
+          .select('user_id, venue')
+          .eq('id', caseId)
+          .single();
+
+        if (caseDetails) {
+          // Call document generation function
+          await supabase.functions.invoke('generate-document', {
+            body: {
+              case_id: caseId,
+              doc_type: caseDetails.venue || 'general',
+              user_email: payerEmail,
+              user_name: resource?.payer?.name?.given_name,
+              form_data: {}, // Add relevant form data here
+            }
+          });
+          console.log('Document generation triggered');
+        }
+      } catch (docError) {
+        console.error('Document generation error:', docError);
+        // Don't fail the webhook if doc generation fails
+      }
+
+      // 5) Create payment audit entry
       await supabase
         .from('payment_audit')
         .insert({
