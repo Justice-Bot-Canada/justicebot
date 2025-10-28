@@ -10,6 +10,9 @@
 /generate           /forms              301!
 /download           /templates          301!
 
+# Block sensitive config files
+/config.json        /404                404
+
 # Return 404 for truly non-existent pages
 /payments/*         /                   404
 /entitlements       /                   404
