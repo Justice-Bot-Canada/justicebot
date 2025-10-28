@@ -99,10 +99,24 @@ export default function TutorialVideos({ pathwayType, category }: TutorialVideos
     );
   }
 
+  // Group videos by category
+  const videosByCategory = videos.reduce((acc, video) => {
+    const category = video.category || 'Other';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(video);
+    return acc;
+  }, {} as Record<string, TutorialVideo[]>);
+
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {videos.map((video, index) => (
+      <div className="space-y-12">
+        {Object.entries(videosByCategory).map(([category, categoryVideos]) => (
+          <div key={category}>
+            <h2 className="text-2xl font-bold mb-6 text-primary">{category}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {categoryVideos.map((video) => (
           <Card 
             key={video.id} 
             className="overflow-hidden hover:shadow-xl transition-all cursor-pointer group"
@@ -143,6 +157,9 @@ export default function TutorialVideos({ pathwayType, category }: TutorialVideos
               </div>
             </div>
           </Card>
+        ))}
+            </div>
+          </div>
         ))}
       </div>
 
