@@ -16,7 +16,8 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AuthDialog from "@/components/AuthDialog";
-import SEOHead from "@/components/SEOHead";
+import EnhancedSEO from "@/components/EnhancedSEO";
+import { CanonicalURL } from "@/components/CanonicalURL";
 import { useAuth } from "@/hooks/useAuth";
 
 const HRTOHelp = () => {
@@ -34,24 +35,65 @@ const HRTOHelp = () => {
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "Service",
-    "name": "Human Rights Tribunal Ontario Help",
-    "description": "Get affordable legal help for HRTO applications, discrimination complaints, and human rights issues in Ontario",
-    "provider": {
-      "@type": "Organization",
-      "name": "Justice-Bot"
-    },
-    "serviceType": "Legal Services",
-    "areaServed": "Ontario, Canada"
+    "@type": "HowTo",
+    "name": "How to File an HRTO Application in Ontario",
+    "description": "Step-by-step guide to filing Human Rights Tribunal Ontario applications for workplace discrimination, housing discrimination, and human rights violations",
+    "totalTime": "PT3H",
+    "supply": ["Evidence of discrimination", "Witness statements", "Timeline of events"],
+    "tool": ["Justice-Bot platform", "HRTO Application Form 1"],
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Document Discrimination",
+        "text": "Gather evidence of discrimination based on protected grounds: race, gender, disability, age, family status, etc. Document dates, witnesses, and specific incidents."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Complete HRTO Form 1",
+        "text": "Fill out the Human Rights Tribunal Application with detailed description of how you were discriminated against and what remedy you're seeking."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Submit Application",
+        "text": "File your HRTO application online (no filing fee), serve the respondent, and prepare for mediation or hearing process."
+      }
+    ]
   };
+
+  const breadcrumbs = [
+    { name: "Home", url: "/" },
+    { name: "HRTO Help", url: "/hrto-help" }
+  ];
+
+  const faqData = [
+    {
+      question: "How do I file a human rights complaint in Ontario?",
+      answer: "To file a human rights complaint in Ontario, complete HRTO Form 1 (Application) describing the discrimination you experienced. There is no filing fee. Submit it online through the HRTO website."
+    },
+    {
+      question: "What is considered discrimination under the Ontario Human Rights Code?",
+      answer: "Discrimination occurs when someone is treated unfairly based on: race, ancestry, place of origin, colour, ethnic origin, citizenship, creed, sex, sexual orientation, gender identity, gender expression, age, marital status, family status, disability, or record of offences."
+    },
+    {
+      question: "How long does the HRTO process take?",
+      answer: "HRTO cases typically take 12-18 months from filing to resolution. Many cases settle through mediation within 6-8 months."
+    },
+    {
+      question: "Do I need a lawyer for an HRTO application?",
+      answer: "No, you can represent yourself at the Human Rights Tribunal. Justice-Bot provides affordable guidance to help you build a strong case without expensive lawyer fees."
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead
-        title="Human Rights Tribunal Ontario (HRTO) Help - File Your Application"
-        description="Need help with HRTO applications? Get affordable legal assistance for discrimination complaints, human rights violations, and tribunal applications in Ontario. Start your case assessment today."
-        keywords="HRTO help, Human Rights Tribunal Ontario, discrimination complaint, human rights lawyer, HRTO application, workplace discrimination, housing discrimination"
+      <CanonicalURL />
+      <EnhancedSEO
+        title="How to File an HRTO Application in Ontario (Step-by-Step)"
+        description="Complete guide to filing Human Rights Tribunal Ontario applications. Learn how to file discrimination complaints for workplace, housing, and service discrimination. Expert AI guidance starting at $5.99."
+        keywords="how to file HRTO application, human rights complaint Ontario, discrimination claim process, file human rights case"
         structuredData={structuredData}
+        breadcrumbs={breadcrumbs}
+        faqData={faqData}
       />
       
       <Header />

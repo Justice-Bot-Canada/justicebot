@@ -16,9 +16,9 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AuthDialog from "@/components/AuthDialog";
-import SEOHead from "@/components/SEOHead";
+import EnhancedSEO from "@/components/EnhancedSEO";
+import { CanonicalURL } from "@/components/CanonicalURL";
 import { useAuth } from "@/hooks/useAuth";
-import { LegalServiceSchema } from "@/components/LegalServiceSchema";
 
 const LTBHelp = () => {
   const navigate = useNavigate();
@@ -35,36 +35,65 @@ const LTBHelp = () => {
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "Service",
-    "name": "Landlord Tenant Board Ontario Help",
-    "description": "Get affordable legal help for LTB applications, eviction disputes, rent increases, and landlord-tenant issues in Ontario",
-    "provider": {
-      "@type": "Organization",
-      "name": "Justice-Bot"
-    },
-    "serviceType": "Legal Services",
-    "areaServed": "Ontario, Canada"
+    "@type": "HowTo",
+    "name": "How to File an LTB Application in Ontario",
+    "description": "Step-by-step guide to filing Landlord and Tenant Board applications for eviction disputes, rent issues, and maintenance complaints in Ontario",
+    "totalTime": "PT2H",
+    "supply": ["Rental agreement", "Evidence of issue", "Receipts and photos"],
+    "tool": ["Justice-Bot platform", "LTB application forms (T1-T6, L1-L2)"],
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Identify Your Issue",
+        "text": "Determine which LTB form applies to your situation: T2 for tenant rights, T6 for maintenance, L1 for rent arrears, etc."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Complete Application",
+        "text": "Fill out the correct LTB form with detailed information about your landlord-tenant dispute and what remedy you're seeking."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Submit and Prepare",
+        "text": "File your application with the $53 fee, serve your landlord/tenant, and prepare evidence for your hearing."
+      }
+    ]
   };
+
+  const breadcrumbs = [
+    { name: "Home", url: "/" },
+    { name: "LTB Help", url: "/ltb-help" }
+  ];
+
+  const faqData = [
+    {
+      question: "How do I file an LTB application in Ontario?",
+      answer: "To file an LTB application, complete the appropriate form (T1-T6 for tenants, L1-L9 for landlords), pay the $53 filing fee, and submit it online or by mail to the Landlord and Tenant Board."
+    },
+    {
+      question: "How long does the LTB process take?",
+      answer: "LTB hearings typically occur 6-8 weeks after filing, though this can vary. Most cases are resolved within 3-4 months from initial filing."
+    },
+    {
+      question: "Can I fight an eviction notice in Ontario?",
+      answer: "Yes, you can dispute an eviction by filing the appropriate LTB application (usually T2 or T5) within the deadline specified on your eviction notice, typically 10-30 days."
+    },
+    {
+      question: "Do I need a lawyer for LTB hearings?",
+      answer: "No, most people represent themselves at LTB hearings. Justice-Bot helps you prepare strong applications and evidence without expensive lawyer fees."
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead
-        title="Landlord Tenant Board (LTB) Help - File Your Application"
-        description="Need help with LTB applications? Get affordable legal assistance for eviction disputes, rent increases, repairs, and landlord-tenant issues in Ontario. Expert guidance starting at $5.99."
-        keywords="LTB help, Landlord Tenant Board Ontario, eviction help, rent increase dispute, landlord tenant lawyer, tenant rights, LTB application"
+      <CanonicalURL />
+      <EnhancedSEO
+        title="How to File an LTB Application in Ontario (Step-by-Step)"
+        description="Complete guide to filing Landlord and Tenant Board applications in Ontario. Learn how to fight evictions, dispute rent increases, and get repairs done. Expert AI guidance starting at $5.99."
+        keywords="how to file LTB application, landlord tenant board process, fight eviction Ontario, tenant rights help, LTB forms guide"
         structuredData={structuredData}
-      />
-      <LegalServiceSchema
-        serviceName="Landlord & Tenant Board (LTB) Legal Help"
-        description="AI-powered assistance for Ontario LTB applications, disputes, and hearings. Expert guidance for tenant rights, eviction defense, rent disputes, and maintenance issues."
-        serviceType={[
-          "Tenant Rights Assistance",
-          "Eviction Defense",
-          "Rent Dispute Resolution",
-          "LTB Application Filing",
-          "Hearing Preparation"
-        ]}
-        venue="Landlord and Tenant Board (LTB)"
+        breadcrumbs={breadcrumbs}
+        faqData={faqData}
       />
       
       <Header />

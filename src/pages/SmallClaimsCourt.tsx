@@ -16,7 +16,8 @@ import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AuthDialog from "@/components/AuthDialog";
-import SEOHead from "@/components/SEOHead";
+import EnhancedSEO from "@/components/EnhancedSEO";
+import { CanonicalURL } from "@/components/CanonicalURL";
 import { useAuth } from "@/hooks/useAuth";
 
 const SmallClaimsCourt = () => {
@@ -34,24 +35,65 @@ const SmallClaimsCourt = () => {
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "Service",
-    "name": "Small Claims Court Ontario Help",
-    "description": "Get affordable legal help for Small Claims Court applications, debt collection, contract disputes, and civil claims under $35,000 in Ontario",
-    "provider": {
-      "@type": "Organization",
-      "name": "Justice-Bot"
-    },
-    "serviceType": "Legal Services",
-    "areaServed": "Ontario, Canada"
+    "@type": "HowTo",
+    "name": "How to File a Small Claims Court Case in Ontario",
+    "description": "Step-by-step guide to filing a Small Claims Court case in Ontario for debt collection, contract disputes, and civil claims under $35,000",
+    "totalTime": "PT2H",
+    "supply": ["Contract or invoice", "Evidence documentation", "Defendant information"],
+    "tool": ["Justice-Bot platform", "Plaintiff's Claim Form 7A"],
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Assess Your Claim",
+        "text": "Determine if your claim is under $35,000 and suitable for Small Claims Court. Gather evidence of debt, contract breach, or damages."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Complete Plaintiff's Claim",
+        "text": "Fill out Form 7A with detailed facts, amounts owed, and what you're seeking from the defendant."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "File and Serve",
+        "text": "Submit your claim to the court, pay the filing fee, and properly serve the defendant within required timeframes."
+      }
+    ]
   };
+
+  const breadcrumbs = [
+    { name: "Home", url: "/" },
+    { name: "Small Claims Court Help", url: "/small-claims" }
+  ];
+
+  const faqData = [
+    {
+      question: "What is the maximum claim amount in Ontario Small Claims Court?",
+      answer: "The maximum claim amount in Ontario Small Claims Court is $35,000, not including interest and costs."
+    },
+    {
+      question: "How much does it cost to file a Small Claims Court case?",
+      answer: "Filing fees range from $102 for claims over $2,500 to $75 for claims under $2,500. There may be additional costs for serving documents."
+    },
+    {
+      question: "How long does a Small Claims Court case take?",
+      answer: "Most Small Claims Court cases take 3-6 months from filing to resolution, though complex cases may take longer."
+    },
+    {
+      question: "Do I need a lawyer for Small Claims Court?",
+      answer: "No, you can represent yourself in Small Claims Court. Justice-Bot provides affordable guidance to help you prepare your case without expensive lawyer fees."
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead
-        title="Small Claims Court Ontario Help - File Your Claim Under $35,000"
-        description="Need help with Small Claims Court in Ontario? Get affordable legal assistance for debt collection, contract disputes, and civil claims under $35,000. Expert guidance starting at $5.99."
-        keywords="Small Claims Court Ontario, debt collection, contract dispute, civil claim, small claims lawyer, sue for money, court forms Ontario"
+      <CanonicalURL />
+      <EnhancedSEO
+        title="How to File a Small Claims Court Case in Ontario (Step-by-Step)"
+        description="Complete guide to filing a Small Claims Court case in Ontario. Learn how to file claims under $35,000 for debt collection, contract disputes, and property damage. Expert AI guidance starting at $5.99."
+        keywords="how to file small claims Ontario, small claims court steps, sue for money Ontario, debt collection court, small claims process"
         structuredData={structuredData}
+        breadcrumbs={breadcrumbs}
+        faqData={faqData}
       />
       
       <Header />
