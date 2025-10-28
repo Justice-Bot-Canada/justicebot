@@ -120,22 +120,41 @@ const Dashboard = () => {
           </TabsList>
 
           <TabsContent value="triage" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5" />
-                  AI Legal Assistant - Start Here
-                </CardTitle>
-                <CardDescription>
-                  {hasExistingCases 
-                    ? "Get help with your legal questions and explore new cases" 
-                    : "Tell me about your legal issue and I'll guide you through the right pathway"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <LegalChatbot />
-              </CardContent>
-            </Card>
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <MessageSquare className="h-5 w-5" />
+                    AI Legal Assistant - Start Here
+                  </CardTitle>
+                  <CardDescription>
+                    {hasExistingCases 
+                      ? "Get help with your legal questions and explore new cases" 
+                      : "Tell me about your legal issue and I'll guide you through the right pathway"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <LegalChatbot />
+                </CardContent>
+              </Card>
+
+              {activeCaseId && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      Upload Evidence & Documents
+                    </CardTitle>
+                    <CardDescription>
+                      After discussing your case, upload relevant documents, evidence, or correspondence for AI analysis
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <DocumentAnalyzer caseId={activeCaseId} />
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </TabsContent>
 
           <TabsContent value="cases" className="mt-6">

@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import type { Database } from "@/integrations/supabase/types";
 import { CalendarExportButton } from "./CalendarExportButton";
 import type { CalendarEvent } from "@/utils/calendarExport";
+import { AddEventDialog } from "./AddEventDialog";
 
 type CaseEvent = Database['public']['Tables']['case_events']['Row'];
 
@@ -29,6 +30,7 @@ export default function CaseCalendar({ caseId }: CaseCalendarProps) {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [events, setEvents] = useState<CaseEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showAddDialog, setShowAddDialog] = useState(false);
 
   useEffect(() => {
     loadEvents();
@@ -117,7 +119,7 @@ export default function CaseCalendar({ caseId }: CaseCalendarProps) {
                 events={calendarEvents}
                 caseName={`Case ${caseId.slice(0, 8)}`}
               />
-              <Button size="sm">
+              <Button size="sm" onClick={() => setShowAddDialog(true)}>
                 <Plus className="w-4 h-4 mr-2" />
                 Add Event
               </Button>
@@ -125,6 +127,12 @@ export default function CaseCalendar({ caseId }: CaseCalendarProps) {
           </div>
         </CardHeader>
         <CardContent>
+          <AddEventDialog
+            caseId={caseId}
+            open={showAddDialog}
+            onOpenChange={setShowAddDialog}
+            onEventAdded={loadEvents}
+          />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Calendar */}
             <div>
