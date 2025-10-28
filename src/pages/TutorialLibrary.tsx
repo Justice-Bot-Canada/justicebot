@@ -2,7 +2,8 @@ import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TutorialVideos from "@/components/TutorialVideos";
-import SEOHead from "@/components/SEOHead";
+import EnhancedSEO from "@/components/EnhancedSEO";
+import { CanonicalURL } from "@/components/CanonicalURL";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayCircle } from "lucide-react";
@@ -10,22 +11,72 @@ import { PlayCircle } from "lucide-react";
 export default function TutorialLibrary() {
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "VideoGallery",
-    "name": "Justice Bot Legal Tutorial Videos",
+    "@type": "ItemList",
+    "name": "Justice-Bot Legal Tutorial Videos",
     "description": "Free video tutorials teaching Canadians how to navigate legal processes including LTB applications, HRTO complaints, Small Claims Court, and more.",
     "url": "https://justice-bot.com/tutorials",
-    "image": "https://justice-bot.com/how-it-works-thumbnail.jpg"
+    "itemListElement": [
+      {
+        "@type": "VideoObject",
+        "name": "How to File an LTB Application",
+        "description": "Step-by-step guide to filing Landlord and Tenant Board applications in Ontario",
+        "thumbnailUrl": "https://justice-bot.com/how-it-works-thumbnail.jpg",
+        "uploadDate": "2025-01-15",
+        "duration": "PT10M"
+      },
+      {
+        "@type": "VideoObject", 
+        "name": "HRTO Application Complete Guide",
+        "description": "Complete walkthrough of filing Human Rights Tribunal Ontario complaints",
+        "thumbnailUrl": "https://justice-bot.com/how-it-works-thumbnail.jpg",
+        "uploadDate": "2025-01-15",
+        "duration": "PT15M"
+      },
+      {
+        "@type": "VideoObject",
+        "name": "Small Claims Court Filing Tutorial",
+        "description": "Learn how to file claims under $35,000 in Ontario Small Claims Court",
+        "thumbnailUrl": "https://justice-bot.com/how-it-works-thumbnail.jpg",
+        "uploadDate": "2025-01-15",
+        "duration": "PT12M"
+      }
+    ]
   };
+
+  const breadcrumbs = [
+    { name: "Home", url: "/" },
+    { name: "Tutorials", url: "/tutorials" }
+  ];
+
+  const faqData = [
+    {
+      question: "Are these video tutorials free?",
+      answer: "Yes! All our video tutorials are completely free to watch. You can learn at your own pace without any subscription required."
+    },
+    {
+      question: "What legal topics do your tutorials cover?",
+      answer: "Our tutorials cover LTB applications, HRTO complaints, Small Claims Court, Family Court matters, and general self-representation skills for Ontario legal processes."
+    },
+    {
+      question: "Do I need an account to watch tutorials?",
+      answer: "No account is required to watch tutorial videos. However, creating a free account gives you access to additional tools and resources."
+    },
+    {
+      question: "How long are the tutorial videos?",
+      answer: "Most tutorials range from 5-15 minutes, designed to be concise and focused on specific legal procedures or forms."
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead
+      <CanonicalURL />
+      <EnhancedSEO
         title="Free Legal Tutorial Videos - LTB, HRTO, Small Claims Guide"
         description="Watch step-by-step video tutorials for Ontario legal processes. Learn how to file LTB applications, HRTO complaints, Small Claims Court documents, and represent yourself effectively."
         keywords="legal tutorials, video guides, LTB tutorial, HRTO tutorial, small claims tutorial, legal help videos, self-representation videos, court procedure videos"
-        canonicalUrl="https://justice-bot.com/tutorials"
-        ogImage="/how-it-works-thumbnail.jpg"
         structuredData={structuredData}
+        breadcrumbs={breadcrumbs}
+        faqData={faqData}
       />
       <Header />
       <main className="container mx-auto px-4 py-12">

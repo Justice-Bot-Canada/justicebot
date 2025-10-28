@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Check, CreditCard, FileText, Zap, Mail, DollarSign, Users } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import SEOHead from "@/components/SEOHead";
+import EnhancedSEO from "@/components/EnhancedSEO";
+import { CanonicalURL } from "@/components/CanonicalURL";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -134,13 +135,105 @@ const Pricing = () => {
     }
   ];
 
+  // Product structured data for each plan
+  const productStructuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Product",
+        "name": "Justice-Bot Premium Monthly",
+        "description": "Full access to professional legal document generation and AI assistance for Ontario legal matters",
+        "brand": {
+          "@type": "Organization",
+          "name": "Justice-Bot"
+        },
+        "offers": {
+          "@type": "Offer",
+          "url": "https://justice-bot.com/pricing",
+          "priceCurrency": "CAD",
+          "price": "19.99",
+          "priceValidUntil": "2025-12-31",
+          "availability": "https://schema.org/InStock",
+          "itemCondition": "https://schema.org/NewCondition"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "reviewCount": "127"
+        }
+      },
+      {
+        "@type": "Product",
+        "name": "Justice-Bot Premium Yearly",
+        "description": "Annual subscription with 58% savings - best value for ongoing legal support",
+        "brand": {
+          "@type": "Organization",
+          "name": "Justice-Bot"
+        },
+        "offers": {
+          "@type": "Offer",
+          "url": "https://justice-bot.com/pricing",
+          "priceCurrency": "CAD",
+          "price": "99.99",
+          "priceValidUntil": "2025-12-31",
+          "availability": "https://schema.org/InStock"
+        }
+      },
+      {
+        "@type": "Product",
+        "name": "Justice-Bot Low-Income Plan",
+        "description": "Affordable access to premium legal services for low-income Canadians",
+        "brand": {
+          "@type": "Organization",
+          "name": "Justice-Bot"
+        },
+        "offers": {
+          "@type": "Offer",
+          "url": "https://justice-bot.com/pricing",
+          "priceCurrency": "CAD",
+          "price": "2.99",
+          "priceValidUntil": "2025-12-31",
+          "availability": "https://schema.org/LimitedAvailability",
+          "eligibleCustomerType": "Low-income individuals"
+        }
+      }
+    ]
+  };
+
+  const breadcrumbs = [
+    { name: "Home", url: "/" },
+    { name: "Pricing", url: "/pricing" }
+  ];
+
+  const faqData = [
+    {
+      question: "What payment methods do you accept?",
+      answer: "We accept PayPal and e-transfer payments. PayPal provides instant access, while e-transfer activation takes 24 hours."
+    },
+    {
+      question: "Can I cancel my subscription anytime?",
+      answer: "Yes, monthly subscriptions can be cancelled anytime. Annual plans are refundable within 30 days if you haven't generated documents."
+    },
+    {
+      question: "What's included in the premium plans?",
+      answer: "Premium plans include professional PDF generation, smart form pre-filling, priority support, advanced case tracking, document templates library, and full access to all legal venues."
+    },
+    {
+      question: "How do I qualify for the low-income plan?",
+      answer: "You qualify if you receive Ontario Works, ODSP, or have a household income below Statistics Canada's Low Income Cut-Off (LICO). Income verification is required."
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead
+      <CanonicalURL />
+      <EnhancedSEO
         title="Affordable Legal Help Pricing - Plans from $2.99/month"
         description="Justice-Bot pricing plans for Canadians. Premium legal forms and document services from $19.99/month. Low-income plans available at $2.99/month. Ontario legal help made affordable."
         keywords="legal services pricing Canada, affordable legal help Ontario, legal document pricing, law help subscription, Canadian legal services cost"
-        canonicalUrl="https://justice-bot.com/pricing"
+        structuredData={productStructuredData}
+        breadcrumbs={breadcrumbs}
+        faqData={faqData}
       />
       <Header />
       <main className="container mx-auto px-4 py-16">

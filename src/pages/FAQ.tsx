@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import SEOHead from "@/components/SEOHead";
+import EnhancedSEO from "@/components/EnhancedSEO";
+import { CanonicalURL } from "@/components/CanonicalURL";
 import {
   Accordion,
   AccordionContent,
@@ -123,12 +124,35 @@ export default function FAQ() {
     }
   ];
 
+  // Generate FAQPage structured data
+  const allFaqItems = faqCategories.flatMap(cat => cat.faqs);
+  const faqStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": allFaqItems.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  };
+
+  const breadcrumbs = [
+    { name: "Home", url: "/" },
+    { name: "FAQ", url: "/faq" }
+  ];
+
   return (
     <div className="min-h-screen flex flex-col">
-      <SEOHead
-        title="FAQ - Frequently Asked Questions | Justice-Bot"
-        description="Get answers to common questions about Justice-Bot pricing, eligibility, privacy, what we can help with, and how our AI-powered legal platform works."
-        keywords="justice-bot faq, legal help questions, pricing, eligibility, privacy, how it works"
+      <CanonicalURL />
+      <EnhancedSEO
+        title="Frequently Asked Questions - Justice-Bot Legal Help"
+        description="Get answers to common questions about Justice-Bot pricing, eligibility, privacy, what we can help with, and how our AI-powered legal platform works in Ontario."
+        keywords="justice-bot faq, legal help questions, pricing, eligibility, privacy, how it works, Ontario legal services"
+        structuredData={faqStructuredData}
+        breadcrumbs={breadcrumbs}
       />
       <Header />
       <main className="flex-1 container mx-auto px-4 py-16">
