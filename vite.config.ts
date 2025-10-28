@@ -22,12 +22,21 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tabs'],
+          'ui-vendor': [
+            '@radix-ui/react-dialog', 
+            '@radix-ui/react-dropdown-menu', 
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-accordion',
+            '@radix-ui/react-select'
+          ],
+          'supabase': ['@supabase/supabase-js'],
+          'utils': ['class-variance-authority', 'clsx', 'tailwind-merge'],
         },
       },
     },
     cssCodeSplit: true,
-    sourcemap: true, // Enable source maps for better debugging
-    chunkSizeWarningLimit: 1000,
+    sourcemap: false, // Disable source maps in production for smaller bundles
+    chunkSizeWarningLimit: 500,
+    assetsInlineLimit: 4096, // Inline assets < 4kb as base64
   },
 }));

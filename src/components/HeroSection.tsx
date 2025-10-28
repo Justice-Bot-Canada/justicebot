@@ -113,6 +113,7 @@ const HeroSection = () => {
               alt="Modern courthouse with classical columns and steps, representing legal clarity and justice in the digital age"
               className="relative rounded-2xl shadow-2xl w-full h-auto max-w-lg mx-auto"
               loading="eager"
+              fetchpriority="high"
               width={512}
               height={384}
             />
