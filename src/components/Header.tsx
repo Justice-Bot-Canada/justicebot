@@ -55,6 +55,10 @@ const Header = () => {
                   src={justiceBotLogo} 
                   alt="Justice-Bot logo - Scale of justice symbol" 
                   className="w-8 h-8 object-contain"
+                  width="32"
+                  height="32"
+                  loading="eager"
+                  decoding="async"
                 />
               </div>
               <div>
@@ -66,7 +70,11 @@ const Header = () => {
           
             <nav id="main-navigation" className="hidden lg:flex items-center gap-6" role="navigation" aria-label="Main navigation">
               <div className="relative group">
-                <button className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1">
+                <button 
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+                  aria-label="Housing legal services menu"
+                  aria-haspopup="true"
+                >
                   Housing
                 </button>
                 <div className="absolute left-0 top-full mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
@@ -76,7 +84,11 @@ const Header = () => {
               </div>
               
               <div className="relative group">
-                <button className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1">
+                <button 
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+                  aria-label="Family law services menu"
+                  aria-haspopup="true"
+                >
                   Family
                 </button>
                 <div className="absolute left-0 top-full mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
@@ -86,7 +98,11 @@ const Header = () => {
               </div>
               
               <div className="relative group">
-                <button className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1">
+                <button 
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+                  aria-label="Human rights services menu"
+                  aria-haspopup="true"
+                >
                   Human Rights
                 </button>
                 <div className="absolute left-0 top-full mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
@@ -96,7 +112,11 @@ const Header = () => {
               </div>
               
               <div className="relative group">
-                <button className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1">
+                <button 
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+                  aria-label="Support and resources menu"
+                  aria-haspopup="true"
+                >
                   Support
                 </button>
                 <div className="absolute left-0 top-full mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">

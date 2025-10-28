@@ -129,7 +129,7 @@ export default function DocumentTemplates() {
           />
         </div>
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-full sm:w-[200px]">
+          <SelectTrigger className="w-full sm:w-[200px]" aria-label="Filter templates by category">
             <Filter className="w-4 h-4 mr-2" />
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>

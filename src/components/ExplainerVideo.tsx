@@ -31,8 +31,10 @@ export const ExplainerVideo = () => {
                 controls
                 preload="metadata"
                 poster="/how-it-works-thumbnail.jpg"
+                aria-label="How Justice-Bot Works - Explainer Video"
               >
                 <source src="/justice-bot-explainer.mp4" type="video/mp4" />
+                <track kind="captions" label="English captions" />
                 Your browser does not support the video tag.
               </video>
             </div>
