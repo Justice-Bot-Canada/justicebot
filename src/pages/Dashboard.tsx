@@ -26,6 +26,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { PremiumGate } from "@/components/PremiumGate";
 import { LegalChatbot } from "@/components/LegalChatbot";
+import { FormsList } from "@/components/FormsList";
 import { supabase } from "@/integrations/supabase/client";
 
 const Dashboard = () => {
@@ -195,94 +196,7 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="forms" className="mt-6">
-            <PremiumGate feature="Premium Form Access">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    Application to Landlord & Tenant Board
-                  </CardTitle>
-                  <CardDescription>File disputes about rent, evictions, or repairs</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <Badge variant="secondary">Form A1 - Tenant Application</Badge>
-                    <Badge variant="secondary">Form A2 - Landlord Application</Badge>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Price: $5.99</span>
-                      <Button size="sm">
-                        Purchase <ArrowRight className="h-4 w-4 ml-1" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    Human Rights Application
-                  </CardTitle>
-                  <CardDescription>File discrimination or human rights complaints</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <Badge variant="secondary">Form 1 - Application</Badge>
-                    <Badge variant="secondary">Supporting Documents Guide</Badge>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Price: $5.99</span>
-                      <Button size="sm">
-                        Purchase <ArrowRight className="h-4 w-4 ml-1" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    Small Claims Court
-                  </CardTitle>
-                  <CardDescription>File claims under $35,000</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <Badge variant="secondary">Plaintiff's Claim</Badge>
-                    <Badge variant="secondary">Defence Form</Badge>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Price: $5.99</span>
-                      <Button size="sm">
-                        Purchase <ArrowRight className="h-4 w-4 ml-1" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2 border-primary/20 bg-primary/5">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <CreditCard className="h-5 w-5" />
-                    Low Income Support
-                  </CardTitle>
-                  <CardDescription>Reduced pricing with income verification</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <Badge variant="outline" className="text-primary">All Forms: $0.99</Badge>
-                    <Badge variant="outline" className="text-primary">Annual Access: $25.99</Badge>
-                    <Button size="sm" variant="outline">
-                      Apply for Support <ArrowRight className="h-4 w-4 ml-1" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-            </PremiumGate>
+            <FormsList />
           </TabsContent>
 
           <TabsContent value="payments" className="mt-6">
