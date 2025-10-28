@@ -37,7 +37,7 @@ const Dashboard = () => {
   const [hasExistingCases, setHasExistingCases] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Check if user has existing cases to show appropriate default tab
+  // Check if user has existing cases
   useEffect(() => {
     const checkExistingCases = async () => {
       if (!user) return;
@@ -51,7 +51,6 @@ const Dashboard = () => {
 
         if (!error && data && data.length > 0) {
           setHasExistingCases(true);
-          setActiveTab("cases");
         }
       } catch (error) {
         console.error('Error checking cases:', error);
@@ -71,7 +70,11 @@ const Dashboard = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Legal Dashboard</h1>
-          <p className="text-muted-foreground">Manage your cases, access forms, and track your progress</p>
+          <p className="text-muted-foreground">
+            {hasExistingCases 
+              ? "Manage your cases, access forms, and track your progress" 
+              : "Start by using AI Triage to understand your legal situation"}
+          </p>
           
           {isFreeUser && userNumber && (
             <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
@@ -86,37 +89,60 @@ const Dashboard = () => {
               </p>
             </div>
           )}
+
+          {!hasExistingCases && (
+            <div className="mt-4 p-4 bg-primary/5 rounded-lg border border-primary/20">
+              <h3 className="font-semibold mb-2 flex items-center gap-2">
+                <MessageSquare className="w-5 h-5" />
+                Welcome! Here's how to get started:
+              </h3>
+              <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
+                <li>Use <strong>AI Triage</strong> to describe your legal issue</li>
+                <li>Create a case from the AI recommendations</li>
+                <li>Upload evidence in the <strong>Documents</strong> tab</li>
+                <li>Track deadlines in the <strong>Calendar</strong> tab</li>
+                <li>Purchase and download forms when ready</li>
+              </ol>
+            </div>
+          )}
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="triage" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
-              AI Triage
+              <span className="hidden sm:inline">AI Triage</span>
+              <span className="sm:hidden">Triage</span>
             </TabsTrigger>
             <TabsTrigger value="cases" className="flex items-center gap-2">
               <Scale className="h-4 w-4" />
-              Cases
+              <span className="hidden sm:inline">Cases</span>
+              <span className="sm:hidden">Cases</span>
             </TabsTrigger>
             <TabsTrigger value="calendar" className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              Calendar
+              <span className="hidden sm:inline">Calendar</span>
+              <span className="sm:hidden">Cal</span>
             </TabsTrigger>
             <TabsTrigger value="documents" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
-              Documents
+              <span className="hidden sm:inline">Documents</span>
+              <span className="sm:hidden">Docs</span>
             </TabsTrigger>
             <TabsTrigger value="forms" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
-              Forms
+              <span className="hidden sm:inline">Forms</span>
+              <span className="sm:hidden">Forms</span>
             </TabsTrigger>
             <TabsTrigger value="payments" className="flex items-center gap-2">
               <CreditCard className="h-4 w-4" />
-              Payments
+              <span className="hidden sm:inline">Payments</span>
+              <span className="sm:hidden">Pay</span>
             </TabsTrigger>
-            <TabsTrigger value="profile" className="flex items-center gap-2">
+            <TabsTrigger value="account" className="flex items-center gap-2">
               <User className="h-4 w-4" />
-              Profile
+              <span className="hidden sm:inline">Account</span>
+              <span className="sm:hidden">Acct</span>
             </TabsTrigger>
           </TabsList>
 
@@ -176,7 +202,8 @@ const Dashboard = () => {
               <Card>
                 <CardContent className="pt-6 text-center text-muted-foreground">
                   <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>Select a case to view its timeline and deadlines</p>
+                  <p className="mb-2 font-medium">No case selected</p>
+                  <p className="text-sm">Go to the <strong>Cases</strong> tab to create or select a case first</p>
                 </CardContent>
               </Card>
             )}
@@ -189,7 +216,8 @@ const Dashboard = () => {
               <Card>
                 <CardContent className="pt-6 text-center text-muted-foreground">
                   <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>Select a case to analyze and upload documents</p>
+                  <p className="mb-2 font-medium">No case selected</p>
+                  <p className="text-sm">Go to the <strong>Cases</strong> tab to create or select a case first</p>
                 </CardContent>
               </Card>
             )}
@@ -252,7 +280,7 @@ const Dashboard = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="profile" className="mt-6">
+          <TabsContent value="account" className="mt-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
