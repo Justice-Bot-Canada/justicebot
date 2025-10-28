@@ -1,13 +1,15 @@
-import { useState } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Upload, FileText, Loader2, CheckCircle } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
+import { useState, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { FileText, Upload, CheckCircle, AlertCircle, Loader2, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useDropzone } from "react-dropzone";
 
 interface AnalysisResult {
   success: boolean;
@@ -16,240 +18,380 @@ interface AnalysisResult {
   caseId?: string;
 }
 
-export function DocumentAnalyzer({ caseId }: { caseId?: string }) {
-  const [file, setFile] = useState<File | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
-  const [description, setDescription] = useState('');
-  const { toast } = useToast();
-  const { user } = useAuth();
+interface FileUploadStatus {
+  file: File;
+  status: 'pending' | 'analyzing' | 'complete' | 'error';
+  progress: number;
+  analysis?: string;
+  error?: string;
+}
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      // Check file size (max 10MB)
-      if (selectedFile.size > 10 * 1024 * 1024) {
-        toast({
-          title: "File too large",
-          description: "Please select a file smaller than 10MB",
-          variant: "destructive",
-        });
-        return;
-      }
-      setFile(selectedFile);
-      setAnalysis(null);
+export function DocumentAnalyzer({ caseId }: { caseId?: string }) {
+  const [files, setFiles] = useState<FileUploadStatus[]>([]);
+  const [description, setDescription] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    const newFiles: FileUploadStatus[] = acceptedFiles.map(file => ({
+      file,
+      status: 'pending',
+      progress: 0
+    }));
+    setFiles(prev => [...prev, ...newFiles]);
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    disabled: isProcessing,
+    maxSize: 10 * 1024 * 1024, // 10MB
+    accept: {
+      'application/pdf': ['.pdf'],
+      'application/msword': ['.doc'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'text/plain': ['.txt'],
+      'image/*': ['.jpg', '.jpeg', '.png', '.gif', '.webp']
     }
+  });
+
+  const removeFile = (index: number) => {
+    if (isProcessing) {
+      toast.error("Cannot remove files while processing");
+      return;
+    }
+    setFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const readFileContent = async (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = (e) => {
-        const content = e.target?.result as string;
-        resolve(content);
-      };
+      reader.onload = (e) => resolve(e.target?.result as string);
       reader.onerror = reject;
-      reader.readAsText(file);
+      
+      if (file.type.startsWith('image/')) {
+        reader.readAsDataURL(file);
+      } else {
+        reader.readAsText(file);
+      }
     });
   };
 
-  const handleAnalyze = async () => {
-    if (!file || !user) {
-      toast({
-        title: "Error",
-        description: "Please select a file and sign in",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsAnalyzing(true);
-
+  const analyzeFile = async (fileStatus: FileUploadStatus, index: number): Promise<void> => {
     try {
-      // Read file content
-      let fileContent = '';
-      try {
-        fileContent = await readFileContent(file);
-      } catch (error) {
-        toast({
-          title: "Error reading file",
-          description: "This file type may not be supported. Try a text-based document.",
-          variant: "destructive",
-        });
-        setIsAnalyzing(false);
-        return;
-      }
+      // Update status to analyzing
+      setFiles(prev => {
+        const updated = [...prev];
+        updated[index] = { ...updated[index], status: 'analyzing', progress: 30 };
+        return updated;
+      });
 
-      // Call edge function to analyze
+      const content = await readFileContent(fileStatus.file);
+      
+      setFiles(prev => {
+        const updated = [...prev];
+        updated[index] = { ...updated[index], progress: 50 };
+        return updated;
+      });
+
+      // Call Supabase Edge Function
       const { data, error } = await supabase.functions.invoke('analyze-document', {
         body: {
-          fileContent,
-          fileName: file.name,
+          fileContent: content,
+          fileName: fileStatus.file.name,
+          fileType: fileStatus.file.type,
           caseId,
-        },
+          description
+        }
       });
 
       if (error) throw error;
 
-      if (data.error) {
-        if (data.error.includes("Rate limit")) {
-          toast({
-            title: "Rate Limit",
-            description: "Too many requests. Please wait a moment and try again.",
-            variant: "destructive",
-          });
-        } else {
-          throw new Error(data.error);
-        }
-        setIsAnalyzing(false);
-        return;
+      if (data?.error) {
+        throw new Error(data.error);
       }
 
-      setAnalysis(data);
+      setFiles(prev => {
+        const updated = [...prev];
+        updated[index] = { ...updated[index], progress: 80 };
+        return updated;
+      });
 
-      // If we have a case ID, save as evidence
-      if (caseId) {
-        // Upload file to storage
-        const filePath = `${user.id}/${caseId}/${Date.now()}_${file.name}`;
-        const { error: uploadError } = await supabase.storage
-          .from('evidence')
-          .upload(filePath, file);
+      // Save to evidence if caseId provided
+      if (caseId && data?.analysis) {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const filePath = `${user.id}/${caseId}/${Date.now()}_${fileStatus.file.name}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('evidence')
+            .upload(filePath, fileStatus.file);
 
-        if (uploadError) {
-          console.error('Upload error:', uploadError);
-        } else {
-          // Save to evidence table
+          if (uploadError) throw uploadError;
+
           const { error: dbError } = await supabase
             .from('evidence')
             .insert({
               case_id: caseId,
-              file_name: file.name,
+              user_id: user.id,
+              file_name: fileStatus.file.name,
               file_path: filePath,
-              file_type: file.type,
+              file_type: fileStatus.file.type,
               description: description || data.analysis.substring(0, 500),
-              ocr_text: data.analysis,
+              ocr_text: data.analysis
             });
 
-          if (dbError) {
-            console.error('Database error:', dbError);
-          } else {
-            toast({
-              title: "Success",
-              description: "Document analyzed and saved to your case",
-            });
-          }
+          if (dbError) throw dbError;
         }
-      } else {
-        toast({
-          title: "Analysis Complete",
-          description: "Document has been analyzed",
-        });
       }
-    } catch (error) {
-      console.error('Analysis error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to analyze document",
-        variant: "destructive",
+
+      // Mark as complete
+      setFiles(prev => {
+        const updated = [...prev];
+        updated[index] = { 
+          ...updated[index], 
+          status: 'complete', 
+          progress: 100,
+          analysis: data?.analysis || 'Analysis complete'
+        };
+        return updated;
       });
-    } finally {
-      setIsAnalyzing(false);
+
+    } catch (error: any) {
+      console.error('Analysis error:', error);
+      setFiles(prev => {
+        const updated = [...prev];
+        updated[index] = { 
+          ...updated[index], 
+          status: 'error', 
+          progress: 0,
+          error: error.message || 'Analysis failed'
+        };
+        return updated;
+      });
     }
   };
 
+  const handleAnalyzeAll = async () => {
+    if (files.length === 0) {
+      toast.error("Please add files to analyze");
+      return;
+    }
+
+    setIsProcessing(true);
+
+    // Process all files concurrently with a limit
+    const batchSize = 3; // Process 3 at a time to avoid overwhelming the API
+    for (let i = 0; i < files.length; i += batchSize) {
+      const batch = files.slice(i, i + batchSize);
+      await Promise.all(
+        batch.map((fileStatus, batchIndex) => {
+          const actualIndex = i + batchIndex;
+          if (fileStatus.status === 'pending') {
+            return analyzeFile(fileStatus, actualIndex);
+          }
+          return Promise.resolve();
+        })
+      );
+    }
+
+    setIsProcessing(false);
+    
+    const successCount = files.filter(f => f.status === 'complete').length;
+    const errorCount = files.filter(f => f.status === 'error').length;
+    
+    if (errorCount === 0) {
+      toast.success(`Successfully analyzed ${successCount} document${successCount > 1 ? 's' : ''}`);
+    } else {
+      toast.warning(`Analyzed ${successCount} documents, ${errorCount} failed`);
+    }
+  };
+
+  const getStatusIcon = (status: FileUploadStatus['status']) => {
+    switch (status) {
+      case 'complete':
+        return <CheckCircle className="w-5 h-5 text-green-600" />;
+      case 'error':
+        return <AlertCircle className="w-5 h-5 text-red-600" />;
+      case 'analyzing':
+        return <Loader2 className="w-5 h-5 text-primary animate-spin" />;
+      default:
+        return <FileText className="w-5 h-5 text-muted-foreground" />;
+    }
+  };
+
+  const getStatusBadge = (status: FileUploadStatus['status']) => {
+    switch (status) {
+      case 'complete':
+        return <Badge variant="default" className="bg-green-600">Complete</Badge>;
+      case 'error':
+        return <Badge variant="destructive">Error</Badge>;
+      case 'analyzing':
+        return <Badge variant="secondary">Analyzing...</Badge>;
+      default:
+        return <Badge variant="outline">Pending</Badge>;
+    }
+  };
+
+  const allComplete = files.length > 0 && files.every(f => f.status === 'complete' || f.status === 'error');
+
   return (
-    <div className="space-y-6">
-      <Card className="p-6">
-        <div className="space-y-4">
-          <div>
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-              <FileText className="w-5 h-5" />
-              Upload Document for Analysis
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              Upload legal documents, evidence, letters, or any text-based files for AI-powered analysis
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="file-upload">Select Document</Label>
-            <div className="flex gap-2">
-              <Input
-                id="file-upload"
-                type="file"
-                onChange={handleFileChange}
-                accept=".txt,.pdf,.doc,.docx,.jpg,.jpeg,.png"
-                className="flex-1"
-              />
-              <Button
-                onClick={handleAnalyze}
-                disabled={!file || isAnalyzing}
-                className="min-w-[120px]"
-              >
-                {isAnalyzing ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Analyzing...
-                  </>
-                ) : (
-                  <>
-                    <Upload className="w-4 h-4 mr-2" />
-                    Analyze
-                  </>
-                )}
-              </Button>
-            </div>
-            {file && (
-              <p className="text-sm text-muted-foreground flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-500" />
-                Selected: {file.name} ({(file.size / 1024).toFixed(2)} KB)
-              </p>
-            )}
-          </div>
-
-          {caseId && (
-            <div className="space-y-2">
-              <Label htmlFor="description">Description (Optional)</Label>
-              <Textarea
-                id="description"
-                placeholder="Add any additional context about this document..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={3}
-              />
-            </div>
-          )}
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <FileText className="w-5 h-5" />
+          AI Document Analyzer
+        </CardTitle>
+        <p className="text-sm text-muted-foreground">
+          Upload multiple documents for AI-powered analysis. Supports PDF, Word, images, and text files.
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Dropzone */}
+        <div
+          {...getRootProps()}
+          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+            isDragActive 
+              ? 'border-primary bg-primary/5' 
+              : 'border-border hover:border-primary/50'
+          } ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          <input {...getInputProps()} />
+          <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+          <p className="text-sm font-medium mb-1">
+            {isDragActive ? 'Drop files here' : 'Drag & drop files here, or click to browse'}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Supports PDF, Word, images, text files (max 10MB each)
+          </p>
         </div>
-      </Card>
 
-      {analysis && (
-        <Card className="p-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                Analysis Results
-              </h3>
-              <span className="text-sm text-muted-foreground">{analysis.fileName}</span>
+        {/* Optional Description */}
+        <div className="space-y-2">
+          <Label htmlFor="description">Context (Optional)</Label>
+          <Textarea
+            id="description"
+            placeholder="Add any context about these documents..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            disabled={isProcessing}
+            rows={2}
+          />
+        </div>
+
+        {/* File List */}
+        {files.length > 0 && (
+          <div className="space-y-2">
+            <div className="flex items-center justify-between mb-2">
+              <Label>Documents ({files.length})</Label>
+              {!isProcessing && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setFiles([])}
+                >
+                  Clear All
+                </Button>
+              )}
             </div>
-            <div className="prose prose-sm max-w-none">
-              <pre className="whitespace-pre-wrap bg-muted p-4 rounded-lg text-sm">
-                {analysis.analysis}
-              </pre>
+            
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              {files.map((fileStatus, index) => (
+                <Card key={index} className="p-3">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        {getStatusIcon(fileStatus.status)}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {fileStatus.file.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {(fileStatus.file.size / 1024).toFixed(1)} KB
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {getStatusBadge(fileStatus.status)}
+                        {!isProcessing && fileStatus.status === 'pending' && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeFile(index)}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Progress Bar */}
+                    {fileStatus.status === 'analyzing' && (
+                      <Progress value={fileStatus.progress} className="h-1" />
+                    )}
+
+                    {/* Error Message */}
+                    {fileStatus.status === 'error' && fileStatus.error && (
+                      <Alert variant="destructive" className="py-2">
+                        <AlertDescription className="text-xs">
+                          {fileStatus.error}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
+                    {/* Analysis Result */}
+                    {fileStatus.status === 'complete' && fileStatus.analysis && (
+                      <Alert className="py-2 bg-green-50 dark:bg-green-900/20 border-green-200">
+                        <AlertDescription className="text-xs whitespace-pre-wrap">
+                          {fileStatus.analysis.substring(0, 200)}
+                          {fileStatus.analysis.length > 200 && '...'}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                  </div>
+                </Card>
+              ))}
             </div>
           </div>
-        </Card>
-      )}
+        )}
 
-      <Card className="p-6 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-900">
-        <h4 className="text-sm font-semibold mb-2">💡 Tips for Best Results</h4>
-        <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-          <li>Text-based documents work best (TXT, PDF with text, Word docs)</li>
-          <li>Ensure documents are clear and readable</li>
-          <li>Include complete documents rather than excerpts when possible</li>
-          <li>Images with text will be processed but may take longer</li>
-        </ul>
-      </Card>
-    </div>
+        {/* Action Button */}
+        <Button
+          onClick={handleAnalyzeAll}
+          disabled={files.length === 0 || isProcessing || allComplete}
+          className="w-full"
+          size="lg"
+        >
+          {isProcessing ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Analyzing Documents...
+            </>
+          ) : allComplete ? (
+            <>
+              <CheckCircle className="w-4 h-4 mr-2" />
+              All Documents Analyzed
+            </>
+          ) : (
+            <>
+              <FileText className="w-4 h-4 mr-2" />
+              Analyze {files.length} Document{files.length > 1 ? 's' : ''}
+            </>
+          )}
+        </Button>
+
+        {/* Helpful Tips */}
+        <Alert>
+          <AlertDescription className="text-xs">
+            <strong>Tips for better analysis:</strong>
+            <ul className="list-disc list-inside mt-1 space-y-1">
+              <li>Upload clear, readable documents</li>
+              <li>Process multiple related documents together</li>
+              <li>Add context to help AI understand the situation</li>
+              <li>Review analysis results before proceeding</li>
+            </ul>
+          </AlertDescription>
+        </Alert>
+      </CardContent>
+    </Card>
   );
 }

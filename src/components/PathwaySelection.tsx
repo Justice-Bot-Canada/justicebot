@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
   ArrowRight, 
-  Scale, 
   FileText, 
   CheckCircle, 
   AlertTriangle,
@@ -73,33 +72,6 @@ export default function PathwaySelection({
 
   return (
     <div className="space-y-6">
-      {/* Merit Score Summary */}
-      <Card className="border-2 border-primary/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Scale className="w-5 h-5 text-primary" />
-            Your Case Merit Score
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-6">
-            <div className="text-center">
-              <div className="text-5xl font-bold text-primary">{meritScore}</div>
-              <div className="text-sm text-muted-foreground">out of 100</div>
-            </div>
-            <div className="flex-1">
-              <p className="text-sm text-muted-foreground mb-2">
-                Based on our analysis, your case has {meritScore >= 70 ? "strong" : meritScore >= 50 ? "moderate" : "limited"} merit. 
-                Below are the recommended legal pathways ranked by suitability for your situation.
-              </p>
-              <Badge variant={meritScore >= 70 ? "default" : "secondary"}>
-                {meritScore >= 70 ? "Strong Case" : meritScore >= 50 ? "Moderate Case" : "Challenging Case"}
-              </Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Pathway Options */}
       <div className="space-y-4">
         <h3 className="text-xl font-semibold">Recommended Legal Pathways</h3>
