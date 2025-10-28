@@ -43,7 +43,7 @@ export function DocumentAnalyzer({ caseId }: { caseId?: string }) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     disabled: isProcessing,
-    maxSize: 10 * 1024 * 1024, // 10MB
+    maxSize: 50 * 1024 * 1024, // 50MB
     accept: {
       'application/pdf': ['.pdf'],
       'application/msword': ['.doc'],
@@ -261,7 +261,7 @@ export function DocumentAnalyzer({ caseId }: { caseId?: string }) {
             {isDragActive ? 'Drop files here' : 'Drag & drop files here, or click to browse'}
           </p>
           <p className="text-xs text-muted-foreground">
-            Supports PDF, Word, images, text files (max 10MB each)
+            Supports PDF, Word, images, text files (max 50MB each)
           </p>
         </div>
 
