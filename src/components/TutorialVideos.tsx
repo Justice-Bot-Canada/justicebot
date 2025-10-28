@@ -123,11 +123,6 @@ export default function TutorialVideos({ pathwayType, category }: TutorialVideos
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                 <Play className="w-16 h-16 text-white" />
               </div>
-              {video.step_number && (
-                <Badge className="absolute top-2 left-2">
-                  Step {video.step_number}
-                </Badge>
-              )}
             </div>
             <div className="p-4">
               <h3 className="font-semibold mb-2 line-clamp-2">{video.title}</h3>
