@@ -30,7 +30,7 @@ export function UpsellModal({ trigger, context }: UpsellModalProps) {
     try {
       // Check if we showed this prompt type in last 24 hours
       const { data: recentPrompts } = await supabase
-        .from('upsell_prompts')
+        .from('upsell_prompts' as any)
         .select('*')
         .eq('user_id', user?.id)
         .eq('prompt_type', trigger)
@@ -43,11 +43,11 @@ export function UpsellModal({ trigger, context }: UpsellModalProps) {
       }
 
       // Log that we're showing this prompt
-      await supabase.from('upsell_prompts').insert({
+      await supabase.from('upsell_prompts' as any).insert({
         user_id: user?.id,
         prompt_type: trigger,
         shown_at: new Date().toISOString()
-      });
+      } as any);
 
       setOpen(true);
     } catch (error) {
@@ -58,8 +58,8 @@ export function UpsellModal({ trigger, context }: UpsellModalProps) {
   const handleDismiss = async () => {
     try {
       await supabase
-        .from('upsell_prompts')
-        .update({ action_taken: 'dismissed' })
+        .from('upsell_prompts' as any)
+        .update({ action_taken: 'dismissed' } as any)
         .eq('user_id', user?.id)
         .eq('prompt_type', trigger)
         .order('shown_at', { ascending: false })
@@ -74,8 +74,8 @@ export function UpsellModal({ trigger, context }: UpsellModalProps) {
   const handleUpgrade = async () => {
     try {
       await supabase
-        .from('upsell_prompts')
-        .update({ action_taken: 'clicked', converted: false })
+        .from('upsell_prompts' as any)
+        .update({ action_taken: 'clicked', converted: false } as any)
         .eq('user_id', user?.id)
         .eq('prompt_type', trigger)
         .order('shown_at', { ascending: false })

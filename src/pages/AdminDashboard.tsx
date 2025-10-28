@@ -53,7 +53,7 @@ export default function AdminDashboard() {
 
       // Get SEO pages
       const { count: seoCount } = await supabase
-        .from('seo_pages')
+        .from('seo_pages' as any)
         .select('*', { count: 'exact', head: true });
 
       // Get referrals

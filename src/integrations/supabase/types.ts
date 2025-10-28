@@ -168,43 +168,58 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          is_paid: boolean | null
           law_section: string | null
           merit_score: number | null
           municipality: string | null
+          owner: string | null
+          plan: string | null
           province: string
           status: string | null
           title: string
+          triage: Json | null
           updated_at: string
           user_id: string
           user_number: number | null
+          venue: string | null
         }
         Insert: {
           created_at?: string
           description?: string | null
           id?: string
+          is_paid?: boolean | null
           law_section?: string | null
           merit_score?: number | null
           municipality?: string | null
+          owner?: string | null
+          plan?: string | null
           province: string
           status?: string | null
           title: string
+          triage?: Json | null
           updated_at?: string
           user_id: string
           user_number?: number | null
+          venue?: string | null
         }
         Update: {
           created_at?: string
           description?: string | null
           id?: string
+          is_paid?: boolean | null
           law_section?: string | null
           merit_score?: number | null
           municipality?: string | null
+          owner?: string | null
+          plan?: string | null
           province?: string
           status?: string | null
           title?: string
+          triage?: Json | null
           updated_at?: string
           user_id?: string
           user_number?: number | null
+          venue?: string | null
         }
         Relationships: []
       }
@@ -293,6 +308,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      email_queue: {
+        Row: {
+          created_at: string | null
+          email: string
+          error: string | null
+          id: string
+          sent_at: string | null
+          status: string | null
+          template: string
+          vars: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          error?: string | null
+          id?: string
+          sent_at?: string | null
+          status?: string | null
+          template: string
+          vars?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          error?: string | null
+          id?: string
+          sent_at?: string | null
+          status?: string | null
+          template?: string
+          vars?: Json | null
+        }
+        Relationships: []
       }
       entitlements: {
         Row: {
@@ -556,6 +604,39 @@ export type Database = {
         }
         Relationships: []
       }
+      leads: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          journey: string | null
+          name: string | null
+          payload: Json | null
+          phone: string | null
+          source: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          journey?: string | null
+          name?: string | null
+          payload?: Json | null
+          phone?: string | null
+          source?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          journey?: string | null
+          name?: string | null
+          payload?: Json | null
+          phone?: string | null
+          source?: string | null
+        }
+        Relationships: []
+      }
       legal_pathways: {
         Row: {
           case_id: string
@@ -759,6 +840,8 @@ export type Database = {
           plan_type: string
           provider: string | null
           provider_order_id: string | null
+          provider_txn_id: string | null
+          raw: Json | null
           status: string
           updated_at: string
           user_id: string
@@ -780,6 +863,8 @@ export type Database = {
           plan_type: string
           provider?: string | null
           provider_order_id?: string | null
+          provider_txn_id?: string | null
+          raw?: Json | null
           status?: string
           updated_at?: string
           user_id: string
@@ -801,6 +886,8 @@ export type Database = {
           plan_type?: string
           provider?: string | null
           provider_order_id?: string | null
+          provider_txn_id?: string | null
+          raw?: Json | null
           status?: string
           updated_at?: string
           user_id?: string
@@ -918,6 +1005,63 @@ export type Database = {
           referred_user_id?: string
           referrer_user_id?: string
           status?: string
+        }
+        Relationships: []
+      }
+      seo_pages: {
+        Row: {
+          content: string
+          conversions: number | null
+          created_at: string | null
+          cta_link: string | null
+          cta_text: string | null
+          faq: Json | null
+          form_type: string | null
+          h1: string
+          id: string
+          location: string | null
+          meta_description: string | null
+          slug: string
+          title: string
+          topic: string | null
+          updated_at: string | null
+          views: number | null
+        }
+        Insert: {
+          content: string
+          conversions?: number | null
+          created_at?: string | null
+          cta_link?: string | null
+          cta_text?: string | null
+          faq?: Json | null
+          form_type?: string | null
+          h1: string
+          id?: string
+          location?: string | null
+          meta_description?: string | null
+          slug: string
+          title: string
+          topic?: string | null
+          updated_at?: string | null
+          views?: number | null
+        }
+        Update: {
+          content?: string
+          conversions?: number | null
+          created_at?: string | null
+          cta_link?: string | null
+          cta_text?: string | null
+          faq?: Json | null
+          form_type?: string | null
+          h1?: string
+          id?: string
+          location?: string | null
+          meta_description?: string | null
+          slug?: string
+          title?: string
+          topic?: string | null
+          updated_at?: string | null
+          views?: number | null
         }
         Relationships: []
       }
@@ -1053,6 +1197,33 @@ export type Database = {
           updated_at?: string
           video_url?: string
           view_count?: number
+        }
+        Relationships: []
+      }
+      upsell_prompts: {
+        Row: {
+          action_taken: string | null
+          created_at: string | null
+          id: string
+          prompt_type: string
+          shown_at: string | null
+          user_id: string
+        }
+        Insert: {
+          action_taken?: string | null
+          created_at?: string | null
+          id?: string
+          prompt_type: string
+          shown_at?: string | null
+          user_id: string
+        }
+        Update: {
+          action_taken?: string | null
+          created_at?: string | null
+          id?: string
+          prompt_type?: string
+          shown_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
