@@ -1,5 +1,8 @@
 # Justice-Bot Automation Setup Guide
 
+## 🆓 **FREE AUTOMATION UPDATE**
+We've switched from Zapier Premium webhooks to **Pipedream** (free) and **n8n** (free/open source) to reduce costs while maintaining full automation capabilities.
+
 ## 🔗 Supabase Edge Function URLs
 
 Your edge functions are deployed at:
@@ -166,52 +169,124 @@ async function generateDocxBuffer(docType: string, formData: any): Promise<Uint8
 
 ---
 
-## 4️⃣ Database Webhooks → Zapier
+## 4️⃣ Email Automation with Pipedream (FREE)
 
-### Setup Database Webhook
-1. Go to: https://supabase.com/dashboard/project/vkzquzjtewqhcisvhsvg/database/hooks
-2. Click "Create a new hook"
-3. Configure:
-   - **Name**: Lead Captured
-   - **Table**: `leads`
-   - **Events**: INSERT
-   - **Type**: HTTP Request
-   - **Method**: POST
-   - **URL**: Your Zapier webhook URL
+### Why Pipedream Instead of Zapier?
+- ✅ **100% FREE** for reasonable usage (100K invocations/month)
+- ✅ Built-in webhook endpoints (no premium required)
+- ✅ Direct Supabase integration
+- ✅ More flexible and developer-friendly
+- ✅ Supports TypeScript/JavaScript
 
-### Zapier Zaps to Create
+### Setup Pipedream Account
 
-#### Zap 1: Welcome Email (Day 0)
-```
-Trigger: Webhook by Zapier (from Supabase)
-Action: Brevo → Send Email
-  - To: {{email}} from webhook
-  - Template: Welcome Email
+1. **Create Free Account**:
+   - Go to https://pipedream.com
+   - Sign up with email (no credit card required)
+
+2. **Connect Supabase**:
+   - In Pipedream, go to "Apps" → Search "Supabase"
+   - Connect with URL: `https://vkzquzjtewqhcisvhsvg.supabase.co`
+   - Add anon key from Supabase settings
+
+3. **Add Brevo API Key**:
+   - In any workflow → Add Secret
+   - Name: `BREVO_API_KEY`
+   - Get key from: https://app.brevo.com/settings/keys/api
+
+### Pipedream Workflows to Create
+
+#### Workflow 1: Welcome Email (Day 0)
+
+**Trigger**: Supabase New Row
+- Table: `leads`
+- Polling: Every 15 seconds
+
+**Action**: Send Email via Brevo API
+```javascript
+import { axios } from "@pipedream/platform"
+
+export default defineComponent({
+  async run({steps, $}) {
+    const lead = steps.trigger.event;
+    
+    return await axios($, {
+      method: "POST",
+      url: "https://api.brevo.com/v3/smtp/email",
+      headers: {
+        "api-key": process.env.BREVO_API_KEY,
+        "Content-Type": "application/json"
+      },
+      data: {
+        sender: { name: "Justice-Bot", email: "hello@justice-bot.com" },
+        to: [{ email: lead.email, name: lead.name }],
+        subject: "Welcome to Justice-Bot! 🎉",
+        htmlContent: `<h1>Welcome ${lead.name}!</h1>
+          <p>Start your legal journey today.</p>
+          <a href="https://justice-bot.com/dashboard">Go to Dashboard</a>`
+      }
+    });
+  }
+})
 ```
 
-#### Zap 2: Upgrade Nudge (Day 3)
-```
-Trigger: Webhook by Zapier
-Action: Delay by Zapier → 3 days
-Action: Brevo → Send Email
-  - Template: Upgrade Prompt
+#### Workflow 2: Upgrade Nudge (Day 3)
+
+**Trigger**: Schedule (CRON)
+- Expression: `0 10 * * *` (daily at 10 AM)
+
+**Step 1**: Query 3-day-old leads
+```javascript
+const threeDaysAgo = new Date();
+threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+const { data } = await axios($, {
+  url: `https://vkzquzjtewqhcisvhsvg.supabase.co/rest/v1/leads`,
+  headers: {
+    "apikey": process.env.SUPABASE_ANON_KEY,
+    "Authorization": `Bearer ${process.env.SUPABASE_ANON_KEY}`
+  },
+  params: {
+    created_at: `eq.${threeDaysAgo.toISOString().split('T')[0]}`,
+    select: "email,name"
+  }
+});
 ```
 
-#### Zap 3: Success Stories (Day 7)
-```
-Trigger: Webhook by Zapier
-Action: Delay by Zapier → 7 days
-Action: Brevo → Send Email
-  - Template: Success Stories + CTA
+**Step 2**: Loop & Send Emails
+```javascript
+for (const lead of data) {
+  await axios($, {
+    method: "POST",
+    url: "https://api.brevo.com/v3/smtp/email",
+    headers: { "api-key": process.env.BREVO_API_KEY },
+    data: {
+      to: [{ email: lead.email }],
+      subject: "Ready to upgrade? 📋",
+      htmlContent: `<h2>Hi ${lead.name}!</h2>
+        <p>Unlock premium features to file faster.</p>
+        <a href="https://justice-bot.com/pricing">View Plans</a>`
+    }
+  });
+}
 ```
 
-#### Zap 4: Referral Ask (Day 14)
+#### Workflow 3: Evidence Reminder (Day 7)
+Follow same pattern, query 7-day-old leads, send evidence reminder.
+
+#### Workflow 4: Referral Ask (Day 14)
+Follow same pattern, query 14-day-old leads, send referral request.
+
+### Alternative: n8n (Self-Hosted)
+
+For complete control, use n8n:
+```bash
+docker run -it --rm --name n8n -p 5678:5678 -v ~/.n8n:/home/node/.n8n n8nio/n8n
 ```
-Trigger: Webhook by Zapier
-Action: Delay by Zapier → 14 days
-Action: Brevo → Send Email
-  - Template: Refer a Friend
-```
+
+Access at: http://localhost:5678
+
+📄 **Full migration guide**: See `PIPEDREAM_MIGRATION.md`
 
 ---
 

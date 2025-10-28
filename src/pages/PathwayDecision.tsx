@@ -5,9 +5,11 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PathwaySelection from "@/components/PathwaySelection";
-import SEOHead from "@/components/SEOHead";
+import EnhancedSEO from "@/components/EnhancedSEO";
+import CanonicalURL from "@/components/CanonicalURL";
 import { Card } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { RelatedPages } from "@/components/RelatedPages";
 
 export default function PathwayDecision() {
   const { caseId } = useParams();
@@ -186,12 +188,48 @@ export default function PathwayDecision() {
     return null;
   }
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Legal Pathway Decision Tool",
+    "description": "Compare legal pathways including LTB, HRTO, and Small Claims Court with personalized recommendations"
+  };
+
+  const relatedPages = [
+    {
+      title: "Small Claims Court Guide",
+      description: "Step-by-step filing instructions for monetary disputes",
+      path: "/small-claims",
+      icon: "calculator" as const
+    },
+    {
+      title: "LTB Application Help",
+      description: "Complete guide to Landlord Tenant Board filings",
+      path: "/ltb-help",
+      icon: "file" as const
+    },
+    {
+      title: "HRTO Complaint Guide",
+      description: "File human rights discrimination complaints",
+      path: "/hrto-help",
+      icon: "help" as const
+    },
+    {
+      title: "Case Assessment",
+      description: "Get a detailed merit score and strategy analysis",
+      path: "/assessment",
+      icon: "book" as const
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-background">
-      <SEOHead
-        title="Choose Your Legal Pathway"
-        description="Discover the best legal options for your case. Compare LTB, HRTO, Small Claims Court pathways with success rates, costs, and timelines."
-        keywords="legal pathway, Ontario legal options, LTB, HRTO, small claims court, legal advice"
+      <CanonicalURL />
+      <EnhancedSEO
+        title="Choose Your Legal Pathway - Compare LTB, HRTO & Small Claims Court"
+        description="Get personalized legal pathway recommendations. Compare success rates, costs, timelines, and next steps for LTB, HRTO, and Small Claims Court in Ontario."
+        keywords="legal pathway decision, LTB vs small claims, HRTO filing, Ontario legal options, legal venue comparison"
+        structuredData={structuredData}
       />
       <Header />
       <main className="container mx-auto px-4 py-8">
@@ -209,6 +247,14 @@ export default function PathwayDecision() {
             province={caseData.province}
             pathways={generatePathways()}
           />
+
+          <div className="mt-8">
+            <RelatedPages 
+              pages={relatedPages}
+              title="Next Steps"
+              description="Continue building your case with these resources"
+            />
+          </div>
         </div>
       </main>
       <Footer />

@@ -24,6 +24,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { RelatedPages } from "@/components/RelatedPages";
+import CanonicalURL from "@/components/CanonicalURL";
+import EnhancedSEO from "@/components/EnhancedSEO";
 
 interface TriageResult {
   venue: string;
@@ -189,8 +192,54 @@ const Triage = () => {
     });
   };
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Legal Triage Tool",
+    "description": "Smart AI-powered legal triage to determine the best legal pathway for your situation",
+    "url": "https://justice-bot.com/triage"
+  };
+
+  const relatedPages = [
+    {
+      title: "Small Claims Court Guide",
+      description: "Learn how to file claims under $35,000",
+      path: "/small-claims",
+      icon: "calculator" as const,
+      category: "Court"
+    },
+    {
+      title: "LTB Filing Help",
+      description: "Landlord Tenant Board application assistance",
+      path: "/ltb-help",
+      icon: "file" as const,
+      category: "Tribunal"
+    },
+    {
+      title: "Human Rights Claims",
+      description: "File discrimination complaints with HRTO",
+      path: "/hrto-help",
+      icon: "help" as const,
+      category: "Tribunal"
+    },
+    {
+      title: "Legal Resources",
+      description: "Free guides, forms, and templates",
+      path: "/legal-resources",
+      icon: "book" as const,
+      category: "Resources"
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-background">
+      <CanonicalURL />
+      <EnhancedSEO
+        title="Free Legal Triage Tool - Find Your Legal Pathway in Ontario"
+        description="Use our AI-powered legal triage to instantly determine if you need Small Claims Court, LTB, HRTO, or Family Court. Get personalized recommendations and next steps."
+        keywords="legal triage, legal pathway, small claims or ltb, Ontario legal help, legal assessment tool"
+        structuredData={structuredData}
+      />
       <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
@@ -404,6 +453,15 @@ const Triage = () => {
                 Try Different Issue
               </Button>
             </div>
+          )}
+
+          {/* Related Pages - Show after triage result */}
+          {step === 1 && (
+            <RelatedPages 
+              pages={relatedPages}
+              title="Explore More Resources"
+              description="Get additional help with your legal journey"
+            />
           )}
 
           {/* Tribunal Locator Modal */}

@@ -8,11 +8,74 @@ import EnhancedSEO from "@/components/EnhancedSEO";
 import { UserJourney } from "@/components/UserJourney";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import { PremiumGate } from "@/components/PremiumGate";
+import { ContentFunnel } from "@/components/ContentFunnel";
+import { RelatedPages } from "@/components/RelatedPages";
 
 const SmallClaimsJourney = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { userSituation } = location.state || {};
+
+  const funnelSteps = [
+    {
+      title: "Legal Triage",
+      description: "Determine the right legal pathway for your case",
+      path: "/triage",
+      completed: true,
+      estimatedTime: "5 min"
+    },
+    {
+      title: "Small Claims Journey",
+      description: "Learn the complete filing process",
+      path: "/small-claims-journey",
+      estimatedTime: "15 min"
+    },
+    {
+      title: "Case Timeline",
+      description: "Track deadlines and court dates",
+      path: "/dashboard",
+      estimatedTime: "5 min"
+    },
+    {
+      title: "Forms & Filing",
+      description: "Complete and submit your claim forms",
+      path: "/forms",
+      estimatedTime: "30 min"
+    },
+    {
+      title: "Pricing & Checkout",
+      description: "Choose your support level",
+      path: "/pricing",
+      estimatedTime: "5 min"
+    }
+  ];
+
+  const relatedPages = [
+    {
+      title: "Court Information & Filing",
+      description: "Find your local Small Claims courthouse and filing requirements",
+      path: "/court-information",
+      icon: "book" as const
+    },
+    {
+      title: "Form Templates",
+      description: "Download and complete official court forms",
+      path: "/forms",
+      icon: "file" as const
+    },
+    {
+      title: "Evidence Builder",
+      description: "Organize evidence to strengthen your case",
+      path: "/evidence",
+      icon: "calculator" as const
+    },
+    {
+      title: "FAQ & Support",
+      description: "Get answers to common Small Claims questions",
+      path: "/faq",
+      icon: "help" as const
+    }
+  ];
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -105,15 +168,27 @@ const SmallClaimsJourney = () => {
             </p>
           </div>
 
-          <PremiumGate feature="Small Claims Court Journey Guide">
-            <UserJourney 
-              venue="small-claims"
-              userSituation={userSituation}
-              onStepComplete={(stepId) => {
-                console.log("Step completed:", stepId);
-              }}
-            />
-          </PremiumGate>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div className="lg:col-span-2">
+              <PremiumGate feature="Small Claims Court Journey Guide">
+                <UserJourney 
+                  venue="small-claims"
+                  userSituation={userSituation}
+                  onStepComplete={(stepId) => {
+                    console.log("Step completed:", stepId);
+                  }}
+                />
+              </PremiumGate>
+            </div>
+            <div>
+              <ContentFunnel 
+                currentStep="/small-claims-journey"
+                steps={funnelSteps}
+              />
+            </div>
+          </div>
+
+          <RelatedPages pages={relatedPages} />
         </div>
       </main>
       
