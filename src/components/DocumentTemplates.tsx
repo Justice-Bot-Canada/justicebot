@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
-import { FileText, Download, Search, Filter } from "lucide-react";
+import { FileText, Download, Search, Filter, Lock, Crown } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 
 interface DocumentTemplate {
   id: string;
@@ -24,11 +26,14 @@ interface DocumentTemplate {
 
 export default function DocumentTemplates() {
   const { user } = useAuth();
+  const { hasAccess, isPremium, loading: accessLoading } = usePremiumAccess();
   const [templates, setTemplates] = useState<DocumentTemplate[]>([]);
   const [filteredTemplates, setFilteredTemplates] = useState<DocumentTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<DocumentTemplate | null>(null);
 
   useEffect(() => {
     loadTemplates();
@@ -78,9 +83,11 @@ export default function DocumentTemplates() {
       return;
     }
 
-    if (template.is_premium) {
-      // Check premium access
-      toast.info('Premium template - checking access...');
+    // Check if template is premium and user doesn't have access
+    if (template.is_premium && !hasAccess) {
+      setSelectedTemplate(template);
+      setShowUpgradeDialog(true);
+      return;
     }
 
     try {
@@ -116,7 +123,8 @@ export default function DocumentTemplates() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6">
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
@@ -186,6 +194,74 @@ export default function DocumentTemplates() {
           ))}
         </div>
       )}
-    </div>
+      </div>
+
+      {/* Upgrade Dialog */}
+      <Dialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-2 mb-2">
+              <Crown className="w-6 h-6 text-primary" />
+              <DialogTitle>Premium Template</DialogTitle>
+            </div>
+            <DialogDescription>
+              This template requires a premium subscription to download.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <Card className="p-4 bg-primary/5 border-primary/20">
+              <div className="flex items-start gap-3">
+                <Lock className="w-5 h-5 text-primary mt-0.5" />
+                <div>
+                  <h4 className="font-semibold mb-1">{selectedTemplate?.title}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedTemplate?.description}
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            <div className="space-y-2">
+              <h4 className="font-semibold text-sm">Get Premium Access:</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  Unlimited premium template downloads
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  Access to all legal forms and documents
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  Priority support and updates
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowUpgradeDialog(false)}
+              className="w-full sm:w-auto"
+            >
+              Maybe Later
+            </Button>
+            <Button
+              onClick={() => {
+                setShowUpgradeDialog(false);
+                window.location.href = '/pricing';
+              }}
+              className="w-full sm:w-auto"
+            >
+              <Crown className="w-4 h-4 mr-2" />
+              Upgrade Now
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
