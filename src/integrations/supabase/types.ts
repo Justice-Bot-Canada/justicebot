@@ -223,6 +223,86 @@ export type Database = {
         }
         Relationships: []
       }
+      court_form_fields: {
+        Row: {
+          created_at: string
+          field_key: string
+          font_size: number
+          form_id: string
+          id: string
+          page: number
+          x: number
+          y: number
+        }
+        Insert: {
+          created_at?: string
+          field_key: string
+          font_size?: number
+          form_id: string
+          id?: string
+          page?: number
+          x: number
+          y: number
+        }
+        Update: {
+          created_at?: string
+          field_key?: string
+          font_size?: number
+          form_id?: string
+          id?: string
+          page?: number
+          x?: number
+          y?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "court_form_fields_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "court_forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      court_forms: {
+        Row: {
+          code: string
+          created_at: string
+          doc_url: string | null
+          id: string
+          is_active: boolean
+          jurisdiction: string
+          last_checked_at: string | null
+          pdf_url: string | null
+          source_url: string
+          title: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          doc_url?: string | null
+          id?: string
+          is_active?: boolean
+          jurisdiction: string
+          last_checked_at?: string | null
+          pdf_url?: string | null
+          source_url: string
+          title: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          doc_url?: string | null
+          id?: string
+          is_active?: boolean
+          jurisdiction?: string
+          last_checked_at?: string | null
+          pdf_url?: string | null
+          source_url?: string
+          title?: string
+        }
+        Relationships: []
+      }
       document_templates: {
         Row: {
           category: string

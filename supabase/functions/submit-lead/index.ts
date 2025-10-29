@@ -1,10 +1,21 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://justice-bot.com',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schema
+const LeadSchema = z.object({
+  email: z.string().trim().email().max(255),
+  name: z.string().trim().max(100).optional(),
+  phone: z.string().trim().max(20).optional(),
+  source: z.string().trim().max(50).optional(),
+  journey: z.string().trim().max(50).optional(),
+  payload: z.record(z.unknown()).optional()
+});
 
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -16,11 +27,17 @@ serve(async (req: Request) => {
     const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { email, name, phone, source, journey, payload } = await req.json();
-
-    if (!email) {
+    const requestBody = await req.json();
+    
+    // Validate input with Zod
+    const validationResult = LeadSchema.safeParse(requestBody);
+    if (!validationResult.success) {
+      console.error('Lead validation error:', validationResult.error.errors);
       return new Response(
-        JSON.stringify({ error: 'Email is required' }),
+        JSON.stringify({ 
+          error: 'Invalid input',
+          details: validationResult.error.errors.map(e => e.message).join(', ')
+        }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 400 
@@ -28,7 +45,8 @@ serve(async (req: Request) => {
       );
     }
 
-    console.log('Submitting lead:', { email, name, source, journey });
+    const { email, name, phone, source, journey, payload } = validationResult.data;
+    console.log('Submitting lead from:', source || 'website');
 
     // Insert lead into database
     const { data: lead, error: leadError } = await supabase
