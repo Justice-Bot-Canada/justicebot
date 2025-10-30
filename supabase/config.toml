@@ -33,6 +33,9 @@ verify_jwt = false
 [functions.sync-ontario-forms]
 verify_jwt = true
 
+[functions.scrape-court-forms]
+verify_jwt = true
+
 [functions.ai-legal-triage]
 verify_jwt = false
 

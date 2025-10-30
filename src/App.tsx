@@ -66,6 +66,7 @@ import Journey from "./pages/Journey";
 // Lazy load heavy components
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Admin = lazy(() => import("./pages/Admin"));
+const AdminFormsSync = lazy(() => import("./pages/AdminFormsSync"));
 const DocumentAnalysis = lazy(() => import("./pages/DocumentAnalysis"));
 const FormBuilder = lazy(() => import("./pages/FormBuilder"));
 const CaseAssessment = lazy(() => import("./pages/CaseAssessment"));
@@ -125,6 +126,7 @@ const AppContent = () => {
           <Route path="/form/:formId" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><FormBuilder /></Suspense></ProtectedRoute>} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/admin" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Admin /></Suspense></ProtectedRoute>} />
+          <Route path="/admin/forms-sync" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><AdminFormsSync /></Suspense></ProtectedRoute>} />
           <Route path="/low-income" element={<ProtectedRoute><LowIncomeApproval /></ProtectedRoute>} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/liability" element={<Liability />} />
