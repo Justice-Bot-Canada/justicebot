@@ -1567,6 +1567,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_profiles: {
+        Row: {
+          auth_user_id: string
+          created_at: string
+          is_paid: boolean
+          updated_at: string
+        }
+        Insert: {
+          auth_user_id: string
+          created_at?: string
+          is_paid?: boolean
+          updated_at?: string
+        }
+        Update: {
+          auth_user_id?: string
+          created_at?: string
+          is_paid?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
