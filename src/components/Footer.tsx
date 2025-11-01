@@ -1,4 +1,5 @@
 import justiceBotLogo from "@/assets/justice-bot-logo.jpeg";
+import { Facebook } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -118,6 +119,23 @@ const Footer = () => {
               <strong>⚠️ Not affiliated with justicebot.org</strong> — Justice-Bot (Canada) is an independent Canadian platform 
               providing AI-powered legal help for Ontario tribunals and courts. We are not associated with any other "JusticeBot" services.
             </p>
+          </div>
+
+          {/* Social Media Links */}
+          <div className="mb-6 flex justify-center">
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-background/80 font-semibold">Follow Us:</span>
+              <a 
+                href="https://www.facebook.com/profile.php?id=61579916761955" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-background/50"
+                aria-label="Visit our Facebook page"
+              >
+                <Facebook className="w-5 h-5" />
+                <span className="text-sm">Facebook</span>
+              </a>
+            </div>
           </div>
 
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
