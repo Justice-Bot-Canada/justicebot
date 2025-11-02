@@ -11,8 +11,7 @@ export const ExplainerVideo = () => {
         thumbnailUrl="https://justice-bot.com/how-it-works-thumbnail.jpg"
         uploadDate="2025-10-03"
         duration="PT2M"
-        contentUrl="https://justice-bot.com/justice-bot-explainer.mp4"
-        embedUrl="https://justice-bot.com/justice-bot-explainer.mp4"
+        embedUrl="https://app.heygen.com/embedded-player/29aae8c531a8443db23b13be0f4ccf6f"
       />
       
       <section className="py-16 bg-gradient-to-b from-background to-muted/30">
@@ -26,17 +25,17 @@ export const ExplainerVideo = () => {
 
           <Card className="max-w-4xl mx-auto overflow-hidden shadow-2xl">
             <div className="relative aspect-video bg-black">
-              <video
-                className="w-full h-full"
-                controls
-                preload="metadata"
-                poster="/how-it-works-thumbnail.jpg"
+              <iframe 
+                width="100%" 
+                height="100%" 
+                src="https://app.heygen.com/embedded-player/29aae8c531a8443db23b13be0f4ccf6f" 
+                title="How Justice-Bot Works - HeyGen video player" 
+                frameBorder="0" 
+                allow="encrypted-media; fullscreen;" 
+                allowFullScreen
+                className="absolute inset-0"
                 aria-label="How Justice-Bot Works - Explainer Video"
-              >
-                <source src="/justice-bot-explainer.mp4" type="video/mp4" />
-                <track kind="captions" label="English captions" />
-                Your browser does not support the video tag.
-              </video>
+              />
             </div>
             <div className="p-6 bg-card">
               <div className="flex items-start gap-4">
