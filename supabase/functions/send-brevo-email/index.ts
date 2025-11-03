@@ -47,7 +47,10 @@ serve(async (req: Request) => {
       );
     }
 
-    console.log('Sending Brevo email to:', to);
+    // Create safe email hash for logging (PIPEDA compliance)
+    const emailHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(to))
+      .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 8));
+    console.log('Sending email via Brevo', { emailHash, hasTemplate: !!templateId });
 
     const emailPayload: any = {
       to: [{ email: to, name: toName || 'User' }],

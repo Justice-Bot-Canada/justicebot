@@ -21,7 +21,8 @@ serve(async (req) => {
 
     const { type, userId, data } = await req.json();
     
-    console.log("Sending email notification:", { type, userId });
+    const requestId = crypto.randomUUID();
+    console.log("Email notification request received", { type, requestId });
 
     // Get user email
     const { data: userData, error: userError } = await supabase.auth.admin.getUserById(userId);

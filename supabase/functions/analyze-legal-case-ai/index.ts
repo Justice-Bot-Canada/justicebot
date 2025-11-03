@@ -43,7 +43,11 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    console.log('Analyzing case for user:', { userId: user.id, caseType, province });
+    // Generic logging without PII - map case types to broad categories
+    const caseCategory = ['ltb', 'small_claims'].includes(caseType) ? 'civil' : 
+                         ['hrto', 'criminal', 'family'].includes(caseType) ? 'sensitive' : 'general';
+    const requestId = crypto.randomUUID();
+    console.log('Legal case analysis started', { caseCategory, province, requestId });
 
     // Step 1: Search A2AJ for similar cases
     const a2ajSearchQuery = buildSearchQuery(caseDetails, caseType);

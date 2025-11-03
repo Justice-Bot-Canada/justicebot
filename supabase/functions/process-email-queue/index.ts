@@ -116,10 +116,12 @@ serve(async (req: Request) => {
           .eq('id', emailRecord.id);
 
         processed++;
-        console.log(`Sent email to ${email}`);
+        const emailHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(email))
+          .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 8));
+        console.log('Email sent successfully', { emailHash, template });
 
       } catch (error: any) {
-        console.error(`Failed to send email to ${emailRecord.email}:`, error);
+        console.error('Failed to send email:', { template: emailRecord.template, error: error.message });
         
         // Mark as failed
         await supabase

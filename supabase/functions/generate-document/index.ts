@@ -103,7 +103,9 @@ serve(async (req: Request) => {
           },
         });
 
-      console.log('Email queued for:', user_email);
+      const emailHash = user_email ? await crypto.subtle.digest('SHA-256', new TextEncoder().encode(user_email))
+        .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 8)) : 'none';
+      console.log('Email queued successfully', { emailHash, template: 'doc_ready', docType: doc_type });
     }
 
     // Send immediate Brevo email if API key is configured

@@ -78,9 +78,10 @@ serve(async (req) => {
         const { data: { user } } = await supabaseClient.auth.admin.getUserById(userId);
         
         if (user?.email) {
-          console.log('Would send email to:', user.email);
+          const emailHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(user.email))
+            .then(buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 8));
+          console.log('Email notification prepared', { emailHash, notificationType: type });
           // TODO: Integrate with Resend for email notifications
-          // For now, just log it
         }
       }
     }
