@@ -1,7 +1,8 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
-import { Handshake, Users, Building, TrendingUp, Shield, Mail } from "lucide-react";
+import { VideoSchema } from "@/components/VideoSchema";
+import { Handshake, Users, Building, TrendingUp, Shield, Mail, Play } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -60,6 +61,14 @@ export default function Partners() {
         description="Join Justice-Bot as a partner. We work with community organizations, legal clinics, advocacy groups, and tech platforms to expand access to justice in Canada."
         keywords="justice-bot partners, legal partnerships, community organizations, legal aid collaboration"
       />
+      <VideoSchema
+        name="Justice-Bot Partnership Program Overview"
+        description="Learn how partnering with Justice-Bot can help your organization expand access to justice across Canada"
+        thumbnailUrl="https://justice-bot.com/justice-bot-logo.jpeg"
+        uploadDate={new Date().toISOString()}
+        duration="PT3M"
+        embedUrl="https://app.heygen.com/embedded-player/c45c2ca3bc2d450e9a862a937b2ad9a1"
+      />
       <Header />
       <main className="flex-1 container mx-auto px-4 py-16">
         <div className="max-w-6xl mx-auto">
@@ -68,6 +77,28 @@ export default function Partners() {
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Together, we can bridge the justice gap. Join organizations across Canada working to make legal help accessible and affordable for everyone.
             </p>
+          </div>
+
+          <div className="mb-16">
+            <Card className="overflow-hidden">
+              <div className="bg-gradient-to-br from-primary/10 to-accent/10 p-8 text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/20 rounded-full mb-4">
+                  <Play className="w-8 h-8 text-primary" />
+                </div>
+                <h2 className="text-2xl font-bold mb-2">See How Partnership Works</h2>
+                <p className="text-muted-foreground mb-6">Watch our partnership overview video</p>
+              </div>
+              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                <iframe 
+                  className="absolute top-0 left-0 w-full h-full"
+                  src="https://app.heygen.com/embedded-player/c45c2ca3bc2d450e9a862a937b2ad9a1" 
+                  title="HeyGen video player - Justice-Bot Partnership Program"
+                  allow="encrypted-media; fullscreen;" 
+                  allowFullScreen
+                  style={{ border: 0 }}
+                />
+              </div>
+            </Card>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 mb-16">
