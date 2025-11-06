@@ -505,6 +505,22 @@ const EvidenceBuilder: React.FC<EvidenceBuilderProps> = ({ caseId, onUpdate }) =
                             <ArrowDown className="h-4 w-4" />
                           </Button>
                         </div>
+                        {(item.file_type === 'application/pdf' || item.file_type.startsWith('image/')) && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => processOCR(item.id)}
+                            disabled={processing.includes(item.id)}
+                            className="gap-1"
+                            title="Re-process OCR with AI"
+                          >
+                            {processing.includes(item.id) ? (
+                              <RotateCcw className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Scan className="h-4 w-4" />
+                            )}
+                          </Button>
+                        )}
                         <Button
                           variant="outline"
                           size="sm"

@@ -24,7 +24,8 @@ import {
   BookOpen,
   Loader2,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  RotateCcw
 } from 'lucide-react';
 
 interface Evidence {
@@ -67,6 +68,7 @@ export function EvidenceHub({ caseId, onEvidenceSelect, selectionMode = false }:
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
+  const [processing, setProcessing] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchEvidence();
@@ -228,6 +230,50 @@ export function EvidenceHub({ caseId, onEvidenceSelect, selectionMode = false }:
     },
     maxSize: 20 * 1024 * 1024 // 20MB
   });
+
+  const reprocessOCR = async (evidenceId: string, filePath: string, fileType: string) => {
+    setProcessing(prev => new Set(prev).add(evidenceId));
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('extract-ocr', {
+        body: {
+          filePath,
+          fileType,
+        }
+      });
+
+      if (error) throw error;
+      
+      if (!data?.success) {
+        throw new Error(data?.error || 'OCR extraction failed');
+      }
+
+      const ocrText = data.text || '';
+      
+      // Update evidence with new OCR text
+      const { error: updateError } = await supabase
+        .from('evidence')
+        .update({ 
+          ocr_text: ocrText,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', evidenceId);
+
+      if (updateError) throw updateError;
+      
+      toast.success(`Re-extracted ${ocrText.length} characters of text`);
+      fetchEvidence();
+    } catch (error: any) {
+      console.error('OCR reprocess error:', error);
+      toast.error(error.message || 'Failed to re-process OCR');
+    } finally {
+      setProcessing(prev => {
+        const next = new Set(prev);
+        next.delete(evidenceId);
+        return next;
+      });
+    }
+  };
 
   const deleteEvidence = async (id: string) => {
     try {
@@ -431,6 +477,24 @@ export function EvidenceHub({ caseId, onEvidenceSelect, selectionMode = false }:
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
+                  {(item.file_type === 'application/pdf' || item.file_type.startsWith('image/')) && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        reprocessOCR(item.id, item.file_path, item.file_type);
+                      }}
+                      disabled={processing.has(item.id)}
+                      title="Re-process OCR with AI"
+                    >
+                      {processing.has(item.id) ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <RotateCcw className="h-4 w-4" />
+                      )}
+                    </Button>
+                  )}
                   <Button
                     size="sm"
                     variant="ghost"
