@@ -179,6 +179,13 @@
   </url>
 
   <url>
+    <loc>https://justice-bot.com/blog</loc>
+    <lastmod>2025-01-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
     <loc>https://justice-bot.com/what-we-do</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>monthly</changefreq>
@@ -209,9 +216,9 @@
 
   <url>
     <loc>https://justice-bot.com/feedback</loc>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2025-01-24</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
 
   <url>

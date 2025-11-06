@@ -137,7 +137,7 @@ export default function Blog() {
         {/* Articles Grid */}
         <div className="grid gap-8 md:grid-cols-2 mb-16">
           {articles.map((article) => (
-            <Card key={article.id} className="overflow-hidden hover:shadow-lg transition-shadow group">
+            <Card key={article.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="p-6">
                 <div className="flex items-center gap-4 mb-4">
                   <Badge variant="secondary">{article.category}</Badge>
@@ -153,7 +153,7 @@ export default function Blog() {
                   </div>
                 </div>
                 
-                <h2 className="text-2xl font-bold mb-3 group-hover:text-primary transition-colors">
+                <h2 className="text-2xl font-bold mb-3">
                   {article.title}
                 </h2>
                 
@@ -161,12 +161,12 @@ export default function Blog() {
                   {article.excerpt}
                 </p>
                 
-                <a 
-                  href={article.slug}
-                  className="inline-flex items-center gap-2 text-primary font-semibold hover:gap-3 transition-all"
-                >
-                  Read Article <ArrowRight className="w-4 h-4" />
-                </a>
+                <div className="inline-flex items-center gap-2 text-muted-foreground text-sm">
+                  <span className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded text-xs font-medium">
+                    Coming Soon
+                  </span>
+                  <span>Full article in development</span>
+                </div>
               </div>
             </Card>
           ))}

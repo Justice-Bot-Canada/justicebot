@@ -18,6 +18,13 @@ http://justice-bot.com/*       https://justice-bot.com/:splat  301!
 /small-claims       /small-claims-journey 301!
 /demo-video         /                   301!
 
+# Blog post redirects (articles not yet created - redirect to main blog)
+/blog/*             /blog               301!
+
+# Docs redirect (no docs section exists)
+/docs               /legal-resources    301!
+/docs/*             /legal-resources    301!
+
 # Block sensitive config files
 /config.json        /404                404
 
