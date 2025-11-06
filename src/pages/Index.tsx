@@ -13,6 +13,7 @@ import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import SuccessStories from "@/components/SuccessStories";
 import TutorialVideos from "@/components/TutorialVideos";
 import DocumentTemplates from "@/components/DocumentTemplates";
+import { PricingComparison } from "@/components/PricingComparison";
 import legalServicesHero from "@/assets/legal-services-hero.jpg";
 
 const Index = () => {
@@ -90,6 +91,7 @@ const Index = () => {
       <Header />
       <main id="main-content" tabIndex={-1}>
         <HeroSection />
+        <PricingComparison />
         <ExplainerVideo />
         
         {/* Interactive Tutorial Section */}
