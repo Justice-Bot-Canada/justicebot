@@ -94,6 +94,22 @@ const Header = () => {
                 <div className="absolute left-0 top-full mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
                   <a href="/family-journey" className="block px-4 py-2 text-sm hover:bg-muted">Family Court</a>
                   <a href="/cas-journey" className="block px-4 py-2 text-sm hover:bg-muted">CAS Issues</a>
+                  <a href="/family-court-mistakes" className="block px-4 py-2 text-sm hover:bg-muted">Common Mistakes</a>
+                </div>
+              </div>
+              
+              <div className="relative group">
+                <button 
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+                  aria-label="Criminal law services menu"
+                  aria-haspopup="true"
+                >
+                  Criminal
+                </button>
+                <div className="absolute left-0 top-full mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                  <a href="/criminal-journey" className="block px-4 py-2 text-sm hover:bg-muted">Criminal Law Guide</a>
+                  <a href="/criminal-court-guide" className="block px-4 py-2 text-sm hover:bg-muted">Court Process</a>
+                  <a href="/criminal-court-mistakes" className="block px-4 py-2 text-sm hover:bg-muted">Common Mistakes</a>
                 </div>
               </div>
               

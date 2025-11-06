@@ -13,7 +13,7 @@ import LegalFAQ from '@/components/LegalFAQ';
 import DocumentTemplateLibrary from '@/components/DocumentTemplateLibrary';
 import EnhancedSEO from '@/components/EnhancedSEO';
 import { useLegalData } from '@/hooks/useLegalData';
-import { BookOpen, HelpCircle, FileText, Video, Users, Scale, Phone, ExternalLink, Search, Building2 } from 'lucide-react';
+import { BookOpen, HelpCircle, FileText, Video, Users, Scale, Phone, ExternalLink, Search, Building2, AlertTriangle } from 'lucide-react';
 
 const LegalResources: React.FC = () => {
   const [activeTab, setActiveTab] = useState('tutorials');
@@ -322,30 +322,30 @@ const LegalResources: React.FC = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Scale className="h-5 w-5" />
-                    Small Claims Court Guide
+                    <FileText className="h-5 w-5" />
+                    LTB & Tribunals Guide
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Complete guide to filing and defending small claims court cases in Ontario.
+                    Ultimate guide to LTB, HRTO, and other Ontario tribunals with procedures and timelines.
                   </p>
-                  <Button className="w-full">Read Guide</Button>
+                  <Button className="w-full" asChild><a href="/ltb-guide">Read Guide</a></Button>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    Landlord & Tenant Guide
+                    <Scale className="h-5 w-5" />
+                    Criminal Court Guide
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Understanding your rights and responsibilities under Ontario's tenancy laws.
+                    Comprehensive guide to criminal court proceedings, your rights, and the justice system in Ontario.
                   </p>
-                  <Button className="w-full">Read Guide</Button>
+                  <Button className="w-full" asChild><a href="/criminal-court-guide">Read Guide</a></Button>
                 </CardContent>
               </Card>
 
@@ -353,14 +353,29 @@ const LegalResources: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Users className="h-5 w-5" />
-                    Human Rights Guide
+                    Family Court Mistakes
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Learn about filing human rights complaints and understanding your protections.
+                    Avoid critical mistakes in family court and child protection cases with this detailed guide.
                   </p>
-                  <Button className="w-full">Read Guide</Button>
+                  <Button className="w-full" asChild><a href="/family-court-mistakes">Read Guide</a></Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5" />
+                    Criminal Court Mistakes
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Learn the 15 most common mistakes people make when facing criminal charges and how to avoid them.
+                  </p>
+                  <Button className="w-full" asChild><a href="/criminal-court-mistakes">Read Guide</a></Button>
                 </CardContent>
               </Card>
             </div>
