@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { Suspense, lazy } from "react";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
@@ -188,6 +188,8 @@ const AppContent = () => {
 
           {/* Payment & Subscription */}
           <Route path="/low-income" element={<ProtectedRoute><LowIncomeApproval /></ProtectedRoute>} />
+          <Route path="/low-income-approval" element={<Navigate to="/low-income" replace />} />
+          <Route path="/court-information" element={<Navigate to="/court" replace />} />
           <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
           <Route path="/subscription-success" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SubscriptionSuccess /></Suspense></ProtectedRoute>} />
           <Route path="/payment-cancel" element={<ProtectedRoute><PaymentCancel /></ProtectedRoute>} />

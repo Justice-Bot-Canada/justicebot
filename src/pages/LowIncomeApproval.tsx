@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { Upload, FileText, CheckCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SEOHead from "@/components/SEOHead";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 const LowIncomeApproval = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -26,6 +30,27 @@ const LowIncomeApproval = () => {
     additional_info: ""
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "GovernmentService",
+    "name": "Low-Income Legal Assistance Program",
+    "description": "Financial assistance program providing affordable access to legal services for low-income Canadians. Get full access to Justice-Bot for just $25/year.",
+    "provider": {
+      "@type": "Organization",
+      "name": "Justice-Bot"
+    },
+    "serviceType": "Legal Aid",
+    "areaServed": "Canada",
+    "offers": {
+      "@type": "Offer",
+      "price": "25",
+      "priceCurrency": "CAD",
+      "priceValidUntil": "2025-12-31",
+      "availability": "https://schema.org/InStock",
+      "eligibleRegion": "CA"
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({
@@ -111,6 +136,12 @@ const LowIncomeApproval = () => {
   if (submitted) {
     return (
       <div className="min-h-screen bg-background">
+        <SEOHead
+          title="Application Submitted - Low-Income Legal Assistance"
+          description="Your low-income program application has been submitted. We'll review within 3-5 business days and notify you via email."
+          keywords="legal aid application, low income legal help, financial assistance submitted"
+          canonicalUrl="https://justice-bot.com/low-income"
+        />
         <Header />
         <main className="container mx-auto px-4 py-16">
           <Card className="max-w-2xl mx-auto text-center">
@@ -126,7 +157,7 @@ const LowIncomeApproval = () => {
                 We'll review your application within 3-5 business days and notify you via email. 
                 If approved, you'll receive instructions on how to access the discounted pricing.
               </p>
-              <Button onClick={() => window.location.href = '/'}>
+              <Button onClick={() => navigate('/')}>
                 Return to Home
               </Button>
             </CardContent>
@@ -139,15 +170,43 @@ const LowIncomeApproval = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEOHead
+        title="Low-Income Legal Assistance Program - $25/Year"
+        description="Apply for affordable legal help if you qualify for our low-income program. Get full access to Justice-Bot legal services for just $25/year. Income verification required for individuals under $30K, families under $45-60K. OW/ODSP recipients and students may qualify."
+        keywords="low income legal help Canada, affordable legal services Ontario, legal aid application, financial assistance legal help, Ontario Works legal help, ODSP legal services, student legal aid"
+        canonicalUrl="https://justice-bot.com/low-income"
+        structuredData={structuredData}
+      />
       <Header />
       <main className="container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto">
+          <Breadcrumbs items={[
+            { label: "Low-Income Program" }
+          ]} />
+          
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-4">Low-Income Program Application</h1>
-            <p className="text-muted-foreground">
-              Access Justice-Bot for just $25/year if you qualify for our low-income program
+            <h1 className="text-3xl font-bold mb-4">Low-Income Legal Assistance Program</h1>
+            <p className="text-muted-foreground text-lg">
+              Access Justice-Bot for just $25/year if you qualify for our low-income program. 
+              We believe everyone deserves access to legal help, regardless of their financial situation.
             </p>
           </div>
+
+          <Card className="mb-6 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+            <CardContent className="pt-6">
+              <h2 className="font-semibold text-blue-900 dark:text-blue-100 mb-3">
+                Who Qualifies for Our Low-Income Program?
+              </h2>
+              <div className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
+                <p><strong>✓ Individuals:</strong> Annual household income under $30,000 CAD</p>
+                <p><strong>✓ Couples/2-person households:</strong> Annual household income under $45,000 CAD</p>
+                <p><strong>✓ Families (3+ members):</strong> Annual household income under $60,000 CAD</p>
+                <p><strong>✓ Social Assistance Recipients:</strong> Ontario Works (OW) or ODSP beneficiaries</p>
+                <p><strong>✓ Students:</strong> Full-time students with limited income</p>
+                <p><strong>✓ Employment Insurance:</strong> Those receiving EI benefits</p>
+              </div>
+            </CardContent>
+          </Card>
 
           <Card>
             <CardHeader>
