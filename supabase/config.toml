@@ -47,3 +47,6 @@ verify_jwt = true
 
 [functions.prefill-form]
 verify_jwt = true
+
+[functions.generate-smart-document]
+verify_jwt = true

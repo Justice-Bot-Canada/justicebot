@@ -74,6 +74,56 @@ export type Database = {
         }
         Relationships: []
       }
+      case_deadlines: {
+        Row: {
+          case_id: string | null
+          completed: boolean
+          created_at: string
+          description: string | null
+          due_date: string
+          id: string
+          priority: string
+          reminder_sent: boolean
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          case_id?: string | null
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          due_date: string
+          id?: string
+          priority?: string
+          reminder_sent?: boolean
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          case_id?: string | null
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          due_date?: string
+          id?: string
+          priority?: string
+          reminder_sent?: boolean
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_deadlines_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       case_events: {
         Row: {
           case_id: string
@@ -1609,6 +1659,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_settings: {
+        Row: {
+          captions_enabled: boolean
+          color_scheme: string
+          font_scale: number
+          prefers_high_contrast: boolean
+          prefers_reduced_motion: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          captions_enabled?: boolean
+          color_scheme?: string
+          font_scale?: number
+          prefers_high_contrast?: boolean
+          prefers_reduced_motion?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          captions_enabled?: boolean
+          color_scheme?: string
+          font_scale?: number
+          prefers_high_contrast?: boolean
+          prefers_reduced_motion?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       legal_pathways_admin_view: {
@@ -1661,6 +1741,83 @@ export type Database = {
           total_revenue: number | null
         }
         Relationships: []
+      }
+      my_payments: {
+        Row: {
+          amount_cents: number | null
+          captured_at: string | null
+          case_id: string | null
+          created_at: string | null
+          currency: string | null
+          form_id: string | null
+          id: string | null
+          provider: string | null
+          provider_order_id: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
+      payments_public: {
+        Row: {
+          amount_cents: number | null
+          captured_at: string | null
+          case_id: string | null
+          created_at: string | null
+          currency: string | null
+          form_id: string | null
+          id: string | null
+          provider: string | null
+          provider_order_id: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount_cents?: number | null
+          captured_at?: string | null
+          case_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          form_id?: string | null
+          id?: string | null
+          provider?: string | null
+          provider_order_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount_cents?: number | null
+          captured_at?: string | null
+          case_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          form_id?: string | null
+          id?: string | null
+          provider?: string | null
+          provider_order_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
@@ -1717,6 +1874,29 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
       make_user_admin: { Args: { p_email: string }; Returns: undefined }
+      payments_public_rows: {
+        Args: never
+        Returns: {
+          amount_cents: number | null
+          captured_at: string | null
+          case_id: string | null
+          created_at: string | null
+          currency: string | null
+          form_id: string | null
+          id: string | null
+          provider: string | null
+          provider_order_id: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "payments_public"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       revoke_admin_role: {
         Args: { revoke_reason?: string; target_user_id: string }
         Returns: undefined

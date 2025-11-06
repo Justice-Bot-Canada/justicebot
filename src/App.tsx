@@ -76,6 +76,7 @@ const LegalChat = lazy(() => import("./pages/LegalChat"));
 const TutorialLibrary = lazy(() => import("./pages/TutorialLibrary"));
 const TemplateLibrary = lazy(() => import("./pages/TemplateLibrary"));
 const Referrals = lazy(() => import("./pages/Referrals"));
+const SmartDocuments = lazy(() => import("./pages/SmartDocuments"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -161,6 +162,7 @@ const AppContent = () => {
           <Route path="/evidence" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Evidence /></Suspense></ProtectedRoute>} />
           <Route path="/legal-resources" element={<LegalResources />} />
           <Route path="/journey" element={<Journey />} />
+          <Route path="/smart-documents" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SmartDocuments /></Suspense></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -27,6 +27,7 @@ import Footer from "@/components/Footer";
 import { PremiumGate } from "@/components/PremiumGate";
 import { LegalChatbot } from "@/components/LegalChatbot";
 import { FormsList } from "@/components/FormsList";
+import { DeadlineWidget } from "@/components/DeadlineWidget";
 import { supabase } from "@/integrations/supabase/client";
 
 const Dashboard = () => {
@@ -196,17 +197,20 @@ const Dashboard = () => {
           </TabsContent>
 
           <TabsContent value="calendar" className="mt-6">
-            {activeCaseId ? (
-              <CaseCalendar caseId={activeCaseId} />
-            ) : (
-              <Card>
-                <CardContent className="pt-6 text-center text-muted-foreground">
-                  <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p className="mb-2 font-medium">No case selected</p>
-                  <p className="text-sm">Go to the <strong>Cases</strong> tab to create or select a case first</p>
-                </CardContent>
-              </Card>
-            )}
+            <div className="space-y-6">
+              <DeadlineWidget />
+              {activeCaseId ? (
+                <CaseCalendar caseId={activeCaseId} />
+              ) : (
+                <Card>
+                  <CardContent className="pt-6 text-center text-muted-foreground">
+                    <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p className="mb-2 font-medium">No case selected</p>
+                    <p className="text-sm">Go to the <strong>Cases</strong> tab to create or select a case first</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </TabsContent>
 
           <TabsContent value="documents" className="mt-6">
