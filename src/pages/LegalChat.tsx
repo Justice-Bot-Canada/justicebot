@@ -1,4 +1,5 @@
 import { LegalChatbot } from '@/components/LegalChatbot';
+import { LegalResearchPanel } from '@/components/LegalResearchPanel';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SEOHead from '@/components/SEOHead';
@@ -19,7 +20,14 @@ export default function LegalChat() {
             Get instant answers to your legal questions about Ontario courts and tribunals
           </p>
         </div>
-        <LegalChatbot />
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="md:col-span-2">
+            <LegalChatbot />
+          </div>
+          <div>
+            <LegalResearchPanel />
+          </div>
+        </div>
       </main>
       <Footer />
     </div>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, BookOpen, Download } from "lucide-react";
@@ -7,14 +7,40 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import { EvidenceHub } from "@/components/EvidenceHub";
+import { EvidenceAnalyzer } from "@/components/EvidenceAnalyzer";
 import { PremiumGate } from "@/components/PremiumGate";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { supabase } from "@/integrations/supabase/client";
 
 const Evidence = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const caseId = searchParams.get('caseId');
+  const [caseData, setCaseData] = useState<any>(null);
+
+  // Load case data for analyzer context
+  useEffect(() => {
+    if (caseId) {
+      loadCaseData();
+    }
+  }, [caseId]);
+
+  const loadCaseData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('cases')
+        .select('*')
+        .eq('id', caseId)
+        .single();
+      
+      if (!error && data) {
+        setCaseData(data);
+      }
+    } catch (error) {
+      console.error('Error loading case:', error);
+    }
+  };
 
   if (!user) {
     return (
@@ -91,7 +117,14 @@ const Evidence = () => {
           </Alert>
 
           <PremiumGate feature="Evidence Management">
-            <EvidenceHub caseId={caseId} />
+            <div className="space-y-6">
+              <EvidenceAnalyzer 
+                caseId={caseId} 
+                caseType={caseData?.venue}
+                caseDescription={caseData?.description}
+              />
+              <EvidenceHub caseId={caseId} />
+            </div>
           </PremiumGate>
         </div>
       </main>

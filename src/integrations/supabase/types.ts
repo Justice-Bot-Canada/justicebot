@@ -549,6 +549,44 @@ export type Database = {
           },
         ]
       }
+      evidence_analysis: {
+        Row: {
+          analysis_data: Json
+          case_id: string
+          created_at: string
+          evidence_count: number
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis_data: Json
+          case_id: string
+          created_at?: string
+          evidence_count?: number
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analysis_data?: Json
+          case_id?: string
+          created_at?: string
+          evidence_count?: number
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evidence_analysis_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       evidence_links: {
         Row: {
           confidence: number | null
