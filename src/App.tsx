@@ -106,80 +106,99 @@ const AppContent = () => {
         <SkipToContent />
         <LiveSupportWidget />
       <Routes>
+          {/* Main Landing & Getting Started */}
           <Route path="/" element={<Index />} />
           <Route path="/welcome" element={<Welcome />} />
-          <Route path="/hrto-help" element={<HRTOHelp />} />
-          <Route path="/ltb-help" element={<LTBHelp />} />
-          <Route path="/small-claims-court" element={<SmallClaimsCourt />} />
-        <Route path="/hrto-journey" element={<HRTOJourney />} />
-        <Route path="/ltb-journey" element={<LTBJourney />} />
-        <Route path="/small-claims-journey" element={<SmallClaimsJourney />} />
-        <Route path="/criminal-journey" element={<CriminalJourney />} />
-        <Route path="/family-journey" element={<FamilyJourney />} />
-        <Route path="/superior-court-journey" element={<SuperiorCourtJourney />} />
-        <Route path="/accountability-journey" element={<AccountabilityJourney />} />
-          <Route path="/accountability/:province/:type" element={<ProvincialAccountabilityJourney />} />
-          <Route path="/police-accountability-journey" element={<PoliceAccountabilityJourney />} />
+          <Route path="/triage" element={<Triage />} />
+          <Route path="/journey" element={<Journey />} />
+          <Route path="/pricing" element={<Pricing />} />
+
+          {/* Legal Journey Pathways */}
+          <Route path="/hrto-journey" element={<HRTOJourney />} />
+          <Route path="/ltb-journey" element={<LTBJourney />} />
+          <Route path="/small-claims-journey" element={<SmallClaimsJourney />} />
+          <Route path="/criminal-journey" element={<CriminalJourney />} />
+          <Route path="/family-journey" element={<FamilyJourney />} />
+          <Route path="/superior-court-journey" element={<SuperiorCourtJourney />} />
           <Route path="/cas-journey" element={<CASJourney />} />
           <Route path="/labour-journey" element={<LabourBoardJourney />} />
           <Route path="/immigration-journey" element={<ImmigrationJourney />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/feedback" element={<Feedback />} />
+          <Route path="/accountability-journey" element={<AccountabilityJourney />} />
+          <Route path="/accountability/:province/:type" element={<ProvincialAccountabilityJourney />} />
+          <Route path="/police-accountability-journey" element={<PoliceAccountabilityJourney />} />
+
+          {/* Tools & Services (Protected) */}
           <Route path="/dashboard" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Dashboard /></Suspense></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Profile /></Suspense></ProtectedRoute>} />
+          <Route path="/legal-chat" element={<Suspense fallback={<LoadingFallback />}><LegalChat /></Suspense>} />
+          <Route path="/document-analysis" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><DocumentAnalysis /></Suspense></ProtectedRoute>} />
+          <Route path="/document-drafter" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><DocumentDrafter /></Suspense></ProtectedRoute>} />
+          <Route path="/smart-documents" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SmartDocuments /></Suspense></ProtectedRoute>} />
+          <Route path="/evidence" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Evidence /></Suspense></ProtectedRoute>} />
+          <Route path="/case-timeline" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><CaseTimeline /></Suspense></ProtectedRoute>} />
+          <Route path="/case-strength" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><CaseStrengthAnalyzer /></Suspense></ProtectedRoute>} />
           <Route path="/assessment" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><CaseAssessment /></Suspense></ProtectedRoute>} />
+          <Route path="/settlement-calculator" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SettlementCalculator /></Suspense></ProtectedRoute>} />
           <Route path="/pathway/:caseId" element={<ProtectedRoute><PathwayDecision /></ProtectedRoute>} />
-          <Route path="/triage" element={<Triage />} />
-          <Route path="/tribunal-locator" element={<TribunalLocatorPage />} />
+
+          {/* Forms Management */}
           <Route path="/forms" element={<Forms />} />
           <Route path="/forms/:venue" element={<ProtectedRoute><FormSelector /></ProtectedRoute>} />
           <Route path="/form/:formId" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><FormBuilder /></Suspense></ProtectedRoute>} />
-          <Route path="/pricing" element={<Pricing />} />
+
+          {/* Resources & Learning */}
+          <Route path="/tutorials" element={<Suspense fallback={<LoadingFallback />}><TutorialLibrary /></Suspense>} />
+          <Route path="/templates" element={<Suspense fallback={<LoadingFallback />}><TemplateLibrary /></Suspense>} />
+          <Route path="/legal-resources" element={<LegalResources />} />
+          <Route path="/features" element={<Suspense fallback={<LoadingFallback />}><FeatureGuide /></Suspense>} />
+          <Route path="/criminal-court-guide" element={<CriminalCourtGuide />} />
+          <Route path="/criminal-court-mistakes" element={<CriminalCourtMistakes />} />
+          <Route path="/tribunal-locator" element={<TribunalLocatorPage />} />
+          <Route path="/court" element={<CourtInformation />} />
+          <Route path="/explain" element={<Explain />} />
+
+          {/* Company & Support */}
+          <Route path="/about" element={<About />} />
+          <Route path="/team" element={<Team />} />
+          <Route path="/scope" element={<Scope />} />
+          <Route path="/what-we-do" element={<WhatWeDo />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/feedback" element={<Feedback />} />
+          <Route path="/roadmap" element={<Roadmap />} />
+          <Route path="/troubleshooting" element={<Troubleshooting />} />
+          <Route path="/partners" element={<Partners />} />
+          <Route path="/referrals" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Referrals /></Suspense></ProtectedRoute>} />
+          <Route path="/media-inquiries" element={<MediaInquiries />} />
+          <Route path="/government-inquiries" element={<GovernmentInquiries />} />
+          <Route path="/legal-updates" element={<LegalUpdates />} />
+
+          {/* Legal & Policies */}
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/liability" element={<Liability />} />
+          <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/payment-policy" element={<PaymentPolicy />} />
+          <Route path="/accessibility" element={<Accessibility />} />
+
+          {/* Admin */}
           <Route path="/admin" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Admin /></Suspense></ProtectedRoute>} />
           <Route path="/admin/forms-sync" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><AdminFormsSync /></Suspense></ProtectedRoute>} />
+
+          {/* Payment & Subscription */}
           <Route path="/low-income" element={<ProtectedRoute><LowIncomeApproval /></ProtectedRoute>} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/liability" element={<Liability />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/profile" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Profile /></Suspense></ProtectedRoute>} />
           <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
           <Route path="/subscription-success" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SubscriptionSuccess /></Suspense></ProtectedRoute>} />
           <Route path="/payment-cancel" element={<ProtectedRoute><PaymentCancel /></ProtectedRoute>} />
           <Route path="/thank-you" element={<ThankYou />} />
-          <Route path="/legal-chat" element={<Suspense fallback={<LoadingFallback />}><LegalChat /></Suspense>} />
-          <Route path="/document-analysis" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><DocumentAnalysis /></Suspense></ProtectedRoute>} />
-          <Route path="/tutorials" element={<Suspense fallback={<LoadingFallback />}><TutorialLibrary /></Suspense>} />
-          <Route path="/templates" element={<Suspense fallback={<LoadingFallback />}><TemplateLibrary /></Suspense>} />
-          <Route path="/referrals" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Referrals /></Suspense></ProtectedRoute>} />
-          <Route path="/disclaimer" element={<Disclaimer />} />
-          <Route path="/about" element={<About />} />
-        <Route path="/faq" element={<FAQ />} />
-          <Route path="/what-we-do" element={<WhatWeDo />} />
-          <Route path="/partners" element={<Partners />} />
-          <Route path="/accessibility" element={<Accessibility />} />
-          <Route path="/payment-policy" element={<PaymentPolicy />} />
-          <Route path="/roadmap" element={<Roadmap />} />
-          <Route path="/scope" element={<Scope />} />
-        <Route path="/team" element={<Team />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/scope" element={<Scope />} />
-          <Route path="/troubleshooting" element={<Troubleshooting />} />
-          <Route path="/media-inquiries" element={<MediaInquiries />} />
-          <Route path="/government-inquiries" element={<GovernmentInquiries />} />
-          <Route path="/legal-updates" element={<LegalUpdates />} />
-          <Route path="/court" element={<CourtInformation />} />
-          <Route path="/explain" element={<Explain />} />
-          <Route path="/evidence" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Evidence /></Suspense></ProtectedRoute>} />
-          <Route path="/legal-resources" element={<LegalResources />} />
-          <Route path="/journey" element={<Journey />} />
-          <Route path="/criminal-court-guide" element={<CriminalCourtGuide />} />
-          <Route path="/criminal-court-mistakes" element={<CriminalCourtMistakes />} />
-          <Route path="/smart-documents" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SmartDocuments /></Suspense></ProtectedRoute>} />
-          <Route path="/case-timeline" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><CaseTimeline /></Suspense></ProtectedRoute>} />
-          <Route path="/document-drafter" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><DocumentDrafter /></Suspense></ProtectedRoute>} />
-          <Route path="/case-strength" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><CaseStrengthAnalyzer /></Suspense></ProtectedRoute>} />
-          <Route path="/settlement-calculator" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SettlementCalculator /></Suspense></ProtectedRoute>} />
-          <Route path="/features" element={<Suspense fallback={<LoadingFallback />}><FeatureGuide /></Suspense>} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+
+          {/* Legacy/Deprecated routes - kept for backwards compatibility */}
+          <Route path="/hrto-help" element={<HRTOHelp />} />
+          <Route path="/ltb-help" element={<LTBHelp />} />
+          <Route path="/small-claims-court" element={<SmallClaimsCourt />} />
+
+          {/* 404 Catch-all */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>

@@ -72,77 +72,58 @@ const Header = () => {
               <div className="relative group">
                 <button 
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
-                  aria-label="Housing legal services menu"
+                  aria-label="Legal areas we help with"
                   aria-haspopup="true"
                 >
-                  Housing
+                  Legal Areas
                 </button>
-                <div className="absolute left-0 top-full mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                  <a href="/ltb-journey" className="block px-4 py-2 text-sm hover:bg-muted">Landlord-Tenant Board</a>
-                  <a href="/small-claims-journey" className="block px-4 py-2 text-sm hover:bg-muted">Eviction Defense</a>
+                <div className="absolute left-0 top-full mt-2 w-56 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                  <div className="py-2">
+                    <div className="px-3 py-1 text-xs font-semibold text-muted-foreground">Housing & Tenancy</div>
+                    <a href="/ltb-journey" className="block px-4 py-2 text-sm hover:bg-muted">Landlord-Tenant Board</a>
+                    <div className="px-3 py-1 mt-2 text-xs font-semibold text-muted-foreground">Family & Children</div>
+                    <a href="/family-journey" className="block px-4 py-2 text-sm hover:bg-muted">Family Court</a>
+                    <a href="/cas-journey" className="block px-4 py-2 text-sm hover:bg-muted">CAS Issues</a>
+                    <div className="px-3 py-1 mt-2 text-xs font-semibold text-muted-foreground">Criminal Law</div>
+                    <a href="/criminal-journey" className="block px-4 py-2 text-sm hover:bg-muted">Criminal Defense</a>
+                    <div className="px-3 py-1 mt-2 text-xs font-semibold text-muted-foreground">Human Rights</div>
+                    <a href="/hrto-journey" className="block px-4 py-2 text-sm hover:bg-muted">HRTO Claims</a>
+                    <a href="/labour-journey" className="block px-4 py-2 text-sm hover:bg-muted">Labour Board</a>
+                  </div>
                 </div>
               </div>
               
               <div className="relative group">
                 <button 
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
-                  aria-label="Family law services menu"
+                  aria-label="AI tools and features"
                   aria-haspopup="true"
                 >
-                  Family
+                  AI Tools
                 </button>
-                <div className="absolute left-0 top-full mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                  <a href="/family-journey" className="block px-4 py-2 text-sm hover:bg-muted">Family Court</a>
-                  <a href="/cas-journey" className="block px-4 py-2 text-sm hover:bg-muted">CAS Issues</a>
-                  <a href="/family-court-mistakes" className="block px-4 py-2 text-sm hover:bg-muted">Common Mistakes</a>
+                <div className="absolute left-0 top-full mt-2 w-56 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                  <a href="/legal-chat" className="block px-4 py-2 text-sm hover:bg-muted">AI Legal Assistant</a>
+                  <a href="/document-analysis" className="block px-4 py-2 text-sm hover:bg-muted">Document Analyzer</a>
+                  <a href="/case-strength" className="block px-4 py-2 text-sm hover:bg-muted">Case Strength Analyzer</a>
+                  <a href="/evidence" className="block px-4 py-2 text-sm hover:bg-muted">Evidence Organizer</a>
+                  <a href="/forms" className="block px-4 py-2 text-sm hover:bg-muted">Form Assistant</a>
                 </div>
               </div>
               
               <div className="relative group">
                 <button 
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
-                  aria-label="Criminal law services menu"
+                  aria-label="Resources and guides"
                   aria-haspopup="true"
                 >
-                  Criminal
+                  Resources
                 </button>
-                <div className="absolute left-0 top-full mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                  <a href="/criminal-journey" className="block px-4 py-2 text-sm hover:bg-muted">Criminal Law Guide</a>
-                  <a href="/criminal-court-guide" className="block px-4 py-2 text-sm hover:bg-muted">Court Process</a>
-                  <a href="/criminal-court-mistakes" className="block px-4 py-2 text-sm hover:bg-muted">Common Mistakes</a>
-                </div>
-              </div>
-              
-              <div className="relative group">
-                <button 
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
-                  aria-label="Human rights services menu"
-                  aria-haspopup="true"
-                >
-                  Human Rights
-                </button>
-                <div className="absolute left-0 top-full mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                  <a href="/hrto-journey" className="block px-4 py-2 text-sm hover:bg-muted">HRTO Claims</a>
-                  <a href="/labour-board-journey" className="block px-4 py-2 text-sm hover:bg-muted">Labour Board</a>
-                </div>
-              </div>
-              
-              <div className="relative group">
-                <button 
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
-                  aria-label="Support and resources menu"
-                  aria-haspopup="true"
-                >
-                  Support
-                </button>
-                <div className="absolute left-0 top-full mt-2 w-48 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                  <a href="/team" className="block px-4 py-2 text-sm hover:bg-muted">Our Team</a>
-                  <a href="/about" className="block px-4 py-2 text-sm hover:bg-muted">About</a>
+                <div className="absolute left-0 top-full mt-2 w-56 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                  <a href="/tutorials" className="block px-4 py-2 text-sm hover:bg-muted">Video Tutorials</a>
+                  <a href="/legal-resources" className="block px-4 py-2 text-sm hover:bg-muted">Legal Guides</a>
+                  <a href="/templates" className="block px-4 py-2 text-sm hover:bg-muted">Document Templates</a>
                   <a href="/blog" className="block px-4 py-2 text-sm hover:bg-muted">Blog</a>
-                  <a href="/scope" className="block px-4 py-2 text-sm hover:bg-muted">What We Help With</a>
                   <a href="/faq" className="block px-4 py-2 text-sm hover:bg-muted">FAQ</a>
-                  <a href="/tutorials" className="block px-4 py-2 text-sm hover:bg-muted">Tutorials</a>
-                  <a href="/contact" className="block px-4 py-2 text-sm hover:bg-muted">Contact</a>
                 </div>
               </div>
               
@@ -249,86 +230,34 @@ const Header = () => {
             role="region"
             aria-label="Mobile navigation menu"
           >
-            <nav className="flex flex-col gap-4 mt-4" role="navigation">
-              <a 
-                href="#merit" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Merit Score
-              </a>
-              <a 
-                href="/pricing" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Pricing
-              </a>
-              <a 
-                href="/feedback" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Feedback
-              </a>
-              <a 
-                href="/contact" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Contact
-              </a>
-              <a 
-                href="/legal-chat" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                AI Assistant
-              </a>
-              <a 
-                href="/document-analysis" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Document Analyzer
-              </a>
-              <a 
-                href="/tutorials" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Tutorials
-              </a>
-              <a 
-                href="/templates" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Templates
-              </a>
-              <a 
-                href="/referrals" 
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Referrals
-              </a>
+            <nav className="flex flex-col gap-2 mt-4" role="navigation">
+              <div className="text-xs font-semibold text-muted-foreground px-2 pt-2">Legal Areas</div>
+              <a href="/ltb-journey" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>Landlord-Tenant</a>
+              <a href="/family-journey" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>Family Court</a>
+              <a href="/criminal-journey" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>Criminal Law</a>
+              <a href="/hrto-journey" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>Human Rights</a>
+              
+              <div className="text-xs font-semibold text-muted-foreground px-2 pt-3">AI Tools</div>
+              <a href="/legal-chat" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>AI Assistant</a>
+              <a href="/document-analysis" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>Document Analyzer</a>
+              <a href="/case-strength" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>Case Strength</a>
+              <a href="/evidence" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>Evidence Hub</a>
+              
+              <div className="text-xs font-semibold text-muted-foreground px-2 pt-3">Resources</div>
+              <a href="/tutorials" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>Tutorials</a>
+              <a href="/legal-resources" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>Legal Guides</a>
+              <a href="/faq" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>FAQ</a>
+              
+              <div className="text-xs font-semibold text-muted-foreground px-2 pt-3">Support</div>
+              <a href="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
+              <a href="/contact" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>Contact</a>
+              
               {isAdmin && (
-                <a 
-                  href="/admin" 
-                  className="text-sm text-primary hover:text-primary/80 transition-colors font-medium"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  🔧 Admin Console
-                </a>
+                <>
+                  <div className="border-t border-border my-2"></div>
+                  <a href="/admin" className="text-sm text-primary hover:text-primary/80 transition-colors font-medium px-2 py-1" onClick={() => setMobileMenuOpen(false)}>🔧 Admin</a>
+                </>
               )}
-              <a 
-                href="/liability" 
-                className="text-sm text-warning hover:text-warning/80 transition-colors font-medium"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                ⚠️ Legal Disclaimer
-              </a>
               
               {user ? (
                 <div className="flex flex-col gap-3 pt-4 border-t border-border">
