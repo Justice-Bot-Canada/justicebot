@@ -6,20 +6,44 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { OnboardingFlow } from "@/components/OnboardingFlow";
+import { supabase } from "@/integrations/supabase/client";
 
 const Welcome = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [verified, setVerified] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [checkingOnboarding, setCheckingOnboarding] = useState(true);
 
   useEffect(() => {
-    if (!loading && user) {
-      setVerified(true);
-    }
+    const checkOnboarding = async () => {
+      if (!loading && user) {
+        setVerified(true);
+        
+        // Check if user has completed onboarding
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('onboarding_completed')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (profile && !profile.onboarding_completed) {
+          setShowOnboarding(true);
+        }
+        setCheckingOnboarding(false);
+      }
+    };
+
+    checkOnboarding();
   }, [user, loading]);
 
   const handleGetStarted = () => {
     navigate("/dashboard");
+  };
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
   };
 
   if (loading) {
@@ -108,6 +132,14 @@ const Welcome = () => {
         </Card>
       </main>
       <Footer />
+
+      {/* Onboarding Flow */}
+      {!checkingOnboarding && (
+        <OnboardingFlow 
+          open={showOnboarding} 
+          onComplete={handleOnboardingComplete}
+        />
+      )}
     </div>
   );
 };
