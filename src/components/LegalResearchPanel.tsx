@@ -5,8 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Search, ExternalLink, BookOpen, AlertTriangle } from 'lucide-react';
+import { Loader2, Search, ExternalLink, BookOpen, AlertTriangle, Sparkles } from 'lucide-react';
 import { useLegalResearch, CaseResult } from '@/hooks/useLegalResearch';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface LegalResearchPanelProps {
   defaultQuery?: string;
@@ -14,12 +16,48 @@ interface LegalResearchPanelProps {
 
 export function LegalResearchPanel({ defaultQuery = '' }: LegalResearchPanelProps) {
   const { loading, results, searchCases } = useLegalResearch();
+  const { toast } = useToast();
   const [query, setQuery] = useState(defaultQuery);
   const [jurisdiction, setJurisdiction] = useState('on');
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
+  const [analyzingAI, setAnalyzingAI] = useState(false);
 
   const handleSearch = () => {
     if (!query.trim()) return;
+    setAiAnalysis(null); // Clear previous analysis
     searchCases(query, jurisdiction);
+  };
+
+  const handleAIAnalysis = async () => {
+    if (results.length === 0) return;
+    
+    setAnalyzingAI(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-legal-research', {
+        body: {
+          searchResults: results,
+          userQuery: query,
+          caseContext: null
+        }
+      });
+
+      if (error) throw error;
+
+      setAiAnalysis(data.analysis);
+      toast({
+        title: "AI Analysis Complete",
+        description: "Review the insights below"
+      });
+    } catch (error: any) {
+      console.error("Error analyzing research:", error);
+      toast({
+        title: "Analysis Failed",
+        description: error.message || "Failed to analyze results",
+        variant: "destructive"
+      });
+    } finally {
+      setAnalyzingAI(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -95,10 +133,35 @@ export function LegalResearchPanel({ defaultQuery = '' }: LegalResearchPanelProp
         )}
 
         {!loading && results.length > 0 && (
-          <div className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Found {results.length} relevant case{results.length !== 1 ? 's' : ''}
-            </p>
+          <>
+            <div className="flex justify-between items-center">
+              <p className="text-sm text-muted-foreground">
+                Found {results.length} relevant case{results.length !== 1 ? 's' : ''}
+              </p>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                onClick={handleAIAnalysis}
+                disabled={analyzingAI}
+              >
+                {analyzingAI ? (
+                  <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Analyzing...</>
+                ) : (
+                  <><Sparkles className="h-3 w-3 mr-1" /> AI Analysis</>
+                )}
+              </Button>
+            </div>
+
+            {aiAnalysis && (
+              <Alert className="border-blue-500/50 bg-blue-50 dark:bg-blue-950/20">
+                <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <AlertDescription className="text-sm mt-2 whitespace-pre-wrap">
+                  {aiAnalysis}
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            <div className="space-y-4">
             {results.map((result, i) => (
               <div key={i} className="p-4 border rounded-lg bg-card space-y-2">
                 <div className="flex items-start justify-between gap-2">
@@ -125,7 +188,8 @@ export function LegalResearchPanel({ defaultQuery = '' }: LegalResearchPanelProp
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          </>
         )}
 
         {!loading && results.length === 0 && !query && (

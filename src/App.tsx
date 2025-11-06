@@ -78,6 +78,8 @@ const TemplateLibrary = lazy(() => import("./pages/TemplateLibrary"));
 const Referrals = lazy(() => import("./pages/Referrals"));
 const SmartDocuments = lazy(() => import("./pages/SmartDocuments"));
 const CaseTimeline = lazy(() => import("./pages/CaseTimeline"));
+const DocumentDrafter = lazy(() => import("./pages/DocumentDrafter"));
+const CaseStrengthAnalyzer = lazy(() => import("./pages/CaseStrengthAnalyzer"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -165,6 +167,8 @@ const AppContent = () => {
           <Route path="/journey" element={<Journey />} />
           <Route path="/smart-documents" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SmartDocuments /></Suspense></ProtectedRoute>} />
           <Route path="/case-timeline" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><CaseTimeline /></Suspense></ProtectedRoute>} />
+          <Route path="/document-drafter" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><DocumentDrafter /></Suspense></ProtectedRoute>} />
+          <Route path="/case-strength" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><CaseStrengthAnalyzer /></Suspense></ProtectedRoute>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
