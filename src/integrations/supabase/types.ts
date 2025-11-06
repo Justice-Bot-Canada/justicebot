@@ -1463,6 +1463,51 @@ export type Database = {
         }
         Relationships: []
       }
+      timeline_events: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          event_date: string
+          event_time: string | null
+          evidence_ids: string[] | null
+          id: string
+          importance: string | null
+          notes: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          event_date: string
+          event_time?: string | null
+          evidence_ids?: string[] | null
+          id?: string
+          importance?: string | null
+          notes?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          event_time?: string | null
+          evidence_ids?: string[] | null
+          id?: string
+          importance?: string | null
+          notes?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tutorial_videos: {
         Row: {
           category: string
