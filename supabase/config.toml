@@ -66,6 +66,9 @@ verify_jwt = true
 [functions.organize-evidence]
 verify_jwt = true
 
+[functions.extract-ocr]
+verify_jwt = true
+
 [functions.assist-form-filling]
 verify_jwt = true
 

@@ -167,27 +167,42 @@ const EvidenceBuilder: React.FC<EvidenceBuilderProps> = ({ caseId, onUpdate }) =
     setProcessing(prev => [...prev, evidenceId]);
     
     try {
-      // In production, this would call an OCR service
-      // For now, simulate OCR processing
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      const item = evidence.find(e => e.id === evidenceId);
+      if (!item) throw new Error('Evidence not found');
+
+      // Call OCR extraction edge function
+      const { data, error: ocrError } = await supabase.functions.invoke('extract-ocr', {
+        body: {
+          filePath: item.file_path,
+          fileType: item.file_type,
+        }
+      });
+
+      if (ocrError) throw ocrError;
       
-      const mockOcrText = "Sample OCR text extracted from document...";
+      if (!data?.success) {
+        throw new Error(data?.error || 'OCR extraction failed');
+      }
+
+      const ocrText = data.text || '';
+      const pageCount = Math.ceil(ocrText.length / 3000); // Estimate pages
       
-      const { error } = await supabase
+      // Update evidence with OCR text
+      const { error: updateError } = await supabase
         .from('evidence')
         .update({ 
-          ocr_text: mockOcrText,
-          page_count: Math.floor(Math.random() * 10) + 1
+          ocr_text: ocrText,
+          page_count: Math.max(1, pageCount)
         } as any)
         .eq('id', evidenceId);
 
-      if (error) throw error;
+      if (updateError) throw updateError;
       
       fetchEvidence();
-      toast.success('OCR processing completed');
-    } catch (error) {
+      toast.success(`OCR extracted ${ocrText.length} characters of text`);
+    } catch (error: any) {
       console.error('OCR error:', error);
-      toast.error('OCR processing failed');
+      toast.error(error.message || 'OCR processing failed');
     } finally {
       setProcessing(prev => prev.filter(id => id !== evidenceId));
     }
