@@ -65,17 +65,15 @@ export function usePremiumAccess(): PremiumAccess {
       if (error) throw error;
       setIsFreeUser(freeEligible === true);
 
-      // Get user number for display
-      const { data: caseData } = await supabase
-        .from('cases')
-        .select('user_number')
-        .eq('user_id', user.id)
-        .not('user_number', 'is', null)
-        .limit(1)
+      // Get user signup number for display (first 500 get free access)
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
         .maybeSingle();
 
-      if (caseData?.user_number) {
-        setUserNumber(caseData.user_number);
+      if (profileData && 'signup_number' in profileData) {
+        setUserNumber(profileData.signup_number as number);
       }
     } catch (error) {
       console.error('Error checking premium access:', error);
