@@ -8,7 +8,7 @@ export const ExplainerVideo = () => {
       <VideoSchema
         name="How Justice-Bot Works - AI Legal Help for Canadians"
         description="Watch this quick explainer to see how Justice-Bot provides affordable AI-powered legal assistance for Ontario tribunals, courts, and legal issues."
-        thumbnailUrl="https://justice-bot.com/how-it-works-thumbnail.jpg"
+        thumbnailUrl="https://justice-bot.com/video-thumbnail-800.webp"
         uploadDate="2025-10-03"
         duration="PT2M"
         contentUrl="https://justice-bot.com/justice-bot-explainer.mp4"
@@ -30,7 +30,7 @@ export const ExplainerVideo = () => {
                 className="w-full h-full"
                 controls
                 preload="metadata"
-                poster="/how-it-works-thumbnail.jpg"
+                poster="/video-thumbnail-800.webp"
                 aria-label="How Justice-Bot Works - Explainer Video"
               >
                 <source src="/justice-bot-explainer.mp4" type="video/mp4" />

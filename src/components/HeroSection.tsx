@@ -1,7 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle } from "lucide-react";
-import LazyImage from "@/components/LazyImage";
-import heroImage from "@/assets/justice-hero.jpg";
 
 const HeroSection = () => {
   return (
@@ -108,15 +106,23 @@ const HeroSection = () => {
 
           <div className="relative" role="img" aria-labelledby="hero-image-desc">
             <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-accent/20 rounded-2xl blur-3xl" aria-hidden="true"></div>
-            <LazyImage 
-              src={heroImage} 
-              alt="Modern courthouse with classical columns and steps, representing legal clarity and justice in the digital age"
-              className="relative rounded-2xl shadow-2xl w-full h-auto max-w-lg mx-auto"
-              loading="eager"
-              fetchpriority="high"
-              width={512}
-              height={384}
-            />
+            <picture className="relative block rounded-2xl shadow-2xl w-full max-w-lg mx-auto">
+              <source 
+                media="(min-width: 768px)" 
+                srcSet="/hero-desktop.webp" 
+                type="image/webp"
+              />
+              <img 
+                src="/hero-mobile.webp" 
+                alt="Modern courthouse with classical columns and steps, representing legal clarity and justice in the digital age"
+                className="rounded-2xl w-full h-auto"
+                loading="eager"
+                fetchPriority="high"
+                width={800}
+                height={450}
+                decoding="async"
+              />
+            </picture>
             <p id="hero-image-desc" className="sr-only">
               A modern courthouse building symbolizing the bridge between traditional legal processes and modern digital assistance
             </p>
