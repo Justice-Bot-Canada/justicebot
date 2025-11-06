@@ -18,7 +18,8 @@ http://justice-bot.com/*       https://justice-bot.com/:splat  301!
 /small-claims       /small-claims-journey 301!
 /demo-video         /                   301!
 
-# Blog post redirects (articles not yet created - redirect to main blog)
+# Blog redirects - all blog posts redirect to main blog (articles not yet created)
+/blog/evidence-organization  /blog      301!
 /blog/*             /blog               301!
 
 # Docs redirect (no docs section exists)
@@ -28,10 +29,10 @@ http://justice-bot.com/*       https://justice-bot.com/:splat  301!
 # Block sensitive config files
 /config.json        /404                404
 
-# Return 404 for truly non-existent pages
-/payments/*         /                   404
-/entitlements       /                   404
-/founders-story     /                   404
+# Return 404 for truly non-existent pages (prevent soft 404s)
+/payments/*         /404                404!
+/entitlements       /404                404!
+/founders-story     /404                404!
 
 # SPA fallback - must be last, handles all React Router routes
 /*                  /index.html         200
