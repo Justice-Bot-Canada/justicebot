@@ -1,3 +1,8 @@
+# Domain canonicalization - redirect www to non-www (MUST BE FIRST)
+https://www.justice-bot.com/*  https://justice-bot.com/:splat  301!
+http://www.justice-bot.com/*   https://justice-bot.com/:splat  301!
+http://justice-bot.com/*       https://justice-bot.com/:splat  301!
+
 # Static files - serve as-is
 /sitemap.xml   /sitemap.xml   200
 /robots.txt    /robots.txt    200
