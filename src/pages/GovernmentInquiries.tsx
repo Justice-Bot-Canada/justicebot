@@ -156,8 +156,8 @@ const GovernmentInquiries = () => {
                 <Mail className="h-5 w-5 text-primary mt-1" />
                 <div>
                   <p className="font-semibold">Government Relations</p>
-                  <a href="mailto:government@justice-bot.com" className="text-primary hover:underline">
-                    government@justice-bot.com
+                  <a href="mailto:admin@justice-bot.com" className="text-primary hover:underline">
+                    admin@justice-bot.com
                   </a>
                 </div>
               </div>

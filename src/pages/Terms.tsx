@@ -165,8 +165,8 @@ const Terms = () => {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">Contact Information</h2>
             <ul>
-              <li>Support: support@justice-bot.com</li>
-              <li>Legal: legal@justice-bot.com</li>
+              <li>Support: admin@justice-bot.com</li>
+              <li>Legal: concerns@justice-bot.com</li>
               <li>Response time: 1-2 business days</li>
             </ul>
           </section>

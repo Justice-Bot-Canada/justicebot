@@ -76,7 +76,7 @@ export const ContactForm = ({ className }: ContactFormProps) => {
       console.error("Error submitting contact form:", error);
       toast({
         title: "Error sending message",
-        description: "Please try again later or email us directly at contact@justice-bot.ca",
+        description: "Please try again later or email us directly at admin@justice-bot.com",
         variant: "destructive",
       });
     } finally {

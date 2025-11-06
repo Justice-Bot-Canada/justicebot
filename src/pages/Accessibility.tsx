@@ -160,7 +160,7 @@ export default function Accessibility() {
               accessibility barriers:
             </p>
             <ul className="space-y-2 text-muted-foreground mb-6">
-              <li><strong>Email:</strong> accessibility@justice-bot.com</li>
+              <li><strong>Email:</strong> admin@justice-bot.com</li>
               <li><strong>Contact Form:</strong> <a href="/contact" className="text-primary hover:underline">justice-bot.com/contact</a></li>
               <li><strong>Response Time:</strong> We aim to respond within 2 business days</li>
             </ul>

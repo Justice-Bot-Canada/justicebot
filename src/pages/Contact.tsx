@@ -69,10 +69,10 @@ const Contact = () => {
                 Business collaborations, integrations, and strategic alliances
               </p>
               <a 
-                href="mailto:press@justice-bot.com" 
+                href="mailto:partnerships@justice-bot.com" 
                 className="text-primary hover:underline font-medium text-sm"
               >
-                press@justice-bot.com
+                partnerships@justice-bot.com
               </a>
             </div>
 
@@ -99,7 +99,7 @@ const Contact = () => {
               <div className="p-4 rounded-lg bg-muted/30 border">
                 <h4 className="font-medium mb-2">Privacy & Data Requests</h4>
                 <p className="text-sm text-muted-foreground mb-2">PIPEDA compliance and data subject rights</p>
-                <p className="text-sm text-muted-foreground">Contact form above or coming soon: privacy@justice-bot.com</p>
+                <a href="mailto:concerns@justice-bot.com" className="text-primary hover:underline text-sm font-medium">concerns@justice-bot.com</a>
               </div>
               <div className="p-4 rounded-lg bg-muted/30 border">
                 <h4 className="font-medium mb-2">General Inquiries</h4>

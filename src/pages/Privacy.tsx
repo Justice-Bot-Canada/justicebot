@@ -163,7 +163,7 @@ const Privacy = () => {
             <div className="bg-gray-100 p-4 rounded-lg">
               <p className="font-semibold mb-2">Data Protection Officer & Privacy Inquiries:</p>
               <ul>
-                <li><strong>Email:</strong> privacy@justice-bot.com | dpo@justice-bot.com</li>
+                <li><strong>Email:</strong> concerns@justice-bot.com</li>
                 <li><strong>Phone:</strong> 1-888-JUSTICE (for urgent privacy matters)</li>
                 <li><strong>Mail:</strong> Privacy Officer, Justice-Bot Technologies Inc.<br/>
                     P.O. Box 12345, Toronto, ON M5V 3A1, Canada</li>

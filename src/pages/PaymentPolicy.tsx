@@ -147,14 +147,14 @@ export default function PaymentPolicy() {
         <section className="mb-12">
           <h2 className="text-3xl font-bold mb-6">Refund Policy</h2>
           
-          <Card className="p-6 mb-4 bg-green-50 border-green-200">
+            <Card className="p-6 mb-4 bg-green-50 border-green-200">
             <h3 className="font-bold text-green-800 mb-3">7-Day Money-Back Guarantee</h3>
             <p className="text-green-700 mb-3">
               If you're not satisfied with Justice-Bot within the first 7 days of your subscription, 
               we'll provide a full refund—no questions asked.
             </p>
             <p className="text-sm text-green-600">
-              Simply email support@justice-bot.com or use the cancellation button in your account settings.
+              Simply email payments@justice-bot.com or use the cancellation button in your account settings.
             </p>
           </Card>
 
@@ -200,7 +200,7 @@ export default function PaymentPolicy() {
               <div>
                 <h4 className="font-semibold text-foreground mb-2">2. Email Cancellation</h4>
                 <ul className="list-disc list-inside space-y-1 ml-4">
-                  <li>Email: support@justice-bot.com</li>
+                  <li>Email: payments@justice-bot.com</li>
                   <li>Subject: "Cancel Subscription"</li>
                   <li>Include your account email</li>
                   <li>Processed within 24 hours</li>
@@ -266,12 +266,12 @@ export default function PaymentPolicy() {
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <h3 className="font-semibold mb-2">Email Support</h3>
-                <p className="text-muted-foreground">support@justice-bot.com</p>
+                <p className="text-muted-foreground">admin@justice-bot.com</p>
                 <p className="text-sm text-muted-foreground">Response within 24 hours</p>
               </div>
               <div>
                 <h3 className="font-semibold mb-2">Billing Inquiries</h3>
-                <p className="text-muted-foreground">billing@justice-bot.com</p>
+                <p className="text-muted-foreground">payments@justice-bot.com</p>
                 <p className="text-sm text-muted-foreground">Response within 48 hours</p>
               </div>
             </div>

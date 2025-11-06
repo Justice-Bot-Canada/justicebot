@@ -4,5 +4,5 @@
   "API_BASE_URL": "/api",
   "PAYPAL_CLIENT_ID": "AS7gni64FdKWkeMYxUGCFStgDXhtyG0SooKeyMu-NwVDwFzrRC8iMfPmesMmSrGXZUQqYz69EsiQ9ril",
   "SUPPORT_EMAIL": "admin@justice-bot.com",
-  "ETRANSFER_EMAIL": "admin@justice-bot.com"
+  "ETRANSFER_EMAIL": "payments@justice-bot.com"
 }

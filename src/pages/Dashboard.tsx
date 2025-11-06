@@ -250,7 +250,7 @@ const Dashboard = () => {
                   <div className="p-4 border rounded-lg">
                     <h4 className="font-semibold mb-2">E-Transfer</h4>
                     <p className="text-sm text-muted-foreground mb-3">
-                      Send payment directly to: admin@justice-bot.com
+                      Send payment directly to: payments@justice-bot.com
                     </p>
                     <Button variant="outline">Copy Email</Button>
                   </div>

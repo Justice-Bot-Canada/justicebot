@@ -151,7 +151,7 @@ const Liability = () => {
 
           <div className="text-center mt-12 p-6 bg-muted rounded-lg">
             <p className="font-semibold text-lg">
-              Questions about these disclaimers? Contact: <a href="mailto:legal@justice-bot.com" className="text-primary">legal@justice-bot.com</a>
+              Questions about these disclaimers? Contact: <a href="mailto:concerns@justice-bot.com" className="text-primary">concerns@justice-bot.com</a>
             </p>
           </div>
         </div>
