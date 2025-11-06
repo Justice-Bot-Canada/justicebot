@@ -62,6 +62,8 @@ import CourtInformation from "./pages/CourtInformation";
 import Explain from "./pages/Explain";
 import LegalResources from "./pages/LegalResources";
 import Journey from "./pages/Journey";
+import CriminalCourtGuide from "./pages/CriminalCourtGuide";
+import CriminalCourtMistakes from "./pages/CriminalCourtMistakes";
 
 // Lazy load heavy components
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -169,6 +171,8 @@ const AppContent = () => {
           <Route path="/evidence" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Evidence /></Suspense></ProtectedRoute>} />
           <Route path="/legal-resources" element={<LegalResources />} />
           <Route path="/journey" element={<Journey />} />
+          <Route path="/criminal-court-guide" element={<CriminalCourtGuide />} />
+          <Route path="/criminal-court-mistakes" element={<CriminalCourtMistakes />} />
           <Route path="/smart-documents" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SmartDocuments /></Suspense></ProtectedRoute>} />
           <Route path="/case-timeline" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><CaseTimeline /></Suspense></ProtectedRoute>} />
           <Route path="/document-drafter" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><DocumentDrafter /></Suspense></ProtectedRoute>} />
