@@ -1,10 +1,13 @@
-import { Check, X, Crown, Heart, Zap, Star } from 'lucide-react';
+import { Check, X, Crown, Heart, Zap, Star, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 const plans = [
   {
@@ -115,15 +118,61 @@ const oneTimePlan = {
 
 export const PricingComparison = () => {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const handleSubscribe = async (planType: string) => {
+    if (!user) {
+      toast({
+        title: 'Sign In Required',
+        description: 'Please sign in to subscribe to a plan.',
+        variant: 'destructive'
+      });
+      navigate('/triage');
+      return;
+    }
+
+    setLoadingPlan(planType);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('create-subscription-checkout', {
+        body: { planType }
+      });
+
+      if (error) throw error;
+
+      if (data.approvalUrl) {
+        window.open(data.approvalUrl, '_blank');
+        toast({
+          title: 'Redirecting to PayPal',
+          description: 'Complete your subscription in the new window.',
+        });
+      }
+    } catch (error) {
+      console.error('Subscription error:', error);
+      toast({
+        title: 'Subscription Failed',
+        description: 'Unable to start subscription. Please try again.',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoadingPlan(null);
+    }
+  };
 
   const handleCTAClick = (planId: string) => {
     if (planId === 'free') {
       navigate('/triage');
     } else if (planId === 'one-time') {
       navigate('/forms');
-    } else {
-      navigate('/pricing');
+    } else if (planId === 'low-income') {
+      handleSubscribe('low-income');
+    } else if (planId === 'monthly') {
+      handleSubscribe('monthly');
+    } else if (planId === 'yearly') {
+      handleSubscribe('yearly');
     }
   };
 
@@ -218,8 +267,16 @@ export const PricingComparison = () => {
                     className="w-full"
                     size="lg"
                     onClick={() => handleCTAClick(plan.id)}
+                    disabled={loadingPlan === plan.id}
                   >
-                    {plan.cta}
+                    {loadingPlan === plan.id ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      plan.cta
+                    )}
                   </Button>
                 </CardFooter>
               </Card>

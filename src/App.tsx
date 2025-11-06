@@ -81,6 +81,8 @@ const CaseTimeline = lazy(() => import("./pages/CaseTimeline"));
 const DocumentDrafter = lazy(() => import("./pages/DocumentDrafter"));
 const CaseStrengthAnalyzer = lazy(() => import("./pages/CaseStrengthAnalyzer"));
 const SettlementCalculator = lazy(() => import("./pages/SettlementCalculator"));
+const SubscriptionSuccess = lazy(() => import("./pages/SubscriptionSuccess"));
+const FeatureGuide = lazy(() => import("./pages/FeatureGuide"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -138,6 +140,7 @@ const AppContent = () => {
           <Route path="/terms" element={<Terms />} />
           <Route path="/profile" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Profile /></Suspense></ProtectedRoute>} />
           <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+          <Route path="/subscription-success" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SubscriptionSuccess /></Suspense></ProtectedRoute>} />
           <Route path="/payment-cancel" element={<ProtectedRoute><PaymentCancel /></ProtectedRoute>} />
           <Route path="/thank-you" element={<ThankYou />} />
           <Route path="/legal-chat" element={<Suspense fallback={<LoadingFallback />}><LegalChat /></Suspense>} />
@@ -171,6 +174,7 @@ const AppContent = () => {
           <Route path="/document-drafter" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><DocumentDrafter /></Suspense></ProtectedRoute>} />
           <Route path="/case-strength" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><CaseStrengthAnalyzer /></Suspense></ProtectedRoute>} />
           <Route path="/settlement-calculator" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SettlementCalculator /></Suspense></ProtectedRoute>} />
+          <Route path="/features" element={<Suspense fallback={<LoadingFallback />}><FeatureGuide /></Suspense>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
