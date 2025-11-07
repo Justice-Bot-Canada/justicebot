@@ -1,5 +1,5 @@
 import justiceBotLogo from "@/assets/justice-bot-logo.jpeg";
-import { Facebook } from "lucide-react";
+import { Facebook, Twitter, Linkedin, Instagram, Youtube } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -123,18 +123,60 @@ const Footer = () => {
 
           {/* Social Media Links */}
           <div className="mb-6 flex justify-center">
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-background/80 font-semibold">Follow Us:</span>
-              <a 
-                href="https://www.facebook.com/profile.php?id=61579916761955" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-background/50"
-                aria-label="Visit our Facebook page"
-              >
-                <Facebook className="w-5 h-5" />
-                <span className="text-sm">Facebook</span>
-              </a>
+            <div className="flex flex-col items-center gap-3">
+              <span className="text-sm text-background/80 font-semibold">Connect With Us:</span>
+              <div className="flex flex-wrap justify-center gap-3">
+                <a 
+                  href="https://www.facebook.com/JusticeBotOfficial" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-background/50"
+                  aria-label="Follow us on Facebook"
+                >
+                  <Facebook className="w-4 h-4" />
+                  <span className="text-sm">Facebook</span>
+                </a>
+                <a 
+                  href="https://twitter.com/JusticeBotCA" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-background/50"
+                  aria-label="Follow us on Twitter"
+                >
+                  <Twitter className="w-4 h-4" />
+                  <span className="text-sm">Twitter</span>
+                </a>
+                <a 
+                  href="https://www.linkedin.com/company/justice-bot" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-background/50"
+                  aria-label="Follow us on LinkedIn"
+                >
+                  <Linkedin className="w-4 h-4" />
+                  <span className="text-sm">LinkedIn</span>
+                </a>
+                <a 
+                  href="https://www.instagram.com/justicebotofficial" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-background/50"
+                  aria-label="Follow us on Instagram"
+                >
+                  <Instagram className="w-4 h-4" />
+                  <span className="text-sm">Instagram</span>
+                </a>
+                <a 
+                  href="https://www.youtube.com/@JusticeBot" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-background/50"
+                  aria-label="Subscribe on YouTube"
+                >
+                  <Youtube className="w-4 h-4" />
+                  <span className="text-sm">YouTube</span>
+                </a>
+              </div>
             </div>
           </div>
 
