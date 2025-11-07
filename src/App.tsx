@@ -50,6 +50,8 @@ import WhatWeDo from "./pages/WhatWeDo";
 import Partners from "./pages/Partners";
 import Team from "./pages/Team";
 import Blog from "./pages/Blog";
+import BlogList from "./pages/BlogList";
+import OntarioSmallClaimsCourt2025 from "./pages/blog/OntarioSmallClaimsCourt2025";
 import Scope from "./pages/Scope";
 import Accessibility from "./pages/Accessibility";
 import PaymentPolicy from "./pages/PaymentPolicy";
@@ -162,7 +164,8 @@ const AppContent = () => {
           <Route path="/team" element={<Team />} />
           <Route path="/scope" element={<Scope />} />
           <Route path="/what-we-do" element={<WhatWeDo />} />
-          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog" element={<BlogList />} />
+          <Route path="/blog/ontario-small-claims-court-2025" element={<OntarioSmallClaimsCourt2025 />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/feedback" element={<Feedback />} />
