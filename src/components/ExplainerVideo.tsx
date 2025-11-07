@@ -11,8 +11,8 @@ export const ExplainerVideo = () => {
         thumbnailUrl="https://justice-bot.com/video-thumbnail-800.webp"
         uploadDate="2025-10-03"
         duration="PT2M"
-        contentUrl="https://justice-bot.com/justice-bot-explainer.mp4"
-        embedUrl="https://justice-bot.com/justice-bot-explainer.mp4"
+        contentUrl="https://justice-bot.com/promo-video.mp4"
+        embedUrl="https://justice-bot.com/promo-video.mp4"
       />
       
       <section className="py-16 bg-gradient-to-b from-background to-muted/30">
@@ -31,9 +31,9 @@ export const ExplainerVideo = () => {
                 controls
                 preload="metadata"
                 poster="/video-thumbnail-800.webp"
-                aria-label="How Justice-Bot Works - Explainer Video"
+                aria-label="How Justice-Bot Works - Full Demo Video"
               >
-                <source src="/justice-bot-explainer.mp4" type="video/mp4" />
+                <source src="/promo-video.mp4" type="video/mp4" />
                 <track kind="captions" label="English captions" />
                 Your browser does not support the video tag.
               </video>
