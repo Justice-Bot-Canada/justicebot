@@ -9,6 +9,7 @@ http://justice-bot.com/*       https://justice-bot.com/:splat  301!
 
 # 301 Redirects - permanent redirects for SEO (prevents duplicate content)
 /terms-of-use       /terms              301!
+/termsofservice     /terms              301!
 /account            /profile            301!
 /signup             /welcome            301!
 /login              /welcome            301!
