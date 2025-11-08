@@ -66,6 +66,7 @@ import LegalResources from "./pages/LegalResources";
 import Journey from "./pages/Journey";
 import CriminalCourtGuide from "./pages/CriminalCourtGuide";
 import CriminalCourtMistakes from "./pages/CriminalCourtMistakes";
+import DemoJourney from "./pages/DemoJourney";
 
 // Lazy load heavy components
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -110,6 +111,7 @@ const AppContent = () => {
       <Routes>
           {/* Main Landing & Getting Started */}
           <Route path="/" element={<Index />} />
+          <Route path="/demo-journey" element={<DemoJourney />} />
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/triage" element={<Triage />} />
           <Route path="/journey" element={<Journey />} />

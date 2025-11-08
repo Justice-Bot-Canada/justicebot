@@ -15,6 +15,7 @@ import TutorialVideos from "@/components/TutorialVideos";
 import DocumentTemplates from "@/components/DocumentTemplates";
 import { PricingComparison } from "@/components/PricingComparison";
 import legalServicesHero from "@/assets/legal-services-hero.jpg";
+import { JourneyFlowchart } from "@/components/JourneyFlowchart";
 
 const Index = () => {
   const structuredData = {
@@ -91,6 +92,7 @@ const Index = () => {
       <Header />
       <main id="main-content" tabIndex={-1}>
         <HeroSection />
+        <JourneyFlowchart />
         <PricingComparison />
         <ExplainerVideo />
         
