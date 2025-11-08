@@ -125,8 +125,8 @@ export const PremiumStatus = ({ caseId, formCode, formData }: PremiumStatusProps
             <p className="text-muted-foreground mb-4">
               Sign up now and get FREE access - limited to first 1000 users
             </p>
-            <Button onClick={() => window.location.href = '/auth'} className="bg-green-600 hover:bg-green-700">
-              <Users className="w-4 h-4 mr-2" />
+            <Button onClick={() => window.location.href = '/auth'} className="bg-green-600 hover:bg-green-700 min-h-[44px]" aria-label="Sign up for free access">
+              <Users className="w-4 h-4 mr-2" aria-hidden="true" />
               Sign Up for FREE
             </Button>
           </div>

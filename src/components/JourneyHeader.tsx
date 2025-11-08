@@ -104,7 +104,7 @@ export const JourneyHeader = ({
               Our guided journey will walk you through every step of the process.
             </p>
           </div>
-          <Button onClick={() => navigate(ctaLink)} size="lg" className="whitespace-nowrap">
+          <Button onClick={() => navigate(ctaLink)} size="lg" className="whitespace-nowrap min-h-[44px] min-w-[44px]" aria-label={ctaText}>
             {ctaText}
           </Button>
         </div>

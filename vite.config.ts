@@ -20,23 +20,41 @@ export default defineConfig(({ mode }) => ({
     minify: 'esbuild',
     rollupOptions: {
       output: {
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': [
-            '@radix-ui/react-dialog', 
-            '@radix-ui/react-dropdown-menu', 
-            '@radix-ui/react-tabs',
-            '@radix-ui/react-accordion',
-            '@radix-ui/react-select'
-          ],
-          'supabase': ['@supabase/supabase-js'],
-          'utils': ['class-variance-authority', 'clsx', 'tailwind-merge'],
+        manualChunks: (id) => {
+          // React core
+          if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
+            return 'react-vendor';
+          }
+          // Radix UI components
+          if (id.includes('@radix-ui')) {
+            return 'ui-vendor';
+          }
+          // Supabase
+          if (id.includes('@supabase')) {
+            return 'supabase';
+          }
+          // Utility libraries
+          if (id.includes('clsx') || id.includes('tailwind-merge') || id.includes('class-variance-authority')) {
+            return 'utils';
+          }
+          // Chart libraries
+          if (id.includes('recharts') || id.includes('lucide-react')) {
+            return 'charts';
+          }
+          // React Query
+          if (id.includes('@tanstack/react-query')) {
+            return 'react-query';
+          }
+          // Node modules that aren't caught above
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
         },
       },
     },
     cssCodeSplit: true,
-    sourcemap: false, // Disable source maps in production for smaller bundles
+    sourcemap: false,
     chunkSizeWarningLimit: 500,
-    assetsInlineLimit: 4096, // Inline assets < 4kb as base64
+    assetsInlineLimit: 4096,
   },
 }));

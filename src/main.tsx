@@ -2,14 +2,9 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
-import { PerformanceMonitor } from "./components/PerformanceMonitor";
-import { HelmetProvider } from "react-helmet-async";
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <HelmetProvider>
-      <PerformanceMonitor />
-      <App />
-    </HelmetProvider>
+    <App />
   </React.StrictMode>
 );

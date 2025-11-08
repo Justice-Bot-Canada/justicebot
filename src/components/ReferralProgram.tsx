@@ -188,16 +188,16 @@ export default function ReferralProgram() {
             readOnly
             className="font-mono text-sm"
           />
-          <Button onClick={copyReferralLink} className="flex-shrink-0">
+          <Button onClick={copyReferralLink} className="flex-shrink-0 min-h-[44px]" aria-label={copied ? "Link copied" : "Copy referral link"}>
             {copied ? (
               <>
-                <Check className="w-4 h-4 mr-2" />
+                <Check className="w-4 h-4 mr-2" aria-hidden="true" />
                 Copied!
               </>
             ) : (
               <>
-                <Copy className="w-4 h-4 mr-2" />
-                Copy
+                <Copy className="w-4 h-4 mr-2" aria-hidden="true" />
+                Copy Link
               </>
             )}
           </Button>

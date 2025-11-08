@@ -144,8 +144,8 @@ const LegalPathwayGuide: React.FC<LegalPathwayGuideProps> = ({ caseId, onBack })
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="outline" onClick={onBack} className="flex items-center gap-2">
-          <ArrowLeft className="h-4 w-4" />
+        <Button variant="outline" onClick={onBack} className="flex items-center gap-2 min-h-[44px]" aria-label="Back to case">
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           Back to Case
         </Button>
         <div>

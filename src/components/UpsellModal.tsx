@@ -159,10 +159,10 @@ export function UpsellModal({ trigger, context }: UpsellModalProps) {
         </div>
 
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleDismiss} className="flex-1">
+          <Button variant="outline" onClick={handleDismiss} className="flex-1 min-h-[44px]" aria-label="Dismiss upgrade offer">
             Maybe Later
           </Button>
-          <Button onClick={handleUpgrade} className="flex-1">
+          <Button onClick={handleUpgrade} className="flex-1 min-h-[44px]" aria-label="Upgrade to premium">
             Upgrade Now
           </Button>
         </div>

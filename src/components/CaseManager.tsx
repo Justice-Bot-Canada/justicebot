@@ -249,8 +249,8 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
           <h1 className="text-3xl font-bold mb-2">Case Management</h1>
           <p className="text-muted-foreground">Manage your legal cases and evidence</p>
         </div>
-        <Button onClick={() => setShowNewCase(true)} className="flex items-center gap-2">
-          <Scale className="h-4 w-4" />
+        <Button onClick={() => setShowNewCase(true)} className="flex items-center gap-2" aria-label="Create new case">
+          <Scale className="h-4 w-4" aria-hidden="true" />
           New Case
         </Button>
       </div>
@@ -529,10 +529,10 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
               </div>
 
               <div className="flex gap-2 pt-4">
-                <Button onClick={createCase} disabled={loading} className="flex-1">
+                <Button onClick={createCase} disabled={loading} className="flex-1 min-h-[44px]" aria-label={loading ? 'Creating case' : 'Create case'}>
                   {loading ? 'Creating...' : 'Create Case'}
                 </Button>
-                <Button variant="outline" onClick={() => setShowNewCase(false)}>
+                <Button variant="outline" onClick={() => setShowNewCase(false)} className="min-h-[44px]" aria-label="Cancel case creation">
                   Cancel
                 </Button>
               </div>
