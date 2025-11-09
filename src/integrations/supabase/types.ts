@@ -1843,7 +1843,50 @@ export type Database = {
           updated_at: string | null
           user_id: string | null
         }
-        Relationships: []
+        Insert: {
+          amount_cents?: number | null
+          captured_at?: string | null
+          case_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          form_id?: string | null
+          id?: string | null
+          provider?: string | null
+          provider_order_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount_cents?: number | null
+          captured_at?: string | null
+          case_id?: string | null
+          created_at?: string | null
+          currency?: string | null
+          form_id?: string | null
+          id?: string | null
+          provider?: string | null
+          provider_order_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payments_public: {
         Row: {
