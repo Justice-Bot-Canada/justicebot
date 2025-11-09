@@ -76,9 +76,9 @@ const FamilyJourney = () => {
     <>
       <PerformanceMonitor />
       <EnhancedSEO 
-        title="Family Law Journey Ontario - Divorce, Custody & Child Support"
-        description="Step-by-step guidance for divorce, custody, child protection, and family court matters in Ontario. Get help with Forms 8, 13, 13.1, 35.1, and 36."
-        keywords="family law, divorce, custody, child protection, family court, Ontario family law"
+        title="CAS Removal & Family Court Ontario 2025 - Custody Forms & Legal Help"
+        description="What to do when CAS removes your child. Get help with family court Ontario, custody forms (8A, 35.1), supervised access orders Canada & child protection cases. Affordable legal guidance for parents dealing with CAS & custody disputes."
+        keywords="CAS removal what to do, family court Ontario help, custody forms Ontario, supervised access order Canada, Form 8A, Form 35.1, child protection Ontario, CAS legal help, family law Ontario"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
         faqData={faqData}
@@ -95,8 +95,8 @@ const FamilyJourney = () => {
         <main id="main-content" className="container mx-auto px-4 py-8" tabIndex={-1}>
           <div className="max-w-4xl mx-auto">
             <JourneyHeader
-              title="Family Law Journey"
-              description="Your complete guide to navigating family court matters in Ontario"
+              title="CAS Removal & Family Court Ontario Help - Custody Forms & Child Protection"
+              description="What to do when CAS removes your child or you need help with family court in Ontario. Complete guide for custody forms, supervised access orders, and child protection cases."
               whoIsItFor="Anyone dealing with divorce, custody/access, child support, spousal support, property division, or child protection matters in Ontario"
               whatYouGet={[
                 "Step-by-step guidance for your specific family law matter",

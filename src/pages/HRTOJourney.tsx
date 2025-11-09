@@ -81,9 +81,9 @@ const HRTOJourney = () => {
     <div className="min-h-screen bg-background">
       <PerformanceMonitor />
       <EnhancedSEO
-        title="HRTO Journey Ontario - File Your Human Rights Complaint"
-        description="Complete guide to filing an HRTO application in Ontario. Get step-by-step instructions, deadlines, forms, and pro tips for your human rights complaint."
-        keywords="HRTO journey, human rights complaint steps, HRTO application guide, discrimination complaint process, Ontario human rights"
+        title="HRTO Application Form 1 Ontario 2025 - File Human Rights Complaint Canada"
+        description="How to file a human rights complaint Canada with HRTO Form 1 & Schedule A. Step-by-step guide for discrimination at work Ontario tribunal, housing discrimination & workplace harassment. Affordable legal help from $5.99/month."
+        keywords="HRTO application form 1 Ontario, how to file a human rights complaint Canada, discrimination at work Ontario tribunal, HRTO Form 1, Schedule A HRTO, human rights complaint Ontario, workplace discrimination Canada"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
         faqData={faqData}
@@ -110,9 +110,9 @@ const HRTOJourney = () => {
               Back
             </Button>
             
-            <h1 className="text-3xl font-bold mb-2">HRTO Filing Journey</h1>
+            <h1 className="text-3xl font-bold mb-2">How to File HRTO Application Form 1 Ontario - Human Rights Complaint Guide</h1>
             <p className="text-muted-foreground">
-              Your complete guide to fighting discrimination through the Human Rights Tribunal of Ontario. We'll help you complete Form 1, Schedule A, and Form 2.
+              Complete guide to filing a human rights complaint in Canada. Get step-by-step help with HRTO Form 1, Schedule A, and Form 2 for discrimination at work, housing discrimination, or harassment cases at Ontario tribunal. Affordable legal support available.
             </p>
           </div>
 

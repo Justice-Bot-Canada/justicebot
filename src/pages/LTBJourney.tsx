@@ -75,9 +75,9 @@ const LTBJourney = () => {
     <div className="min-h-screen bg-background">
       <PerformanceMonitor />
       <EnhancedSEO
-        title="LTB Journey Ontario - File Your Landlord Tenant Board Application"
-        description="Complete guide to filing an LTB application in Ontario. Get step-by-step instructions, forms, deadlines, and expert tips for your landlord-tenant dispute."
-        keywords="LTB journey, landlord tenant board steps, LTB application guide, tenant rights process, Ontario LTB"
+        title="LTB Forms Ontario 2025 - How to File T2 T6 Form | Tenant Rights Canada"
+        description="File LTB applications online with step-by-step guidance. Complete T2, T6, N4, N12 forms for eviction notice Ontario, rent disputes & Landlord Tenant Board Canada help. Free resources & affordable legal support starting $5.99/month."
+        keywords="LTB forms Ontario, how to file T2 T6 form, tenant rights Canada, Landlord Tenant Board Canada help, eviction notice Ontario, N4 form, N12 form, LTB application Ontario, tenant rights Ontario 2025"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
         faqData={faqData}
@@ -104,9 +104,9 @@ const LTBJourney = () => {
               Back
             </Button>
             
-            <h1 className="text-3xl font-bold mb-2">LTB Filing Journey</h1>
+            <h1 className="text-3xl font-bold mb-2">How to File LTB Forms Ontario: T2, T6 & Eviction Notice Help</h1>
             <p className="text-muted-foreground">
-              Your complete guide to protecting tenant rights through the Landlord and Tenant Board
+              Complete guide to filing Landlord Tenant Board applications in Ontario. Get help with T2 forms (tenant rights), T6 forms (maintenance), N4/N12 eviction notices, and protect your tenant rights in Canada with affordable legal support.
             </p>
           </div>
 
