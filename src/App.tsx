@@ -67,6 +67,10 @@ import Journey from "./pages/Journey";
 import CriminalCourtGuide from "./pages/CriminalCourtGuide";
 import CriminalCourtMistakes from "./pages/CriminalCourtMistakes";
 import DemoJourney from "./pages/DemoJourney";
+import TenantRightsGuide from "./pages/TenantRightsGuide";
+import FamilyLawGuide from "./pages/FamilyLawGuide";
+import HumanRightsGuide from "./pages/HumanRightsGuide";
+import LTBT2FormGuide from "./pages/LTBT2FormGuide";
 
 // Lazy load heavy components
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -160,6 +164,12 @@ const AppContent = () => {
           <Route path="/tribunal-locator" element={<TribunalLocatorPage />} />
           <Route path="/court" element={<CourtInformation />} />
           <Route path="/explain" element={<Explain />} />
+          
+          {/* SEO Pillar & Cluster Pages */}
+          <Route path="/tenant-rights-ontario-guide" element={<TenantRightsGuide />} />
+          <Route path="/family-law-ontario-guide" element={<FamilyLawGuide />} />
+          <Route path="/human-rights-ontario-guide" element={<HumanRightsGuide />} />
+          <Route path="/ltb-t2-form-guide" element={<LTBT2FormGuide />} />
 
           {/* Company & Support */}
           <Route path="/about" element={<About />} />
