@@ -37,7 +37,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.ai-legal-triage]
-verify_jwt = false
+verify_jwt = true
 
 [functions.generate-seo-pages]
 verify_jwt = true
@@ -55,7 +55,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.search-canlii]
-verify_jwt = false
+verify_jwt = true
 
 [functions.draft-legal-document]
 verify_jwt = true
