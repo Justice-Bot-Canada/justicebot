@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Shield, FileText, Scale, AlertCircle, CheckCircle, Home } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const TenantRightsGuide = () => {
   const clusterPages = [
@@ -40,6 +42,7 @@ const TenantRightsGuide = () => {
       />
 
       <div className="min-h-screen bg-background">
+        <Header />
         {/* Hero Section */}
         <section className="bg-gradient-to-b from-primary/10 to-background py-16 px-4">
           <div className="container max-w-4xl mx-auto">
@@ -301,6 +304,7 @@ const TenantRightsGuide = () => {
             </div>
           </div>
         </section>
+        <Footer />
       </div>
     </>
   );

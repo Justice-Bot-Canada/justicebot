@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { FileText, Download, AlertCircle, CheckCircle } from "lucide-react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const LTBT2FormGuide = () => {
   return (
@@ -26,6 +28,7 @@ const LTBT2FormGuide = () => {
       />
 
       <div className="min-h-screen bg-background">
+        <Header />
         <section className="bg-gradient-to-b from-primary/10 to-background py-16 px-4">
           <div className="container max-w-4xl mx-auto">
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
@@ -416,6 +419,7 @@ const LTBT2FormGuide = () => {
             </div>
           </div>
         </section>
+        <Footer />
       </div>
     </>
   );
