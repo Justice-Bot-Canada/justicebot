@@ -16,6 +16,9 @@ import DocumentTemplates from "@/components/DocumentTemplates";
 import { PricingComparison } from "@/components/PricingComparison";
 import legalServicesHero from "@/assets/legal-services-hero.jpg";
 import { JourneyFlowchart } from "@/components/JourneyFlowchart";
+import { LeadCaptureModal } from "@/components/LeadCaptureModal";
+import { NewsletterBanner } from "@/components/NewsletterBanner";
+import { LeadMagnetCard } from "@/components/LeadMagnetCard";
 
 const Index = () => {
   const structuredData = {
@@ -117,9 +120,58 @@ const Index = () => {
         
         <FeaturesSection />
         <AppDemoVideo />
+        
+        {/* Lead Magnets Section */}
+        <section className="py-16 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">Free Legal Resources for Canadians</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Get instant access to expert legal guides and templates - no credit card required
+              </p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              <LeadMagnetCard
+                title="Ontario Legal Rights Guide 2025"
+                description="Complete guide to your rights in landlord disputes, employment, and more"
+                benefits={[
+                  "Know your rights in 15+ legal situations",
+                  "Step-by-step tribunal procedures",
+                  "Common mistakes to avoid"
+                ]}
+                downloadType="guide"
+                journey="general"
+              />
+              <LeadMagnetCard
+                title="LTB Form T2 Template"
+                description="Professional template for tenant applications against landlords"
+                benefits={[
+                  "Pre-filled sections & examples",
+                  "Legal language included",
+                  "Increases your success rate"
+                ]}
+                downloadType="template"
+                journey="ltb"
+              />
+              <LeadMagnetCard
+                title="Small Claims Checklist"
+                description="Everything you need before filing in Small Claims Court"
+                benefits={[
+                  "Complete document checklist",
+                  "Timeline & deadline tracker",
+                  "Evidence preparation tips"
+                ]}
+                downloadType="checklist"
+                journey="small_claims"
+              />
+            </div>
+          </div>
+        </section>
       </main>
       <Footer />
       <AccessibilityPanel />
+      <LeadCaptureModal trigger="scroll" />
+      <NewsletterBanner />
     </div>
   );
 };
