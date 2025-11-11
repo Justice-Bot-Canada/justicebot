@@ -6,17 +6,16 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vkzquzjtewqhcisvhsvg.supabase.co https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://vkzquzjtewqhcisvhsvg.supabase.co wss://vkzquzjtewqhcisvhsvg.supabase.co https://www.google-analytics.com; media-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vkzquzjtewqhcisvhsvg.supabase.co https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://vkzquzjtewqhcisvhsvg.supabase.co wss://vkzquzjtewqhcisvhsvg.supabase.co https://www.google-analytics.com https://ai.gateway.lovable.dev; media-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';
   X-Permitted-Cross-Domain-Policies: none
-  Cross-Origin-Embedder-Policy: require-corp
-  Cross-Origin-Opener-Policy: same-origin
-  Cross-Origin-Resource-Policy: same-origin
   
-  # Cache Control
-  Cache-Control: public, max-age=31536000, immutable
+  # Cache Control  
+  Cache-Control: public, max-age=3600
 
 /index.html
   Cache-Control: no-cache, no-store, must-revalidate
+  Link: </assets/*>; rel=preload; as=style
+  Link: </assets/*>; rel=preload; as=script
 
 /*.js
   Cache-Control: public, max-age=31536000, immutable

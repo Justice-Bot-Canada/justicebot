@@ -9,11 +9,25 @@
     <!-- Performance: DNS Prefetch & Preconnect -->
     <link rel="preconnect" href="https://vkzquzjtewqhcisvhsvg.supabase.co" crossorigin>
     <link rel="dns-prefetch" href="https://vkzquzjtewqhcisvhsvg.supabase.co">
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="dns-prefetch" href="https://www.google-analytics.com">
+    <link rel="preconnect" href="https://ai.gateway.lovable.dev">
     
     <!-- Performance: Preload critical assets -->
     <link rel="preload" href="/logo-64.webp" as="image" type="image/webp">
     <link rel="preload" href="/hero-mobile.webp" as="image" type="image/webp" media="(max-width: 767px)">
     <link rel="preload" href="/hero-desktop.webp" as="image" type="image/webp" media="(min-width: 768px)">
+    
+    <!-- Performance: Font display swap -->
+    <style>
+      @font-face {
+        font-family: system;
+        font-style: normal;
+        font-weight: 300 900;
+        font-display: swap;
+        src: local(-apple-system), local(BlinkMacSystemFont);
+      }
+    </style>
     
     <title>Justice-Bot • Build a stronger case, step by step</title>
     <meta name="description" content="Guided triage, document prep, and filing help for Canadians. Clear steps, solid documents, and rights-aware guidance." />
