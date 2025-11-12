@@ -37,14 +37,30 @@ func cors(next http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
 			w.Header().Set("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS")
+			w.Header().Set("Access-Control-Max-Age", "600") // 10 minutes
 		}
 
-		// Handle preflight quickly
+		// Handle preflight - only for allowed origins
 		if r.Method == http.MethodOptions {
+			if allowedOrigins[origin] {
+				w.WriteHeader(http.StatusNoContent)
+				return
+			}
 			w.WriteHeader(http.StatusNoContent)
 			return
 		}
 
+		next.ServeHTTP(w, r)
+	})
+}
+
+// ---------- SECURITY HEADERS ----------
+func security(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "DENY")
+		w.Header().Set("Referrer-Policy", "no-referrer-when-downgrade")
+		w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
 		next.ServeHTTP(w, r)
 	})
 }
@@ -118,6 +134,9 @@ type supaClaims struct {
 
 func requireSupabase(next http.HandlerFunc) http.HandlerFunc {
 	secret := os.Getenv("SUPABASE_JWT_SECRET")
+	if secret == "" {
+		log.Fatal("SUPABASE_JWT_SECRET is not set")
+	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Header.Get("Authorization")
 		if !strings.HasPrefix(auth, "Bearer ") {
@@ -126,7 +145,7 @@ func requireSupabase(next http.HandlerFunc) http.HandlerFunc {
 		}
 		tok := strings.TrimPrefix(auth, "Bearer ")
 		token, err := jwt.ParseWithClaims(tok, &supaClaims{}, func(t *jwt.Token) (any, error) {
-			if t.Method.Alg() != jwt.SigningMethodHS256.Alg() {
+			if t.Method != jwt.SigningMethodHS256 {
 				return nil, jwt.ErrTokenUnverifiable
 			}
 			return []byte(secret), nil
@@ -135,7 +154,7 @@ func requireSupabase(next http.HandlerFunc) http.HandlerFunc {
 			http.Error(w, "invalid token", http.StatusUnauthorized)
 			return
 		}
-		claims := token.Claims.(*supaClaims)
+		claims, _ := token.Claims.(*supaClaims)
 		r.Header.Set("X-User-Sub", claims.Subject)
 		r.Header.Set("X-User-Email", claims.Email)
 		next.ServeHTTP(w, r)
@@ -276,6 +295,7 @@ func main() {
 		})
 	}
 
-	log.Printf("✅ listening on :%s with CORS enabled", port)
-	log.Fatal(http.ListenAndServe(":"+port, cors(mux)))
+	handler := cors(security(mux))
+	log.Printf("✅ listening on :%s with CORS + security headers enabled", port)
+	log.Fatal(http.ListenAndServe(":"+port, handler))
 }
