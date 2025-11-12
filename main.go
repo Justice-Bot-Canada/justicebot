@@ -21,8 +21,10 @@ var httpc = &http.Client{Timeout: 15 * time.Second}
 
 // ---------- CORS MIDDLEWARE ----------
 var allowedOrigins = map[string]bool{
-	"https://justice-bot.com":     true,
-	"https://www.justice-bot.com": true,
+	"https://justice-bot.com":        true,
+	"https://www.justice-bot.com":    true,
+	"https://app.justice-bot.com":    true,
+	"https://justicebot.lovable.app": true,
 }
 
 func cors(next http.Handler) http.Handler {
