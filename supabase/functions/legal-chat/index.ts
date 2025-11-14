@@ -3,31 +3,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "https://justice-bot.com",
+  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-// Rate limiting: Track requests by IP
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT_WINDOW = 60000; // 1 minute
-const RATE_LIMIT_MAX_REQUESTS = 10;
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const record = rateLimitMap.get(ip);
-  
-  if (!record || now > record.resetTime) {
-    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
-    return true;
-  }
-  
-  if (record.count >= RATE_LIMIT_MAX_REQUESTS) {
-    return false;
-  }
-  
-  record.count++;
-  return true;
-}
 
 // Input validation schema
 const ChatRequestSchema = z.object({
@@ -43,14 +21,6 @@ serve(async (req) => {
   }
 
   try {
-    // Rate limiting
-    const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
-    if (!checkRateLimit(clientIp)) {
-      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Please try again later.' }), {
-        status: 429,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
     // Authenticate user
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {

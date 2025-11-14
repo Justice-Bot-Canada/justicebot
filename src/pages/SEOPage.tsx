@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Loader2, ArrowRight } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
-import DOMPurify from 'dompurify';
 
 export default function SEOPage() {
   const { slug } = useParams();
@@ -97,10 +96,7 @@ export default function SEOPage() {
               <Card className="p-8">
                 <article 
                   className="prose prose-lg max-w-none"
-                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(page.content, { 
-                    ALLOWED_TAGS: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'br', 'blockquote'],
-                    ALLOWED_ATTR: ['href', 'target', 'rel']
-                  }) }}
+                  dangerouslySetInnerHTML={{ __html: page.content }}
                 />
               </Card>
 
