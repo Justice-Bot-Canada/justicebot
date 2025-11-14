@@ -11,6 +11,9 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
+  optimizeDeps: {
+    include: ['react', 'react-dom'],
+  },
   test: {
     globals: true,
     environment: 'jsdom',
@@ -41,6 +44,10 @@ export default defineConfig(({ mode }) => ({
   build: {
     target: 'es2015',
     minify: 'esbuild',
+    sourcemap: true,
+    commonjsOptions: { 
+      include: [/node_modules/] 
+    },
     rollupOptions: {
       output: {
         manualChunks: (id) => {
@@ -76,7 +83,6 @@ export default defineConfig(({ mode }) => ({
       },
     },
     cssCodeSplit: true,
-    sourcemap: false,
     chunkSizeWarningLimit: 500,
     assetsInlineLimit: 4096,
   },
