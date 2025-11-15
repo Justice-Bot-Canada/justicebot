@@ -2,43 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta 
-    name="viewport" 
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  />
-
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Justice-Bot — Fast access to the right legal forms</title>
-  <meta 
-    name="description" 
-    content="Justice-Bot helps you sign in securely, pay with PayPal, and download the forms you need." 
-  />
-
-  <!-- Favicon -->
+  <meta name="description" content="Justice-Bot helps you sign in securely, pay with PayPal, and download the forms you need." />
   <link rel="icon" href="/favicon.ico">
 
   <!-- Manifest -->
   <link rel="manifest" href="/manifest.webmanifest" crossorigin="use-credentials">
 
-  <!-- Theme Colors -->
+  <!-- Theme color (with light/dark variants) -->
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#D32F2F">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#B71C1C">
   <meta name="theme-color" content="#D32F2F">
 
-  <!-- iOS PWA Settings -->
+  <!-- iOS Safari PWA tweaks -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="/icons/icon-192.png">
 
-  <!-- Application Metadata -->
+  <!-- Basic SEO -->
   <meta name="application-name" content="Justice Bot">
   <meta name="apple-mobile-web-app-title" content="JusticeBot">
+  <meta name="description" content="AI legal assistant.">
 
-  <!-- Styles -->
   <style>
     :root { --bg:#0b1220; --panel:#0f172a; --muted:#94a3b8; --text:#e2e8f0; --brand:#3b82f6; --brand-2:#60a5fa; }
-    *{box-sizing:border-box} html,body{height:100%}
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{margin:0;background:linear-gradient(180deg,#0a0f1a,#0b1220 35%,#0a1426);color:var(--text);font:16px/1.6 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-    a{color:var(--brand);text-decoration:none} a:hover{text-decoration:underline}
+    a{color:var(--brand);text-decoration:none}
+    a:hover{text-decoration:underline}
     .wrap{max-width:1100px;margin:0 auto;padding:24px}
     .nav{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
     .logo{font-size:28px;font-weight:800;letter-spacing:.5px}
@@ -55,10 +48,9 @@
     .footer{color:#8aa1c2;font-size:13px;padding:32px 0;border-top:1px solid #1f2937;margin-top:48px}
     @media (max-width:900px){.hero{grid-template-columns:1fr}.h1{font-size:36px}}
   </style>
-
 </head>
-<body>
 
+<body>
   <div class="wrap">
     <div class="nav">
       <div class="logo">Justice-Bot</div>
@@ -108,13 +100,10 @@
     </div>
   </div>
 
-  <!-- Year Auto-Fill -->
   <script>
     document.getElementById('y').textContent = new Date().getFullYear();
   </script>
 
-  <!-- Vite resolves /index.mjs to public/index.mjs -->
-  <script type="module" src="/index.mjs"></script>
-
 </body>
 </html>
+
