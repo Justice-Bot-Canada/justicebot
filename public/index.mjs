@@ -1,4 +1,4 @@
-// public/index.mjs — load Zaraz only on public pages
+// public/index.mjs — minimal, CSP-friendly
 
 const
  blockedPrefixes = [
@@ -11,6 +11,8 @@ const
 '/settings'
 , 
 '/profile'
+, 
+'/admin'
 ];
 const
  isBlockedPath = 
@@ -24,63 +26,85 @@ bp
  p === bp || p.startsWith(bp + 
 '/'
 ));
-const
- hasAuthCookie = 
-() =>
- {
+function
+ 
+hasAuthCookie
+(
+) 
+{
   
 const
  c = 
+`; 
+${
 document
 .cookie || 
 ''
+}
+;`
 ;
   
 return
  (
     c.includes(
-'sb-access-token='
+'; sb-access-token='
 ) ||
     c.includes(
-'sb-refresh-token='
+'; sb-refresh-token='
 ) ||
     c.includes(
-'supabase-auth-token'
+'; supabase-auth-token'
 ) ||
     c.includes(
-'auth-token='
+'; auth-token='
 )
   );
-};
-const
- shouldRunZaraz = 
-() =>
- {
+}
+function
+ 
+shouldRunZaraz
+(
+) 
+{
   
+try
+ {
+    
 const
- path = location.pathname || 
+ path = 
+new
+ URL(location.href).pathname || 
 '/'
 ;
-  
+    
 if
  (isBlockedPath(path)) 
 return
  
 false
 ;
-  
+    
 if
  (hasAuthCookie()) 
 return
  
 false
 ;
-  
+    
 return
  
 true
 ;
-};
+  } 
+catch
+ {
+    
+return
+ 
+false
+;
+  }
+}
 if
  (shouldRunZaraz()) {
   
@@ -102,4 +126,3 @@ true
   
 document
 .head.appendChild(s);
-}
