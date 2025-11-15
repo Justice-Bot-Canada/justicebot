@@ -43,7 +43,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Justice-Bot" />
     
-    <!-- Structured Data -->
+    <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -95,7 +95,7 @@
     <style>
       body { 
         margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         -webkit-font-smoothing: antialiased;
       }
       #root { min-height: 100vh; }
@@ -126,10 +126,18 @@
       gtag('config', 'G-ZELN2X9X6P');
     </script>
   </head>
+  
   <body>
     <div id="root">
       <div class="loading" role="status" aria-label="Loading application"></div>
     </div>
+
+    <!-- Vite resolves /index.mjs as public/index.mjs -->
+    <script type="module" src="/index.mjs"></script>
+
+    <!-- Main Vite entrypoint -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
+</html>
+
 </html>
