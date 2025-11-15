@@ -7,7 +7,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { Suspense, lazy } from "react";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import { SkipToContent, useFocusManagement, useKeyboardNavigation } from "@/components/AccessibilityFeatures";
-import IndexSimple from "./pages/IndexSimple";
+import Index from "./pages/Index";
 import PathwayDecision from "./pages/PathwayDecision";
 import Pricing from "./pages/Pricing";
 import LowIncomeApproval from "./pages/LowIncomeApproval";
@@ -121,7 +121,7 @@ const AppContent = () => {
         <LiveSupportWidget />
       <Routes>
           {/* Main Landing & Getting Started */}
-          <Route path="/" element={<IndexSimple />} />
+          <Route path="/" element={<Index />} />
           <Route path="/demo-journey" element={<DemoJourney />} />
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/triage" element={<Triage />} />
