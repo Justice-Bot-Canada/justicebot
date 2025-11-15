@@ -21,6 +21,8 @@ import { NewsletterBanner } from "@/components/NewsletterBanner";
 import { LeadMagnetCard } from "@/components/LeadMagnetCard";
 
 const Index = () => {
+  console.log('Index component rendering...');
+  
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "LegalService",
