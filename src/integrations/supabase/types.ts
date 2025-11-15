@@ -177,6 +177,48 @@ export type Database = {
           },
         ]
       }
+      case_merit_audit: {
+        Row: {
+          canlii_latency_ms: number | null
+          case_id: string
+          created_at: string
+          decision: Json
+          error: string | null
+          id: number
+          jurisdiction: string
+          query_signature: string
+          run_id: string
+          user_id: string
+          weights: Json | null
+        }
+        Insert: {
+          canlii_latency_ms?: number | null
+          case_id: string
+          created_at?: string
+          decision: Json
+          error?: string | null
+          id?: number
+          jurisdiction?: string
+          query_signature: string
+          run_id?: string
+          user_id: string
+          weights?: Json | null
+        }
+        Update: {
+          canlii_latency_ms?: number | null
+          case_id?: string
+          created_at?: string
+          decision?: Json
+          error?: string | null
+          id?: number
+          jurisdiction?: string
+          query_signature?: string
+          run_id?: string
+          user_id?: string
+          weights?: Json | null
+        }
+        Relationships: []
+      }
       case_milestones: {
         Row: {
           case_id: string
@@ -210,6 +252,54 @@ export type Database = {
           milestone_type?: string
           order_index?: number
           title?: string
+        }
+        Relationships: []
+      }
+      case_references: {
+        Row: {
+          canlii_id: string | null
+          case_id: string
+          citations: Json | null
+          court: string | null
+          created_at: string
+          decision_date: string | null
+          id: number
+          jurisdiction: string
+          query_signature: string
+          raw: Json | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          canlii_id?: string | null
+          case_id: string
+          citations?: Json | null
+          court?: string | null
+          created_at?: string
+          decision_date?: string | null
+          id?: number
+          jurisdiction?: string
+          query_signature: string
+          raw?: Json | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          canlii_id?: string | null
+          case_id?: string
+          citations?: Json | null
+          court?: string | null
+          created_at?: string
+          decision_date?: string | null
+          id?: number
+          jurisdiction?: string
+          query_signature?: string
+          raw?: Json | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -586,6 +676,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      evidence_extractions: {
+        Row: {
+          case_id: string
+          created_at: string
+          entities: Json | null
+          facts: Json | null
+          id: number
+          keywords: string[] | null
+          query_signature: string
+          score: number | null
+          user_id: string
+        }
+        Insert: {
+          case_id: string
+          created_at?: string
+          entities?: Json | null
+          facts?: Json | null
+          id?: number
+          keywords?: string[] | null
+          query_signature: string
+          score?: number | null
+          user_id: string
+        }
+        Update: {
+          case_id?: string
+          created_at?: string
+          entities?: Json | null
+          facts?: Json | null
+          id?: number
+          keywords?: string[] | null
+          query_signature?: string
+          score?: number | null
+          user_id?: string
+        }
+        Relationships: []
       }
       evidence_links: {
         Row: {

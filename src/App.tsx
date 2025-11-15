@@ -7,7 +7,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { Suspense, lazy } from "react";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import { SkipToContent, useFocusManagement, useKeyboardNavigation } from "@/components/AccessibilityFeatures";
-import Index from "./pages/Index";
+import IndexSimple from "./pages/IndexSimple";
 import PathwayDecision from "./pages/PathwayDecision";
 import Pricing from "./pages/Pricing";
 import LowIncomeApproval from "./pages/LowIncomeApproval";
@@ -94,15 +94,22 @@ const SubscriptionSuccess = lazy(() => import("./pages/SubscriptionSuccess"));
 const FeatureGuide = lazy(() => import("./pages/FeatureGuide"));
 
 // Loading fallback component
-const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-  </div>
-);
+const LoadingFallback = () => {
+  console.log('LoadingFallback rendering...');
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    </div>
+  );
+};
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
+  console.log('AppContent rendering...');
   useFocusManagement();
   useKeyboardNavigation();
   
@@ -114,7 +121,7 @@ const AppContent = () => {
         <LiveSupportWidget />
       <Routes>
           {/* Main Landing & Getting Started */}
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<IndexSimple />} />
           <Route path="/demo-journey" element={<DemoJourney />} />
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/triage" element={<Triage />} />
