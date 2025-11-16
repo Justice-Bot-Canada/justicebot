@@ -6,28 +6,86 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'paypal-transmission-id, paypal-transmission-time, paypal-transmission-sig, paypal-cert-url, paypal-auth-algo',
 };
 
+async function getPayPalAccessToken(): Promise<string> {
+  const clientId = Deno.env.get('PAYPAL_CLIENT_ID');
+  const clientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET');
+  const isLive = clientId?.startsWith('A') && !clientId.includes('sandbox');
+  const baseUrl = isLive 
+    ? 'https://api-m.paypal.com'
+    : 'https://api-m.sandbox.paypal.com';
+
+  const auth = btoa(`${clientId}:${clientSecret}`);
+  const response = await fetch(`${baseUrl}/v1/oauth2/token`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'grant_type=client_credentials',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to get PayPal access token: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  return data.access_token;
+}
+
 async function verifyWebhookSignature(req: Request, body: string): Promise<boolean> {
   const transmissionId = req.headers.get('paypal-transmission-id');
   const transmissionTime = req.headers.get('paypal-transmission-time');
   const transmissionSig = req.headers.get('paypal-transmission-sig');
   const certUrl = req.headers.get('paypal-cert-url');
+  const authAlgo = req.headers.get('paypal-auth-algo');
   const webhookId = Deno.env.get('PAYPAL_WEBHOOK_ID');
 
   console.log('Verifying webhook signature:', { transmissionId, transmissionTime, webhookId });
 
-  if (!transmissionId || !transmissionTime || !transmissionSig || !webhookId) {
+  if (!transmissionId || !transmissionTime || !transmissionSig || !webhookId || !certUrl || !authAlgo) {
     console.error('Missing webhook verification headers');
     return false;
   }
 
-  // For production, implement full PayPal signature verification:
-  // 1. Download PayPal cert from certUrl
-  // 2. Construct verification string: transmissionId|transmissionTime|webhookId|crc32(body)
-  // 3. Verify signature using PayPal's public key
-  // See: https://developer.paypal.com/docs/api-basics/notifications/webhooks/notification-messages/#link-verifywebhooksignature
-  
-  // For now, verify basic headers are present (replace with full verification in production)
-  return true; // TODO: Implement full signature verification
+  try {
+    // Use PayPal's verification API
+    const accessToken = await getPayPalAccessToken();
+    const clientId = Deno.env.get('PAYPAL_CLIENT_ID');
+    const isLive = clientId?.startsWith('A') && !clientId.includes('sandbox');
+    const baseUrl = isLive 
+      ? 'https://api-m.paypal.com'
+      : 'https://api-m.sandbox.paypal.com';
+
+    const verifyResponse = await fetch(`${baseUrl}/v1/notifications/verify-webhook-signature`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({
+        transmission_id: transmissionId,
+        transmission_time: transmissionTime,
+        cert_url: certUrl,
+        auth_algo: authAlgo,
+        transmission_sig: transmissionSig,
+        webhook_id: webhookId,
+        webhook_event: JSON.parse(body),
+      }),
+    });
+
+    if (!verifyResponse.ok) {
+      console.error('PayPal verification API error:', await verifyResponse.text());
+      return false;
+    }
+
+    const verifyData = await verifyResponse.json();
+    console.log('PayPal verification result:', verifyData);
+    
+    return verifyData.verification_status === 'SUCCESS';
+  } catch (error) {
+    console.error('Error verifying PayPal webhook signature:', error);
+    return false;
+  }
 }
 
 serve(async (req: Request) => {
@@ -41,7 +99,7 @@ serve(async (req: Request) => {
     // Verify PayPal webhook signature
     const isValid = await verifyWebhookSignature(req, bodyText);
     if (!isValid) {
-      console.error('Invalid webhook signature');
+      console.error('Invalid webhook signature - rejecting request');
       return new Response(
         JSON.stringify({ error: 'Invalid webhook signature' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
