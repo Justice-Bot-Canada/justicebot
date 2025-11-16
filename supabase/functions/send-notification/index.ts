@@ -1,21 +1,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface NotificationRequest {
-  userId: string;
-  title: string;
-  message: string;
-  type?: 'info' | 'success' | 'warning' | 'deadline';
-  actionUrl?: string;
-  relatedCaseId?: string;
-  relatedEventId?: string;
-  sendEmail?: boolean;
-}
+const NotificationSchema = z.object({
+  userId: z.string().uuid(),
+  title: z.string().trim().min(1).max(200),
+  message: z.string().trim().min(1).max(2000),
+  type: z.enum(['info', 'success', 'warning', 'deadline']).optional(),
+  actionUrl: z.string().url().optional(),
+  relatedCaseId: z.string().uuid().optional(),
+  relatedEventId: z.string().uuid().optional(),
+  sendEmail: z.boolean().optional()
+});
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -29,6 +30,16 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
+    const body = await req.json();
+    const validationResult = NotificationSchema.safeParse(body);
+    
+    if (!validationResult.success) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid input', details: validationResult.error.issues }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const {
       userId,
       title,
@@ -38,7 +49,7 @@ serve(async (req) => {
       relatedCaseId,
       relatedEventId,
       sendEmail = false,
-    }: NotificationRequest = await req.json();
+    } = validationResult.data;
 
     console.log('Creating notification for user:', userId);
 
