@@ -1,18 +1,19 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface EmailRequest {
-  to: string;
-  toName?: string;
-  subject: string;
-  htmlContent?: string;
-  templateId?: number;
-  params?: Record<string, any>;
-}
+const EmailSchema = z.object({
+  to: z.string().email().max(255),
+  toName: z.string().trim().max(100).optional(),
+  subject: z.string().trim().min(1).max(200),
+  htmlContent: z.string().max(100000).optional(),
+  templateId: z.number().optional(),
+  params: z.record(z.unknown()).optional()
+});
 
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -35,17 +36,17 @@ serve(async (req: Request) => {
       );
     }
 
-    const { to, toName, subject, htmlContent, templateId, params }: EmailRequest = await req.json();
-
-    if (!to) {
+    const body = await req.json();
+    const validationResult = EmailSchema.safeParse(body);
+    
+    if (!validationResult.success) {
       return new Response(
-        JSON.stringify({ error: 'Recipient email is required' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400 
-        }
+        JSON.stringify({ error: 'Invalid input', details: validationResult.error.issues }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    const { to, toName, subject, htmlContent, templateId, params } = validationResult.data;
 
     // Create safe email hash for logging (PIPEDA compliance)
     const emailHash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(to))
