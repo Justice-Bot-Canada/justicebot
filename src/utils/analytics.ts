@@ -57,4 +57,16 @@ export const analytics = {
   // Chat interactions
   chatStart: () => trackEvent('chat_start'),
   chatMessage: (messageCount: number) => trackEvent('chat_message', { message_count: messageCount }),
+  
+  // Signup tracking
+  signupClick: () => trackEvent('signup_click'),
+  signupAttempt: (email: string) => trackEvent('signup_attempt', { email }),
+  signupComplete: (email: string, method: string) => trackEvent('signup_complete', { email, method }),
+  signupFailed: (error: string) => trackEvent('signup_failed', { error }),
+  
+  // Payment tracking
+  paymentInitiated: (plan: string, amount: string, method: string) => trackEvent('payment_initiated', { plan, amount, method }),
+  paymentCompleted: (plan: string, amount: string, paymentId?: string) => trackEvent('payment_completed', { plan, amount, payment_id: paymentId, value: parseFloat(amount.replace(/[^0-9.]/g, '')), currency: 'CAD' }),
+  paymentAbandoned: (plan: string, amount: string, reason: string) => trackEvent('payment_abandoned', { plan, amount, reason }),
+  paymentFailed: (plan: string, amount: string, error: string) => trackEvent('payment_failed', { plan, amount, error }),
 };

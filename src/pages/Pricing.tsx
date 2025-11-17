@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { analytics } from "@/utils/analytics";
 
 const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
@@ -43,6 +44,7 @@ const Pricing = () => {
       return;
     }
 
+    analytics.paymentInitiated(plan, amount, 'paypal');
     setLoading(plan);
     try {
       const { data, error } = await supabase.functions.invoke('create-paypal-payment', {
@@ -64,6 +66,7 @@ const Pricing = () => {
       }
     } catch (error) {
       console.error('Payment error:', error);
+      analytics.paymentFailed(plan, amount, error instanceof Error ? error.message : 'Unknown error');
       toast({
         title: "Payment Error",
         description: "Failed to create payment. Please try again.",
@@ -75,6 +78,7 @@ const Pricing = () => {
   };
 
   const handleETransferPayment = (plan: string, amount: string) => {
+    analytics.paymentInitiated(plan, amount, 'e-transfer');
     const subject = `Justice Bot - ${plan} Plan Payment`;
     const body = `I would like to purchase the ${plan} plan for $${amount} CAD. Please send me payment instructions for e-transfer.`;
     const mailtoLink = `mailto:admin@justice-bot.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;

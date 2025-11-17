@@ -8,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
+import { analytics } from "@/utils/analytics";
 
 interface AuthDialogProps {
   open: boolean;
@@ -71,6 +72,7 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       return;
     }
 
+    analytics.signupAttempt(email);
     setIsLoading(true);
 
     try {
@@ -94,12 +96,14 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       });
 
       if (error) {
+        analytics.signupFailed(error.message);
         toast({
           title: "Error",
           description: error.message,
           variant: "destructive",
         });
       } else {
+        analytics.signupComplete(email, 'email');
         toast({
           title: "Check your email",
           description: "We've sent you a confirmation link to complete your registration.",
@@ -135,7 +139,7 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         <Tabs defaultValue="signin" className="w-full" aria-label="Authentication options">
           <TabsList className="grid w-full grid-cols-2" role="tablist">
             <TabsTrigger value="signin" role="tab" aria-controls="signin-panel">Sign In</TabsTrigger>
-            <TabsTrigger value="signup" role="tab" aria-controls="signup-panel">Sign Up</TabsTrigger>
+            <TabsTrigger value="signup" role="tab" aria-controls="signup-panel" onClick={() => analytics.signupClick()}>Sign Up</TabsTrigger>
           </TabsList>
           
           <TabsContent value="signin" id="signin-panel" role="tabpanel" aria-labelledby="signin-tab">
