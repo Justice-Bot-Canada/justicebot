@@ -1,9 +1,16 @@
 import React from "react";
-import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
-import "./index.css";
+import ReactDOM from "react-dom/client";
 
-createRoot(document.getElementById("root")!).render(
+function App() {
+  return (
+    <div style={{ padding: "2rem", fontFamily: "system-ui" }}>
+      <h1>Justice-Bot test render ✅</h1>
+      <p>If you see this, React is working and the crash is in your real App code.</p>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>
