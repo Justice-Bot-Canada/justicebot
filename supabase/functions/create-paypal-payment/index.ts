@@ -68,9 +68,12 @@ serve(async (req) => {
     const validation = PaymentRequestSchema.safeParse(requestBody);
     
     if (!validation.success) {
+      console.error('[SECURITY] Validation failed:', {
+        errors: validation.error.issues,
+        userId: userData?.user?.id
+      });
       return new Response(JSON.stringify({ 
-        error: 'Invalid request data',
-        details: validation.error.issues 
+        error: 'Invalid request'
       }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -82,7 +85,11 @@ serve(async (req) => {
     // Validate price matches plan type
     const expectedAmount = VALID_PRICES[planType];
     if (!expectedAmount) {
-      return new Response(JSON.stringify({ error: 'Invalid plan type' }), {
+      console.error('[SECURITY] Invalid plan type:', {
+        planType,
+        userId: userData.user.id
+      });
+      return new Response(JSON.stringify({ error: 'Invalid request' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -90,10 +97,14 @@ serve(async (req) => {
 
     const submittedAmount = parseFloat(amount);
     if (Math.abs(submittedAmount - expectedAmount) > 0.01) {
-      return new Response(JSON.stringify({ 
-        error: 'Invalid payment amount for plan type',
+      console.error('[SECURITY] Price manipulation attempt:', {
+        planType,
         expected: expectedAmount,
-        received: submittedAmount
+        received: submittedAmount,
+        userId: userData.user.id
+      });
+      return new Response(JSON.stringify({ 
+        error: 'Invalid request'
       }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -109,7 +120,12 @@ serve(async (req) => {
         .single();
       
       if (caseError || !caseData || caseData.user_id !== userData.user.id) {
-        return new Response(JSON.stringify({ error: 'Case not found or unauthorized' }), {
+        console.error('[SECURITY] Case access denied:', {
+          caseId,
+          userId: userData.user.id,
+          error: caseError?.message
+        });
+        return new Response(JSON.stringify({ error: 'Access denied' }), {
           status: 403,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -207,8 +223,11 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Error in create-paypal-payment function:', error);
-    return new Response(JSON.stringify({ error: (error as Error).message }), {
+    console.error('[ERROR] Payment creation failed:', {
+      error: (error as Error).message,
+      stack: (error as Error).stack
+    });
+    return new Response(JSON.stringify({ error: 'Payment processing failed' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

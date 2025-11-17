@@ -86,8 +86,11 @@ serve(async (req) => {
     // Validate input with Zod
     const validationResult = FormPaymentSchema.safeParse(requestBody);
     if (!validationResult.success) {
-      logStep("Validation error", { errors: validationResult.error.errors });
-      throw new Error(`Invalid request: ${validationResult.error.errors.map(e => e.message).join(', ')}`);
+      console.error('[SECURITY] Validation failed:', {
+        errors: validationResult.error.errors,
+        userId: user.id
+      });
+      throw new Error('Invalid request');
     }
 
     const { formId, amount, currency } = validationResult.data;
@@ -95,18 +98,21 @@ serve(async (req) => {
     // CRITICAL: Verify amount matches server-side price
     const expectedAmount = FORM_PRICES[formId];
     if (!expectedAmount) {
-      logStep("Invalid form ID", { formId });
-      throw new Error("Invalid form ID");
+      console.error('[SECURITY] Invalid form ID:', {
+        formId,
+        userId: user.id
+      });
+      throw new Error('Invalid request');
     }
     
     if (amount !== expectedAmount) {
-      logStep("Price manipulation detected", { 
-        providedAmount: amount, 
-        expectedAmount,
+      console.error('[SECURITY] Price manipulation attempt:', {
+        provided: amount,
+        expected: expectedAmount,
         formId,
-        userId: user.id 
+        userId: user.id
       });
-      throw new Error("Invalid payment amount");
+      throw new Error('Invalid request');
     }
 
     logStep("Creating form payment", { formId, amount, currency });
@@ -188,10 +194,13 @@ serve(async (req) => {
     );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR", { message: errorMessage });
+    console.error('[ERROR] Form payment creation failed:', {
+      error: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined
+    });
     
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: 'Payment processing failed' }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
