@@ -3,6 +3,16 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
+// Diagnostic check
+if (!React || !React.createContext) {
+  console.error("React failed to load properly. Clearing cache and reloading...");
+  if ('caches' in window) {
+    caches.keys().then(keys => keys.forEach(key => caches.delete(key)));
+  }
+  setTimeout(() => window.location.reload(), 100);
+  throw new Error("React module corrupted - reloading");
+}
+
 const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error("Root element not found");
 
