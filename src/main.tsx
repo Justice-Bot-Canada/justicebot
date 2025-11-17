@@ -1,19 +1,22 @@
-import React from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
 const rootElement = document.getElementById("root");
-if (!rootElement) throw new Error("Root element not found");
 
-// Remove loading spinner immediately
-const loadingSpinner = document.querySelector('.loading');
-if (loadingSpinner) {
-  loadingSpinner.remove();
+if (!rootElement) {
+  throw new Error("Failed to find the root element");
+}
+
+// Remove loading spinner
+const spinner = rootElement.querySelector('.loading');
+if (spinner) {
+  spinner.remove();
 }
 
 createRoot(rootElement).render(
-  <React.StrictMode>
+  <StrictMode>
     <App />
-  </React.StrictMode>
+  </StrictMode>
 );
