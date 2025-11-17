@@ -86,17 +86,18 @@ const FormSelector = () => {
   }, [venue]);
 
   // Auto-select form from case profile
-  useEffect(() => {
-    if (caseProfile?.recommendedForm && forms.length > 0 && !selectedForm) {
-      const matchingForm = forms.find(f => 
-        f.form_code.toLowerCase().includes(caseProfile.recommendedForm.toLowerCase())
-      );
-      if (matchingForm) {
-        setSelectedForm(matchingForm);
-        toast.success(`Auto-selected: ${matchingForm.title}`);
-      }
-    }
-  }, [caseProfile, forms, selectedForm]);
+  // Temporarily disabled to fix loading issues
+  // useEffect(() => {
+  //   if (caseProfile?.recommendedForm && forms.length > 0 && !selectedForm) {
+  //     const matchingForm = forms.find(f => 
+  //       f.form_code.toLowerCase().includes(caseProfile.recommendedForm.toLowerCase())
+  //     );
+  //     if (matchingForm) {
+  //       setSelectedForm(matchingForm);
+  //       toast.success(`Auto-selected: ${matchingForm.title}`);
+  //     }
+  //   }
+  // }, [caseProfile, forms, selectedForm]);
 
   const fetchForms = async () => {
     if (!venue) return;
