@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { PremiumStatus } from "@/components/PremiumStatus";
+import { useCaseProfile } from "@/hooks/useCaseProfile";
 
 interface FormInfo {
   id: string;
@@ -54,6 +55,7 @@ const FormBuilder = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { caseProfile } = useCaseProfile();
   
   const [form, setForm] = useState<FormInfo | null>(null);
   const [fields, setFields] = useState<FormField[]>([]);
@@ -73,11 +75,15 @@ const FormBuilder = () => {
   }, [formId]);
 
   useEffect(() => {
-    // Auto-fill basic information if available
-    if (prefillData && fields.length > 0 && Object.keys(formData).length === 0) {
-      autoFillForm();
+    // Auto-fill from case profile or prefillData
+    if (fields.length > 0 && Object.keys(formData).length === 0) {
+      if (caseProfile) {
+        autoFillFromProfile();
+      } else if (prefillData) {
+        autoFillForm();
+      }
     }
-  }, [fields, prefillData]);
+  }, [fields, prefillData, caseProfile]);
 
   const fetchForm = async () => {
     if (!formId) return;
@@ -161,6 +167,33 @@ const FormBuilder = () => {
     }
 
     return baseFields;
+  };
+
+  const autoFillFromProfile = () => {
+    if (!caseProfile) return;
+    
+    setAutoFilling(true);
+    const filled: Record<string, any> = { ...formData };
+
+    // Fill common fields from profile
+    if (caseProfile.parties?.tenant) filled['tenant_name'] = caseProfile.parties.tenant;
+    if (caseProfile.parties?.landlord) filled['landlord_name'] = caseProfile.parties.landlord;
+    if (caseProfile.location?.postalCode) filled['postal_code'] = caseProfile.location.postalCode;
+    if (caseProfile.location?.municipality) filled['municipality'] = caseProfile.location.municipality;
+    
+    // Fill description with facts
+    if (caseProfile.facts && caseProfile.facts.length > 0) {
+      filled['issue_description'] = caseProfile.facts.join('. ');
+    }
+
+    // Fill keywords and flags
+    if (caseProfile.keywords) {
+      filled['keywords'] = caseProfile.keywords.join(', ');
+    }
+
+    setFormData(filled);
+    setAutoFilling(false);
+    toast.success("Form auto-filled from case profile");
   };
 
   const autoFillForm = async () => {

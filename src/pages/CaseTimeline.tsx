@@ -6,11 +6,12 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Plus, Calendar, Clock, AlertCircle, FileText, Users, Mail, Shield } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { AddTimelineEventDialog } from "@/components/AddTimelineEventDialog";
 import { format } from "date-fns";
 import SEOHead from "@/components/SEOHead";
+import { useCaseProfile } from "@/hooks/useCaseProfile";
 
 interface TimelineEvent {
   id: string;
@@ -28,9 +29,13 @@ export default function CaseTimeline() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  const caseId = searchParams.get('caseId');
+  const { caseProfile } = useCaseProfile(caseId || undefined);
   const [events, setEvents] = useState<TimelineEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [seedsAdded, setSeedsAdded] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -39,6 +44,13 @@ export default function CaseTimeline() {
     }
     loadEvents();
   }, [user, navigate]);
+
+  // Auto-generate timeline from case profile
+  useEffect(() => {
+    if (caseProfile?.timelineSeeds && caseProfile.timelineSeeds.length > 0 && !seedsAdded) {
+      autoGenerateTimeline();
+    }
+  }, [caseProfile, seedsAdded]);
 
   const loadEvents = async () => {
     try {
@@ -58,6 +70,36 @@ export default function CaseTimeline() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const autoGenerateTimeline = async () => {
+    if (!caseProfile?.timelineSeeds || !user) return;
+
+    try {
+      const eventsToInsert = caseProfile.timelineSeeds.map(seed => ({
+        user_id: user.id,
+        title: seed.type,
+        description: seed.description,
+        event_date: seed.date,
+        category: 'incident',
+        importance: 'medium',
+      }));
+
+      const { error } = await supabase
+        .from('timeline_events')
+        .insert(eventsToInsert);
+
+      if (error) throw error;
+
+      setSeedsAdded(true);
+      loadEvents();
+      toast({
+        title: "Timeline Generated",
+        description: `Added ${eventsToInsert.length} events from case analysis`,
+      });
+    } catch (error) {
+      console.error('Error auto-generating timeline:', error);
     }
   };
 

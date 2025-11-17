@@ -20,6 +20,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useCaseProfile } from "@/hooks/useCaseProfile";
+import { useSearchParams } from "react-router-dom";
 
 interface FormInfo {
   id: string;
@@ -68,6 +70,9 @@ const FormSelector = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const caseId = searchParams.get('caseId');
+  const { caseProfile } = useCaseProfile(caseId || undefined);
   
   const [forms, setForms] = useState<FormInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,6 +84,19 @@ const FormSelector = () => {
   useEffect(() => {
     fetchForms();
   }, [venue]);
+
+  // Auto-select form from case profile
+  useEffect(() => {
+    if (caseProfile?.recommendedForm && forms.length > 0 && !selectedForm) {
+      const matchingForm = forms.find(f => 
+        f.form_code.toLowerCase().includes(caseProfile.recommendedForm.toLowerCase())
+      );
+      if (matchingForm) {
+        setSelectedForm(matchingForm);
+        toast.success(`Auto-selected: ${matchingForm.title}`);
+      }
+    }
+  }, [caseProfile, forms, selectedForm]);
 
   const fetchForms = async () => {
     if (!venue) return;
