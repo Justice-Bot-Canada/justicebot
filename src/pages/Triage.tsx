@@ -27,6 +27,7 @@ import Footer from "@/components/Footer";
 import { RelatedPages } from "@/components/RelatedPages";
 import CanonicalURL from "@/components/CanonicalURL";
 import EnhancedSEO from "@/components/EnhancedSEO";
+import { useCaseProfile, CaseProfile } from "@/hooks/useCaseProfile";
 
 interface TriageResult {
   venue: string;
@@ -75,6 +76,7 @@ const venues = {
 const Triage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { saveCaseProfile } = useCaseProfile();
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [triageResult, setTriageResult] = useState<TriageResult | null>(null);
@@ -167,17 +169,149 @@ const Triage = () => {
     }
   };
 
-  const proceedToForms = () => {
+  const proceedToForms = async () => {
+    if (!user) {
+      toast.error("Please sign in to continue");
+      navigate("/");
+      return;
+    }
+
     if (!triageResult) return;
+
+    try {
+      // Extract timeline seeds from triage
+      const timelineSeeds = extractTimelineSeeds(userInput, triageResult);
+      
+      // Build case profile
+      const profile: CaseProfile = {
+        issueType: triageResult.venue,
+        tribunal: triageResult.venue,
+        recommendedForm: triageResult.recommendedForms[0] || '',
+        facts: extractFacts(userInput),
+        keywords: extractKeywords(userInput, triageResult.venue),
+        timelineSeeds,
+        flags: extractFlags(userInput),
+        venue: triageResult.venue,
+        confidence: triageResult.confidence,
+        reasoning: triageResult.reasoning,
+        location: {
+          province: location.province,
+          postalCode: location.postalCode,
+        },
+      };
+
+      // Create a case with triage data
+      const { data: caseData, error: caseError } = await supabase
+        .from('cases')
+        .insert({
+          user_id: user.id,
+          title: `${triageResult.venue.toUpperCase()} Case`,
+          description: userInput,
+          venue: triageResult.venue,
+          province: location.province,
+          municipality: location.postalCode || undefined,
+          status: 'active',
+          triage: profile as any,
+        })
+        .select()
+        .single();
+
+      if (caseError) throw caseError;
+
+      // Save case profile
+      await saveCaseProfile(profile, caseData.id);
+
+      toast.success("Case created successfully");
+      navigate(`/form-selector?venue=${triageResult.venue}&caseId=${caseData.id}`);
+    } catch (error) {
+      console.error("Error creating case:", error);
+      toast.error("Failed to create case");
+    }
+  };
+
+  const extractTimelineSeeds = (input: string, result: TriageResult) => {
+    const seeds = [];
+    const text = input.toLowerCase();
     
-    // Navigate to venue-specific form selection
-    navigate(`/forms/${triageResult.venue}`, { 
-      state: { 
-        userInput, 
-        location,
-        triageResult 
-      } 
-    });
+    // Extract dates and create events
+    const datePattern = /(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})|(\w+ \d{1,2},? \d{4})/g;
+    const dates = input.match(datePattern);
+    
+    if (dates && dates.length > 0) {
+      seeds.push({
+        date: new Date().toISOString().split('T')[0],
+        type: 'Issue Reported',
+        description: `User reported ${result.venue} issue`,
+      });
+    }
+
+    // Add venue-specific seeds
+    if (text.includes('evict') || text.includes('notice')) {
+      seeds.push({
+        date: new Date().toISOString().split('T')[0],
+        type: 'Notice Received',
+        description: 'Notice or eviction document received',
+      });
+    }
+
+    if (text.includes('discriminat') || text.includes('harass')) {
+      seeds.push({
+        date: new Date().toISOString().split('T')[0],
+        type: 'Incident',
+        description: 'Discrimination or harassment incident occurred',
+      });
+    }
+
+    return seeds;
+  };
+
+  const extractFacts = (input: string): string[] => {
+    const facts = [];
+    const sentences = input.split(/[.!?]+/);
+    
+    for (const sentence of sentences) {
+      if (sentence.trim().length > 20) {
+        facts.push(sentence.trim());
+      }
+    }
+    
+    return facts.slice(0, 5);
+  };
+
+  const extractKeywords = (input: string, venue: string): string[] => {
+    const text = input.toLowerCase();
+    const keywords = new Set<string>();
+    
+    const venueKeywords = {
+      'ltb': ['rent', 'eviction', 'landlord', 'tenant', 'maintenance', 'repair', 'lease'],
+      'hrto': ['discrimination', 'harassment', 'disability', 'race', 'gender', 'accommodation'],
+      'family': ['custody', 'support', 'access', 'child', 'parent', 'cas'],
+      'small-claims': ['debt', 'contract', 'property', 'damage', 'breach'],
+    };
+
+    const relevantWords = venueKeywords[venue as keyof typeof venueKeywords] || [];
+    
+    for (const word of relevantWords) {
+      if (text.includes(word)) {
+        keywords.add(word);
+      }
+    }
+
+    return Array.from(keywords);
+  };
+
+  const extractFlags = (input: string): string[] => {
+    const text = input.toLowerCase();
+    const flags = [];
+
+    if (text.includes('discriminat')) flags.push('discrimination');
+    if (text.includes('health') || text.includes('safety')) flags.push('health/safety');
+    if (text.includes('urgent') || text.includes('emergency')) flags.push('urgent');
+    if (text.includes('child') || text.includes('minor')) flags.push('child-involved');
+    if (text.includes('disab')) flags.push('disability');
+    if (text.includes('harass')) flags.push('harassment');
+
+    return flags;
   };
 
   const startFullAssessment = () => {
