@@ -33,9 +33,11 @@ serve(async (req) => {
     const validation = VerifyPaymentSchema.safeParse(requestBody);
     
     if (!validation.success) {
+      console.error('[SECURITY] Validation failed:', {
+        errors: validation.error.issues
+      });
       return new Response(JSON.stringify({ 
-        error: 'Invalid request data',
-        details: validation.error.issues 
+        error: 'Invalid request'
       }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -70,8 +72,13 @@ serve(async (req) => {
 
     if (!captureResponse.ok) {
       const errorData = await captureResponse.text();
-      console.error('PayPal Capture Error:', errorData);
-      throw new Error(`PayPal capture failed: ${captureResponse.status}`);
+      console.error('[ERROR] PayPal capture failed:', {
+        status: captureResponse.status,
+        error: errorData,
+        paymentId,
+        userId: userData.user.id
+      });
+      throw new Error('Payment verification failed');
     }
 
     const captureData = await captureResponse.json();
@@ -148,8 +155,11 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Error in verify-paypal-payment function:', error);
-    return new Response(JSON.stringify({ error: (error as Error).message }), {
+    console.error('[ERROR] Payment verification failed:', {
+      error: (error as Error).message,
+      stack: (error as Error).stack
+    });
+    return new Response(JSON.stringify({ error: 'Payment verification failed' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
