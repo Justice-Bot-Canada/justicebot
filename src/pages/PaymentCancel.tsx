@@ -1,8 +1,21 @@
 import { XCircle, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { analytics } from "@/utils/analytics";
+import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 
 const PaymentCancel = () => {
+  const [searchParams] = useSearchParams();
+  
+  useEffect(() => {
+    // Track payment abandonment
+    const plan = searchParams.get('plan') || 'Unknown';
+    const amount = searchParams.get('amount') || '0';
+    
+    analytics.paymentAbandoned(plan, amount, 'user_cancelled');
+  }, [searchParams]);
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="max-w-md w-full text-center">
