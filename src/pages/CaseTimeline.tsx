@@ -46,12 +46,11 @@ export default function CaseTimeline() {
   }, [user, navigate]);
 
   // Auto-generate timeline from case profile
-  // Temporarily disabled to fix loading issues
-  // useEffect(() => {
-  //   if (caseProfile?.timelineSeeds && caseProfile.timelineSeeds.length > 0 && !seedsAdded) {
-  //     autoGenerateTimeline();
-  //   }
-  // }, [caseProfile, seedsAdded]);
+  useEffect(() => {
+    if (caseProfile?.timelineSeeds && caseProfile.timelineSeeds.length > 0 && !seedsAdded) {
+      autoGenerateTimeline();
+    }
+  }, [caseProfile, seedsAdded]);
 
   const loadEvents = async () => {
     try {
