@@ -1357,6 +1357,7 @@ export type Database = {
           last_name: string | null
           onboarding_completed: boolean | null
           phone: string | null
+          signup_number: number | null
           updated_at: string
           user_id: string
         }
@@ -1370,6 +1371,7 @@ export type Database = {
           last_name?: string | null
           onboarding_completed?: boolean | null
           phone?: string | null
+          signup_number?: number | null
           updated_at?: string
           user_id: string
         }
@@ -1383,6 +1385,7 @@ export type Database = {
           last_name?: string | null
           onboarding_completed?: boolean | null
           phone?: string | null
+          signup_number?: number | null
           updated_at?: string
           user_id?: string
         }

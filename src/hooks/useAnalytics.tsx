@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useLocation } from 'react-router-dom';
@@ -7,11 +7,7 @@ export function useAnalytics() {
   const { user } = useAuth();
   const location = useLocation();
 
-  useEffect(() => {
-    trackPageView();
-  }, [location.pathname, user?.id]);
-
-  const trackPageView = async () => {
+  const trackPageView = useCallback(async () => {
     try {
       await supabase.from('analytics_events').insert({
         user_id: user?.id || null,
@@ -23,7 +19,11 @@ export function useAnalytics() {
     } catch (error) {
       console.error('Analytics tracking error:', error);
     }
-  };
+  }, [location.pathname, user?.id]);
+
+  useEffect(() => {
+    trackPageView();
+  }, [trackPageView]);
 
   const trackEvent = async (eventType: string, eventData?: any) => {
     try {
