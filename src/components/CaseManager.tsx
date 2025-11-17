@@ -42,10 +42,16 @@ interface LegalPathway {
   next_steps: any; // JSON field from database
 }
 
+interface CaseWithMetrics extends Case {
+  evidence_count: number;
+  latest_event: { title: string; event_date: string } | null;
+  next_step: string | null;
+}
+
 const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) => void }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [cases, setCases] = useState<Case[]>([]);
+  const [cases, setCases] = useState<CaseWithMetrics[]>([]);
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
   const [evidence, setEvidence] = useState<Evidence[]>([]);
   const [pathways, setPathways] = useState<LegalPathway[]>([]);
@@ -77,14 +83,53 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
 
   const fetchCases = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: casesData, error } = await supabase
         .from('cases')
         .select('*')
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setCases(data || []);
+      
+      // Fetch additional metrics for each case
+      const casesWithMetrics = await Promise.all(
+        (casesData || []).map(async (case_) => {
+          // Get evidence count
+          const { count: evidenceCount } = await supabase
+            .from('evidence')
+            .select('*', { count: 'exact', head: true })
+            .eq('case_id', case_.id);
+
+          // Get latest timeline event
+          const { data: latestEvent } = await supabase
+            .from('case_events')
+            .select('title, event_date')
+            .eq('case_id', case_.id)
+            .order('event_date', { ascending: false })
+            .limit(1)
+            .single();
+
+          // Get next recommended step from pathways
+          const { data: pathway } = await supabase
+            .from('legal_pathways')
+            .select('next_steps')
+            .eq('case_id', case_.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          const nextStep = pathway?.next_steps?.[0] || null;
+
+          return {
+            ...case_,
+            evidence_count: evidenceCount || 0,
+            latest_event: latestEvent || null,
+            next_step: nextStep
+          };
+        })
+      );
+
+      setCases(casesWithMetrics);
     } catch (error) {
       console.error('Error fetching cases:', error);
       toast.error('Failed to fetch cases');
@@ -268,45 +313,81 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
                 <p className="text-muted-foreground text-center py-4">No cases yet</p>
               ) : (
                 cases.map((case_) => (
-                  <div
+                  <Card
                     key={case_.id}
-                    className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                      selectedCase?.id === case_.id ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'
+                    className={`overflow-hidden transition-all hover:shadow-md ${
+                      selectedCase?.id === case_.id ? 'ring-2 ring-primary' : ''
                     }`}
-                    onClick={() => {
-                      setSelectedCase(case_);
-                      onCaseSelect?.(case_.id);
-                    }}
                   >
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-semibold truncate">{case_.title}</h3>
-                      <Badge className={getStatusColor(case_.status)}>
-                        {case_.status}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-2">{case_.province}</p>
-                    {case_.merit_score > 0 && (
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <TrendingUp className="h-4 w-4" />
-                          <span className={`font-semibold ${getScoreColor(case_.merit_score)}`}>
-                            {case_.merit_score}% Merit
+                    <CardContent className="p-4 space-y-3">
+                      {/* Header */}
+                      <div className="flex justify-between items-start gap-2">
+                        <h3 className="font-semibold text-base line-clamp-2 flex-1">{case_.title}</h3>
+                        <Badge className={getStatusColor(case_.status)} variant="secondary">
+                          {case_.status}
+                        </Badge>
+                      </div>
+
+                      {/* Merit Score */}
+                      {case_.merit_score > 0 && (
+                        <div className="flex items-center gap-2 p-2 bg-muted/50 rounded">
+                          <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm font-medium">Merit Score:</span>
+                          <span className={`font-bold ${getScoreColor(case_.merit_score)}`}>
+                            {case_.merit_score}%
                           </span>
                         </div>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/pathway/${case_.id}`);
+                      )}
+
+                      {/* Evidence Count */}
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <FileText className="h-4 w-4" />
+                        <span>{case_.evidence_count} {case_.evidence_count === 1 ? 'document' : 'documents'}</span>
+                      </div>
+
+                      {/* Timeline Preview */}
+                      {case_.latest_event && (
+                        <div className="p-2 bg-primary/5 rounded-md border border-primary/10">
+                          <p className="text-xs font-medium text-muted-foreground mb-1">Latest Event</p>
+                          <p className="text-sm font-medium line-clamp-1">{case_.latest_event.title}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {new Date(case_.latest_event.event_date).toLocaleDateString()}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Next Step */}
+                      {case_.next_step && (
+                        <div className="p-2 bg-accent/10 rounded-md border border-accent/20">
+                          <p className="text-xs font-medium text-accent-foreground mb-1">Next Step</p>
+                          <p className="text-sm line-clamp-2">{case_.next_step}</p>
+                        </div>
+                      )}
+
+                      {/* Actions */}
+                      <div className="flex gap-2 pt-2">
+                        <Button
+                          size="sm"
+                          variant="default"
+                          className="flex-1"
+                          onClick={() => {
+                            setSelectedCase(case_);
+                            onCaseSelect?.(case_.id);
                           }}
                         >
-                          View Pathways
-                          <ArrowRight className="h-3 w-3 ml-1" />
+                          <ArrowRight className="h-4 w-4 mr-1" />
+                          Resume Case
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => navigate(`/case-timeline?caseId=${case_.id}`)}
+                        >
+                          <Target className="h-4 w-4" />
                         </Button>
                       </div>
-                    )}
-                  </div>
+                    </CardContent>
+                  </Card>
                 ))
               )}
             </CardContent>
