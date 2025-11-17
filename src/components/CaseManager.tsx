@@ -72,7 +72,8 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
   useEffect(() => {
     console.log('[CaseManager] User effect running:', { user: !!user });
     if (user) {
-      fetchCases();
+      // Temporarily disabled to fix loading issue
+      // fetchCases();
     }
   }, [user]);
 
