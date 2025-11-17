@@ -34,9 +34,6 @@ const Header = () => {
     setMobileMenuOpen(false);
   };
 
-  // Debug logging
-  console.log('Header - User:', user?.id, 'IsAdmin:', isAdmin);
-
   return (
     <>
       <SkipToContent />

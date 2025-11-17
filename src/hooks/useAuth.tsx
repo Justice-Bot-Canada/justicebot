@@ -8,37 +8,36 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('[useAuth] Setting up auth listener');
+    let mounted = true;
     
-    // Set up auth state listener FIRST
+    // Check for existing session immediately
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        if (mounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false);
+        }
+      })
+      .catch(() => {
+        if (mounted) {
+          setLoading(false);
+        }
+      });
+
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('[useAuth] Auth state changed:', event, { hasSession: !!session });
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+        if (mounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false);
+        }
       }
     );
 
-    // THEN check for existing session
-    console.log('[useAuth] Checking for existing session');
-    supabase.auth.getSession()
-      .then(({ data: { session }, error }) => {
-        if (error) {
-          console.error('[useAuth] Auth session error:', error);
-        }
-        console.log('[useAuth] Got session:', { hasSession: !!session });
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('[useAuth] Failed to get session:', err);
-        setLoading(false);
-      });
-
     return () => {
-      console.log('[useAuth] Cleaning up subscription');
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);

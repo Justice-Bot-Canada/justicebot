@@ -67,14 +67,13 @@ const venues = [
 const TriageSection = () => {
   const { user } = useAuth();
   
-  // Temporarily disable CaseManager to fix loading issue
-  // if (user) {
-  //   return (
-  //     <section id="triage" className="py-20 bg-secondary/30">
-  //       <CaseManager />
-  //     </section>
-  //   );
-  // }
+  if (user) {
+    return (
+      <section id="triage" className="py-20 bg-secondary/30">
+        <CaseManager />
+      </section>
+    );
+  }
 
   return (
     <section id="triage" className="py-20 bg-secondary/30">
