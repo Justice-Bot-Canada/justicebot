@@ -4,6 +4,18 @@ import { supabase } from '@/integrations/supabase/client';
 
 export type UserRole = 'admin' | 'moderator' | 'user';
 
+/**
+ * SECURITY NOTE: This hook is for UI display purposes ONLY.
+ * 
+ * DO NOT use this for authorization decisions! All security-critical
+ * operations must verify roles server-side via:
+ * - Edge functions calling is_admin() RPC
+ * - Database RLS policies using has_role() function
+ * - SECURITY DEFINER functions with role checks
+ * 
+ * This hook only controls what UI elements are shown/hidden.
+ * Actual access control is enforced by the backend.
+ */
 export function useRole() {
   const { user } = useAuth();
   const [userRoles, setUserRoles] = useState<UserRole[]>([]);
