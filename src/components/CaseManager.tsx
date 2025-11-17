@@ -59,6 +59,7 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
   const [showPathwayGuide, setShowPathwayGuide] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [fetchingCases, setFetchingCases] = useState(false);
 
   const [newCase, setNewCase] = useState({
     title: '',
@@ -69,6 +70,7 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
   });
 
   useEffect(() => {
+    console.log('[CaseManager] User effect running:', { user: !!user });
     if (user) {
       fetchCases();
     }
@@ -82,6 +84,14 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
   }, [selectedCase]);
 
   const fetchCases = async () => {
+    if (fetchingCases) {
+      console.log('[CaseManager] Already fetching cases, skipping');
+      return;
+    }
+    
+    console.log('[CaseManager] Starting fetchCases');
+    setFetchingCases(true);
+    
     try {
       const { data: casesData, error } = await supabase
         .from('cases')
@@ -90,6 +100,8 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      
+      console.log('[CaseManager] Fetched cases:', casesData?.length);
       
       // Fetch additional metrics for each case
       const casesWithMetrics = await Promise.all(
@@ -130,9 +142,12 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
       );
 
       setCases(casesWithMetrics);
+      console.log('[CaseManager] Cases loaded successfully:', casesWithMetrics.length);
     } catch (error) {
-      console.error('Error fetching cases:', error);
+      console.error('[CaseManager] Error fetching cases:', error);
       toast.error('Failed to fetch cases');
+    } finally {
+      setFetchingCases(false);
     }
   };
 

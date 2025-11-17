@@ -41,48 +41,74 @@ export function useCaseProfile(caseId?: string) {
   const [caseProfile, setCaseProfile] = useState<CaseProfile | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Load from localStorage on mount
+  // Load from localStorage or database on mount
   useEffect(() => {
-    if (caseId) {
-      loadCaseProfile(caseId);
-    } else {
+    console.log('[useCaseProfile] Effect triggered', { caseId, hasUser: !!user });
+    
+    // If no caseId, try localStorage
+    if (!caseId) {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         try {
-          setCaseProfile(JSON.parse(stored));
+          const profile = JSON.parse(stored);
+          console.log('[useCaseProfile] Loaded from localStorage');
+          setCaseProfile(profile);
         } catch (e) {
-          console.error('Failed to parse case profile from localStorage:', e);
+          console.error('[useCaseProfile] Failed to parse from localStorage:', e);
         }
       }
+      return;
     }
-  }, [caseId]);
 
-  const loadCaseProfile = async (id: string) => {
-    if (!user) return;
+    // If we have caseId but no user, can't load from DB
+    if (!user) {
+      console.log('[useCaseProfile] No user, skipping database load');
+      return;
+    }
+
+    // Load from database
+    let cancelled = false;
     
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('cases')
-        .select('triage')
-        .eq('id', id)
-        .single();
+    const loadFromDB = async () => {
+      setLoading(true);
+      try {
+        console.log('[useCaseProfile] Fetching from database:', caseId);
+        const { data, error } = await supabase
+          .from('cases')
+          .select('triage')
+          .eq('id', caseId)
+          .maybeSingle();
 
-      if (error) throw error;
+        if (cancelled) return;
+        
+        if (error) throw error;
 
-      if (data?.triage) {
-        const profile = data.triage as unknown as CaseProfile;
-        setCaseProfile(profile);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+        if (data?.triage) {
+          const profile = data.triage as unknown as CaseProfile;
+          console.log('[useCaseProfile] Loaded from database');
+          setCaseProfile(profile);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error('[useCaseProfile] Error loading case profile:', error);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
-    } catch (error) {
-      console.error('Error loading case profile:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    loadFromDB();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [caseId, user]);
 
   const saveCaseProfile = async (profile: CaseProfile, caseIdToUpdate?: string) => {
+    console.log('[useCaseProfile] Saving case profile', { caseIdToUpdate });
     setCaseProfile(profile);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
 
@@ -95,8 +121,9 @@ export function useCaseProfile(caseId?: string) {
           .eq('id', caseIdToUpdate);
 
         if (error) throw error;
+        console.log('[useCaseProfile] Synced to database');
       } catch (error) {
-        console.error('Error syncing case profile to database:', error);
+        console.error('[useCaseProfile] Error syncing case profile to database:', error);
       }
     }
 
@@ -104,6 +131,7 @@ export function useCaseProfile(caseId?: string) {
   };
 
   const clearCaseProfile = () => {
+    console.log('[useCaseProfile] Clearing case profile');
     setCaseProfile(null);
     localStorage.removeItem(STORAGE_KEY);
   };
@@ -112,7 +140,6 @@ export function useCaseProfile(caseId?: string) {
     caseProfile,
     loading,
     saveCaseProfile,
-    loadCaseProfile,
     clearCaseProfile,
   };
 }
