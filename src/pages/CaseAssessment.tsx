@@ -111,7 +111,20 @@ const CaseAssessment = () => {
         console.error('Analysis error:', analysisResponse.error);
       }
 
-      toast.success("Case submitted for analysis!");
+      // Auto-generate timeline events from case data
+      // This is the MAGIC that connects triage → timeline
+      const { generateTimelineFromCase } = await import('@/utils/timelineGenerator');
+      await generateTimelineFromCase({
+        id: data.id,
+        title: formData.title,
+        description: formData.description,
+        province: formData.province,
+        municipality: formData.municipality,
+        law_section: formData.law_section,
+        user_id: user.id
+      });
+
+      toast.success("Case created! Timeline events generated automatically.");
       
       // Navigate to pathway selection with the case ID and merit score
       navigate(`/pathway/${data.id}`);

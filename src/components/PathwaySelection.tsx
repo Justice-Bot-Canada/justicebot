@@ -12,17 +12,24 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+interface RecommendedForm {
+  code: string;
+  name: string;
+  formId: string | null;
+}
+
 interface Pathway {
   id: string;
   title: string;
   description: string;
   suitability: "excellent" | "good" | "fair" | "poor";
+  recommended?: boolean;
   timeframe: string;
   cost: string;
   successRate: number;
   pros: string[];
   cons: string[];
-  recommendedForms: string[];
+  recommendedForms: RecommendedForm[];
   nextSteps: string[];
 }
 
@@ -164,7 +171,7 @@ export default function PathwaySelection({
                   {pathway.recommendedForms.map((form, i) => (
                     <Badge key={i} variant="outline">
                       <FileText className="w-3 h-3 mr-1" />
-                      {form}
+                      {form.code} - {form.name}
                     </Badge>
                   ))}
                 </div>
