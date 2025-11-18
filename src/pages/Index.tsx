@@ -89,7 +89,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <PerformanceMonitor />
       <EnhancedSEO
         title="Free Legal Help Ontario 2025 | AI Legal Assistant Canada - Justice-Bot"
         description="Get free & low-income legal aid online with Justice-Bot - Canada's #1 AI legal chatbot. Affordable alternative to expensive lawyers for LTB, HRTO, family court & more. Legal help Ontario residents trust. Try free tools or subscribe from $5.99/month."
@@ -121,7 +120,8 @@ const Index = () => {
         <FeaturesSection />
         <AppDemoVideo />
         
-        {/* Lead Magnets Section */}
+        {/* Temporarily disabled lead magnets until Turnstile is properly configured */}
+        {/* 
         <section className="py-16 bg-background">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
@@ -167,10 +167,11 @@ const Index = () => {
             </div>
           </div>
         </section>
+        */}
       </main>
       <Footer />
       <AccessibilityPanel />
-      <LeadCaptureModal trigger="scroll" />
+      {/* <LeadCaptureModal trigger="scroll" /> */}
       <NewsletterBanner />
     </div>
   );
