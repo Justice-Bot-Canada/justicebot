@@ -2081,6 +2081,19 @@ export type Database = {
     Functions: {
       can_access_case_event: { Args: { p_case_id: string }; Returns: boolean }
       check_free_tier_eligibility: { Args: never; Returns: boolean }
+      debug_auth_claims: {
+        Args: never
+        Returns: {
+          email: string
+          is_admin: boolean
+          org_id: string
+          raw_jwt: Json
+          roles: string[]
+          tenant_id: string
+          uid: string
+          user_role: string
+        }[]
+      }
       debug_auth_context: {
         Args: never
         Returns: {
