@@ -7,6 +7,7 @@ export interface LeadInput {
   source?: string;
   journey?: string;
   payload?: any;
+  turnstileToken?: string;
 }
 
 export async function submitLead(input: LeadInput) {

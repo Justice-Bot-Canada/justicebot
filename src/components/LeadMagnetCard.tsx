@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Download, FileText, CheckCircle } from 'lucide-react';
 import { submitLead } from '@/api/leads';
 import { useToast } from '@/hooks/use-toast';
+import { TurnstileWidget } from '@/components/TurnstileWidget';
 
 interface LeadMagnetCardProps {
   title: string;
@@ -26,6 +27,7 @@ export function LeadMagnetCard({
   const [name, setName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const { toast } = useToast();
 
   const getIcon = () => {
@@ -38,6 +40,16 @@ export function LeadMagnetCard({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!turnstileToken) {
+      toast({
+        title: "Verification required",
+        description: "Please complete the security check",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -46,7 +58,8 @@ export function LeadMagnetCard({
         name,
         source: 'lead_magnet_card',
         journey,
-        payload: { downloadType, title }
+        payload: { downloadType, title },
+        turnstileToken
       });
 
       setIsSubmitted(true);
@@ -127,7 +140,19 @@ export function LeadMagnetCard({
               required
             />
           </div>
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          
+          <TurnstileWidget 
+            onSuccess={(token) => setTurnstileToken(token)}
+            onError={() => {
+              toast({
+                title: "Verification failed",
+                description: "Please refresh the page and try again",
+                variant: "destructive",
+              });
+            }}
+          />
+          
+          <Button type="submit" className="w-full" disabled={isSubmitting || !turnstileToken}>
             <Download className="mr-2 h-4 w-4" />
             {isSubmitting ? 'Sending...' : `Get Free ${downloadType.charAt(0).toUpperCase() + downloadType.slice(1)}`}
           </Button>

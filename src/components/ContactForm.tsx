@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Phone, Building } from "lucide-react";
+import { TurnstileWidget } from "@/components/TurnstileWidget";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100, "Name must be less than 100 characters"),
@@ -31,6 +32,7 @@ interface ContactFormProps {
 
 export const ContactForm = ({ className }: ContactFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const { toast } = useToast();
 
   const form = useForm<ContactFormData>({
@@ -46,6 +48,15 @@ export const ContactForm = ({ className }: ContactFormProps) => {
   });
 
   const onSubmit = async (data: ContactFormData) => {
+    if (!turnstileToken) {
+      toast({
+        title: "Verification required",
+        description: "Please complete the security check",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -56,7 +67,7 @@ export const ContactForm = ({ className }: ContactFormProps) => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify({ ...data, turnstileToken }),
         }
       );
 
@@ -260,10 +271,21 @@ export const ContactForm = ({ className }: ContactFormProps) => {
               )}
             />
 
+            <TurnstileWidget 
+              onSuccess={(token) => setTurnstileToken(token)}
+              onError={() => {
+                toast({
+                  title: "Verification failed",
+                  description: "Please refresh the page and try again",
+                  variant: "destructive",
+                });
+              }}
+            />
+
             <Button 
               type="submit" 
               className="w-full" 
-              disabled={isSubmitting}
+              disabled={isSubmitting || !turnstileToken}
               size="lg"
             >
               {isSubmitting ? "Sending..." : "Send Message"}

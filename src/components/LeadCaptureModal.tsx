@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { submitLead } from '@/api/leads';
 import { useToast } from '@/hooks/use-toast';
 import { Gift, X } from 'lucide-react';
+import { TurnstileWidget } from '@/components/TurnstileWidget';
 
 interface LeadCaptureModalProps {
   trigger?: 'time' | 'scroll' | 'exit' | 'manual';
@@ -17,6 +18,7 @@ export function LeadCaptureModal({ trigger = 'time', delaySeconds = 30 }: LeadCa
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -65,6 +67,16 @@ export function LeadCaptureModal({ trigger = 'time', delaySeconds = 30 }: LeadCa
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!turnstileToken) {
+      toast({
+        title: "Verification required",
+        description: "Please complete the security check",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -73,7 +85,8 @@ export function LeadCaptureModal({ trigger = 'time', delaySeconds = 30 }: LeadCa
         name,
         source: 'lead_capture_modal',
         journey: 'newsletter',
-        payload: { trigger }
+        payload: { trigger },
+        turnstileToken
       });
 
       localStorage.setItem('lead_submitted', Date.now().toString());
@@ -171,7 +184,19 @@ export function LeadCaptureModal({ trigger = 'time', delaySeconds = 30 }: LeadCa
               required
             />
           </div>
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          
+          <TurnstileWidget 
+            onSuccess={(token) => setTurnstileToken(token)}
+            onError={() => {
+              toast({
+                title: "Verification failed",
+                description: "Please refresh the page and try again",
+                variant: "destructive",
+              });
+            }}
+          />
+          
+          <Button type="submit" className="w-full" disabled={isSubmitting || !turnstileToken}>
             {isSubmitting ? 'Sending...' : 'Get Free Guide Now'}
           </Button>
           <p className="text-xs text-center text-muted-foreground">
