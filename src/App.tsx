@@ -113,7 +113,6 @@ const AppContent = () => {
   return (
     <ErrorBoundary>
       <div className="min-h-screen">
-        <PerformanceMonitor />
         <SkipToContent />
         <LiveSupportWidget />
       <Routes>
