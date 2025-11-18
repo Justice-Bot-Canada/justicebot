@@ -2130,7 +2130,9 @@ export type Database = {
             Returns: boolean
           }
       increment_form_usage: { Args: { form_id: string }; Returns: undefined }
-      is_admin: { Args: never; Returns: boolean }
+      is_admin:
+        | { Args: { p_user_id: string }; Returns: boolean }
+        | { Args: never; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
       make_user_admin: { Args: { p_email: string }; Returns: undefined }
       payments_public_rows: {

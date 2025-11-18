@@ -13,7 +13,10 @@ export default defineConfig(({ mode }) => ({
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   optimizeDeps: {
     include: ['react', 'react-dom', 'react/jsx-runtime'],
-    exclude: []
+    exclude: [],
+    esbuildOptions: {
+      jsx: 'automatic'
+    }
   },
   test: {
     globals: true,
@@ -47,7 +50,8 @@ export default defineConfig(({ mode }) => ({
     minify: 'esbuild',
     sourcemap: true,
     commonjsOptions: { 
-      include: [/node_modules/] 
+      include: [/node_modules/],
+      transformMixedEsModules: true
     },
     rollupOptions: {
       output: {
