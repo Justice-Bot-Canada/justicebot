@@ -2079,6 +2079,7 @@ export type Database = {
       }
     }
     Functions: {
+      can_access_case_event: { Args: { p_case_id: string }; Returns: boolean }
       check_free_tier_eligibility: { Args: never; Returns: boolean }
       ensure_admin_bypass_policies: {
         Args: { target_schemas?: string[] }
