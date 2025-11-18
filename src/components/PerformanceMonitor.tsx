@@ -161,37 +161,46 @@ class PerformanceTracker {
 
 export const PerformanceMonitor: React.FC = () => {
   useEffect(() => {
-    const tracker = PerformanceTracker.getInstance();
-    
-    // Collect metrics after page load
-    if (document.readyState === 'complete') {
-      tracker.collectMetrics();
-    } else {
-      window.addEventListener('load', () => {
-        tracker.collectMetrics();
-      });
-    }
+    // Use setTimeout to prevent blocking render
+    const timer = setTimeout(() => {
+      try {
+        const tracker = PerformanceTracker.getInstance();
+        
+        // Collect metrics after page load
+        if (document.readyState === 'complete') {
+          tracker.collectMetrics();
+        } else {
+          window.addEventListener('load', () => {
+            tracker.collectMetrics();
+          });
+        }
 
-    // Error boundary for unhandled errors
-    const handleError = (event: ErrorEvent) => {
-      tracker.reportError(new Error(event.message), {
-        filename: event.filename,
-        lineno: event.lineno,
-        colno: event.colno
-      });
-    };
+        // Error boundary for unhandled errors
+        const handleError = (event: ErrorEvent) => {
+          tracker.reportError(new Error(event.message), {
+            filename: event.filename,
+            lineno: event.lineno,
+            colno: event.colno
+          });
+        };
 
-    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
-      tracker.reportError(new Error(`Unhandled Promise Rejection: ${event.reason}`));
-    };
+        const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+          tracker.reportError(new Error(`Unhandled Promise Rejection: ${event.reason}`));
+        };
 
-    window.addEventListener('error', handleError);
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+        window.addEventListener('error', handleError);
+        window.addEventListener('unhandledrejection', handleUnhandledRejection);
 
-    return () => {
-      window.removeEventListener('error', handleError);
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
-    };
+        return () => {
+          window.removeEventListener('error', handleError);
+          window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+        };
+      } catch (error) {
+        console.warn('Performance monitoring setup failed:', error);
+      }
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return null;

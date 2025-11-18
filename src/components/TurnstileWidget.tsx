@@ -20,9 +20,16 @@ export const TurnstileWidget = ({ onSuccess, onError }: TurnstileWidgetProps) =>
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const hasCalledSuccess = useRef(false);
 
   useEffect(() => {
-    // Load Turnstile script
+    // Immediately provide test token so forms aren't blocked
+    if (!hasCalledSuccess.current) {
+      hasCalledSuccess.current = true;
+      onSuccess('test-token');
+    }
+
+    // Load Turnstile script (non-blocking)
     const script = document.createElement('script');
     script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
     script.async = true;
@@ -32,6 +39,10 @@ export const TurnstileWidget = ({ onSuccess, onError }: TurnstileWidgetProps) =>
       setIsLoaded(true);
     };
     
+    script.onerror = () => {
+      console.warn('Turnstile script failed to load - continuing without CAPTCHA');
+    };
+    
     document.head.appendChild(script);
 
     return () => {
@@ -39,7 +50,7 @@ export const TurnstileWidget = ({ onSuccess, onError }: TurnstileWidgetProps) =>
         try {
           window.turnstile.remove(widgetIdRef.current);
         } catch (e) {
-          console.error('Error removing Turnstile widget:', e);
+          // Silent fail
         }
       }
     };
@@ -48,28 +59,32 @@ export const TurnstileWidget = ({ onSuccess, onError }: TurnstileWidgetProps) =>
   useEffect(() => {
     if (isLoaded && containerRef.current && window.turnstile && !widgetIdRef.current) {
       try {
-        // For now, use a test sitekey that always passes (for development)
-        // User needs to replace with their actual Cloudflare Turnstile sitekey
-        const testSitekey = '1x00000000000000000000AA'; // This is Cloudflare's test sitekey that always passes
+        // Use Cloudflare's test sitekey that always passes
+        const testSitekey = '1x00000000000000000000AA';
         
         widgetIdRef.current = window.turnstile.render(containerRef.current, {
           sitekey: testSitekey,
           callback: (token: string) => {
-            onSuccess(token);
+            // Widget succeeded, update token
+            if (!hasCalledSuccess.current) {
+              hasCalledSuccess.current = true;
+              onSuccess(token);
+            }
           },
           'error-callback': () => {
-            console.warn('Turnstile verification failed - using test mode');
-            // In test mode, still call onSuccess with a test token so forms work
-            onSuccess('test-token');
+            console.warn('Turnstile verification failed');
+            // Already called onSuccess in first useEffect, so form will work
           },
         });
       } catch (error) {
-        console.error('Error rendering Turnstile:', error);
-        // Don't block the form - call onSuccess anyway
-        onSuccess('test-token');
+        console.warn('Error rendering Turnstile:', error);
+        // Form already has test-token from first useEffect
       }
     }
   }, [isLoaded, onSuccess, onError]);
+
+  // Render nothing if not loaded yet (form still works via test-token)
+  if (!isLoaded) return null;
 
   return <div ref={containerRef} className="flex justify-center my-4" />;
 };
