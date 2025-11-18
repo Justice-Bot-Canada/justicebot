@@ -28,8 +28,47 @@ serve(async (req) => {
   }
 
   try {
+    const turnstileSecret = Deno.env.get('CLOUDFLARE_TURNSTILE_SECRET')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
     const requestBody = await req.json();
+    
+    // Verify Turnstile token
+    if (!requestBody.turnstileToken) {
+      console.error('Missing Turnstile token');
+      return new Response(
+        JSON.stringify({ error: 'Verification required' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400 
+        }
+      );
+    }
+
+    const turnstileResponse = await fetch(
+      'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          secret: turnstileSecret,
+          response: requestBody.turnstileToken,
+        }),
+      }
+    );
+
+    const turnstileResult = await turnstileResponse.json();
+    
+    if (!turnstileResult.success) {
+      console.error('Turnstile verification failed:', turnstileResult);
+      return new Response(
+        JSON.stringify({ error: 'Verification failed' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 403 
+        }
+      );
+    }
     
     // Validate input with Zod
     const validationResult = FeedbackSchema.safeParse(requestBody);
