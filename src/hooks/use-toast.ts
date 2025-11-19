@@ -1,5 +1,6 @@
 import * as React from "react";
 
+// Use type-only import to avoid circular dependency issues
 import type { ToastActionElement, ToastProps } from "@/components/ui/toast";
 
 const TOAST_LIMIT = 1;
