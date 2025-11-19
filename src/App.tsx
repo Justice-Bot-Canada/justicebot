@@ -103,10 +103,17 @@ const LoadingFallback = () => (
   </div>
 );
 
-const queryClient = new QueryClient();
+// Initialize QueryClient outside component to avoid re-creation
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const AppContent = () => {
-  console.log('AppContent rendering...');
   useFocusManagement();
   useKeyboardNavigation();
   
