@@ -1,10 +1,20 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schema
+const GenerateDocumentSchema = z.object({
+  case_id: z.string().uuid("Invalid case ID format"),
+  doc_type: z.string().trim().min(1).max(100),
+  user_email: z.string().email().optional(),
+  user_name: z.string().trim().max(100).optional(),
+  form_data: z.record(z.unknown()).optional().default({})
+});
 
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -16,17 +26,24 @@ serve(async (req: Request) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    const { case_id, doc_type, user_email, user_name, form_data } = await req.json();
-
-    if (!case_id || !doc_type) {
+    const requestBody = await req.json();
+    
+    // Validate input
+    const validation = GenerateDocumentSchema.safeParse(requestBody);
+    if (!validation.success) {
       return new Response(
-        JSON.stringify({ error: 'case_id and doc_type are required' }),
+        JSON.stringify({ 
+          error: 'Invalid request data',
+          details: validation.error.issues.map(i => i.message).join(', ')
+        }),
         { 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 400 
         }
       );
     }
+
+    const { case_id, doc_type, user_email, user_name, form_data } = validation.data;
 
     console.log('Generating document:', { case_id, doc_type });
 

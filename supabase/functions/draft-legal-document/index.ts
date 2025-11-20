@@ -1,9 +1,18 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schema
+const DraftDocumentSchema = z.object({
+  documentType: z.string().trim().min(1).max(50),
+  caseDetails: z.record(z.unknown()).optional().default({}),
+  recipientInfo: z.record(z.unknown()).optional(),
+  additionalDetails: z.string().trim().max(5000).optional()
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -11,7 +20,24 @@ serve(async (req) => {
   }
 
   try {
-    const { documentType, caseDetails, recipientInfo, additionalDetails } = await req.json();
+    const requestBody = await req.json();
+    
+    // Validate input
+    const validation = DraftDocumentSchema.safeParse(requestBody);
+    if (!validation.success) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid request data',
+          details: validation.error.issues.map(i => i.message).join(', ')
+        }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+    
+    const { documentType, caseDetails, recipientInfo, additionalDetails } = validation.data;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
