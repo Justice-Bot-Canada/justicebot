@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Calendar, Clock, ArrowRight, Mail } from "lucide-react";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { useState } from "react";
-import { toast } from "sonner";
+// ❌ REMOVED - Sonner causing runtime errors
+// import { toast } from "sonner";
+import { toast } from "@/lib/toast-stub";
 
 export default function Blog() {
   const [email, setEmail] = useState("");

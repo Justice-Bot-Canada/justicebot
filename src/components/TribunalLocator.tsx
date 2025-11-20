@@ -20,7 +20,9 @@ import {
 } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { toast } from "sonner";
+// ❌ REMOVED - Sonner causing runtime errors
+// import { toast } from "sonner";
+import { toast } from "@/lib/toast-stub";
 import { DeadlineTimeline } from "./DeadlineTimeline";
 import { FilingInstructions } from "./FilingInstructions";
 

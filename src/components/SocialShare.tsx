@@ -7,7 +7,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { toast } from "sonner";
+// ❌ REMOVED - Sonner causing runtime errors
+// import { toast } from "sonner";
+import { toast } from "@/lib/toast-stub";
 
 interface SocialShareProps {
   url?: string;
@@ -40,10 +42,12 @@ export const SocialShare = ({
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
-      toast.success("Link copied to clipboard!");
+      // toast.success("Link copied to clipboard!");
+      console.log("Link copied to clipboard!");
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      toast.error("Failed to copy link");
+      // toast.error("Failed to copy link");
+      console.error("Failed to copy link");
     }
   };
 

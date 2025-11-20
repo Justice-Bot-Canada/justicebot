@@ -9,7 +9,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Calendar, Download, ExternalLink } from 'lucide-react';
 import { downloadCalendar, generateGoogleCalendarUrl, generateOutlookCalendarUrl, CalendarEvent } from '@/utils/calendarExport';
-import { toast } from 'sonner';
+// ❌ REMOVED - Sonner causing runtime errors
+// import { toast } from 'sonner';
+import { toast } from "@/lib/toast-stub";
 
 interface CalendarExportButtonProps {
   events: CalendarEvent[];

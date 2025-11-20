@@ -18,7 +18,9 @@ import Footer from "@/components/Footer";
 import SEOHead from "@/components/SEOHead";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { useAuth } from "@/hooks/useAuth";
-import { toast } from "sonner";
+// ❌ REMOVED - Sonner causing runtime errors
+// import { toast } from "sonner";
+import { toast } from "@/lib/toast-stub";
 import legalFormsImg from "@/assets/legal-forms-feature.jpg";
 
 interface FormCategory {
