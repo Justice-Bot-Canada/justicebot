@@ -1,3 +1,7 @@
+// ❌ REMOVED - Sonner causing runtime errors
+// This file is completely disabled to prevent runtime errors
+
+/*
 import { Toaster as Sonner, toast } from "sonner";
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
@@ -24,3 +28,4 @@ const Toaster = ({ ...props }: ToasterProps) => {
 };
 
 export { Toaster, toast };
+*/

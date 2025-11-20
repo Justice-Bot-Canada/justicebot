@@ -7,7 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { toast } from 'sonner';
+// ❌ REMOVED - Sonner causing runtime errors
+// import { toast } from 'sonner';
+import { toast } from "@/lib/toast-stub";
 import {
   Upload,
   FileText,

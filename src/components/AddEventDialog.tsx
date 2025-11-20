@@ -10,7 +10,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { CalendarIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+// ❌ REMOVED - Sonner causing runtime errors
+// import { toast } from "sonner";
+import { toast } from "@/lib/toast-stub";
 
 interface AddEventDialogProps {
   caseId: string;
@@ -32,7 +34,8 @@ export function AddEventDialog({ caseId, open, onOpenChange, onEventAdded }: Add
     e.preventDefault();
     
     if (!title || !date) {
-      toast.error("Please fill in all required fields");
+      // toast.error("Please fill in all required fields");
+      console.warn("Please fill in all required fields");
       return;
     }
 
@@ -42,7 +45,8 @@ export function AddEventDialog({ caseId, open, onOpenChange, onEventAdded }: Add
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        toast.error("You must be logged in to add events");
+        // toast.error("You must be logged in to add events");
+        console.warn("You must be logged in to add events");
         return;
       }
 
@@ -62,7 +66,8 @@ export function AddEventDialog({ caseId, open, onOpenChange, onEventAdded }: Add
 
       if (error) throw error;
 
-      toast.success("Event added successfully");
+      // toast.success("Event added successfully");
+      console.log("Event added successfully");
       
       // Reset form
       setTitle("");
@@ -76,7 +81,7 @@ export function AddEventDialog({ caseId, open, onOpenChange, onEventAdded }: Add
       onOpenChange(false);
     } catch (error: any) {
       console.error('Error adding event:', error);
-      toast.error(error.message || "Failed to add event");
+      // toast.error(error.message || "Failed to add event");
     } finally {
       setLoading(false);
     }
