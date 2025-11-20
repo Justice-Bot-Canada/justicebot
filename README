@@ -1,0 +1,121 @@
+Justice Bot is an AI-powered legal assistant designed to help users understand legal issues, draft documents, and get guidance—all through a simple web interface.
+The project is built using a lightweight modern frontend stack and deployed on Cloudflare Pages for fast, global performance.
+
+🚀 Features
+
+AI-powered legal chat assistant
+
+Clean, responsive UI
+
+Fast static deployment via Cloudflare Pages
+
+Secure API calls and rate limiting
+
+Zero-backend architecture (or optional serverless functions)
+
+📁 Project Structure
+/
+├── public/              # Static assets
+├── src/
+│   ├── components/      # UI components
+│   ├── hooks/           # Custom hooks
+│   ├── lib/             # API and utility modules
+│   ├── pages/           # Page-level components
+│   └── main.js/tsx      # App entry
+├── package.json
+├── README.md
+└── vite.config.js / next.config.js / etc.
+
+
+(Feel free to adjust depending on your actual stack—React, Next.js, Vite, Svelte, etc.)
+
+🛠 Development
+
+Install dependencies:
+
+npm install
+
+
+Run the dev server:
+
+npm run dev
+
+
+The development preview should match what you see inside Lovable.
+
+🧪 Build
+
+To create a production build locally:
+
+npm run build
+
+
+Preview the production bundle:
+
+npm run preview
+
+
+This ensures the local build works before deploying to Cloudflare.
+
+🌐 Deployment (Cloudflare Pages)
+
+The site is automatically deployed from the main branch via Cloudflare Pages.
+
+Build Settings
+Setting	Value
+Build Command	npm run build
+Build Output Directory	dist (or your framework’s output)
+Node Version	18+
+Package Manager	npm / pnpm / yarn
+🔄 Fixing Stale/Corrupted Builds on Cloudflare Pages
+
+Because Cloudflare may serve cached or stale JS bundles, you can fix JS initialization or hydration errors by doing any of the following:
+
+Option A — Re-deploy latest build
+
+Cloudflare Dashboard → Pages → justice-bot
+
+Deployments → Retry deployment
+
+Option B — Force a new deploy
+
+Make any small commit to GitHub (e.g. update this README).
+Cloudflare will deploy a fresh build.
+
+Option C — Purge cache
+
+Cloudflare Dashboard → Caching
+
+Purge Everything
+
+This clears stale JS/CSS bundles from Edge.
+
+Option D — Full reset (rarely needed)
+
+Delete the project on Cloudflare Pages → re-create it pointing to the repo.
+
+🔐 Environment Variables (if used)
+
+Create a .env file:
+
+VITE_OPENAI_API_KEY=your_key_here
+API_BASE_URL=...
+
+
+Or configure them in Cloudflare Pages → Settings → Environment Variables.
+
+🧭 Roadmap
+
+Add more legal domains & templates
+
+Add session history
+
+Improve conversational memory
+
+Add multi-language support
+
+Add serverless backend module for secure API proxying
+
+📝 License
+
+MIT License — free to use and modify.vdf
