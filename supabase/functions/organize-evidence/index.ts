@@ -1,9 +1,18 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schema
+const OrganizeEvidenceSchema = z.object({
+  fileName: z.string().trim().min(1).max(255),
+  description: z.string().trim().max(1000).optional(),
+  ocrText: z.string().max(50000).optional(),
+  caseType: z.string().trim().max(100).optional()
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -11,7 +20,24 @@ serve(async (req) => {
   }
 
   try {
-    const { fileName, description, ocrText, caseType } = await req.json();
+    const requestBody = await req.json();
+    
+    // Validate input
+    const validation = OrganizeEvidenceSchema.safeParse(requestBody);
+    if (!validation.success) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid request data',
+          details: validation.error.issues.map(i => i.message).join(', ')
+        }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+    
+    const { fileName, description, ocrText, caseType } = validation.data;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {

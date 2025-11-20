@@ -1,10 +1,18 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Input validation schema
+const PrefillFormSchema = z.object({
+  triageData: z.string().trim().min(10).max(10000),
+  formFields: z.array(z.record(z.unknown())).min(1),
+  userProfile: z.record(z.unknown()).optional()
+});
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -12,7 +20,24 @@ serve(async (req) => {
   }
 
   try {
-    const { triageData, formFields, userProfile } = await req.json();
+    const requestBody = await req.json();
+    
+    // Validate input
+    const validation = PrefillFormSchema.safeParse(requestBody);
+    if (!validation.success) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid request data',
+          details: validation.error.issues.map(i => i.message).join(', ')
+        }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" }
+        }
+      );
+    }
+    
+    const { triageData, formFields, userProfile } = validation.data;
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
