@@ -12,12 +12,16 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react/jsx-runtime'],
+    include: [
+      'react', 
+      'react-dom', 
+      'react/jsx-runtime',
+      'react-dom/client'
+    ],
     exclude: [],
     esbuildOptions: {
       jsx: 'automatic'
-    },
-    force: true
+    }
   },
   test: {
     globals: true,
