@@ -58,40 +58,6 @@ export default defineConfig(({ mode }) => ({
       include: [/node_modules/],
       transformMixedEsModules: true
     },
-    rollupOptions: {
-      output: {
-        manualChunks: (id) => {
-          // React core
-          if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-            return 'react-vendor';
-          }
-          // Radix UI components
-          if (id.includes('@radix-ui')) {
-            return 'ui-vendor';
-          }
-          // Supabase
-          if (id.includes('@supabase')) {
-            return 'supabase';
-          }
-          // Utility libraries
-          if (id.includes('clsx') || id.includes('tailwind-merge') || id.includes('class-variance-authority')) {
-            return 'utils';
-          }
-          // Chart libraries
-          if (id.includes('recharts') || id.includes('lucide-react')) {
-            return 'charts';
-          }
-          // React Query
-          if (id.includes('@tanstack/react-query')) {
-            return 'react-query';
-          }
-          // Node modules that aren't caught above
-          if (id.includes('node_modules')) {
-            return 'vendor';
-          }
-        },
-      },
-    },
     cssCodeSplit: true,
     chunkSizeWarningLimit: 500,
     assetsInlineLimit: 4096,
