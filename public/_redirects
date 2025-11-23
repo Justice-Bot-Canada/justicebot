@@ -1,39 +1,32 @@
-# Domain canonicalization - redirect www to non-www (MUST BE FIRST)
-https://www.justice-bot.com/*  https://justice-bot.com/:splat  301!
-http://www.justice-bot.com/*   https://justice-bot.com/:splat  301!
-http://justice-bot.com/*       https://justice-bot.com/:splat  301!
-
 # Static files - serve as-is
 /sitemap.xml   /sitemap.xml   200
 /robots.txt    /robots.txt    200
 
 # 301 Redirects - permanent redirects for SEO (prevents duplicate content)
-/terms-of-use       /terms              301!
-/termsofservice     /terms              301!
-/account            /profile            301!
-/signup             /welcome            301!
-/login              /welcome            301!
-/generate           /forms              301!
-/download           /templates          301!
-/timeline           /dashboard          301!
-/small-claims       /small-claims-journey 301!
-/demo-video         /                   301!
+/terms-of-use       /terms              301
+/termsofservice     /terms              301
+/account            /profile            301
+/signup             /welcome            301
+/login              /welcome            301
+/generate           /forms              301
+/download           /templates          301
+/timeline           /dashboard          301
+/small-claims       /small-claims-journey 301
+/demo-video         /                   301
 
 # Blog redirects - all blog posts redirect to main blog (articles not yet created)
-/blog/evidence-organization  /blog      301!
-/blog/*             /blog               301!
+/blog/evidence-organization  /blog      301
+/blog/*             /blog               301
 
 # Docs redirect (no docs section exists)
-/docs               /legal-resources    301!
-/docs/*             /legal-resources    301!
+/docs               /legal-resources    301
+/docs/*             /legal-resources    301
 
-# Block sensitive config files
-/config.json        /404                404
+# Block sensitive config files (serve custom 404 route instead)
+/config.json        /404                302
 
-# Return 404 for truly non-existent pages (prevent soft 404s)
-/payments/*         /404                404!
-/entitlements       /404                404!
-/founders-story     /404                404!
+# Return 404-like experience for truly non-existent pages (prevent soft 404s)
+/payments/*         /404                302
+/entitlements       /404                302
+/founders-story     /404                302
 
-# SPA fallback - must be last, handles all React Router routes
-/*                  /index.html         200
