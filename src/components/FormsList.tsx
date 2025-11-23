@@ -34,11 +34,13 @@ export function FormsList() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [purchasedFormIds, setPurchasedFormIds] = useState<Set<string>>(new Set());
   const [processingPayment, setProcessingPayment] = useState<string | null>(null);
+  const [userCaseVenues, setUserCaseVenues] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     loadForms();
     if (user) {
       loadPurchasedForms();
+      loadUserCases();
     }
   }, [user]);
 
@@ -79,6 +81,28 @@ export function FormsList() {
       setPurchasedFormIds(formIds);
     } catch (error) {
       console.error('Error loading purchased forms:', error);
+    }
+  };
+
+  const loadUserCases = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('cases')
+        .select('venue, law_section')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      
+      const venues = new Set(
+        data
+          ?.map(c => c.venue?.toLowerCase())
+          .filter(Boolean) || []
+      );
+      setUserCaseVenues(venues);
+    } catch (error) {
+      console.error('Error loading user cases:', error);
     }
   };
 
@@ -164,7 +188,13 @@ export function FormsList() {
                          form.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          form.form_code.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || form.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    
+    // Only show forms relevant to user's cases
+    const matchesUserCases = userCaseVenues.size === 0 || 
+                             userCaseVenues.has(form.tribunal_type.toLowerCase()) ||
+                             userCaseVenues.has(form.category.toLowerCase());
+    
+    return matchesSearch && matchesCategory && matchesUserCases;
   });
 
   const categories = Array.from(new Set(forms.map(f => f.category)));
@@ -229,7 +259,14 @@ export function FormsList() {
         <Card>
           <CardContent className="pt-6 text-center text-muted-foreground">
             <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>No forms found matching your criteria</p>
+            {userCaseVenues.size === 0 ? (
+              <div>
+                <p className="font-medium mb-2">No cases yet</p>
+                <p className="text-sm">Create a case first to see relevant forms for your legal matter</p>
+              </div>
+            ) : (
+              <p>No forms found matching your criteria</p>
+            )}
           </CardContent>
         </Card>
       ) : (
