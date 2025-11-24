@@ -98,6 +98,18 @@ const FormBuilder = () => {
         .maybeSingle();
 
       if (error) throw error;
+
+      if (!data) {
+        toast.error("Form not found");
+        navigate('/forms');
+        return;
+      }
+
+      if (!data.pdf_url && !data.form_fields) {
+        toast.error("This form is not yet available. Redirecting to forms library.");
+        navigate('/forms');
+        return;
+      }
       
       if (!data) {
         toast.error("Form not found");
