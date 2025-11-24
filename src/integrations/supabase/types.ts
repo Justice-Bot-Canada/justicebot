@@ -1595,6 +1595,68 @@ export type Database = {
         }
         Relationships: []
       }
+      testimonials: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          case_id: string | null
+          case_type: string
+          created_at: string
+          featured: boolean | null
+          id: string
+          location: string | null
+          name: string
+          outcome: string | null
+          rating: number
+          status: string
+          story: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          case_id?: string | null
+          case_type: string
+          created_at?: string
+          featured?: boolean | null
+          id?: string
+          location?: string | null
+          name: string
+          outcome?: string | null
+          rating: number
+          status?: string
+          story: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          case_id?: string | null
+          case_type?: string
+          created_at?: string
+          featured?: boolean | null
+          id?: string
+          location?: string | null
+          name?: string
+          outcome?: string | null
+          rating?: number
+          status?: string
+          story?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "testimonials_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       timeline_events: {
         Row: {
           category: string | null

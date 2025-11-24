@@ -1,64 +1,89 @@
+import { useState, useEffect } from "react";
 import { Star, Quote } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { supabase } from "@/integrations/supabase/client";
+
+interface Testimonial {
+  name: string;
+  location: string | null;
+  case_type: string;
+  rating: number;
+  story: string;
+  outcome: string | null;
+}
 
 export default function SuccessStories() {
-  const testimonials = [
-    {
-      name: "Sarah M.",
-      location: "Toronto, ON",
-      caseType: "Landlord & Tenant Board",
-      rating: 5,
-      story: "Justice-Bot helped me prepare my LTB application in under an hour. The AI guidance was clear and the forms were automatically filled. I won my case and got my deposit back!",
-      initials: "SM",
-      outcome: "Won case, recovered $2,400 deposit"
-    },
-    {
-      name: "James T.",
-      location: "Ottawa, ON",
-      caseType: "Human Rights Tribunal",
-      rating: 5,
-      story: "As someone with no legal background, I was overwhelmed. Justice-Bot walked me through every step, explained the process clearly, and helped me file a solid complaint. Highly recommend!",
-      initials: "JT",
-      outcome: "Case accepted, settlement reached"
-    },
-    {
-      name: "Priya K.",
-      location: "Mississauga, ON",
-      caseType: "Small Claims Court",
-      rating: 5,
-      story: "The document analyzer saved me so much time! I uploaded my contracts, and it immediately identified the key issues. The merit score gave me confidence to proceed.",
-      initials: "PK",
-      outcome: "Settled for $4,500"
-    },
-    {
-      name: "Michael R.",
-      location: "Hamilton, ON",
-      caseType: "Small Claims Court",
-      rating: 5,
-      story: "I couldn't afford a lawyer for a $3,000 dispute. Justice-Bot cost me $50 and helped me prepare professional court documents. The judge was impressed with my submission.",
-      initials: "MR",
-      outcome: "Full judgment in my favor"
-    },
-    {
-      name: "Chen L.",
-      location: "Markham, ON",
-      caseType: "Landlord & Tenant Board",
-      rating: 5,
-      story: "The AI chatbot answered all my questions about Ontario rental law at 2am when I was panicking about an eviction notice. It explained my rights and helped me respond properly.",
-      initials: "CL",
-      outcome: "Eviction prevented"
-    },
-    {
-      name: "Amanda W.",
-      location: "London, ON",
-      caseType: "Human Rights Tribunal",
-      rating: 5,
-      story: "Filing an HRTO complaint felt impossible until I found Justice-Bot. The step-by-step guidance and timeline tracker kept me organized throughout the entire process.",
-      initials: "AW",
-      outcome: "Complaint filed successfully"
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadTestimonials();
+  }, []);
+
+  const loadTestimonials = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("testimonials")
+        .select("name, location, case_type, rating, story, outcome")
+        .eq("status", "approved")
+        .order("featured", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(6);
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        setTestimonials(data);
+      } else {
+        // Fallback to demo data if no testimonials yet
+        setTestimonials([
+          {
+            name: "Sarah M.",
+            location: "Toronto, ON",
+            case_type: "Landlord & Tenant Board",
+            rating: 5,
+            story: "Justice-Bot helped me prepare my LTB application in under an hour. The AI guidance was clear and the forms were automatically filled. I won my case and got my deposit back!",
+            outcome: "Won case, recovered $2,400 deposit"
+          },
+          {
+            name: "James T.",
+            location: "Ottawa, ON",
+            case_type: "Human Rights Tribunal",
+            rating: 5,
+            story: "As someone with no legal background, I was overwhelmed. Justice-Bot walked me through every step, explained the process clearly, and helped me file a solid complaint.",
+            outcome: "Case accepted, settlement reached"
+          },
+          {
+            name: "Priya K.",
+            location: "Mississauga, ON",
+            case_type: "Small Claims Court",
+            rating: 5,
+            story: "The document analyzer saved me so much time! I uploaded my contracts, and it immediately identified the key issues.",
+            outcome: "Settled for $4,500"
+          }
+        ]);
+      }
+    } catch (error) {
+      console.error("Error loading testimonials:", error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const getInitials = (name: string) => {
+    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
+  if (loading) {
+    return (
+      <section className="py-20 bg-gradient-to-b from-background to-muted/20">
+        <div className="container mx-auto px-4 text-center">
+          <p>Loading testimonials...</p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-20 bg-gradient-to-b from-background to-muted/20">
@@ -85,7 +110,7 @@ export default function SuccessStories() {
               <div className="flex items-start gap-4 mb-4">
                 <Avatar className="w-12 h-12">
                   <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                    {testimonial.initials}
+                    {getInitials(testimonial.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
@@ -102,16 +127,18 @@ export default function SuccessStories() {
 
               <div className="mb-4">
                 <span className="inline-block bg-primary/10 text-primary text-xs font-medium px-3 py-1 rounded-full mb-3">
-                  {testimonial.caseType}
+                  {testimonial.case_type}
                 </span>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-3">
                   {testimonial.story}
                 </p>
-                <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-primary">
-                  <p className="text-sm font-semibold text-primary">
-                    ✓ {testimonial.outcome}
-                  </p>
-                </div>
+                {testimonial.outcome && (
+                  <div className="bg-muted/50 rounded-lg p-3 border-l-4 border-primary">
+                    <p className="text-sm font-semibold text-primary">
+                      ✓ {testimonial.outcome}
+                    </p>
+                  </div>
+                )}
               </div>
             </Card>
           ))}

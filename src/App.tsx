@@ -75,6 +75,7 @@ import LTBT2FormGuide from "./pages/LTBT2FormGuide";
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Admin = lazy(() => import("./pages/Admin"));
 const AdminFormsSync = lazy(() => import("./pages/AdminFormsSync"));
+const AdminTestimonials = lazy(() => import("./pages/AdminTestimonials"));
 const DocumentAnalysis = lazy(() => import("./pages/DocumentAnalysis"));
 const FormBuilder = lazy(() => import("./pages/FormBuilder"));
 const CaseAssessment = lazy(() => import("./pages/CaseAssessment"));
@@ -209,6 +210,7 @@ const AppContent = () => {
           {/* Admin */}
           <Route path="/admin" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Admin /></Suspense></ProtectedRoute>} />
           <Route path="/admin/forms-sync" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><AdminFormsSync /></Suspense></ProtectedRoute>} />
+          <Route path="/admin/testimonials" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><AdminTestimonials /></Suspense></ProtectedRoute>} />
 
           {/* Payment & Subscription */}
           <Route path="/low-income" element={<ProtectedRoute><LowIncomeApproval /></ProtectedRoute>} />
