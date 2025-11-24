@@ -14,14 +14,18 @@ serve(async (req) => {
 
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    { auth: { persistSession: false } }
   );
 
   try {
-    const authHeader = req.headers.get("Authorization")!;
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header");
+
     const token = authHeader.replace("Bearer ", "");
-    const { data } = await supabaseClient.auth.getUser(token);
-    const user = data.user;
+    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
+    if (userError) throw userError;
+    const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated");
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
@@ -29,27 +33,33 @@ serve(async (req) => {
     });
 
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    let customerId;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
+    
+    if (customers.data.length === 0) {
+      return new Response(JSON.stringify({ subscribed: false }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
     }
 
-    // TODO: Replace price_1XXXXX with your actual Stripe price ID for $19/month
-    const session = await stripe.checkout.sessions.create({
+    const customerId = customers.data[0].id;
+    const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
-      customer_email: customerId ? undefined : user.email,
-      line_items: [
-        {
-          price: "price_1XXXXX", // REPLACE THIS with your $19/month Stripe price ID
-          quantity: 1,
-        },
-      ],
-      mode: "subscription",
-      success_url: `${req.headers.get("origin")}/subscription-success`,
-      cancel_url: `${req.headers.get("origin")}/pricing?cancelled=true`,
+      status: "active",
+      limit: 1,
     });
 
-    return new Response(JSON.stringify({ url: session.url }), {
+    const hasActiveSub = subscriptions.data.length > 0;
+    let subscriptionEnd = null;
+
+    if (hasActiveSub) {
+      const subscription = subscriptions.data[0];
+      subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
+    }
+
+    return new Response(JSON.stringify({
+      subscribed: hasActiveSub,
+      subscription_end: subscriptionEnd
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });

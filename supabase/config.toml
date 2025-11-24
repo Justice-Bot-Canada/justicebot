@@ -81,5 +81,11 @@ verify_jwt = true
 [functions.create-subscription-checkout]
 verify_jwt = true
 
+[functions.create-form-checkout]
+verify_jwt = true
+
+[functions.check-subscription]
+verify_jwt = true
+
 [functions.verify-subscription-status]
 verify_jwt = true
