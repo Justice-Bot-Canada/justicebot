@@ -34,6 +34,7 @@ interface FormInfo {
   price_cents: number;
   filing_requirements: any;
   form_fields: any;
+  pdf_url?: string | null;
 }
 
 const venueInfo = {
@@ -134,6 +135,12 @@ const FormSelector = () => {
   const startForm = (form: FormInfo) => {
     if (!user) {
       toast.error("Please sign in to access forms");
+      return;
+    }
+
+    // Check if form has necessary data
+    if (!form.pdf_url && !form.form_fields) {
+      toast.error("This form is not yet available. We're working on adding it!");
       return;
     }
 
