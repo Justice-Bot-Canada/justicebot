@@ -1,128 +1,248 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Lock, CreditCard } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Check, Lock, Zap, Clock, CreditCard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 
 interface FormPaywallProps {
   formId: string;
   formTitle: string;
-  formPrice: number; // in cents
-  onAccessGranted: () => void;
-  children: React.ReactNode;
+  formPrice?: number;
+  onAccessGranted?: () => void;
+  children?: React.ReactNode;
+  daysUntilDeadline?: number;
 }
 
 export default function FormPaywall({
   formId,
   formTitle,
-  formPrice,
-  onAccessGranted,
+  formPrice = 3900,
+  daysUntilDeadline,
   children,
 }: FormPaywallProps) {
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [loading, setLoading] = useState<"form" | "subscription" | null>(null);
   const { hasAccess, isPremium } = usePremiumAccess();
-  const { toast } = useToast();
 
   // Premium users get all forms free
   if (isPremium || hasAccess) {
     return <>{children}</>;
   }
 
-  const handlePayForForm = async () => {
+  const handleOneTimePayment = async () => {
+    setLoading("form");
     try {
-      setIsProcessing(true);
-
-      const { data, error } = await supabase.functions.invoke("create-form-payment", {
-        body: {
-          formId,
-          amount: formPrice,
-          currency: "CAD",
-        },
+      const { data, error } = await supabase.functions.invoke('create-form-checkout', {
+        body: { formId, formTitle }
       });
 
       if (error) throw error;
-
-      if (data?.approvalUrl) {
-        // Open PayPal checkout in new tab
-        window.open(data.approvalUrl, "_blank");
-        
+      if (data?.url) {
+        window.open(data.url, '_blank');
         toast({
-          title: "Payment initiated",
-          description: "Complete the payment in the new window to access this form.",
+          title: "Opening Stripe Checkout",
+          description: "Complete payment to access your form immediately",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Payment error:", error);
       toast({
-        title: "Payment failed",
-        description: error instanceof Error ? error.message : "Failed to initiate payment",
+        title: "Error",
+        description: error.message || "Failed to start checkout",
         variant: "destructive",
       });
     } finally {
-      setIsProcessing(false);
+      setLoading(null);
+    }
+  };
+
+  const handleSubscription = async () => {
+    setLoading("subscription");
+    try {
+      const { data, error } = await supabase.functions.invoke('create-subscription-checkout');
+
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, '_blank');
+        toast({
+          title: "Opening Stripe Checkout",
+          description: "Subscribe for unlimited access to all forms",
+        });
+      }
+    } catch (error: any) {
+      console.error("Payment error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to start checkout",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(null);
     }
   };
 
   return (
-    <div className="relative">
-      {/* Blurred content */}
-      <div className="pointer-events-none select-none blur-sm opacity-50">
-        {children}
+    <div className="max-w-4xl mx-auto p-6">
+      {daysUntilDeadline && daysUntilDeadline <= 7 && (
+        <div className="mb-6 p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+          <div className="flex items-center gap-3">
+            <Clock className="h-5 w-5 text-orange-600" />
+            <p className="font-semibold text-orange-900 dark:text-orange-100">
+              {daysUntilDeadline <= 3 ? (
+                <span className="text-red-600 dark:text-red-400">
+                  ⚠️ URGENT: Only {daysUntilDeadline} days left to file!
+                </span>
+              ) : (
+                `Time-sensitive: ${daysUntilDeadline} days remaining to submit`
+              )}
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-2 mb-4">
+          <Lock className="w-5 h-5 text-primary" />
+          <span className="text-sm font-semibold text-primary">Premium Form Access</span>
+        </div>
+        <h2 className="text-3xl font-bold mb-2">Access "{formTitle}"</h2>
+        <p className="text-muted-foreground">
+          Complete your legal forms in minutes with AI-powered assistance
+        </p>
       </div>
 
-      {/* Paywall overlay */}
-      <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-        <Card className="max-w-md mx-4">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-4 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <Lock className="w-6 h-6 text-primary" />
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* One-Time Purchase */}
+        <Card className="relative border-2 hover:border-primary/50 transition-all">
+          <CardHeader>
+            <div className="flex items-center justify-between mb-2">
+              <CardTitle className="text-2xl">Single Form</CardTitle>
+              <Badge variant="outline">One-Time</Badge>
             </div>
-            <CardTitle>Access Required</CardTitle>
-            <CardDescription>
-              Purchase access to <strong>{formTitle}</strong> to continue
-            </CardDescription>
+            <CardDescription>Perfect if you need just this form</CardDescription>
+            <div className="mt-4">
+              <div className="text-4xl font-bold">$39</div>
+              <div className="text-sm text-muted-foreground">one-time payment</div>
+            </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 bg-muted rounded-lg text-center">
-              <p className="text-2xl font-bold text-primary">
-                ${(formPrice / 100).toFixed(2)} CAD
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">
-                One-time payment for lifetime access
-              </p>
-            </div>
 
-            <Button
-              onClick={handlePayForForm}
-              disabled={isProcessing}
+          <CardContent className="space-y-4">
+            <ul className="space-y-3">
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                <span className="text-sm">Instant access to {formTitle}</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                <span className="text-sm">AI-powered form filling assistance</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                <span className="text-sm">PDF generation & download</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                <span className="text-sm">Lifetime access to this form</span>
+              </li>
+            </ul>
+
+            <Button 
+              onClick={handleOneTimePayment} 
+              disabled={loading !== null}
               className="w-full"
               size="lg"
             >
-              <CreditCard className="mr-2 h-4 w-4" />
-              {isProcessing ? "Processing..." : "Pay with PayPal"}
+              {loading === "form" ? (
+                "Processing..."
+              ) : (
+                <>
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Buy for $39
+                </>
+              )}
             </Button>
-
-            <div className="text-center">
-              <p className="text-xs text-muted-foreground">
-                Or upgrade to Premium for unlimited access to all forms
-              </p>
-              <Button variant="link" size="sm" asChild>
-                <a href="/pricing">View Plans</a>
-              </Button>
-            </div>
-
-            <div className="pt-4 border-t">
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>✓ Instant access after payment</li>
-                <li>✓ Secure PayPal checkout</li>
-                <li>✓ Download completed forms as PDF</li>
-                <li>✓ Save progress and return anytime</li>
-              </ul>
-            </div>
           </CardContent>
         </Card>
+
+        {/* Monthly Subscription */}
+        <Card className="relative border-primary ring-2 ring-primary/20">
+          <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+            <Badge className="bg-primary">
+              <Zap className="w-3 h-3 mr-1" />
+              Best Value
+            </Badge>
+          </div>
+
+          <CardHeader>
+            <div className="flex items-center justify-between mb-2">
+              <CardTitle className="text-2xl">Unlimited</CardTitle>
+              <Badge variant="outline">Monthly</Badge>
+            </div>
+            <CardDescription>Access all forms, cancel anytime</CardDescription>
+            <div className="mt-4">
+              <div className="text-4xl font-bold">$19<span className="text-lg font-normal">/mo</span></div>
+              <div className="text-sm text-green-600 font-medium">Save $20 vs. buying 2 forms</div>
+            </div>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            <ul className="space-y-3">
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                <span className="text-sm">Unlimited access to ALL forms</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                <span className="text-sm">AI legal chatbot & document analysis</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                <span className="text-sm">Priority customer support</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                <span className="text-sm">Case tracking & deadline reminders</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                <span className="text-sm">Cancel anytime, no commitment</span>
+              </li>
+            </ul>
+
+            <Button 
+              onClick={handleSubscription} 
+              disabled={loading !== null}
+              className="w-full bg-primary hover:bg-primary/90"
+              size="lg"
+            >
+              {loading === "subscription" ? (
+                "Processing..."
+              ) : (
+                <>
+                  <Zap className="w-4 h-4 mr-2" />
+                  Subscribe for $19/mo
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {daysUntilDeadline && daysUntilDeadline <= 7 && (
+        <div className="mt-6 text-center">
+          <div className="inline-flex items-center gap-2 bg-orange-50 dark:bg-orange-900/20 text-orange-900 dark:text-orange-100 px-4 py-2 rounded-lg">
+            <Clock className="w-4 h-4" />
+            <span className="text-sm font-semibold">
+              Complete your forms in under 20 minutes - Don't miss your deadline!
+            </span>
+          </div>
+        </div>
+      )}
+
+      <div className="mt-8 text-center text-sm text-muted-foreground">
+        <p>🔒 Secure payment powered by Stripe • 30-day money-back guarantee</p>
       </div>
     </div>
   );

@@ -24,29 +24,49 @@ serve(async (req) => {
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
 
+    const { formId, formTitle } = await req.json();
+
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
+    // Check if customer exists
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     let customerId;
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
     }
 
-    // TODO: Replace price_1XXXXX with your actual Stripe price ID for $19/month
+    // Create one-time payment session for form
+    // REPLACE price_1XXXXX with your actual Stripe price ID for $39 one-time
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
       line_items: [
         {
-          price: "price_1XXXXX", // REPLACE THIS with your $19/month Stripe price ID
+          price: "price_1XXXXX", // TODO: Replace with your $39 one-time price ID
           quantity: 1,
         },
       ],
-      mode: "subscription",
-      success_url: `${req.headers.get("origin")}/subscription-success`,
-      cancel_url: `${req.headers.get("origin")}/pricing?cancelled=true`,
+      mode: "payment",
+      success_url: `${req.headers.get("origin")}/form/${formId}?payment=success`,
+      cancel_url: `${req.headers.get("origin")}/forms?payment=cancelled`,
+      metadata: {
+        user_id: user.id,
+        form_id: formId,
+        form_title: formTitle,
+      },
+    });
+
+    // Log purchase intent
+    await supabaseClient.from("payments").insert({
+      user_id: user.id,
+      form_id: formId,
+      amount_cents: 3900,
+      provider: "stripe",
+      provider_order_id: session.id,
+      status: "pending",
+      plan_type: "one_time_form",
     });
 
     return new Response(JSON.stringify({ url: session.url }), {
