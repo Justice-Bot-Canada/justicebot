@@ -34,17 +34,17 @@ export default function FormPaywall({
   const handleOneTimePayment = async () => {
     setLoading("form");
     try {
-      const { data, error } = await supabase.functions.invoke('create-form-checkout', {
-        body: { formId, formTitle }
+      const { data, error } = await supabase.functions.invoke('create-form-payment', {
+        body: { 
+          formId, 
+          amount: formPrice,
+          currency: 'CAD'
+        }
       });
 
       if (error) throw error;
-      if (data?.url) {
-        window.open(data.url, '_blank');
-        toast({
-          title: "Opening Stripe Checkout",
-          description: "Complete payment to access your form immediately",
-        });
+      if (data?.approvalUrl) {
+        window.location.href = data.approvalUrl;
       }
     } catch (error: any) {
       console.error("Payment error:", error);
@@ -61,15 +61,16 @@ export default function FormPaywall({
   const handleSubscription = async () => {
     setLoading("subscription");
     try {
-      const { data, error } = await supabase.functions.invoke('create-subscription-checkout');
+      // Replace with your actual PayPal Monthly Plan ID from PayPal dashboard
+      const PAYPAL_MONTHLY_PLAN_ID = "P-XXXXXXXXXXXXXXXXXXXX";
+      
+      const { data, error } = await supabase.functions.invoke('create-paypal-subscription', {
+        body: { planId: PAYPAL_MONTHLY_PLAN_ID }
+      });
 
       if (error) throw error;
-      if (data?.url) {
-        window.open(data.url, '_blank');
-        toast({
-          title: "Opening Stripe Checkout",
-          description: "Subscribe for unlimited access to all forms",
-        });
+      if (data?.approvalUrl) {
+        window.location.href = data.approvalUrl;
       }
     } catch (error: any) {
       console.error("Payment error:", error);
@@ -242,7 +243,7 @@ export default function FormPaywall({
       )}
 
       <div className="mt-8 text-center text-sm text-muted-foreground">
-        <p>🔒 Secure payment powered by Stripe • 30-day money-back guarantee</p>
+        <p>🔒 Secure payment powered by PayPal • 30-day money-back guarantee</p>
       </div>
     </div>
   );
