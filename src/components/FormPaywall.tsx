@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Lock, Zap, Clock, CreditCard } from "lucide-react";
+import { Check, Lock, Zap, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
@@ -23,40 +23,38 @@ export default function FormPaywall({
   daysUntilDeadline,
   children,
 }: FormPaywallProps) {
-  const [loading, setLoading] = useState<"form" | "subscription" | null>(null);
+  const [loading, setLoading] = useState<"subscription" | null>(null);
+  const [paypalLoaded, setPaypalLoaded] = useState(false);
   const { hasAccess, isPremium } = usePremiumAccess();
+  const paypalButtonRef = useRef<HTMLDivElement>(null);
+
+  // Load PayPal SDK
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = "https://www.paypal.com/sdk/js?client-id=BAAX70lJFewN5Sur8CW1Za_Q0USFYAZErHKuZtZ9zEqJ9uncHMycZe2W0IeO5ZPk04uV-59Fm3mNP7nXkE&components=hosted-buttons&disable-funding=venmo&currency=CAD";
+    script.async = true;
+    script.onload = () => setPaypalLoaded(true);
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  // Render PayPal hosted button
+  useEffect(() => {
+    if (paypalLoaded && paypalButtonRef.current && (window as any).paypal) {
+      paypalButtonRef.current.innerHTML = '';
+      (window as any).paypal.HostedButtons({
+        hostedButtonId: "HBWJDLMJG9EZL",
+      }).render(paypalButtonRef.current);
+    }
+  }, [paypalLoaded]);
 
   // Premium users get all forms free
   if (isPremium || hasAccess) {
     return <>{children}</>;
   }
-
-  const handleOneTimePayment = async () => {
-    setLoading("form");
-    try {
-      const { data, error } = await supabase.functions.invoke('create-form-payment', {
-        body: { 
-          formId, 
-          amount: formPrice,
-          currency: 'CAD'
-        }
-      });
-
-      if (error) throw error;
-      if (data?.approvalUrl) {
-        window.location.href = data.approvalUrl;
-      }
-    } catch (error: any) {
-      console.error("Payment error:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to start checkout",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(null);
-    }
-  };
 
   const handleSubscription = async () => {
     setLoading("subscription");
@@ -148,21 +146,13 @@ export default function FormPaywall({
               </li>
             </ul>
 
-            <Button 
-              onClick={handleOneTimePayment} 
-              disabled={loading !== null}
-              className="w-full"
-              size="lg"
-            >
-              {loading === "form" ? (
-                "Processing..."
-              ) : (
-                <>
-                  <CreditCard className="w-4 h-4 mr-2" />
-                  Buy for $39
-                </>
+            <div ref={paypalButtonRef} className="w-full min-h-[45px]">
+              {!paypalLoaded && (
+                <Button disabled className="w-full" size="lg">
+                  Loading PayPal...
+                </Button>
               )}
-            </Button>
+            </div>
           </CardContent>
         </Card>
 
