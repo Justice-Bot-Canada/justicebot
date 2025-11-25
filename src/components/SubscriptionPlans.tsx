@@ -6,11 +6,10 @@ import { Check, CreditCard } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-// PayPal Plan IDs - You need to create these in PayPal Dashboard
-// https://www.paypal.com/businessmanage/account/subscriptions
+// PayPal Plan IDs from PayPal Dashboard
 const PAYPAL_PLANS = {
-  monthly: "P-4A5259923D5955645NDW6GKI",
-  yearly: "P-9AX658241M042612XM7XYWQA",
+  monthly: "P-85C49396FY903261CNESQ7AA",
+  yearly: "P-9AX658241M042612XM7XYWQA", // Update this with your yearly plan ID when created
 };
 
 interface PlanCardProps {
