@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 // PayPal Plan IDs from PayPal Dashboard
 const PAYPAL_PLANS = {
   monthly: "P-85C49396FY903261CNESQ7AA",
-  yearly: "P-9AX658241M042612XM7XYWQA", // Update this with your yearly plan ID when created
+  yearly: "P-90P22685X9661492WNESRBIA",
 };
 
 interface PlanCardProps {
