@@ -79,7 +79,7 @@ export default function FormPaywall({
     if (paypalLoaded && paypalButtonRef.current && (window as any).paypal) {
       paypalButtonRef.current.innerHTML = '';
       (window as any).paypal.HostedButtons({
-        hostedButtonId: "HBWJDLMJG9EZL",
+        hostedButtonId: "PJ7Y4KTDGVJKY",
       }).render(paypalButtonRef.current);
     }
   }, [paypalLoaded]);
