@@ -61,8 +61,7 @@ export default function FormPaywall({
   const handleSubscription = async () => {
     setLoading("subscription");
     try {
-      // Replace with your actual PayPal Monthly Plan ID from PayPal dashboard
-      const PAYPAL_MONTHLY_PLAN_ID = "P-XXXXXXXXXXXXXXXXXXXX";
+      const PAYPAL_MONTHLY_PLAN_ID = "P-85C49396FY903261CNESQ7AA";
       
       const { data, error } = await supabase.functions.invoke('create-paypal-subscription', {
         body: { planId: PAYPAL_MONTHLY_PLAN_ID }
