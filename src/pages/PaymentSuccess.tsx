@@ -1,21 +1,88 @@
-import { CheckCircle, ArrowLeft } from "lucide-react";
+import { CheckCircle, ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { analytics } from "@/utils/analytics";
-import { useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [verifying, setVerifying] = useState(true);
+  const [verified, setVerified] = useState(false);
+  const [formId, setFormId] = useState<string | null>(null);
   
   useEffect(() => {
-    // Track payment completion with URL params
-    const plan = searchParams.get('plan') || 'Unknown';
-    const amount = searchParams.get('amount') || '0';
-    const paymentId = searchParams.get('paymentId') || searchParams.get('orderId');
-    
-    analytics.paymentCompleted(plan, amount, paymentId || undefined);
+    const verifyPayment = async () => {
+      try {
+        // Get payment details from URL
+        const token = searchParams.get('token');
+        const payerId = searchParams.get('PayerID');
+        const formIdParam = searchParams.get('formId');
+        
+        if (formIdParam) setFormId(formIdParam);
+        
+        if (!token) {
+          console.error('No payment token in URL');
+          setVerifying(false);
+          return;
+        }
+
+        // Verify and capture payment
+        const { data, error } = await supabase.functions.invoke('verify-paypal-payment', {
+          body: { 
+            paymentId: token,
+            payerId: payerId || undefined
+          }
+        });
+
+        if (error) throw error;
+
+        if (data?.success) {
+          setVerified(true);
+          
+          // Track payment completion
+          const plan = searchParams.get('plan') || 'form_purchase';
+          const amount = '29.99';
+          analytics.paymentCompleted(plan, amount, token);
+          
+          toast({
+            title: "Payment Successful!",
+            description: "You now have access to this form.",
+          });
+        } else {
+          throw new Error('Payment verification failed');
+        }
+      } catch (error) {
+        console.error('Payment verification error:', error);
+        toast({
+          title: "Verification Failed",
+          description: "Please contact support if you were charged.",
+          variant: "destructive",
+        });
+      } finally {
+        setVerifying(false);
+      }
+    };
+
+    verifyPayment();
   }, [searchParams]);
+
+  if (verifying) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="max-w-md w-full text-center">
+          <CardContent className="py-12">
+            <Loader2 className="w-12 h-12 animate-spin mx-auto text-primary mb-4" />
+            <h2 className="text-xl font-semibold mb-2">Verifying Payment...</h2>
+            <p className="text-muted-foreground">Please wait while we confirm your purchase.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -25,24 +92,34 @@ const PaymentSuccess = () => {
             <CheckCircle className="w-16 h-16 text-green-500" />
           </div>
           <CardTitle className="text-2xl font-bold text-green-700">
-            Payment Successful!
+            {verified ? 'Payment Successful!' : 'Thank You!'}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground">
-            Thank you for your payment. Your transaction has been processed successfully.
-            You should receive a confirmation email shortly.
+            {verified 
+              ? 'Your payment has been confirmed. You now have full access to your purchased form.'
+              : 'Your transaction has been processed. You should receive a confirmation email shortly.'}
           </p>
           <div className="space-y-2">
+            {formId && verified && (
+              <Button 
+                onClick={() => navigate(`/forms?id=${formId}`)}
+                className="w-full"
+              >
+                Access Your Form
+              </Button>
+            )}
             <Button 
-              onClick={() => window.location.href = "/dashboard"}
+              onClick={() => navigate("/forms")}
               className="w-full"
+              variant={formId ? "outline" : "default"}
             >
-              Go to Dashboard
+              View All Forms
             </Button>
             <Button 
               variant="outline" 
-              onClick={() => window.location.href = "/"}
+              onClick={() => navigate("/")}
               className="w-full"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />

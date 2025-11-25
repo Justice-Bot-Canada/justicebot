@@ -25,8 +25,41 @@ export default function FormPaywall({
 }: FormPaywallProps) {
   const [loading, setLoading] = useState<"subscription" | null>(null);
   const [paypalLoaded, setPaypalLoaded] = useState(false);
+  const [hasPurchased, setHasPurchased] = useState(false);
+  const [checkingAccess, setCheckingAccess] = useState(true);
   const { hasAccess, isPremium } = usePremiumAccess();
   const paypalButtonRef = useRef<HTMLDivElement>(null);
+
+  // Check if user has purchased this specific form
+  useEffect(() => {
+    const checkFormPurchase = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setCheckingAccess(false);
+          return;
+        }
+
+        // Check entitlements for this specific form
+        const { data, error } = await supabase
+          .from('entitlements')
+          .select('product_id')
+          .eq('user_id', user.id)
+          .eq('product_id', `form_${formId}`)
+          .maybeSingle();
+
+        if (!error && data) {
+          setHasPurchased(true);
+        }
+      } catch (error) {
+        console.error('Error checking form purchase:', error);
+      } finally {
+        setCheckingAccess(false);
+      }
+    };
+
+    checkFormPurchase();
+  }, [formId]);
 
   // Load PayPal SDK
   useEffect(() => {
@@ -51,8 +84,16 @@ export default function FormPaywall({
     }
   }, [paypalLoaded]);
 
-  // Premium users get all forms free
-  if (isPremium || hasAccess) {
+  // Premium users or users who purchased this form get access
+  if (checkingAccess) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (isPremium || hasAccess || hasPurchased) {
     return <>{children}</>;
   }
 

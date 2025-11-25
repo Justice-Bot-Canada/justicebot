@@ -3,7 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://justice-bot.com',
+  'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
@@ -61,89 +61,148 @@ serve(async (req) => {
     // Get PayPal access token
     const accessToken = await getPayPalAccessToken();
     
-    // Capture the payment
-    const captureResponse = await fetch(`${PAYPAL_BASE_URL}/v2/checkout/orders/${paymentId}/capture`, {
-      method: 'POST',
+    // First, try to get order details (for hosted buttons that auto-capture)
+    const orderResponse = await fetch(`${PAYPAL_BASE_URL}/v2/checkout/orders/${paymentId}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
       },
     });
 
-    if (!captureResponse.ok) {
-      const errorData = await captureResponse.text();
-      console.error('[ERROR] PayPal capture failed:', {
-        status: captureResponse.status,
-        error: errorData,
-        paymentId,
-        userId: userData.user.id
-      });
-      throw new Error('Payment verification failed');
+    let orderData = null;
+    let isAlreadyCaptured = false;
+
+    if (orderResponse.ok) {
+      orderData = await orderResponse.json();
+      console.log('Order details:', orderData);
+      
+      // Check if order is already captured (hosted button flow)
+      isAlreadyCaptured = orderData.status === 'COMPLETED';
     }
 
-    const captureData = await captureResponse.json();
-    console.log('PayPal payment captured:', captureData);
+    let captureData = orderData;
+
+    // If not already captured, try to capture it (regular flow)
+    if (!isAlreadyCaptured) {
+      const captureResponse = await fetch(`${PAYPAL_BASE_URL}/v2/checkout/orders/${paymentId}/capture`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!captureResponse.ok) {
+        const errorData = await captureResponse.text();
+        console.error('[ERROR] PayPal capture failed:', {
+          status: captureResponse.status,
+          error: errorData,
+          paymentId,
+          userId: userData.user.id
+        });
+        throw new Error('Payment verification failed');
+      }
+
+      captureData = await captureResponse.json();
+      console.log('PayPal payment captured:', captureData);
+    }
 
     // Check if payment was successful
     const isSuccessful = captureData.status === 'COMPLETED';
     
-    // Update payment record in database
-    const { error: updateError } = await supabase
+    // Update or create payment record in database
+    const { data: existingPayment } = await supabase
       .from('payments')
-      .update({
-        status: isSuccessful ? 'completed' : 'failed',
-        payer_id: payerId,
-        captured_at: new Date().toISOString(),
-        paypal_response: captureData
-      })
+      .select('id, plan_type, form_id')
       .eq('payment_id', paymentId)
-      .eq('user_id', userData.user.id);
+      .eq('user_id', userData.user.id)
+      .maybeSingle();
 
-    if (updateError) {
-      console.error('Error updating payment:', updateError);
-    }
+    let paymentRecord = existingPayment;
 
-    // If payment successful, grant premium access
-    if (isSuccessful) {
-      // Get the payment details to determine plan type
-      const { data: paymentData } = await supabase
+    if (!existingPayment && isSuccessful) {
+      // Create new payment record for hosted button payments
+      const amount = parseFloat(captureData.purchase_units?.[0]?.amount?.value || '29.99');
+      
+      const { data: newPayment, error: insertError } = await supabase
         .from('payments')
-        .select('plan_type, case_id')
-        .eq('payment_id', paymentId)
-        .eq('user_id', userData.user.id)
+        .insert({
+          user_id: userData.user.id,
+          payment_id: paymentId,
+          amount: amount,
+          currency: 'CAD',
+          status: 'completed',
+          plan_type: 'form_purchase',
+          payment_provider: 'paypal',
+          payer_id: payerId,
+          captured_at: new Date().toISOString(),
+          paypal_response: captureData
+        })
+        .select()
         .single();
 
-      if (paymentData) {
-        // Grant entitlement
-        const { error: entitlementError } = await supabase
-          .from('entitlements')
-          .insert({
-            user_id: userData.user.id,
-            product_id: paymentData.plan_type,
-            granted_at: new Date().toISOString()
-          });
-
-        if (entitlementError) {
-          console.error('Error granting entitlement:', entitlementError);
-        } else {
-          console.log('Premium access granted for user:', userData.user.id);
-        }
-
-        // Create payment audit log
-        await supabase
-          .from('payment_audit')
-          .insert({
-            payment_id: paymentId,
-            user_id: userData.user.id,
-            event_type: isSuccessful ? 'completed' : 'failed',
-            metadata: {
-              amount: paymentData?.amount || 0,
-              plan_type: paymentData.plan_type,
-              payer_id: payerId,
-              transaction_id: captureData.id
-            }
-          });
+      if (insertError) {
+        console.error('Error creating payment record:', insertError);
+      } else {
+        paymentRecord = newPayment;
       }
+    } else if (existingPayment) {
+      // Update existing payment record
+      const { error: updateError } = await supabase
+        .from('payments')
+        .update({
+          status: isSuccessful ? 'completed' : 'failed',
+          payer_id: payerId,
+          captured_at: new Date().toISOString(),
+          paypal_response: captureData
+        })
+        .eq('payment_id', paymentId)
+        .eq('user_id', userData.user.id);
+
+      if (updateError) {
+        console.error('Error updating payment:', updateError);
+      }
+    }
+
+    // If payment successful, grant access
+    if (isSuccessful && paymentRecord) {
+      const productId = paymentRecord.form_id 
+        ? `form_${paymentRecord.form_id}`
+        : paymentRecord.plan_type;
+
+      // Grant entitlement
+      const { error: entitlementError } = await supabase
+        .from('entitlements')
+        .upsert({
+          user_id: userData.user.id,
+          product_id: productId,
+          granted_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id,product_id'
+        });
+
+      if (entitlementError) {
+        console.error('Error granting entitlement:', entitlementError);
+      } else {
+        console.log('Access granted for user:', userData.user.id, 'product:', productId);
+      }
+
+      // Create payment audit log
+      await supabase
+        .from('payment_audit')
+        .insert({
+          payment_id: paymentId,
+          user_id: userData.user.id,
+          event_type: 'completed',
+          metadata: {
+            amount: paymentRecord.amount || 29.99,
+            plan_type: paymentRecord.plan_type,
+            payer_id: payerId,
+            transaction_id: captureData.id,
+            product_id: productId
+          }
+        });
     }
 
     return new Response(JSON.stringify({ 
