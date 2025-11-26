@@ -158,9 +158,9 @@
 
   <url>
     <loc>https://justice-bot.com/faq</loc>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2025-01-26</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.9</priority>
   </url>
 
   <url>
@@ -201,9 +201,9 @@
 
   <url>
     <loc>https://justice-bot.com/team</loc>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2025-01-26</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
   </url>
 
   <url>
@@ -216,9 +216,9 @@
   <!-- Contact & Support -->
   <url>
     <loc>https://justice-bot.com/contact</loc>
-    <lastmod>2025-01-15</lastmod>
+    <lastmod>2025-01-26</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
 
   <url>
