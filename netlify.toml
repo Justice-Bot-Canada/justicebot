@@ -4,17 +4,23 @@
   command = "npm run build"
   publish = "dist"
 
-# Redirect HTTP to HTTPS
+# Redirect HTTP to HTTPS and non-www to www (canonical domain)
 [[redirects]]
   from = "http://justice-bot.com/*"
-  to = "https://justice-bot.com/:splat"
+  to = "https://www.justice-bot.com/:splat"
   status = 301
   force = true
 
-# Redirect www to non-www
 [[redirects]]
-  from = "https://www.justice-bot.com/*"
-  to = "https://justice-bot.com/:splat"
+  from = "http://www.justice-bot.com/*"
+  to = "https://www.justice-bot.com/:splat"
+  status = 301
+  force = true
+
+# Redirect non-www to www
+[[redirects]]
+  from = "https://justice-bot.com/*"
+  to = "https://www.justice-bot.com/:splat"
   status = 301
   force = true
 
