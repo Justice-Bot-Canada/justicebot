@@ -83,12 +83,26 @@ const EnhancedSEO = ({
   const breadcrumbSchema = breadcrumbs ? {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "itemListElement": breadcrumbs.map((item, index) => ({
-      "@type": "ListItem",
-      "position": index + 1,
-      "name": item.name,
-      "item": item.url
-    }))
+    "itemListElement": breadcrumbs.map((item, index) => {
+      // Ensure absolute URL with www version
+      let absoluteUrl = item.url;
+      if (absoluteUrl.startsWith('/')) {
+        // Relative URL - prepend domain
+        absoluteUrl = `https://www.justice-bot.com${absoluteUrl}`;
+      } else if (absoluteUrl.startsWith('https://justice-bot.com')) {
+        // Non-www URL - add www
+        absoluteUrl = absoluteUrl.replace('https://justice-bot.com', 'https://www.justice-bot.com');
+      }
+      // Remove trailing slash
+      absoluteUrl = absoluteUrl.replace(/\/$/, '');
+      
+      return {
+        "@type": "ListItem",
+        "position": index + 1,
+        "name": item.name,
+        "item": absoluteUrl
+      };
+    })
   } : null;
 
   // Generate FAQ Schema
