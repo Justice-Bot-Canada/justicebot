@@ -30,7 +30,7 @@ const EnhancedSEO = ({
   description, 
   keywords, 
   canonicalUrl,
-  ogImage = "https://justice-bot.com/og-image.jpg",
+  ogImage = "https://justice-bot.com/justice-bot-logo.jpeg",
   structuredData,
   articleData,
   breadcrumbs,
@@ -151,8 +151,9 @@ const EnhancedSEO = ({
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={ogImage} />
-      <meta property="og:image:width" content="1200" />
-      <meta property="og:image:height" content="630" />
+      <meta property="og:image:type" content="image/jpeg" />
+      <meta property="og:image:width" content="1080" />
+      <meta property="og:image:height" content="1080" />
       <meta property="og:image:alt" content="Justice-Bot - Affordable Legal Help" />
       {currentUrl && <meta property="og:url" content={currentUrl} />}
       <meta property="og:type" content={articleData ? "article" : "website"} />
