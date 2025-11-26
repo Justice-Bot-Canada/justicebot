@@ -30,7 +30,7 @@ const EnhancedSEO = ({
   description, 
   keywords, 
   canonicalUrl,
-  ogImage = "https://justice-bot.com/justice-bot-logo.jpeg",
+  ogImage = "https://www.justice-bot.com/justice-bot-logo.jpeg",
   structuredData,
   articleData,
   breadcrumbs,
@@ -40,7 +40,7 @@ const EnhancedSEO = ({
   const fullTitle = `${title} | Justice-Bot - Affordable Legal Help`;
   
   // Build clean canonical URL - no query params, no trailing slash
-  const cleanCanonical = canonicalUrl || `https://justice-bot.com${location.pathname.replace(/\/$/, '')}`;
+  const cleanCanonical = canonicalUrl || `https://www.justice-bot.com${location.pathname.replace(/\/$/, '')}`;
   const currentUrl = cleanCanonical;
 
   // Generate Organization Schema
@@ -48,8 +48,8 @@ const EnhancedSEO = ({
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "Justice-Bot",
-    "url": "https://justice-bot.com",
-    "logo": "https://justice-bot.com/justice-bot-logo.jpeg",
+    "url": "https://www.justice-bot.com",
+    "logo": "https://www.justice-bot.com/justice-bot-logo.jpeg",
     "sameAs": [
       "https://twitter.com/justicebot",
       "https://linkedin.com/company/justice-bot"
@@ -68,12 +68,12 @@ const EnhancedSEO = ({
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Justice-Bot",
-    "url": "https://justice-bot.com",
+    "url": "https://www.justice-bot.com",
     "potentialAction": {
       "@type": "SearchAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": "https://justice-bot.com/search?q={search_term_string}"
+        "urlTemplate": "https://www.justice-bot.com/search?q={search_term_string}"
       },
       "query-input": "required name=search_term_string"
     }
@@ -121,7 +121,7 @@ const EnhancedSEO = ({
       "name": "Justice-Bot",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://justice-bot.com/justice-bot-logo.jpeg"
+        "url": "https://www.justice-bot.com/justice-bot-logo.jpeg"
       }
     },
     "datePublished": articleData.publishedTime,
