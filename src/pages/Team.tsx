@@ -65,9 +65,14 @@ export default function Team() {
   return (
     <div className="min-h-screen bg-background">
       <EnhancedSEO
-        title="Our Team & Methodology - Justice-Bot"
-        description="Learn about the team and methodology behind Justice-Bot, Ontario's trusted legal self-help platform. Built by self-represented litigants for self-represented litigants."
+        title="Our Team & Methodology - Built by Self-Rep Litigants | Justice-Bot"
+        description="Meet the Justice-Bot team: real people who successfully navigated Ontario courts as self-represented litigants. Learn our methodology for making legal help accessible: LTB, HRTO, Family & Small Claims Court expertise."
+        keywords="Justice-Bot team, self-represented litigant, Ontario legal methodology, legal tech team, tribunal experience, court navigation experts"
         canonicalUrl="https://justice-bot.com/team"
+        breadcrumbs={[
+          { name: "Home", url: "https://justice-bot.com/" },
+          { name: "Team", url: "https://justice-bot.com/team" }
+        ]}
       />
       <Header />
       

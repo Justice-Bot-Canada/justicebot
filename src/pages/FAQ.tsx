@@ -148,9 +148,10 @@ export default function FAQ() {
     <div className="min-h-screen flex flex-col">
       <CanonicalURL />
       <EnhancedSEO
-        title="Frequently Asked Questions - Justice-Bot Legal Help"
-        description="Get answers to common questions about Justice-Bot pricing, eligibility, privacy, what we can help with, and how our AI-powered legal platform works in Ontario."
-        keywords="justice-bot faq, legal help questions, pricing, eligibility, privacy, how it works, Ontario legal services"
+        title="FAQ - Justice-Bot Pricing, Features & How It Works | Ontario Legal Help"
+        description="Answers to common questions about Justice-Bot: pricing ($19/month), what legal issues we cover (LTB, HRTO, Small Claims, Family Court), eligibility, privacy, and how our AI legal assistant works in Ontario."
+        keywords="Justice-Bot FAQ, legal help questions Ontario, AI legal assistant pricing, LTB help questions, HRTO questions, small claims FAQ, legal aid alternative questions"
+        canonicalUrl="https://justice-bot.com/faq"
         structuredData={faqStructuredData}
         breadcrumbs={breadcrumbs}
       />

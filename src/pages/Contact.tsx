@@ -1,25 +1,31 @@
 import { ContactForm } from "@/components/ContactForm";
-import SEOHead from "@/components/SEOHead";
+import EnhancedSEO from "@/components/EnhancedSEO";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { ArticleSchema } from "@/components/ArticleSchema";
 
 const Contact = () => {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "name": "Contact Justice-Bot",
+    "description": "Contact Justice-Bot for support, partnerships, media inquiries, or general questions about our AI legal assistance platform.",
+    "url": "https://justice-bot.com/contact"
+  };
+
+  const breadcrumbs = [
+    { name: "Home", url: "https://justice-bot.com/" },
+    { name: "Contact", url: "https://justice-bot.com/contact" }
+  ];
+
   return (
     <>
-      <SEOHead
-        title="Contact Us - Media, Partnership & Government Inquiries"
-        description="Get in touch with Justice Bot for media inquiries, business partnerships, and government collaboration. Multiple contact options including email and contact form available."
-        keywords="contact justice bot, media inquiries, business partnerships, government collaboration, legal tech contact"
+      <EnhancedSEO
+        title="Contact Justice-Bot - Support, Partnerships & Media Inquiries"
+        description="Contact Justice-Bot for customer support, business partnerships, media inquiries, or government collaboration. Email, phone, and contact form available. Quick response guaranteed."
+        keywords="contact Justice-Bot, legal tech support, partnership inquiries, media contact, Ontario legal services contact"
         canonicalUrl="https://justice-bot.com/contact"
-      />
-      <ArticleSchema
-        headline="Contact Justice Bot - Get in Touch"
-        description="Contact Justice Bot for media inquiries, partnerships, government relations, and general support. We're here to help make legal services more accessible."
-        image="https://justice-bot.com/justice-bot-logo.jpeg"
-        datePublished="2025-01-15T00:00:00Z"
-        dateModified={new Date().toISOString()}
-        url="https://justice-bot.com/contact"
+        structuredData={structuredData}
+        breadcrumbs={breadcrumbs}
       />
       
       <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background">
