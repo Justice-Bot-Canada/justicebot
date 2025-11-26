@@ -8,7 +8,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://justice-bot.com/</loc>
-    <lastmod>2025-11-07</lastmod>
+    <lastmod>2025-01-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
@@ -130,9 +130,9 @@
   <!-- Resources -->
   <url>
     <loc>https://justice-bot.com/forms</loc>
-    <lastmod>2025-01-24</lastmod>
+    <lastmod>2025-01-26</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
 
   <url>
