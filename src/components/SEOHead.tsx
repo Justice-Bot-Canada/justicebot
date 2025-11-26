@@ -19,7 +19,7 @@ const SEOHead = ({
   description, 
   keywords, 
   canonicalUrl,
-  ogImage = "https://justice-bot.com/justice-bot-logo.jpeg",
+  ogImage = "https://justice-bot.com/og-image.jpg",
   structuredData,
   author = "Justice-Bot Team",
   publishedTime,
