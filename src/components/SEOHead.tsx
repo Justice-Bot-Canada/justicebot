@@ -19,7 +19,7 @@ const SEOHead = ({
   description, 
   keywords, 
   canonicalUrl,
-  ogImage = "https://justice-bot.com/justice-bot-logo.jpeg",
+  ogImage = "https://www.justice-bot.com/justice-bot-logo.jpeg",
   structuredData,
   author = "Justice-Bot Team",
   publishedTime,
@@ -29,8 +29,8 @@ const SEOHead = ({
   const location = useLocation();
   const fullTitle = `${title} | Justice-Bot - Affordable Legal Help`;
   
-  // Build clean canonical URL - no query params, no trailing slash, always https://justice-bot.com
-  const cleanCanonical = canonicalUrl || `https://justice-bot.com${location.pathname.replace(/\/$/, '')}`;
+  // Build clean canonical URL - no query params, no trailing slash, always https://www.justice-bot.com
+  const cleanCanonical = canonicalUrl || `https://www.justice-bot.com${location.pathname.replace(/\/$/, '')}`;
   const currentUrl = cleanCanonical;
 
   return (
