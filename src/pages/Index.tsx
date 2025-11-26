@@ -27,7 +27,7 @@ const Index = () => {
     "name": "Justice-Bot",
     "description": "Affordable AI-powered legal help for Canadians. Get expert guidance for landlord-tenant disputes, human rights issues, small claims court, and more.",
     "url": "https://justice-bot.com",
-    "image": "https://justice-bot.com/legal-services-hero.jpg",
+    "image": "https://justice-bot.com/og-image.jpg",
     "logo": "https://justice-bot.com/justice-bot-logo.jpeg",
     "serviceType": [
       "Legal Consultation",

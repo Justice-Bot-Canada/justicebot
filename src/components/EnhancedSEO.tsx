@@ -30,7 +30,7 @@ const EnhancedSEO = ({
   description, 
   keywords, 
   canonicalUrl,
-  ogImage = "/justice-bot-logo.jpeg",
+  ogImage = "https://justice-bot.com/og-image.jpg",
   structuredData,
   articleData,
   breadcrumbs,
