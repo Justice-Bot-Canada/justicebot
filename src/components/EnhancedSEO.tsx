@@ -39,8 +39,17 @@ const EnhancedSEO = ({
   const location = useLocation();
   const fullTitle = `${title} | Justice-Bot - Affordable Legal Help`;
   
+  // CRITICAL: Normalize canonical URL to always use www version
+  const normalizeUrl = (url: string) => {
+    return url
+      .replace('https://justice-bot.com', 'https://www.justice-bot.com')
+      .replace(/\/$/, ''); // Remove trailing slash
+  };
+  
   // Build clean canonical URL - no query params, no trailing slash
-  const cleanCanonical = canonicalUrl || `https://www.justice-bot.com${location.pathname.replace(/\/$/, '')}`;
+  const cleanCanonical = canonicalUrl 
+    ? normalizeUrl(canonicalUrl)
+    : `https://www.justice-bot.com${location.pathname.replace(/\/$/, '')}`;
   const currentUrl = cleanCanonical;
 
   // Generate Organization Schema
