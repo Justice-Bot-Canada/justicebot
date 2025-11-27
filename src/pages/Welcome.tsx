@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Loader2 } from "lucide-react";
+import { CheckCircle, Loader2, Mail } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { OnboardingFlow } from "@/components/OnboardingFlow";
 import { supabase } from "@/integrations/supabase/client";
+import AuthDialog from "@/components/AuthDialog";
 
 const Welcome = () => {
   const { user, loading } = useAuth();
@@ -15,6 +16,7 @@ const Welcome = () => {
   const [verified, setVerified] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   useEffect(() => {
     const checkOnboarding = async () => {
@@ -67,22 +69,50 @@ const Welcome = () => {
     );
   }
 
-  if (!verified || !user) {
+  // Show email verification instructions if not logged in
+  if (!user && !loading) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
         <main className="container mx-auto px-4 py-20">
           <Card className="max-w-2xl mx-auto text-center py-12">
-            <CardContent>
-              <h3 className="text-lg font-semibold mb-2">Verification Failed</h3>
-              <p className="text-muted-foreground mb-4">
-                We couldn't verify your account. The link may have expired.
-              </p>
-              <Button onClick={() => navigate("/")}>Return to Home</Button>
+            <CardHeader>
+              <div className="flex justify-center mb-4">
+                <Mail className="h-16 w-16 text-primary" />
+              </div>
+              <CardTitle className="text-3xl mb-2">Check Your Email</CardTitle>
+              <CardDescription className="text-lg">
+                We've sent you a verification link
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="text-left space-y-4 max-w-lg mx-auto">
+                <p className="text-muted-foreground">
+                  To complete your registration:
+                </p>
+                <ol className="space-y-3 text-muted-foreground list-decimal list-inside">
+                  <li>Check your email inbox (and spam folder)</li>
+                  <li>Click the verification link in the email</li>
+                  <li>You'll be automatically logged in and redirected here</li>
+                </ol>
+                <p className="text-sm text-muted-foreground pt-4 border-t">
+                  Already verified your email?
+                </p>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button onClick={() => setShowAuthDialog(true)} variant="default">
+                  Sign In Now
+                </Button>
+                <Button onClick={() => navigate("/")} variant="outline">
+                  Return to Home
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </main>
         <Footer />
+        <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
       </div>
     );
   }
