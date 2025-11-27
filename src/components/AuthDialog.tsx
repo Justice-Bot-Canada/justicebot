@@ -104,10 +104,12 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         analytics.signupComplete(email, 'email');
         toast({
           title: "Almost there! Check your email",
-          description: "We've sent a verification link to your email. Click the link to activate your account and get started.",
-          duration: 10000,
+          description: "We've sent a verification link to your email. Click the link to activate your account.",
+          duration: 5000,
         });
         onOpenChange(false);
+        // Redirect to welcome page after signup
+        window.location.href = '/welcome';
       }
     } catch (error) {
       toast({
