@@ -25,18 +25,21 @@ const Welcome = () => {
         const { data: profile } = await supabase
           .from('profiles')
           .select('onboarding_completed')
-          .eq('id', user.id)
+          .eq('user_id', user.id)
           .maybeSingle();
 
         if (profile && !profile.onboarding_completed) {
           setShowOnboarding(true);
+        } else {
+          // Auto-redirect to dashboard after 2 seconds if onboarding is complete
+          setTimeout(() => navigate("/dashboard"), 2000);
         }
         setCheckingOnboarding(false);
       }
     };
 
     checkOnboarding();
-  }, [user, loading]);
+  }, [user, loading, navigate]);
 
   const handleGetStarted = () => {
     navigate("/dashboard");
