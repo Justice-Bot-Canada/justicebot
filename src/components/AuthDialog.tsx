@@ -76,9 +76,7 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     setIsLoading(true);
 
     try {
-      const redirectUrl = window.location.origin.includes('localhost')
-        ? 'https://justice-bot.lovable.app/welcome'
-        : `${window.location.origin}/welcome`;
+      const redirectUrl = `${window.location.origin}/welcome`;
       
       const { error } = await supabase.auth.signUp({
         email,
@@ -105,8 +103,9 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       } else {
         analytics.signupComplete(email, 'email');
         toast({
-          title: "Check your email",
-          description: "We've sent you a confirmation link to complete your registration.",
+          title: "Almost there! Check your email",
+          description: "We've sent a verification link to your email. Click the link to activate your account and get started.",
+          duration: 10000,
         });
         onOpenChange(false);
       }
