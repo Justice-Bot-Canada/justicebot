@@ -1,24 +1,29 @@
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
-import TriageSection from "@/components/TriageSection";
-import FeaturesSection from "@/components/FeaturesSection";
-import { AppDemoVideo } from "@/components/AppDemoVideo";
-import { ExplainerVideo } from "@/components/ExplainerVideo";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
-import InteractiveTutorial from "@/components/InteractiveTutorial";
-import TrustSignals from "@/components/TrustSignals";
-import { AccessibilityPanel } from "@/components/AccessibilityEnhanced";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
-import SuccessStories from "@/components/SuccessStories";
-import TutorialVideos from "@/components/TutorialVideos";
-import DocumentTemplates from "@/components/DocumentTemplates";
-import { PricingComparison } from "@/components/PricingComparison";
-import legalServicesHero from "@/assets/legal-services-hero.jpg";
-import { JourneyFlowchart } from "@/components/JourneyFlowchart";
-import { LeadCaptureModal } from "@/components/LeadCaptureModal";
-import { NewsletterBanner } from "@/components/NewsletterBanner";
-import { LeadMagnetCard } from "@/components/LeadMagnetCard";
+import { AccessibilityPanel } from "@/components/AccessibilityEnhanced";
+import { Suspense, lazy } from "react";
+
+// Lazy load below-the-fold components for better LCP
+const TriageSection = lazy(() => import("@/components/TriageSection"));
+const FeaturesSection = lazy(() => import("@/components/FeaturesSection"));
+const AppDemoVideo = lazy(() => import("@/components/AppDemoVideo").then(m => ({ default: m.AppDemoVideo })));
+const ExplainerVideo = lazy(() => import("@/components/ExplainerVideo").then(m => ({ default: m.ExplainerVideo })));
+const InteractiveTutorial = lazy(() => import("@/components/InteractiveTutorial"));
+const TrustSignals = lazy(() => import("@/components/TrustSignals"));
+const SuccessStories = lazy(() => import("@/components/SuccessStories"));
+const DocumentTemplates = lazy(() => import("@/components/DocumentTemplates"));
+const PricingComparison = lazy(() => import("@/components/PricingComparison").then(m => ({ default: m.PricingComparison })));
+const JourneyFlowchart = lazy(() => import("@/components/JourneyFlowchart").then(m => ({ default: m.JourneyFlowchart })));
+const NewsletterBanner = lazy(() => import("@/components/NewsletterBanner").then(m => ({ default: m.NewsletterBanner })));
+
+const LoadingSection = () => (
+  <div className="py-16 flex items-center justify-center">
+    <div className="animate-pulse">Loading...</div>
+  </div>
+);
 
 const Index = () => {
   const structuredData = {
@@ -26,9 +31,9 @@ const Index = () => {
     "@type": "LegalService",
     "name": "Justice-Bot",
     "description": "Affordable AI-powered legal help for Canadians. Get expert guidance for landlord-tenant disputes, human rights issues, small claims court, and more.",
-    "url": "https://justice-bot.com",
-    "image": "https://justice-bot.com/justice-bot-logo.jpeg",
-    "logo": "https://justice-bot.com/justice-bot-logo.jpeg",
+    "url": "https://www.justice-bot.com",
+    "image": "https://www.justice-bot.com/justice-bot-logo.jpeg",
+    "logo": "https://www.justice-bot.com/justice-bot-logo.jpeg",
     "serviceType": [
       "Legal Consultation",
       "Document Preparation", 
@@ -84,7 +89,7 @@ const Index = () => {
   ];
 
   const breadcrumbs = [
-    { name: "Home", url: "https://justice-bot.com/" }
+    { name: "Home", url: "https://www.justice-bot.com/" }
   ];
 
   return (
@@ -93,32 +98,54 @@ const Index = () => {
         title="Free Legal Help Ontario 2025 | AI Legal Assistant Canada - Justice-Bot"
         description="Get free & low-income legal aid online with Justice-Bot - Canada's #1 AI legal chatbot. Affordable alternative to expensive lawyers for LTB, HRTO, family court & more. Legal help Ontario residents trust. Try free tools or subscribe from $5.99/month."
         keywords="free legal help Ontario, low income legal aid online, legal aid alternatives Canada, AI legal advice Canada, AI legal assistant Canada, Justice-Bot Canada, legal chatbot Ontario, affordable lawyer Canada"
-        canonicalUrl="https://justice-bot.com/"
+        canonicalUrl="https://www.justice-bot.com/"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
         faqData={faqData}
       />
+      {/* Critical resource preload for LCP improvement */}
+      <link rel="preload" as="image" href="/hero-desktop.webp" type="image/webp" media="(min-width: 768px)" />
+      <link rel="preload" as="image" href="/hero-mobile.webp" type="image/webp" media="(max-width: 767px)" />
+      <PerformanceMonitor />
       
       <Header />
       <main id="main-content" tabIndex={-1}>
         <HeroSection />
-        <JourneyFlowchart />
-        <PricingComparison />
-        <ExplainerVideo />
+        <Suspense fallback={<LoadingSection />}>
+          <JourneyFlowchart />
+        </Suspense>
+        <Suspense fallback={<LoadingSection />}>
+          <PricingComparison />
+        </Suspense>
+        <Suspense fallback={<LoadingSection />}>
+          <ExplainerVideo />
+        </Suspense>
         
         {/* Interactive Tutorial Section */}
         <section id="tutorials" className="py-16 bg-muted/30">
           <div className="container mx-auto px-4">
-            <InteractiveTutorial />
+            <Suspense fallback={<LoadingSection />}>
+              <InteractiveTutorial />
+            </Suspense>
           </div>
         </section>
         
-        <TriageSection />
-        <TrustSignals />
-        <SuccessStories />
+        <Suspense fallback={<LoadingSection />}>
+          <TriageSection />
+        </Suspense>
+        <Suspense fallback={<LoadingSection />}>
+          <TrustSignals />
+        </Suspense>
+        <Suspense fallback={<LoadingSection />}>
+          <SuccessStories />
+        </Suspense>
         
-        <FeaturesSection />
-        <AppDemoVideo />
+        <Suspense fallback={<LoadingSection />}>
+          <FeaturesSection />
+        </Suspense>
+        <Suspense fallback={<LoadingSection />}>
+          <AppDemoVideo />
+        </Suspense>
         
         {/* Temporarily disabled lead magnets until Turnstile is properly configured */}
         {/* 
@@ -172,7 +199,9 @@ const Index = () => {
       <Footer />
       <AccessibilityPanel />
       {/* <LeadCaptureModal trigger="scroll" /> */}
-      <NewsletterBanner />
+      <Suspense fallback={null}>
+        <NewsletterBanner />
+      </Suspense>
     </div>
   );
 };
