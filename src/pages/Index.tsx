@@ -2,6 +2,8 @@ import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
+import LocalBusinessSchema from "@/components/LocalBusinessSchema";
+import MeritScoreCalculator from "@/components/MeritScoreCalculator";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import { AccessibilityPanel } from "@/components/AccessibilityEnhanced";
 import { Suspense, lazy } from "react";
@@ -103,6 +105,7 @@ const Index = () => {
         breadcrumbs={breadcrumbs}
         faqData={faqData}
       />
+      <LocalBusinessSchema />
       {/* Critical resource preload for LCP improvement */}
       <link rel="preload" as="image" href="/hero-desktop.webp" type="image/webp" media="(min-width: 768px)" />
       <link rel="preload" as="image" href="/hero-mobile.webp" type="image/webp" media="(max-width: 767px)" />
@@ -136,6 +139,20 @@ const Index = () => {
         <Suspense fallback={<LoadingSection />}>
           <TriageSection />
         </Suspense>
+
+        {/* Merit Score Calculator Section */}
+        <section className="py-16 px-4 bg-gradient-to-b from-background to-muted/30">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Check Your Case Strength</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Get an instant AI-powered assessment of your legal case merit score
+              </p>
+            </div>
+            <MeritScoreCalculator />
+          </div>
+        </section>
+
         <Suspense fallback={<LoadingSection />}>
           <TrustSignals />
         </Suspense>
