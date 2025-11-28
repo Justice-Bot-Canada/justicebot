@@ -37,6 +37,7 @@ const Footer = () => {
           <nav aria-labelledby="guides-heading">
             <h3 id="guides-heading" className="font-semibold mb-4">Popular Guides</h3>
             <ul className="space-y-2 text-sm text-background/80">
+              <li><a href="/ltb-toronto" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">LTB Toronto Guide</a></li>
               <li><a href="/ltb-guide" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">LTB Guide</a></li>
               <li><a href="/criminal-court-guide" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Criminal Court Guide</a></li>
               <li><a href="/family-court-mistakes" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Family Court Mistakes</a></li>

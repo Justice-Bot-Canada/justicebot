@@ -78,6 +78,7 @@ const Header = () => {
                   <div className="py-2">
                     <div className="px-3 py-1 text-xs font-semibold text-muted-foreground">Housing & Tenancy</div>
                     <a href="/ltb-journey" className="block px-4 py-2 text-sm hover:bg-muted">Landlord-Tenant Board</a>
+                    <a href="/ltb-toronto" className="block px-4 py-2 text-sm hover:bg-muted">LTB Toronto Guide</a>
                     <div className="px-3 py-1 mt-2 text-xs font-semibold text-muted-foreground">Family & Children</div>
                     <a href="/family-journey" className="block px-4 py-2 text-sm hover:bg-muted">Family Court</a>
                     <a href="/cas-journey" className="block px-4 py-2 text-sm hover:bg-muted">CAS Issues</a>
