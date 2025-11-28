@@ -182,6 +182,12 @@ const AppContent = () => {
           <Route path="/human-rights-ontario-guide" element={<HumanRightsGuide />} />
           <Route path="/ltb-t2-form-guide" element={<LTBT2FormGuide />} />
           <Route path="/ltb-toronto" element={<LTBToronto />} />
+          <Route path="/how-to-file-t2-ontario" element={<HowToFileT2Ontario />} />
+          <Route path="/tenant-rights-repairs-not-done" element={<TenantRightsRepairsNotDone />} />
+          <Route path="/tenant-rights-harassment-by-landlord" element={<TenantRightsHarassment />} />
+          <Route path="/tenant-rights-unsafe-housing" element={<TenantRightsUnsafeHousing />} />
+          <Route path="/tenant-rights-privacy-violations" element={<TenantRightsPrivacyViolations />} />
+          <Route path="/how-to-file-t6-ontario" element={<HowToFileT6Ontario />} />
 
           {/* Company & Support */}
           <Route path="/about" element={<About />} />
