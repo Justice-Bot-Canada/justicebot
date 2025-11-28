@@ -6,6 +6,11 @@ import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 import MeritScoreCalculator from "@/components/MeritScoreCalculator";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import { AccessibilityPanel } from "@/components/AccessibilityEnhanced";
+import { SocialProofTicker } from "@/components/SocialProofTicker";
+import { UrgencyTimer } from "@/components/UrgencyTimer";
+import { MoneyBackGuarantee } from "@/components/MoneyBackGuarantee";
+import LiveSupportWidget from "@/components/LiveSupportWidget";
+import { LeadCaptureModal } from "@/components/LeadCaptureModal";
 import { Suspense, lazy } from "react";
 
 // Lazy load below-the-fold components for better LCP
@@ -117,6 +122,11 @@ const Index = () => {
       <Header />
       <main id="main-content" tabIndex={-1}>
         <HeroSection />
+        
+        {/* Urgency Timer */}
+        <div className="container mx-auto px-4 py-4">
+          <UrgencyTimer />
+        </div>
         <Suspense fallback={<LoadingSection />}>
           <JourneyFlowchart />
         </Suspense>
@@ -156,6 +166,14 @@ const Index = () => {
         <Suspense fallback={<LoadingSection />}>
           <TrustSignals />
         </Suspense>
+        
+        {/* Money-Back Guarantee */}
+        <section className="py-8 px-4 bg-background">
+          <div className="max-w-4xl mx-auto">
+            <MoneyBackGuarantee />
+          </div>
+        </section>
+        
         <Suspense fallback={<LoadingSection />}>
           <SuccessStories />
         </Suspense>
@@ -218,7 +236,16 @@ const Index = () => {
       </main>
       <Footer />
       <AccessibilityPanel />
-      {/* <LeadCaptureModal trigger="scroll" /> */}
+      
+      {/* Exit-Intent Popup */}
+      <LeadCaptureModal trigger="exit" />
+      
+      {/* Social Proof Ticker */}
+      <SocialProofTicker />
+      
+      {/* Live Support Widget */}
+      <LiveSupportWidget />
+      
       <Suspense fallback={null}>
         <NewsletterBanner />
       </Suspense>
