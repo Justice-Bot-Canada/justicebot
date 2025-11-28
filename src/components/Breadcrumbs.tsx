@@ -27,6 +27,7 @@ export const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
           <Link 
             to="/" 
             itemProp="item"
+            itemID="https://www.justice-bot.com/"
             className="hover:text-foreground transition-colors flex items-center gap-1"
             aria-label="Home"
           >
@@ -36,35 +37,45 @@ export const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
           <meta itemProp="position" content="1" />
         </li>
         
-        {items.map((item, index) => (
-          <li 
-            key={index}
-            itemProp="itemListElement" 
-            itemScope 
-            itemType="https://schema.org/ListItem"
-            className="flex items-center gap-2"
-          >
-            <ChevronRight className="h-4 w-4" aria-hidden="true" />
-            {item.href ? (
-              <Link 
-                to={item.href} 
-                itemProp="item"
-                className="hover:text-foreground transition-colors"
-              >
-                <span itemProp="name">{item.label}</span>
-              </Link>
-            ) : (
-              <span 
-                itemProp="name" 
-                className="text-foreground font-medium"
-                aria-current="page"
-              >
-                {item.label}
-              </span>
-            )}
-            <meta itemProp="position" content={(index + 2).toString()} />
-          </li>
-        ))}
+        {items.map((item, index) => {
+          const itemUrl = item.href 
+            ? `https://www.justice-bot.com${item.href}` 
+            : `https://www.justice-bot.com${window.location.pathname}`;
+          
+          return (
+            <li 
+              key={index}
+              itemProp="itemListElement" 
+              itemScope 
+              itemType="https://schema.org/ListItem"
+              className="flex items-center gap-2"
+            >
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              {item.href ? (
+                <Link 
+                  to={item.href} 
+                  itemProp="item"
+                  itemID={itemUrl}
+                  className="hover:text-foreground transition-colors"
+                >
+                  <span itemProp="name">{item.label}</span>
+                </Link>
+              ) : (
+                <>
+                  <span itemProp="item" itemID={itemUrl} className="hidden" />
+                  <span 
+                    itemProp="name" 
+                    className="text-foreground font-medium"
+                    aria-current="page"
+                  >
+                    {item.label}
+                  </span>
+                </>
+              )}
+              <meta itemProp="position" content={(index + 2).toString()} />
+            </li>
+          );
+        })}
       </ol>
     </nav>
   );

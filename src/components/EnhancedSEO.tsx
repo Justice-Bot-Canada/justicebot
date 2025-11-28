@@ -109,7 +109,10 @@ const EnhancedSEO = ({
         "@type": "ListItem",
         "position": index + 1,
         "name": item.name,
-        "item": absoluteUrl
+        "item": {
+          "@id": absoluteUrl,
+          "name": item.name
+        }
       };
     })
   } : null;
