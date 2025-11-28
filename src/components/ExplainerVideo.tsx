@@ -8,11 +8,11 @@ export const ExplainerVideo = () => {
       <VideoSchema
         name="How Justice-Bot Works - AI Legal Help for Canadians"
         description="Watch this quick explainer to see how Justice-Bot provides affordable AI-powered legal assistance for Ontario tribunals, courts, and legal issues."
-        thumbnailUrl="https://justice-bot.com/video-thumbnail-800.webp"
-        uploadDate="2025-10-03"
+        thumbnailUrl="https://www.justice-bot.com/video-thumbnail-800.webp"
+        uploadDate="2025-10-03T12:00:00-05:00"
         duration="PT2M"
-        contentUrl="https://justice-bot.com/promo-video.mp4"
-        embedUrl="https://justice-bot.com/promo-video.mp4"
+        contentUrl="https://www.justice-bot.com/promo-video.mp4"
+        embedUrl="https://www.justice-bot.com/promo-video.mp4"
       />
       
       <section className="py-16 bg-gradient-to-b from-background to-muted/30">

@@ -4,7 +4,7 @@ interface VideoSchemaProps {
   name: string;
   description: string;
   thumbnailUrl: string;
-  uploadDate: string;
+  uploadDate: string; // ISO 8601 format with timezone, e.g., "2025-10-03T12:00:00-05:00"
   duration?: string; // ISO 8601 format, e.g., "PT5M30S" for 5 minutes 30 seconds
   contentUrl?: string;
   embedUrl?: string;
@@ -34,7 +34,7 @@ export const VideoSchema = ({
       "name": "Justice-Bot",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://justice-bot.com/justice-bot-logo.jpeg"
+        "url": "https://www.justice-bot.com/justice-bot-logo.jpeg"
       }
     }
   };
