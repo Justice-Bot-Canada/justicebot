@@ -30,9 +30,9 @@ export const AppDemoVideo = () => {
         name="Justice-Bot Tutorial Videos - Legal Help for HRTO, Small Claims, LTB"
         description="Watch video tutorials showing how to use Justice-Bot for Human Rights Tribunal, Small Claims Court, and Landlord Tenant Board cases in Ontario."
         thumbnailUrl="https://img.youtube.com/vi/jDpTN7oKdsc/maxresdefault.jpg"
-        uploadDate="2025-10-03"
+        uploadDate="2025-10-03T12:00:00-05:00"
         duration="PT5M"
-        contentUrl="https://justice-bot.com/demo-video"
+        contentUrl="https://www.justice-bot.com/demo-video"
         embedUrl="https://www.youtube.com/watch?v=jDpTN7oKdsc"
       />
       

@@ -64,7 +64,7 @@ export default function Partners() {
       <VideoSchema
         name="Justice-Bot Partnership Program Overview"
         description="Learn how partnering with Justice-Bot can help your organization expand access to justice across Canada"
-        thumbnailUrl="https://justice-bot.com/justice-bot-logo.jpeg"
+        thumbnailUrl="https://www.justice-bot.com/justice-bot-logo.jpeg"
         uploadDate={new Date().toISOString()}
         duration="PT3M"
         embedUrl="https://app.heygen.com/embedded-player/c45c2ca3bc2d450e9a862a937b2ad9a1"
