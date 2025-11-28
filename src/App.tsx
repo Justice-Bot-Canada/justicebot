@@ -77,6 +77,9 @@ import TenantRightsHarassment from "./pages/TenantRightsHarassment";
 import TenantRightsUnsafeHousing from "./pages/TenantRightsUnsafeHousing";
 import TenantRightsPrivacyViolations from "./pages/TenantRightsPrivacyViolations";
 import HowToFileT6Ontario from "./pages/HowToFileT6Ontario";
+import HowToFightN4Eviction from "./pages/HowToFightN4Eviction";
+import HRTOToronto from "./pages/HRTOToronto";
+import HRTOOttawa from "./pages/HRTOOttawa";
 
 // Lazy load heavy components
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -194,6 +197,9 @@ const AppContent = () => {
           <Route path="/tenant-rights-unsafe-housing" element={<TenantRightsUnsafeHousing />} />
           <Route path="/tenant-rights-privacy-violations" element={<TenantRightsPrivacyViolations />} />
           <Route path="/how-to-file-t6-ontario" element={<HowToFileT6Ontario />} />
+          <Route path="/how-to-fight-n4-eviction-ontario" element={<HowToFightN4Eviction />} />
+          <Route path="/hrto-toronto" element={<HRTOToronto />} />
+          <Route path="/hrto-ottawa" element={<HRTOOttawa />} />
 
           {/* Company & Support */}
           <Route path="/about" element={<About />} />
