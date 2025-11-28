@@ -71,6 +71,12 @@ import FamilyLawGuide from "./pages/FamilyLawGuide";
 import HumanRightsGuide from "./pages/HumanRightsGuide";
 import LTBT2FormGuide from "./pages/LTBT2FormGuide";
 import LTBToronto from "./pages/LTBToronto";
+import HowToFileT2Ontario from "./pages/HowToFileT2Ontario";
+import TenantRightsRepairsNotDone from "./pages/TenantRightsRepairsNotDone";
+import TenantRightsHarassment from "./pages/TenantRightsHarassment";
+import TenantRightsUnsafeHousing from "./pages/TenantRightsUnsafeHousing";
+import TenantRightsPrivacyViolations from "./pages/TenantRightsPrivacyViolations";
+import HowToFileT6Ontario from "./pages/HowToFileT6Ontario";
 
 // Lazy load heavy components
 const Dashboard = lazy(() => import("./pages/Dashboard"));

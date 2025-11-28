@@ -38,12 +38,12 @@ const Footer = () => {
             <h3 id="guides-heading" className="font-semibold mb-4">Popular Guides</h3>
             <ul className="space-y-2 text-sm text-background/80">
               <li><a href="/ltb-toronto" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">LTB Toronto Guide</a></li>
+              <li><a href="/how-to-file-t2-ontario" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">How to File T2</a></li>
+              <li><a href="/how-to-file-t6-ontario" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">How to File T6</a></li>
+              <li><a href="/tenant-rights-repairs-not-done" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Repairs Not Done</a></li>
+              <li><a href="/tenant-rights-harassment-by-landlord" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Landlord Harassment</a></li>
               <li><a href="/ltb-guide" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">LTB Guide</a></li>
               <li><a href="/criminal-court-guide" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Criminal Court Guide</a></li>
-              <li><a href="/family-court-mistakes" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Family Court Mistakes</a></li>
-              <li><a href="/criminal-court-mistakes" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Criminal Mistakes</a></li>
-              <li><a href="/tutorials" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Video Tutorials</a></li>
-              <li><a href="/templates" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Document Templates</a></li>
             </ul>
           </nav>
 
