@@ -57,7 +57,7 @@ export default defineConfig(({ mode }) => ({
   build: {
     target: 'es2015',
     minify: 'esbuild',
-    sourcemap: true,
+    sourcemap: false, // Disable sourcemaps in production for smaller bundle
     commonjsOptions: { 
       include: [/node_modules/],
       transformMixedEsModules: true
@@ -65,5 +65,18 @@ export default defineConfig(({ mode }) => ({
     cssCodeSplit: true,
     chunkSizeWarningLimit: 500,
     assetsInlineLimit: 4096,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
+          'form-vendor': ['react-hook-form', '@hookform/resolvers', 'zod'],
+          'supabase': ['@supabase/supabase-js'],
+        },
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
+      }
+    }
   },
 }));
