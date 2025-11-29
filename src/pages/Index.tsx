@@ -245,10 +245,6 @@ const Index = () => {
       
       {/* Live Support Widget */}
       <LiveSupportWidget />
-      
-      <Suspense fallback={null}>
-        <NewsletterBanner />
-      </Suspense>
     </div>
   );
 };
