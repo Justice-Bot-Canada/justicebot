@@ -22,18 +22,12 @@ export function LeadCaptureModal({ trigger = 'time', delaySeconds = 30 }: LeadCa
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user already submitted (don't show again for 7 days)
+    // Check if user already submitted or dismissed - never show again
     const lastSubmit = localStorage.getItem('lead_submitted');
-    if (lastSubmit) {
-      const daysSince = (Date.now() - parseInt(lastSubmit)) / (1000 * 60 * 60 * 24);
-      if (daysSince < 7) return;
-    }
-
-    // Check if modal was dismissed today
     const dismissed = localStorage.getItem('lead_modal_dismissed');
-    if (dismissed) {
-      const hoursSince = (Date.now() - parseInt(dismissed)) / (1000 * 60 * 60);
-      if (hoursSince < 24) return;
+    
+    if (lastSubmit || dismissed) {
+      return; // Never show again if already submitted or dismissed
     }
 
     if (trigger === 'time') {
@@ -54,12 +48,17 @@ export function LeadCaptureModal({ trigger = 'time', delaySeconds = 30 }: LeadCa
     }
 
     if (trigger === 'exit') {
+      let hasTriggered = false;
+      
       const handleMouseLeave = (e: MouseEvent) => {
-        if (e.clientY <= 0) {
+        // Only trigger if mouse leaves from top and hasn't triggered yet
+        if (e.clientY <= 0 && !hasTriggered && !isOpen) {
+          hasTriggered = true;
           setIsOpen(true);
           document.removeEventListener('mouseleave', handleMouseLeave);
         }
       };
+      
       document.addEventListener('mouseleave', handleMouseLeave);
       return () => document.removeEventListener('mouseleave', handleMouseLeave);
     }
