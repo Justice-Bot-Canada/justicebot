@@ -188,10 +188,12 @@ export function LeadCaptureModal({ trigger = 'time', delaySeconds = 30 }: LeadCa
             onSuccess={(token) => setTurnstileToken(token)}
             onError={() => {
               toast({
-                title: "Verification failed",
-                description: "Please refresh the page and try again",
+                title: "Security verification not configured",
+                description: "Please contact support to enable this feature",
                 variant: "destructive",
               });
+              // Close modal since verification isn't available
+              setTimeout(() => setIsOpen(false), 3000);
             }}
           />
           
