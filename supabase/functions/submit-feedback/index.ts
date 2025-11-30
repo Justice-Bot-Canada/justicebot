@@ -45,35 +45,33 @@ serve(async (req) => {
       );
     }
 
-    // Skip verification in test mode
-    if (requestBody.turnstileToken !== 'test-token') {
-      const turnstileResponse = await fetch(
-        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            secret: turnstileSecret,
-            response: requestBody.turnstileToken,
-          }),
+    // Verify with Cloudflare Turnstile
+    const turnstileResponse = await fetch(
+      'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          secret: turnstileSecret,
+          response: requestBody.turnstileToken,
+        }),
+      }
+    );
+
+    const turnstileResult = await turnstileResponse.json();
+    
+    if (!turnstileResult.success) {
+      console.error('Turnstile verification failed:', turnstileResult);
+      return new Response(
+        JSON.stringify({ error: 'Verification failed' }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 403 
         }
       );
-
-      const turnstileResult = await turnstileResponse.json();
-      
-      if (!turnstileResult.success) {
-        console.error('Turnstile verification failed:', turnstileResult);
-        return new Response(
-          JSON.stringify({ error: 'Verification failed' }),
-          { 
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 403 
-          }
-        );
-      }
-    } else {
-      console.log('Test mode: Skipping Turnstile verification');
     }
+    
+    console.log('Turnstile verification successful');
     
     // Validate input with Zod
     const validationResult = FeedbackSchema.safeParse(requestBody);
