@@ -54,11 +54,11 @@ export const TurnstileWidget = ({ onSuccess, onError }: TurnstileWidgetProps) =>
     if (isLoaded && containerRef.current && window.turnstile && !widgetIdRef.current) {
       try {
         // Get sitekey from environment variable
-        // TODO: Set VITE_TURNSTILE_SITEKEY in your .env file
         const sitekey = import.meta.env.VITE_TURNSTILE_SITEKEY || '';
         
-        if (!sitekey) {
-          console.error('VITE_TURNSTILE_SITEKEY environment variable not set');
+        if (!sitekey || sitekey === 'YOUR_SITEKEY_HERE') {
+          console.error('⚠️ TURNSTILE NOT CONFIGURED: Add your Cloudflare Turnstile sitekey to .env file');
+          console.error('Get sitekey at: https://dash.cloudflare.com/');
           onError?.();
           return;
         }
