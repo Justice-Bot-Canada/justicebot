@@ -1,475 +1,124 @@
 <!DOCTYPE html>
-<html lang=
-"en-CA"
->
+<html lang="en-CA">
   <head>
-    <meta charset=
-"UTF-8"
- />
-    <link rel=
-"icon"
- href=
-"/favicon.png"
- type=
-"image/png"
->
-    <meta name=
-"viewport"
- content=
-"width=device-width, initial-scale=1.0"
- />
-    <link rel=
-"manifest"
- href=
-"/manifest.json"
->
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="/manifest.json">
+
     <!-- Performance: DNS Prefetch & Preconnect -->
-    <link rel=
-"preconnect"
- href=
-"https://vkzquzjtewqhcisvhsvg.supabase.co"
- crossorigin>
-    <link rel=
-"dns-prefetch"
- href=
-"https://vkzquzjtewqhcisvhsvg.supabase.co"
->
-    <link rel=
-"dns-prefetch"
- href=
-"https://api.justice-bot.com"
->
+    <link rel="preconnect" href="https://vkzquzjtewqhcisvhsvg.supabase.co" crossorigin>
+    <link rel="dns-prefetch" href="https://vkzquzjtewqhcisvhsvg.supabase.co">
+    <link rel="dns-prefetch" href="https://api.justice-bot.com">
+
     <!-- Performance: Preload critical assets -->
-    <link rel=
-"preload"
- href=
-"/logo-64.webp"
- as=
-"image"
- type=
-"image/webp"
- fetchpriority=
-"high"
->
-    <link rel=
-"preload"
- href=
-"/hero-mobile.webp"
- as=
-"image"
- type=
-"image/webp"
- media=
-"(max-width: 767px)"
- fetchpriority=
-"high"
->
-    <link rel=
-"preload"
- href=
-"/hero-desktop.webp"
- as=
-"image"
- type=
-"image/webp"
- media=
-"(min-width: 768px)"
- fetchpriority=
-"high"
->
-    <title>Free Legal Help Ontario 
-2025
- | AI Legal Assistant Canada - Justice-Bot</title>
-    <meta name=
-"description"
- content=
-"Get free & affordable legal help in Ontario with Justice-Bot - Canada's AI legal assistant. LTB, HRTO, Small Claims, Family Court guidance. Free tools + $19/month subscription. Legal aid alternative trusted by 1000+ Ontarians."
- />
-    <link rel=
-"canonical"
- href=
-"https://www.justice-bot.com/"
- />
+    <link rel="preload" href="/logo-64.webp" as="image" type="image/webp" fetchpriority="high">
+    <link rel="preload" href="/hero-mobile.webp" as="image" type="image/webp" media="(max-width: 767px)" fetchpriority="high">
+    <link rel="preload" href="/hero-desktop.webp" as="image" type="image/webp" media="(min-width: 768px)" fetchpriority="high">
+
+    <title>Free Legal Help Ontario 2025 | AI Legal Assistant Canada - Justice-Bot</title>
+    <meta name="description" content="Get free & affordable legal help in Ontario with Justice-Bot - Canada's AI legal assistant. LTB, HRTO, Small Claims, Family Court guidance. Free tools + $19/month subscription. Legal aid alternative trusted by 1000+ Ontarians." />
+    <link rel="canonical" href="https://www.justice-bot.com/" />
+
     <!-- Open Graph -->
-    <meta property=
-"og:title"
- content=
-"Free Legal Help Ontario | AI Legal Assistant Canada - Justice-Bot"
- />
-    <meta property=
-"og:description"
- content=
-"Affordable AI-powered legal assistance for Ontario residents. LTB forms, HRTO applications, Small Claims Court, Family Law. Starting at $19/month."
- />
-    <meta property=
-"og:url"
- content=
-"https://www.justice-bot.com/"
- />
-    <meta property=
-"og:type"
- content=
-"website"
- />
-    <meta property=
-"og:image"
- content=
-"https://www.justice-bot.com/justice-bot-logo.jpeg"
- />
-    <meta property=
-"og:image:type"
- content=
-"image/jpeg"
- />
-    <meta property=
-"og:image:width"
- content=
-"1080"
- />
-    <meta property=
-"og:image:height"
- content=
-"1080"
- />
-    <meta property=
-"og:image:alt"
- content=
-"Justice-Bot - AI Legal Assistant for Ontario"
- />
-    <meta property=
-"og:locale"
- content=
-"en_CA"
- />
-    <meta property=
-"og:site_name"
- content=
-"Justice-Bot"
- />
+    <meta property="og:title" content="Free Legal Help Ontario | AI Legal Assistant Canada - Justice-Bot" />
+    <meta property="og:description" content="Affordable AI-powered legal assistance for Ontario residents. LTB forms, HRTO applications, Small Claims Court, Family Law. Starting at $19/month." />
+    <meta property="og:url" content="https://www.justice-bot.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://www.justice-bot.com/justice-bot-logo.jpeg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1080" />
+    <meta property="og:image:height" content="1080" />
+    <meta property="og:image:alt" content="Justice-Bot - AI Legal Assistant for Ontario" />
+    <meta property="og:locale" content="en_CA" />
+    <meta property="og:site_name" content="Justice-Bot" />
+
     <!-- Twitter Card -->
-    <meta name=
-"twitter:card"
- content=
-"summary_large_image"
- />
-    <meta name=
-"twitter:site"
- content=
-"@JusticeBot"
- />
-    <meta name=
-"twitter:title"
- content=
-"Free Legal Help Ontario | AI Legal Assistant Canada"
- />
-    <meta name=
-"twitter:description"
- content=
-"Affordable AI-powered legal assistance. LTB, HRTO, Small Claims Court, Family Law. Starting at $19/month."
- />
-    <meta name=
-"twitter:image"
- content=
-"https://www.justice-bot.com/justice-bot-logo.jpeg"
- />
-    <meta name=
-"twitter:image:alt"
- content=
-"Justice-Bot - AI Legal Assistant for Ontario"
- />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@JusticeBot" />
+    <meta name="twitter:title" content="Free Legal Help Ontario | AI Legal Assistant Canada" />
+    <meta name="twitter:description" content="Affordable AI-powered legal assistance. LTB, HRTO, Small Claims Court, Family Law. Starting at $19/month." />
+    <meta name="twitter:image" content="https://www.justice-bot.com/justice-bot-logo.jpeg" />
+    <meta name="twitter:image:alt" content="Justice-Bot - AI Legal Assistant for Ontario" />
+
     <!-- Additional Meta -->
-    <meta name=
-"author"
- content=
-"Justice-Bot Technologies Inc."
- />
-    <meta name=
-"robots"
- content=
-"index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
- />
-    <meta name=
-"theme-color"
- content=
-"#D32F2F"
- />
-    <meta name=
-"mobile-web-app-capable"
- content=
-"yes"
- />
-    <meta name=
-"apple-mobile-web-app-capable"
- content=
-"yes"
- />
-    <meta name=
-"apple-mobile-web-app-status-bar-style"
- content=
-"default"
- />
-    <meta name=
-"apple-mobile-web-app-title"
- content=
-"Justice-Bot"
- />
+    <meta name="author" content="Justice-Bot Technologies Inc." />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="theme-color" content="#D32F2F" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Justice-Bot" />
+
     <!-- JSON-LD Structured Data -->
-    <script type=
-"application/ld+json"
->
+    <script type="application/ld+json">
     {
-      
-"@context"
-: 
-"https://schema.org"
-,
-      
-"@type"
-: 
-"LegalService"
-,
-      
-"name"
-: 
-"Justice-Bot"
-,
-      
-"description"
-: 
-"Guided legal triage, document preparation, and filing assistance for Canadians"
-,
-      
-"url"
-: 
-"https://www.justice-bot.com"
-,
-      
-"logo"
-: 
-"https://www.justice-bot.com/justice-bot-logo.jpeg"
-,
-      
-"areaServed"
-: { 
-"@type"
-: 
-"Country"
-, 
-"name"
-: 
-"Canada"
- },
-      
-"availableLanguage"
-: 
-"English"
-,
-      
-"priceRange"
-: 
-"$19-$99"
-,
-      
-"offers"
-: [
-        { 
-"@type"
-: 
-"Offer"
-, 
-"name"
-: 
-"Monthly Subscription"
-, 
-"price"
-: 
-"19.00"
-, 
-"priceCurrency"
-: 
-"CAD"
-, 
-"availability"
-: 
-"https://schema.org/InStock"
- },
-        { 
-"@type"
-: 
-"Offer"
-, 
-"name"
-: 
-"Annual Subscription"
-, 
-"price"
-: 
-"99.99"
-, 
-"priceCurrency"
-: 
-"CAD"
-, 
-"availability"
-: 
-"https://schema.org/InStock"
- },
-        { 
-"@type"
-: 
-"Offer"
-, 
-"name"
-: 
-"One-Time Form Purchase"
-, 
-"price"
-: 
-"29.99"
-, 
-"priceCurrency"
-: 
-"CAD"
-, 
-"availability"
-: 
-"https://schema.org/InStock"
- }
+      "@context": "https://schema.org",
+      "@type": "LegalService",
+      "name": "Justice-Bot",
+      "description": "Guided legal triage, document preparation, and filing assistance for Canadians",
+      "url": "https://www.justice-bot.com",
+      "logo": "https://www.justice-bot.com/justice-bot-logo.jpeg",
+      "areaServed": { "@type": "Country", "name": "Canada" },
+      "availableLanguage": "English",
+      "priceRange": "$19-$99",
+      "offers": [
+        { "@type": "Offer", "name": "Monthly Subscription", "price": "19.00", "priceCurrency": "CAD", "availability": "https://schema.org/InStock" },
+        { "@type": "Offer", "name": "Annual Subscription", "price": "99.99", "priceCurrency": "CAD", "availability": "https://schema.org/InStock" },
+        { "@type": "Offer", "name": "One-Time Form Purchase", "price": "29.99", "priceCurrency": "CAD", "availability": "https://schema.org/InStock" }
       ],
-      
-"aggregateRating"
-: { 
-"@type"
-: 
-"AggregateRating"
-, 
-"ratingValue"
-: 
-"4.8"
-, 
-"reviewCount"
-: 
-"127"
- },
-      
-"provider"
-: { 
-"@type"
-: 
-"Organization"
-, 
-"name"
-: 
-"Justice-Bot Technologies Inc."
-, 
-"address"
-: { 
-"@type"
-: 
-"PostalAddress"
-, 
-"addressCountry"
-: 
-"CA"
-, 
-"addressRegion"
-: 
-"ON"
- } }
+      "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "reviewCount": "127" },
+      "provider": { "@type": "Organization", "name": "Justice-Bot Technologies Inc.", "address": { "@type": "PostalAddress", "addressCountry": "CA", "addressRegion": "ON" } }
     }
     </script>
+
     <!-- Critical CSS -->
     <style>
       body {
-        margin: 
-0
-;
+        margin: 0;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         -webkit-font-smoothing: antialiased;
       }
-      #root { min-height: 
-100
-vh; }
+      #root { min-height: 100vh; }
       .loading {
         position: fixed;
-        top: 
-50
-%;
-        left: 
-50
-%;
-        transform: translate(
--50
-%, -50%);
-        width: 
-48
-px;
-        height: 
-48
-px;
-        border: 
-4
-px solid #f3f3f3;
-        border-top: 
-4
-px solid #D32F2F;
-        border-radius: 
-50
-%;
-        animation: spin 
-1
-s linear infinite;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 48px;
+        height: 48px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #D32F2F;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
       }
       @keyframes spin {
-        0% { transform: translate(
--50
-%, -50%) rotate(0deg); }
-        
-100
-% { transform: translate(
--50
-%, -50%) rotate(360deg); }
+        0% { transform: translate(-50%, -50%) rotate(0deg); }
+        100% { transform: translate(-50%, -50%) rotate(360deg); }
       }
     </style>
-    <!-- Google tag (gtag.js) -->
-    <script async src=
-"https://www.googletagmanager.com/gtag/js?id=G-ZELN2X9X6P"
-></script>
-    <script>
-      
-// Consent Mode scaffold (optional – adjust to your policy or remove)
 
-      
-// gtag('consent', 'default', { analytics_storage: 'granted' });
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZELN2X9X6P"></script>
+    <script>
+      // Consent Mode scaffold (optional – adjust to your policy or remove)
+      // gtag('consent', 'default', { analytics_storage: 'granted' });
 
       window.dataLayer = window.dataLayer || [];
       function gtag(){ dataLayer.push(arguments); }
       gtag('js', new Date());
-      
-// Important for SPAs: disable automatic page_view
 
-      gtag('config', 'G-ZELN2X9X6P', { send_page_view: 
-false
- });
+      // Important for SPAs: disable automatic page_view
+      gtag('config', 'G-ZELN2X9X6P', { send_page_view: false });
     </script>
   </head>
+
   <body>
-    <div id=
-"root"
->
-      <div class=
-"loading"
- role=
-"status"
- aria-label=
-"Loading application"
-></div>
+    <div id="root">
+      <div class="loading" role="status" aria-label="Loading application"></div>
     </div>
+
     <!-- Main Vite entrypoint -->
-    <script type=
-"module"
- src=
-"/src/main.tsx"
-></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
