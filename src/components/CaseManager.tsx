@@ -6,14 +6,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, FileText, Scale, TrendingUp, AlertCircle, ArrowRight, Target } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-// ❌ REMOVED - Sonner causing runtime errors
-// import { toast } from "sonner";
 import { toast } from "@/lib/toast-stub";
 import { useNavigate } from "react-router-dom";
 import LegalPathwayGuide from "./LegalPathwayGuide";
+import { CaseWorkspace } from "./CaseWorkspace";
 
 interface Case {
   id: string;
@@ -68,7 +68,8 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
     description: '',
     province: '',
     municipality: '',
-    law_section: ''
+    law_section: '',
+    venue: 'LTB'
   });
 
   useEffect(() => {
@@ -219,7 +220,7 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
         console.error('Analysis error:', analysisResponse.error);
       }
 
-      setNewCase({ title: '', description: '', province: '', municipality: '', law_section: '' });
+      setNewCase({ title: '', description: '', province: '', municipality: '', law_section: '', venue: 'LTB' });
       setShowNewCase(false);
       fetchCases();
       toast.success('Case created and analysis started');
@@ -298,6 +299,19 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
       <LegalPathwayGuide 
         caseId={selectedCase.id} 
         onBack={() => setShowPathwayGuide(false)} 
+      />
+    );
+  }
+
+  // Show focused workspace when a case is selected
+  if (selectedCase) {
+    return (
+      <CaseWorkspace 
+        caseId={selectedCase.id}
+        onBack={() => {
+          setSelectedCase(null);
+          onCaseSelect?.(null);
+        }}
       />
     );
   }
@@ -593,6 +607,24 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
                   placeholder="Detailed case description"
                   rows={3}
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="venue">Case Type *</Label>
+                <Select value={newCase.venue} onValueChange={(value) => setNewCase({ ...newCase, venue: value })}>
+                  <SelectTrigger id="venue">
+                    <SelectValue placeholder="Select case type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="HRTO">Human Rights Tribunal (HRTO)</SelectItem>
+                    <SelectItem value="LTB">Landlord Tenant Board (LTB)</SelectItem>
+                    <SelectItem value="SMALL_CLAIMS">Small Claims Court</SelectItem>
+                    <SelectItem value="FAMILY">Family Court</SelectItem>
+                    <SelectItem value="SUPERIOR">Superior Court</SelectItem>
+                    <SelectItem value="CRIMINAL">Criminal Court</SelectItem>
+                    <SelectItem value="LABOUR">Labour Relations Board</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
