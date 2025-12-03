@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { TrendingUp, AlertCircle, CheckCircle, XCircle } from "lucide-react";
 import SEOHead from "@/components/SEOHead";
@@ -31,6 +32,7 @@ export default function CaseStrengthAnalyzer() {
   const [caseDetails, setCaseDetails] = useState("");
   const [evidenceList, setEvidenceList] = useState("");
   const [jurisdiction, setJurisdiction] = useState("Ontario, Canada");
+  const [caseType, setCaseType] = useState("HRTO");
   const [analysis, setAnalysis] = useState<CaseAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -40,10 +42,10 @@ export default function CaseStrengthAnalyzer() {
       return;
     }
 
-    if (!caseDetails) {
+    if (!caseDetails || caseDetails.length < 10) {
       toast({
         title: "Missing Information",
-        description: "Please provide case details",
+        description: "Please provide detailed case description (at least 10 characters)",
         variant: "destructive",
       });
       return;
@@ -56,15 +58,20 @@ export default function CaseStrengthAnalyzer() {
           caseDetails,
           evidenceList,
           jurisdiction,
+          caseType,
         },
       });
 
       if (error) throw error;
 
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
       setAnalysis(data.analysis);
       toast({
         title: "Analysis Complete",
-        description: "Your case strength has been analyzed",
+        description: `Your ${getCaseTypeLabel(caseType)} case has been analyzed`,
       });
     } catch (error: any) {
       console.error("Error analyzing case:", error);
@@ -76,6 +83,19 @@ export default function CaseStrengthAnalyzer() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getCaseTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      'HRTO': 'Human Rights Tribunal',
+      'LTB': 'Landlord Tenant Board',
+      'SMALL_CLAIMS': 'Small Claims Court',
+      'FAMILY': 'Family Court',
+      'SUPERIOR': 'Superior Court',
+      'CRIMINAL': 'Criminal Court',
+      'LABOUR': 'Labour Board'
+    };
+    return labels[type] || type;
   };
 
   const getProbabilityColor = (prob: string) => {
@@ -115,12 +135,30 @@ export default function CaseStrengthAnalyzer() {
             
             <div className="space-y-4">
               <div>
+                <Label htmlFor="caseType">Case Type *</Label>
+                <Select value={caseType} onValueChange={setCaseType}>
+                  <SelectTrigger id="caseType">
+                    <SelectValue placeholder="Select case type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="HRTO">Human Rights Tribunal (HRTO)</SelectItem>
+                    <SelectItem value="LTB">Landlord Tenant Board (LTB)</SelectItem>
+                    <SelectItem value="SMALL_CLAIMS">Small Claims Court</SelectItem>
+                    <SelectItem value="FAMILY">Family Court</SelectItem>
+                    <SelectItem value="SUPERIOR">Superior Court</SelectItem>
+                    <SelectItem value="CRIMINAL">Criminal Court</SelectItem>
+                    <SelectItem value="LABOUR">Labour Relations Board</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
                 <Label htmlFor="caseDetails">Case Details *</Label>
                 <Textarea
                   id="caseDetails"
                   value={caseDetails}
                   onChange={(e) => setCaseDetails(e.target.value)}
-                  placeholder="Describe your case: what happened, when, who is involved, what laws may apply..."
+                  placeholder={`Describe your ${getCaseTypeLabel(caseType)} case: what happened, when, who is involved...`}
                   rows={6}
                 />
               </div>
@@ -149,7 +187,7 @@ export default function CaseStrengthAnalyzer() {
 
               <Button onClick={handleAnalyze} disabled={loading} className="w-full">
                 <TrendingUp className="h-4 w-4 mr-2" />
-                {loading ? "Analyzing..." : "Analyze Case Strength"}
+                {loading ? `Analyzing ${getCaseTypeLabel(caseType)} Case...` : `Analyze ${getCaseTypeLabel(caseType)} Case`}
               </Button>
             </div>
           </Card>

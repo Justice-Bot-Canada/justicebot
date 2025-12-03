@@ -9,6 +9,7 @@ import SEOHead from "@/components/SEOHead";
 import { EvidenceHub } from "@/components/EvidenceHub";
 import { EvidenceAnalyzer } from "@/components/EvidenceAnalyzer";
 import { PremiumGate } from "@/components/PremiumGate";
+import { CaseMeritScore } from "@/components/CaseMeritScore";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -118,6 +119,13 @@ const Evidence = () => {
 
           <PremiumGate feature="Evidence Management">
             <div className="space-y-6">
+              {/* Case-Specific Merit Score */}
+              <CaseMeritScore 
+                caseId={caseId}
+                caseType={caseData?.venue}
+                caseDescription={caseData?.description}
+              />
+              
               <EvidenceAnalyzer 
                 caseId={caseId} 
                 caseType={caseData?.venue}
