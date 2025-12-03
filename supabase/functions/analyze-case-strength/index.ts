@@ -6,13 +6,20 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Input validation schema
+// Input validation schema - accepts both string and object formats
 const CaseStrengthSchema = z.object({
-  caseDetails: z.record(z.unknown()).refine(val => Object.keys(val).length > 0, {
-    message: "Case details cannot be empty"
-  }),
-  evidenceList: z.array(z.record(z.unknown())).optional().default([]),
-  jurisdiction: z.string().trim().max(100).optional().default('Ontario, Canada')
+  caseDetails: z.union([
+    z.string().min(10, "Case details must be at least 10 characters"),
+    z.record(z.unknown()).refine(val => Object.keys(val).length > 0, {
+      message: "Case details cannot be empty"
+    })
+  ]),
+  evidenceList: z.union([
+    z.string(),
+    z.array(z.record(z.unknown()))
+  ]).optional().default([]),
+  jurisdiction: z.string().trim().max(100).optional().default('Ontario, Canada'),
+  caseType: z.string().optional()
 });
 
 serve(async (req) => {
@@ -38,24 +45,32 @@ serve(async (req) => {
       );
     }
     
-    const { caseDetails, evidenceList, jurisdiction } = validation.data;
+    const { caseDetails, evidenceList, jurisdiction, caseType } = validation.data;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY not configured");
     }
 
-    const systemPrompt = `You are a legal case strength analyzer specializing in Canadian law.
+    // Determine case type label for context
+    const caseTypeLabel = caseType ? getCaseTypeLabel(caseType) : 'General Legal';
+
+    const systemPrompt = `You are a legal case strength analyzer specializing in Canadian law, specifically ${caseTypeLabel} cases.
 Analyze case details and provide objective probability assessments.
-Base your analysis on legal precedent, evidence strength, and applicable law.
+Base your analysis on legal precedent, evidence strength, and applicable law for ${caseTypeLabel} matters.
 DO NOT provide legal advice, only analytical assessments.
 Always include disclaimers that this is not legal advice.`;
 
-    const prompt = `Analyze the following case and provide a strength assessment:
+    // Convert to string if needed
+    const caseDetailsStr = typeof caseDetails === 'string' ? caseDetails : JSON.stringify(caseDetails);
+    const evidenceStr = typeof evidenceList === 'string' ? evidenceList : JSON.stringify(evidenceList);
 
+    const prompt = `Analyze the following ${caseTypeLabel} case and provide a strength assessment:
+
+Case Type: ${caseTypeLabel}
 Jurisdiction: ${jurisdiction || 'Ontario, Canada'}
-Case Details: ${JSON.stringify(caseDetails)}
-Available Evidence: ${JSON.stringify(evidenceList)}
+Case Details: ${caseDetailsStr}
+Available Evidence: ${evidenceStr}
 
 Provide analysis in JSON format with:
 - strengthScore (0-100): Overall case strength
@@ -140,3 +155,18 @@ Remember: This is educational analysis, not legal advice.`;
     );
   }
 });
+
+// Helper function to convert case type codes to readable labels
+function getCaseTypeLabel(caseType: string): string {
+  const labels: Record<string, string> = {
+    'HRTO': 'Human Rights Tribunal of Ontario',
+    'LTB': 'Landlord and Tenant Board',
+    'SMALL_CLAIMS': 'Small Claims Court',
+    'FAMILY': 'Family Court',
+    'SUPERIOR': 'Superior Court',
+    'CRIMINAL': 'Criminal Court',
+    'LABOUR': 'Labour Relations Board',
+    'IMMIGRATION': 'Immigration and Refugee Board'
+  };
+  return labels[caseType?.toUpperCase()] || caseType || 'General Legal';
+}
