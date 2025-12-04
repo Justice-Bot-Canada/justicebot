@@ -19,6 +19,7 @@ export function LeadCaptureModal({ trigger = 'time', delaySeconds = 30 }: LeadCa
   const [name, setName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileError, setTurnstileError] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -67,7 +68,8 @@ export function LeadCaptureModal({ trigger = 'time', delaySeconds = 30 }: LeadCa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!turnstileToken) {
+    // Only require token if Turnstile loaded successfully
+    if (!turnstileToken && !turnstileError) {
       toast({
         title: "Verification required",
         description: "Please complete the security check",
@@ -184,20 +186,14 @@ export function LeadCaptureModal({ trigger = 'time', delaySeconds = 30 }: LeadCa
             />
           </div>
           
-          <TurnstileWidget 
-            onSuccess={(token) => setTurnstileToken(token)}
-            onError={() => {
-              toast({
-                title: "Security verification not configured",
-                description: "Please contact support to enable this feature",
-                variant: "destructive",
-              });
-              // Close modal since verification isn't available
-              setTimeout(() => setIsOpen(false), 3000);
-            }}
-          />
+          {!turnstileError && (
+            <TurnstileWidget 
+              onSuccess={(token) => setTurnstileToken(token)}
+              onError={() => setTurnstileError(true)}
+            />
+          )}
           
-          <Button type="submit" className="w-full" disabled={isSubmitting || !turnstileToken}>
+          <Button type="submit" className="w-full" disabled={isSubmitting || (!turnstileToken && !turnstileError)}>
             {isSubmitting ? 'Sending...' : 'Get Free Guide Now'}
           </Button>
           <p className="text-xs text-center text-muted-foreground">

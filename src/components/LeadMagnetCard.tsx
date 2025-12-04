@@ -28,6 +28,7 @@ export function LeadMagnetCard({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileError, setTurnstileError] = useState(false);
   const { toast } = useToast();
 
   const getIcon = () => {
@@ -41,7 +42,8 @@ export function LeadMagnetCard({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!turnstileToken) {
+    // Only require token if Turnstile loaded successfully
+    if (!turnstileToken && !turnstileError) {
       toast({
         title: "Verification required",
         description: "Please complete the security check",
@@ -141,18 +143,14 @@ export function LeadMagnetCard({
             />
           </div>
           
-          <TurnstileWidget 
-            onSuccess={(token) => setTurnstileToken(token)}
-            onError={() => {
-              toast({
-                title: "Verification failed",
-                description: "Please refresh the page and try again",
-                variant: "destructive",
-              });
-            }}
-          />
+          {!turnstileError && (
+            <TurnstileWidget 
+              onSuccess={(token) => setTurnstileToken(token)}
+              onError={() => setTurnstileError(true)}
+            />
+          )}
           
-          <Button type="submit" className="w-full" disabled={isSubmitting || !turnstileToken}>
+          <Button type="submit" className="w-full" disabled={isSubmitting || (!turnstileToken && !turnstileError)}>
             <Download className="mr-2 h-4 w-4" />
             {isSubmitting ? 'Sending...' : `Get Free ${downloadType.charAt(0).toUpperCase() + downloadType.slice(1)}`}
           </Button>
