@@ -80,7 +80,7 @@ import HowToFileT6Ontario from "./pages/HowToFileT6Ontario";
 import HowToFightN4Eviction from "./pages/HowToFightN4Eviction";
 import HRTOToronto from "./pages/HRTOToronto";
 import HRTOOttawa from "./pages/HRTOOttawa";
-
+import LTBCityPage from "./pages/LTBCityPage";
 // Lazy load heavy components
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Admin = lazy(() => import("./pages/Admin"));
@@ -200,8 +200,28 @@ const AppContent = () => {
           <Route path="/how-to-fight-n4-eviction-ontario" element={<HowToFightN4Eviction />} />
           <Route path="/hrto-toronto" element={<HRTOToronto />} />
           <Route path="/hrto-ottawa" element={<HRTOOttawa />} />
+          
+          {/* City-specific LTB Pages */}
+          <Route path="/ltb-ottawa" element={<LTBCityPage />} />
+          <Route path="/ltb-mississauga" element={<LTBCityPage />} />
+          <Route path="/ltb-hamilton" element={<LTBCityPage />} />
+          <Route path="/ltb-brampton" element={<LTBCityPage />} />
+          <Route path="/ltb-london" element={<LTBCityPage />} />
+          <Route path="/ltb-kitchener" element={<LTBCityPage />} />
+          <Route path="/ltb-windsor" element={<LTBCityPage />} />
+          <Route path="/ltb-markham" element={<LTBCityPage />} />
+          <Route path="/ltb-vaughan" element={<LTBCityPage />} />
+          <Route path="/ltb-oakville" element={<LTBCityPage />} />
+          <Route path="/ltb-burlington" element={<LTBCityPage />} />
+          <Route path="/ltb-oshawa" element={<LTBCityPage />} />
+          <Route path="/ltb-barrie" element={<LTBCityPage />} />
+          <Route path="/ltb-guelph" element={<LTBCityPage />} />
+          <Route path="/ltb-cambridge" element={<LTBCityPage />} />
+          <Route path="/ltb-whitby" element={<LTBCityPage />} />
+          <Route path="/ltb-ajax" element={<LTBCityPage />} />
+          <Route path="/ltb-richmond-hill" element={<LTBCityPage />} />
+          <Route path="/ltb-sudbury" element={<LTBCityPage />} />
 
-          {/* Company & Support */}
           <Route path="/about" element={<About />} />
           <Route path="/team" element={<Team />} />
           <Route path="/scope" element={<Scope />} />
