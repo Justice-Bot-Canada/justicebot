@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, FileText, Scale, TrendingUp, AlertCircle, ArrowRight, Target } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Upload, FileText, Scale, TrendingUp, AlertCircle, ArrowRight, Target, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/lib/toast-stub";
@@ -69,7 +70,7 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
     province: '',
     municipality: '',
     law_section: '',
-    venue: 'LTB'
+    venue: ''
   });
 
   useEffect(() => {
@@ -185,8 +186,8 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
   };
 
   const createCase = async () => {
-    if (!user || !newCase.title || !newCase.description || !newCase.province) {
-      toast.error('Please fill in all required fields');
+    if (!user || !newCase.title || !newCase.description || !newCase.province || !newCase.venue) {
+      toast.error('Please fill in all required fields including case type');
       return;
     }
 
@@ -220,7 +221,7 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
         console.error('Analysis error:', analysisResponse.error);
       }
 
-      setNewCase({ title: '', description: '', province: '', municipality: '', law_section: '', venue: 'LTB' });
+      setNewCase({ title: '', description: '', province: '', municipality: '', law_section: '', venue: '' });
       setShowNewCase(false);
       fetchCases();
       toast.success('Case created and analysis started');
@@ -229,6 +230,35 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
       toast.error('Failed to create case');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteCase = async (caseId: string) => {
+    try {
+      // Delete related records first (foreign key constraints)
+      await supabase.from('evidence').delete().eq('case_id', caseId);
+      await supabase.from('legal_pathways').delete().eq('case_id', caseId);
+      await supabase.from('case_events').delete().eq('case_id', caseId);
+      await supabase.from('case_deadlines').delete().eq('case_id', caseId);
+      
+      const { error } = await supabase
+        .from('cases')
+        .delete()
+        .eq('id', caseId)
+        .eq('user_id', user?.id);
+
+      if (error) throw error;
+      
+      if (selectedCase?.id === caseId) {
+        setSelectedCase(null);
+        onCaseSelect?.(null);
+      }
+      
+      fetchCases();
+      toast.success('Case deleted successfully');
+    } catch (error) {
+      console.error('Error deleting case:', error);
+      toast.error('Failed to delete case');
     }
   };
 
@@ -415,6 +445,30 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
                         >
                           <Target className="h-4 w-4" />
                         </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button size="sm" variant="outline" className="text-destructive hover:bg-destructive hover:text-destructive-foreground">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Case</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete "{case_.title}"? This will permanently delete the case and all associated evidence, events, and pathways. This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction 
+                                onClick={() => deleteCase(case_.id)}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </CardContent>
                   </Card>

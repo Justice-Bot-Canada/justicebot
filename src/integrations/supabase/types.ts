@@ -891,6 +891,44 @@ export type Database = {
           },
         ]
       }
+      form_submissions: {
+        Row: {
+          created_at: string
+          form_id: string
+          id: string
+          payload: Json
+          status: string
+          submitted_by: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          form_id: string
+          id?: string
+          payload: Json
+          status?: string
+          submitted_by: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          form_id?: string
+          id?: string
+          payload?: Json
+          status?: string
+          submitted_by?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_submissions_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       form_usage: {
         Row: {
           case_id: string | null
@@ -955,7 +993,10 @@ export type Database = {
           form_fields: Json | null
           id: string
           instructions: string | null
+          internal_route: string | null
           is_active: boolean
+          legal_section: string | null
+          meta: Json | null
           pdf_url: string | null
           price_cents: number
           purchasable: boolean | null
@@ -973,7 +1014,10 @@ export type Database = {
           form_fields?: Json | null
           id?: string
           instructions?: string | null
+          internal_route?: string | null
           is_active?: boolean
+          legal_section?: string | null
+          meta?: Json | null
           pdf_url?: string | null
           price_cents?: number
           purchasable?: boolean | null
@@ -991,7 +1035,10 @@ export type Database = {
           form_fields?: Json | null
           id?: string
           instructions?: string | null
+          internal_route?: string | null
           is_active?: boolean
+          legal_section?: string | null
+          meta?: Json | null
           pdf_url?: string | null
           price_cents?: number
           purchasable?: boolean | null
@@ -2248,6 +2295,7 @@ export type Database = {
         Args: { revoke_reason?: string; target_user_id: string }
         Returns: undefined
       }
+      user_has_role: { Args: { target_role: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "owner"
