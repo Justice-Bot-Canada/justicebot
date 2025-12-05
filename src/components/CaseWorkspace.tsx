@@ -16,7 +16,8 @@ import {
   Upload,
   Info,
   Target,
-  Loader2
+  Loader2,
+  AlertCircle
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -56,12 +57,12 @@ const CASE_TYPE_CONFIG: Record<string, {
     label: 'Human Rights',
     fullName: 'Human Rights Tribunal of Ontario',
     color: 'bg-purple-500',
-    forms: ['HRTO Application', 'Response Form', 'Request to Extend Time'],
+    forms: ['HRTO Form 1 - Application', 'Schedule A - Details', 'Form 2 - Response'],
     filingSteps: [
       'Complete the HRTO Application Form (Form 1)',
+      'Complete Schedule A with detailed facts',
       'Attach supporting documents and evidence',
       'File within 1 year of the alleged discrimination',
-      'Pay the filing fee (waived for individuals)',
       'Serve the respondent with a copy'
     ],
     documentsNeeded: [
@@ -106,7 +107,7 @@ const CASE_TYPE_CONFIG: Record<string, {
     label: 'Small Claims',
     fullName: 'Small Claims Court',
     color: 'bg-blue-500',
-    forms: ['Plaintiff\'s Claim', 'Defence', 'Defendant\'s Claim'],
+    forms: ['Form 7A - Plaintiff\'s Claim', 'Form 9A - Defence', 'Form 11A - Affidavit of Service'],
     filingSteps: [
       'Complete the Plaintiff\'s Claim form',
       'Calculate your damages (up to $35,000)',
@@ -131,7 +132,7 @@ const CASE_TYPE_CONFIG: Record<string, {
     label: 'Family',
     fullName: 'Family Court',
     color: 'bg-pink-500',
-    forms: ['Application (Form 8)', 'Answer (Form 10)', 'Financial Statement'],
+    forms: ['Form 8 - Application', 'Form 10 - Answer', 'Form 13 - Financial Statement'],
     filingSteps: [
       'Complete the appropriate family court form',
       'File your financial statement (Form 13)',
@@ -150,6 +151,81 @@ const CASE_TYPE_CONFIG: Record<string, {
       '30 days to serve application',
       '30 days for respondent to answer',
       'Financial disclosure within 10 days'
+    ]
+  },
+  'SUPERIOR': {
+    label: 'Superior Court',
+    fullName: 'Ontario Superior Court of Justice',
+    color: 'bg-indigo-500',
+    forms: ['Statement of Claim', 'Statement of Defence', 'Affidavit of Documents'],
+    filingSteps: [
+      'Draft your Statement of Claim',
+      'Pay the filing fee ($229)',
+      'Serve the defendant personally',
+      'Wait for Statement of Defence (20-40 days)',
+      'Complete documentary discovery'
+    ],
+    documentsNeeded: [
+      'All relevant contracts',
+      'Expert reports',
+      'Financial records',
+      'Witness statements',
+      'Timeline of events'
+    ],
+    deadlines: [
+      '2 years limitation period',
+      '20 days (Ontario) or 40 days (outside) for defence',
+      '30 days for affidavit of documents'
+    ]
+  },
+  'CRIMINAL': {
+    label: 'Criminal',
+    fullName: 'Ontario Court of Justice - Criminal',
+    color: 'bg-red-500',
+    forms: ['Private Information', 'Bail Variation Request', 'Section 810 Peace Bond'],
+    filingSteps: [
+      'Consult with duty counsel',
+      'Understand the charges',
+      'Gather disclosure from Crown',
+      'Prepare your defence',
+      'Attend all court appearances'
+    ],
+    documentsNeeded: [
+      'Disclosure from Crown',
+      'Character references',
+      'Employment records',
+      'Any alibi evidence',
+      'Witness contact information'
+    ],
+    deadlines: [
+      'Arraignment within 90 days',
+      '18-month trial deadline (s. 11(b))',
+      'Bail review within 90 days'
+    ]
+  },
+  'LABOUR': {
+    label: 'Labour Board',
+    fullName: 'Ontario Labour Relations Board',
+    color: 'bg-orange-500',
+    forms: ['Application for Certification', 'Unfair Labour Practice Complaint', 'Grievance Referral'],
+    filingSteps: [
+      'File your application online',
+      'Provide supporting documentation',
+      'Serve all other parties',
+      'Attend pre-hearing conference',
+      'Present your case at hearing'
+    ],
+    documentsNeeded: [
+      'Employment contract',
+      'Union correspondence',
+      'Collective agreement',
+      'Company policies',
+      'Termination documents'
+    ],
+    deadlines: [
+      '6 months for unfair labour practice',
+      '30 days for certification votes',
+      '35 days for grievance referrals'
     ]
   }
 };
@@ -199,11 +275,31 @@ export function CaseWorkspace({ caseId, onBack }: CaseWorkspaceProps) {
     );
   }
 
-  const caseType = caseData.venue?.toUpperCase() || 'LTB';
-  const config = CASE_TYPE_CONFIG[caseType] || CASE_TYPE_CONFIG['LTB'];
+  const caseType = caseData.venue?.toUpperCase() || '';
+  const config = CASE_TYPE_CONFIG[caseType] || {
+    label: 'Unknown',
+    fullName: 'Unknown Case Type',
+    color: 'bg-gray-500',
+    forms: [],
+    filingSteps: ['Update your case with the correct case type to see filing steps'],
+    documentsNeeded: ['Update your case to see required documents'],
+    deadlines: ['Update your case to see deadlines']
+  };
+  const hasValidCaseType = !!CASE_TYPE_CONFIG[caseType];
 
   return (
     <div className="space-y-6">
+      {/* Warning if no case type set */}
+      {!hasValidCaseType && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            <strong>Case type not set:</strong> This case doesn't have a venue/case type assigned. 
+            Forms and filing guidance shown may not be relevant. Please update your case with the correct venue type.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
