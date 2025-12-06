@@ -2262,7 +2262,10 @@ export type Database = {
             }
             Returns: boolean
           }
-      increment_form_usage: { Args: { form_id: string }; Returns: undefined }
+      increment_form_usage: {
+        Args: { form_id_input: string }
+        Returns: undefined
+      }
       is_admin:
         | { Args: { p_user_id: string }; Returns: boolean }
         | { Args: never; Returns: boolean }
