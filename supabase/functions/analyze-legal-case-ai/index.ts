@@ -36,7 +36,7 @@ serve(async (req) => {
       );
     }
 
-    const { caseDetails, caseType, province } = await req.json();
+    const { caseDetails, caseType, province, caseId } = await req.json();
     
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
@@ -48,6 +48,42 @@ serve(async (req) => {
                          ['hrto', 'criminal', 'family'].includes(caseType) ? 'sensitive' : 'general';
     const requestId = crypto.randomUUID();
     console.log('Legal case analysis started', { caseCategory, province, requestId });
+
+    // Step 0: Fetch evidence analysis if caseId provided
+    let evidenceContext = null;
+    if (caseId) {
+      const { data: evidenceAnalysis } = await supabaseClient
+        .from('evidence_analysis')
+        .select('analysis_data, evidence_count')
+        .eq('case_id', caseId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (evidenceAnalysis) {
+        evidenceContext = {
+          count: evidenceAnalysis.evidence_count,
+          analysis: evidenceAnalysis.analysis_data
+        };
+        console.log(`Found evidence analysis with ${evidenceContext.count} pieces`);
+      }
+
+      // Also fetch raw evidence descriptions
+      const { data: rawEvidence } = await supabaseClient
+        .from('evidence')
+        .select('file_name, description, file_type, ocr_text')
+        .eq('case_id', caseId);
+      
+      if (rawEvidence?.length) {
+        evidenceContext = evidenceContext || { count: rawEvidence.length };
+        evidenceContext.rawEvidence = rawEvidence.map((e: any) => ({
+          name: e.file_name,
+          type: e.file_type,
+          description: e.description,
+          ocrText: e.ocr_text?.substring(0, 500) // Truncate OCR text
+        }));
+      }
+    }
 
     // Step 1: Search A2AJ for similar cases
     const a2ajSearchQuery = buildSearchQuery(caseDetails, caseType);
@@ -67,6 +103,7 @@ serve(async (req) => {
       province,
       a2ajResults,
       canliiResults,
+      evidenceContext,
       LOVABLE_API_KEY
     );
 
@@ -78,7 +115,8 @@ serve(async (req) => {
         analysis: aiAnalysis,
         sources: {
           a2aj: a2ajResults?.results?.length || 0,
-          canlii: canliiResults?.results?.length || 0
+          canlii: canliiResults?.results?.length || 0,
+          evidence: evidenceContext?.count || 0
         }
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -174,29 +212,35 @@ async function searchA2AJ(query: string, caseType: string) {
 async function searchCanLII(query: string, province: string, apiKey: string) {
   try {
     // CanLII search - focusing on relevant jurisdictions
-    const jurisdiction = province === 'ON' ? 'on' : 'ca';
-    const params = new URLSearchParams({
-      search: query,
-      jurisdiction: jurisdiction,
-      resultCount: '10'
-    });
-
-    const url = `https://api.canlii.org/v1/caseBrowse/en/?${params}`;
-    console.log('Searching CanLII');
+    const jurisdiction = province?.toLowerCase() === 'on' ? 'on' : province?.toLowerCase() || 'on';
+    
+    // Correct CanLII API URL format
+    const url = `https://api.canlii.org/v1/caseBrowse/${jurisdiction}/en/?api_key=${apiKey}&resultCount=10&search=${encodeURIComponent(query)}`;
+    console.log('Searching CanLII for:', query.substring(0, 50) + '...');
     
     const response = await fetch(url, {
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
         'Accept': 'application/json'
       }
     });
 
     if (!response.ok) {
-      console.error('CanLII API error:', response.status);
+      console.error('CanLII API error:', response.status, await response.text());
       return null;
     }
 
-    return await response.json();
+    const data = await response.json();
+    
+    // Transform to standard format
+    return {
+      results: (data.cases || []).map((c: any) => ({
+        citation: c.citation || c.databaseId,
+        title: c.title,
+        date: c.decisionDate,
+        court: c.court,
+        url: c.url || `https://www.canlii.org/en/${jurisdiction}/${c.databaseId}`
+      }))
+    };
   } catch (error) {
     console.error('CanLII search error:', error);
     return null;
@@ -209,28 +253,54 @@ async function analyzeWithAI(
   province: string,
   a2ajResults: any,
   canliiResults: any,
+  evidenceContext: any,
   apiKey: string
 ) {
   const systemPrompt = `You are an expert Canadian legal analyst specializing in ${caseType} cases in ${province}. 
-Your role is to analyze case law, calculate merit scores, and provide actionable legal strategies.
+Your role is to analyze case law, evidence, calculate merit scores, and provide actionable legal strategies.
 
 IMPORTANT RULES:
-1. Base merit scores on actual case outcomes from the provided data
+1. Base merit scores on actual case outcomes from the provided data AND the quality of evidence
 2. Cite specific cases with citations when making recommendations
 3. Provide realistic probability assessments
 4. Include both strengths and weaknesses
-5. Suggest concrete next steps with timelines`;
+5. Suggest concrete next steps with timelines
+6. Factor in evidence strength when calculating merit score - strong evidence can add 10-20 points, weak/missing evidence can subtract 10-30 points`;
+
+  // Build evidence section for the prompt
+  let evidenceSection = 'No evidence uploaded yet.';
+  if (evidenceContext) {
+    if (evidenceContext.analysis) {
+      evidenceSection = `EVIDENCE ANALYSIS (${evidenceContext.count} pieces):
+Strengths: ${JSON.stringify(evidenceContext.analysis.strengths || [])}
+Weaknesses: ${JSON.stringify(evidenceContext.analysis.weaknesses || [])}
+Gaps: ${JSON.stringify(evidenceContext.analysis.gaps || [])}
+Summary: ${evidenceContext.analysis.summary || 'N/A'}`;
+    }
+    if (evidenceContext.rawEvidence) {
+      evidenceSection += `\n\nRAW EVIDENCE FILES:\n${evidenceContext.rawEvidence.map((e: any, i: number) => 
+        `${i + 1}. ${e.name} (${e.type}): ${e.description || 'No description'}${e.ocrText ? '\n   OCR Preview: ' + e.ocrText.substring(0, 200) + '...' : ''}`
+      ).join('\n')}`;
+    }
+  }
 
   const userPrompt = `Analyze this case and provide a comprehensive legal assessment:
 
 CASE DETAILS:
 ${JSON.stringify(caseDetails, null, 2)}
 
+${evidenceSection}
+
 SIMILAR CASES FROM A2AJ:
 ${a2ajResults ? JSON.stringify(a2ajResults.results?.slice(0, 10), null, 2) : 'No A2AJ results'}
 
 SIMILAR CASES FROM CANLII:
 ${canliiResults ? JSON.stringify(canliiResults.results?.slice(0, 5), null, 2) : 'No CanLII results'}
+
+INSTRUCTIONS:
+1. Calculate merit score factoring in: case law precedents, evidence quality, and legal strength
+2. Reference specific CanLII cases where applicable
+3. Identify evidence gaps that could weaken the case
 
 Provide your analysis in the following JSON structure:
 {
