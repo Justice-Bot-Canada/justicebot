@@ -2309,8 +2309,8 @@ export type Database = {
         Returns: undefined
       }
       is_admin:
-        | { Args: { p_user_id: string }; Returns: boolean }
         | { Args: never; Returns: boolean }
+        | { Args: { p_user_id: string }; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
       make_user_admin: { Args: { p_email: string }; Returns: undefined }
       payments_public_rows: {
