@@ -52,25 +52,6 @@ const EnhancedSEO = ({
     : `https://www.justice-bot.com${location.pathname.replace(/\/$/, '')}`;
   const currentUrl = cleanCanonical;
 
-  // Generate Organization Schema
-  const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Justice-Bot",
-    "url": "https://www.justice-bot.com",
-    "logo": "https://www.justice-bot.com/justice-bot-logo.jpeg",
-    "sameAs": [
-      "https://twitter.com/justicebot",
-      "https://linkedin.com/company/justice-bot"
-    ],
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "telephone": "+1-800-JUSTICE",
-      "contactType": "customer service",
-      "areaServed": "CA",
-      "availableLanguage": ["English", "French"]
-    }
-  };
 
   // Generate Website Schema
   const websiteSchema = {
@@ -228,9 +209,6 @@ const EnhancedSEO = ({
       <link rel="preconnect" href="https://vkzquzjtewqhcisvhsvg.supabase.co" />
       
       {/* Structured Data */}
-      <script type="application/ld+json">
-        {JSON.stringify(organizationSchema)}
-      </script>
       <script type="application/ld+json">
         {JSON.stringify(websiteSchema)}
       </script>
