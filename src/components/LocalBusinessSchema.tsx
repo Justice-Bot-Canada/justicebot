@@ -18,11 +18,7 @@ const LocalBusinessSchema = () => {
     "areaServed": {
       "@type": "Country",
       "name": "Canada"
-    },
-    "sameAs": [
-      "https://twitter.com/justicebot",
-      "https://linkedin.com/company/justice-bot"
-    ]
+    }
   };
 
   return (
