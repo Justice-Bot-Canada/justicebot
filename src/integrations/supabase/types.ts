@@ -74,6 +74,36 @@ export type Database = {
         }
         Relationships: []
       }
+      api_usage: {
+        Row: {
+          count: number
+          day: string
+          id: number
+          ip_addr: unknown
+          last_called_at: string
+          route: string
+          user_id: string | null
+        }
+        Insert: {
+          count?: number
+          day?: string
+          id?: number
+          ip_addr?: unknown
+          last_called_at?: string
+          route: string
+          user_id?: string | null
+        }
+        Update: {
+          count?: number
+          day?: string
+          id?: number
+          ip_addr?: unknown
+          last_called_at?: string
+          route?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       case_deadlines: {
         Row: {
           case_id: string | null
