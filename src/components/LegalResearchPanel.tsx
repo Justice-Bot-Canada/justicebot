@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Search, ExternalLink, BookOpen, AlertTriangle, Sparkles } from 'lucide-react';
+import { Loader2, Search, ExternalLink, BookOpen, Sparkles } from 'lucide-react';
 import { useLegalResearch, CaseResult } from '@/hooks/useLegalResearch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -78,14 +78,6 @@ export function LegalResearchPanel({ defaultQuery = '' }: LegalResearchPanelProp
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Development Notice */}
-        <Alert className="border-amber-500/50 bg-amber-50 dark:bg-amber-950/20">
-          <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
-          <AlertDescription className="text-xs text-amber-800 dark:text-amber-200">
-            <strong>Under Development:</strong> This feature is currently showing demo results while we await CanLII API access. 
-            Accurate case law data will be available in the coming days.
-          </AlertDescription>
-        </Alert>
         {/* Search Controls */}
         <div className="flex gap-2">
           <div className="flex-1">
