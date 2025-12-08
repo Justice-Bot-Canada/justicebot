@@ -2334,6 +2334,19 @@ export type Database = {
             }
             Returns: boolean
           }
+      increment_api_usage: {
+        Args: {
+          p_inc?: number
+          p_ip: unknown
+          p_route: string
+          p_user_id: string
+        }
+        Returns: {
+          daily_limit: number
+          limit_exceeded: boolean
+          usage_count: number
+        }[]
+      }
       increment_form_usage: {
         Args: { form_id_input: string }
         Returns: undefined
