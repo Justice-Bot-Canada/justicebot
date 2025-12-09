@@ -26,21 +26,31 @@ export function LeadCaptureModal({ trigger = 'time', delaySeconds = 30 }: LeadCa
     // Check if user already submitted or dismissed - never show again
     const lastSubmit = localStorage.getItem('lead_submitted');
     const dismissed = localStorage.getItem('lead_modal_dismissed');
+    const sessionShown = sessionStorage.getItem('lead_modal_shown_this_session');
     
-    if (lastSubmit || dismissed) {
-      return; // Never show again if already submitted or dismissed
+    // Never show if: already submitted, dismissed permanently, OR already shown this session
+    if (lastSubmit || dismissed || sessionShown) {
+      return;
     }
 
+    const showModal = () => {
+      // Double-check session flag before showing
+      if (!sessionStorage.getItem('lead_modal_shown_this_session')) {
+        sessionStorage.setItem('lead_modal_shown_this_session', 'true');
+        setIsOpen(true);
+      }
+    };
+
     if (trigger === 'time') {
-      const timer = setTimeout(() => setIsOpen(true), delaySeconds * 1000);
+      const timer = setTimeout(showModal, delaySeconds * 1000);
       return () => clearTimeout(timer);
     }
 
     if (trigger === 'scroll') {
       const handleScroll = () => {
         const scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-        if (scrollPercent > 50 && !isOpen) {
-          setIsOpen(true);
+        if (scrollPercent > 50) {
+          showModal();
           window.removeEventListener('scroll', handleScroll);
         }
       };
@@ -49,21 +59,21 @@ export function LeadCaptureModal({ trigger = 'time', delaySeconds = 30 }: LeadCa
     }
 
     if (trigger === 'exit') {
-      let hasTriggered = false;
-      
       const handleMouseLeave = (e: MouseEvent) => {
-        // Only trigger if mouse leaves from top and hasn't triggered yet
-        if (e.clientY <= 0 && !hasTriggered && !isOpen) {
-          hasTriggered = true;
-          setIsOpen(true);
+        // Only trigger if mouse leaves from top of viewport
+        if (e.clientY <= 0) {
+          showModal();
           document.removeEventListener('mouseleave', handleMouseLeave);
         }
       };
       
-      document.addEventListener('mouseleave', handleMouseLeave);
-      return () => document.removeEventListener('mouseleave', handleMouseLeave);
+      // Only add listener on desktop (mouse events don't work on mobile)
+      if (window.matchMedia('(pointer: fine)').matches) {
+        document.addEventListener('mouseleave', handleMouseLeave);
+        return () => document.removeEventListener('mouseleave', handleMouseLeave);
+      }
     }
-  }, [trigger, delaySeconds, isOpen]);
+  }, [trigger, delaySeconds]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
