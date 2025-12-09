@@ -77,27 +77,33 @@ export type Database = {
       api_usage: {
         Row: {
           count: number
+          created_at: string
           day: string
           id: number
           ip_addr: unknown
+          ip_address: string
           last_called_at: string
           route: string
           user_id: string | null
         }
         Insert: {
           count?: number
+          created_at?: string
           day?: string
           id?: number
           ip_addr?: unknown
+          ip_address: string
           last_called_at?: string
           route: string
           user_id?: string | null
         }
         Update: {
           count?: number
+          created_at?: string
           day?: string
           id?: number
           ip_addr?: unknown
+          ip_address?: string
           last_called_at?: string
           route?: string
           user_id?: string | null
@@ -2099,170 +2105,148 @@ export type Database = {
         }
         Relationships: []
       }
+      low_income_applications_safe: {
+        Row: {
+          annual_income: number | null
+          created_at: string | null
+          email: string | null
+          employment_status: string | null
+          full_name: string | null
+          household_size: number | null
+          id: string | null
+          phone: string | null
+          proof_of_income_url: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          annual_income?: number | null
+          created_at?: string | null
+          email?: string | null
+          employment_status?: string | null
+          full_name?: string | null
+          household_size?: number | null
+          id?: string | null
+          phone?: string | null
+          proof_of_income_url?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          annual_income?: number | null
+          created_at?: string | null
+          email?: string | null
+          employment_status?: string | null
+          full_name?: string | null
+          household_size?: number | null
+          id?: string | null
+          phone?: string | null
+          proof_of_income_url?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       my_payments: {
         Row: {
-          amount_cents: number | null
-          captured_at: string | null
-          case_id: string | null
+          amount: number | null
           created_at: string | null
           currency: string | null
-          form_id: string | null
           id: string | null
-          provider: string | null
-          provider_order_id: string | null
           status: string | null
-          updated_at: string | null
           user_id: string | null
         }
         Insert: {
-          amount_cents?: number | null
-          captured_at?: string | null
-          case_id?: string | null
+          amount?: number | null
           created_at?: string | null
           currency?: string | null
-          form_id?: string | null
           id?: string | null
-          provider?: string | null
-          provider_order_id?: string | null
           status?: string | null
-          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
-          amount_cents?: number | null
-          captured_at?: string | null
-          case_id?: string | null
+          amount?: number | null
           created_at?: string | null
           currency?: string | null
-          form_id?: string | null
           id?: string | null
-          provider?: string | null
-          provider_order_id?: string | null
           status?: string | null
-          updated_at?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "payments_case_id_fkey"
-            columns: ["case_id"]
-            isOneToOne: false
-            referencedRelation: "cases"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "payments_form_id_fkey"
-            columns: ["form_id"]
-            isOneToOne: false
-            referencedRelation: "forms"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      payments_public: {
-        Row: {
-          amount_cents: number | null
-          captured_at: string | null
-          case_id: string | null
-          created_at: string | null
-          currency: string | null
-          form_id: string | null
-          id: string | null
-          provider: string | null
-          provider_order_id: string | null
-          status: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          amount_cents?: number | null
-          captured_at?: string | null
-          case_id?: string | null
-          created_at?: string | null
-          currency?: string | null
-          form_id?: string | null
-          id?: string | null
-          provider?: string | null
-          provider_order_id?: string | null
-          status?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          amount_cents?: number | null
-          captured_at?: string | null
-          case_id?: string | null
-          created_at?: string | null
-          currency?: string | null
-          form_id?: string | null
-          id?: string | null
-          provider?: string | null
-          provider_order_id?: string | null
-          status?: string | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "payments_case_id_fkey"
-            columns: ["case_id"]
-            isOneToOne: false
-            referencedRelation: "cases"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "payments_form_id_fkey"
-            columns: ["form_id"]
-            isOneToOne: false
-            referencedRelation: "forms"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profiles_public_view: {
         Row: {
           avatar_url: string | null
-          bio: string | null
-          created_at: string | null
           display_name: string | null
-          first_name: string | null
-          id: string | null
-          last_name: string | null
-          onboarding_completed: boolean | null
-          signup_number: number | null
-          updated_at: string | null
           user_id: string | null
         }
         Insert: {
           avatar_url?: string | null
-          bio?: string | null
-          created_at?: string | null
           display_name?: string | null
-          first_name?: string | null
-          id?: string | null
-          last_name?: string | null
-          onboarding_completed?: boolean | null
-          signup_number?: number | null
-          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
           avatar_url?: string | null
-          bio?: string | null
-          created_at?: string | null
           display_name?: string | null
-          first_name?: string | null
-          id?: string | null
-          last_name?: string | null
-          onboarding_completed?: boolean | null
-          signup_number?: number | null
-          updated_at?: string | null
           user_id?: string | null
         }
         Relationships: []
       }
     }
     Functions: {
+      admin_delete_low_income_application: {
+        Args: { p_admin_note?: string; p_id: string }
+        Returns: undefined
+      }
+      admin_list_low_income_applications: {
+        Args: { p_status?: string }
+        Returns: {
+          annual_income: number
+          created_at: string
+          email: string
+          employment_status: string
+          full_name: string
+          household_size: number
+          id: string
+          phone: string | null
+          proof_of_income_url: string
+          status: string
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "low_income_applications"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_update_low_income_application_status: {
+        Args: { p_admin_note?: string; p_id: string; p_new_status: string }
+        Returns: {
+          annual_income: number
+          created_at: string
+          email: string
+          employment_status: string
+          full_name: string
+          household_size: number
+          id: string
+          phone: string | null
+          proof_of_income_url: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "low_income_applications"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       can_access_case_event: { Args: { p_case_id: string }; Returns: boolean }
       check_free_tier_eligibility: { Args: never; Returns: boolean }
       debug_auth_claims: {
@@ -2314,9 +2298,47 @@ export type Database = {
           last_sign_in_at: string
         }[]
       }
+      get_lia_by_id: {
+        Args: { p_id: string }
+        Returns: {
+          annual_income: number
+          created_at: string
+          email: string
+          employment_status: string
+          full_name: string
+          household_size: number
+          id: string
+          phone: string | null
+          proof_of_income_url: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "low_income_applications"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       get_platform_analytics: {
         Args: { end_date?: string; start_date?: string }
         Returns: Json
+      }
+      get_recent_usage_counts: {
+        Args: {
+          p_ip_address: string
+          p_route: string
+          p_user_id: string
+          p_window_days: number
+          p_window_minutes: number
+        }
+        Returns: {
+          ip_daily_count: number
+          ip_window_count: number
+          user_daily_count: number
+          user_window_count: number
+        }[]
       }
       grant_admin_role: {
         Args: { admin_notes?: string; target_user_id: string }
@@ -2334,19 +2356,24 @@ export type Database = {
             }
             Returns: boolean
           }
-      increment_api_usage: {
-        Args: {
-          p_inc?: number
-          p_ip: unknown
-          p_route: string
-          p_user_id: string
-        }
-        Returns: {
-          daily_limit: number
-          limit_exceeded: boolean
-          usage_count: number
-        }[]
-      }
+      increment_api_usage:
+        | {
+            Args: {
+              p_inc?: number
+              p_ip: unknown
+              p_route: string
+              p_user_id: string
+            }
+            Returns: {
+              daily_limit: number
+              limit_exceeded: boolean
+              usage_count: number
+            }[]
+          }
+        | {
+            Args: { p_ip_address: string; p_route: string; p_user_id: string }
+            Returns: undefined
+          }
       increment_form_usage: {
         Args: { form_id_input: string }
         Returns: undefined
@@ -2355,30 +2382,11 @@ export type Database = {
         | { Args: never; Returns: boolean }
         | { Args: { p_user_id: string }; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
-      make_user_admin: { Args: { p_email: string }; Returns: undefined }
-      payments_public_rows: {
-        Args: never
-        Returns: {
-          amount_cents: number | null
-          captured_at: string | null
-          case_id: string | null
-          created_at: string | null
-          currency: string | null
-          form_id: string | null
-          id: string | null
-          provider: string | null
-          provider_order_id: string | null
-          status: string | null
-          updated_at: string | null
-          user_id: string | null
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "payments_public"
-          isOneToOne: false
-          isSetofReturn: true
-        }
+      lia_log: {
+        Args: { action: string; application_id: string; details: Json }
+        Returns: undefined
       }
+      make_user_admin: { Args: { p_email: string }; Returns: undefined }
       revoke_admin_role: {
         Args: { revoke_reason?: string; target_user_id: string }
         Returns: undefined
