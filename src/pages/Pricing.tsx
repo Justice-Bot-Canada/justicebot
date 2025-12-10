@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Check, CreditCard, FileText, Zap, Mail, DollarSign, Users } from "lucide-react";
+import { Check, CreditCard, FileText, Zap, Mail, DollarSign, Users, Sparkles, X } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
@@ -7,19 +7,33 @@ import { CanonicalURL } from "@/components/CanonicalURL";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { analytics } from "@/utils/analytics";
 
+const VALID_PROMO_CODES: Record<string, { discount: number; label: string }> = {
+  "LAUNCH50": { discount: 0.5, label: "50% OFF First Month" },
+  "FIRST50": { discount: 0.5, label: "50% OFF First Month" },
+  "DEMO2024": { discount: 0.5, label: "Demo Special 50% OFF" },
+};
+
 const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
   const [isFreeUser, setIsFreeUser] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount: number; label: string } | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
 
   useEffect(() => {
     checkFreeEligibility();
+    // Check for saved promo code
+    const savedPromo = localStorage.getItem("promo-code");
+    if (savedPromo && VALID_PROMO_CODES[savedPromo]) {
+      setAppliedPromo({ code: savedPromo, ...VALID_PROMO_CODES[savedPromo] });
+    }
   }, [user]);
 
   const checkFreeEligibility = async () => {
@@ -32,6 +46,36 @@ const Pricing = () => {
     } catch (error) {
       console.error('Error checking free eligibility:', error);
     }
+  };
+
+  const handleApplyPromo = () => {
+    const code = promoCode.toUpperCase().trim();
+    if (VALID_PROMO_CODES[code]) {
+      setAppliedPromo({ code, ...VALID_PROMO_CODES[code] });
+      localStorage.setItem("promo-code", code);
+      toast({
+        title: "Promo Code Applied!",
+        description: `${VALID_PROMO_CODES[code].label} - discount will be applied at checkout.`,
+      });
+    } else {
+      toast({
+        title: "Invalid Code",
+        description: "This promo code is not valid or has expired.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setAppliedPromo(null);
+    setPromoCode("");
+    localStorage.removeItem("promo-code");
+  };
+
+  const getDiscountedPrice = (price: string) => {
+    if (!appliedPromo) return null;
+    const numPrice = parseInt(price.replace('$', ''));
+    return (numPrice * (1 - appliedPromo.discount)).toFixed(2);
   };
 
   const handlePayPalPayment = async (plan: string, amount: string) => {
@@ -244,6 +288,41 @@ const Pricing = () => {
       />
       <Header />
       <main className="container mx-auto px-4 py-16">
+        {/* Promo Banner */}
+        {appliedPromo ? (
+          <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 mb-8 max-w-2xl mx-auto">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-6 h-6 text-green-500" />
+                <div>
+                  <p className="font-bold text-green-700 dark:text-green-400">{appliedPromo.label}</p>
+                  <p className="text-sm text-green-600 dark:text-green-500">Code: {appliedPromo.code}</p>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={handleRemovePromo}>
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 mb-8 max-w-2xl mx-auto">
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <Sparkles className="w-6 h-6 text-primary flex-shrink-0" />
+              <p className="text-sm font-medium">Have a promo code?</p>
+              <div className="flex items-center gap-2 flex-1">
+                <Input
+                  placeholder="Enter code (e.g., LAUNCH50)"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                  className="max-w-48"
+                  onKeyDown={(e) => e.key === 'Enter' && handleApplyPromo()}
+                />
+                <Button onClick={handleApplyPromo} size="sm">Apply</Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Hero Banner */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4">
@@ -290,9 +369,21 @@ const Pricing = () => {
                   {plan.description}
                 </CardDescription>
                 <div className="mt-4">
-                  <div className="text-4xl font-bold">
-                    {plan.price}
-                  </div>
+                  {appliedPromo ? (
+                    <>
+                      <div className="text-2xl text-muted-foreground line-through">
+                        {plan.price}
+                      </div>
+                      <div className="text-4xl font-bold text-green-600">
+                        ${getDiscountedPrice(plan.price)}
+                      </div>
+                      <Badge className="bg-green-500 mt-1">{appliedPromo.label}</Badge>
+                    </>
+                  ) : (
+                    <div className="text-4xl font-bold">
+                      {plan.price}
+                    </div>
+                  )}
                   <div className="text-sm text-muted-foreground">
                     {plan.period}
                   </div>

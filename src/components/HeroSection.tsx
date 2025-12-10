@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle } from "lucide-react";
+import { ArrowRight, CheckCircle, Sparkles, Shield, Clock } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const HeroSection = () => {
   return (
@@ -73,23 +74,66 @@ const HeroSection = () => {
               ))}
             </ul>
 
-            <div className="flex flex-col items-center sm:items-start gap-4" role="group" aria-label="Main actions">
-              <Button 
-                variant="cta" 
-                size="lg" 
-                className="group w-full sm:w-auto text-lg px-8 py-6"
-                onClick={() => window.location.href = '/triage'}
-                aria-describedby="cta-description"
-              >
-                Start Your Case
-                <ArrowRight 
-                  className="w-5 h-5 group-hover:translate-x-1 transition-transform" 
-                  aria-hidden="true"
-                />
-                <span id="cta-description" className="sr-only">
-                  Begin your legal case assessment process
-                </span>
-              </Button>
+            {/* Pricing CTA Block */}
+            <div className="bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 rounded-2xl p-6 border-2 border-primary/30 shadow-lg">
+              <div className="flex flex-wrap items-center gap-3 mb-4">
+                <Badge className="bg-green-500 text-white px-3 py-1 text-sm font-bold animate-pulse">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  LAUNCH SPECIAL
+                </Badge>
+                <Badge variant="outline" className="border-primary text-primary">
+                  Use code: LAUNCH50
+                </Badge>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
+                <div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl font-bold text-primary">$2.99</span>
+                    <span className="text-lg text-muted-foreground line-through">$5.99</span>
+                    <span className="text-sm text-muted-foreground">/month</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">First month 50% off with code LAUNCH50</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 mb-4" role="group" aria-label="Main actions">
+                <Button 
+                  variant="cta" 
+                  size="lg" 
+                  className="group text-lg px-8 py-6 shadow-xl"
+                  onClick={() => window.location.href = '/pricing'}
+                  aria-describedby="cta-description"
+                >
+                  Get Started Now
+                  <ArrowRight 
+                    className="w-5 h-5 group-hover:translate-x-1 transition-transform" 
+                    aria-hidden="true"
+                  />
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="text-lg px-6 py-6"
+                  onClick={() => window.location.href = '/triage'}
+                >
+                  Try Free Assessment
+                </Button>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Shield className="w-4 h-4 text-green-500" />
+                  <span>7-day money-back guarantee</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="w-4 h-4 text-primary" />
+                  <span>Cancel anytime</span>
+                </div>
+              </div>
+              <span id="cta-description" className="sr-only">
+                Begin your legal case with our premium plan
+              </span>
             </div>
 
             <div 
