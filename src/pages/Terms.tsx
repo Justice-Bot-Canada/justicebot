@@ -94,11 +94,28 @@ const Terms = () => {
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">Refund Policy</h2>
+            <div className="bg-green-50 border border-green-200 p-4 rounded-lg mb-4">
+              <p className="font-semibold text-green-800">7-Day Money-Back Guarantee</p>
+              <p className="text-green-700 mt-2">
+                If you're not satisfied with Justice-Bot within the first 7 days of your subscription, 
+                we'll provide a full refund—no questions asked.
+              </p>
+            </div>
             <ul>
-              <li><strong>Subscriptions:</strong> Cancel anytime, no pro-rated refunds</li>
-              <li><strong>Forms:</strong> No refunds after successful download/access</li>
-              <li><strong>Technical issues:</strong> Contact support within 7 days</li>
-              <li><strong>Unauthorized charges:</strong> Report immediately</li>
+              <li><strong>Monthly Subscriptions:</strong></li>
+              <ul className="ml-4 mt-1 mb-2">
+                <li>• Within 7 days: Full refund, no questions asked</li>
+                <li>• After 7 days: Prorated refund for unused portion</li>
+                <li>• Cancellation: Access continues until end of billing period</li>
+              </ul>
+              <li><strong>One-Time Form Purchases:</strong></li>
+              <ul className="ml-4 mt-1 mb-2">
+                <li>• Before download: Full refund available</li>
+                <li>• Technical issues: Full refund if form doesn't work as described</li>
+                <li>• After download: No refund (digital product)</li>
+              </ul>
+              <li><strong>Processing time:</strong> 5-10 business days to original payment method</li>
+              <li><strong>Unauthorized charges:</strong> Report immediately to payments@justice-bot.com</li>
             </ul>
           </section>
 
