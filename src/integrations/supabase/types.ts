@@ -2358,6 +2358,10 @@ export type Database = {
           }
       increment_api_usage:
         | {
+            Args: { p_ip_address: string; p_route: string; p_user_id: string }
+            Returns: undefined
+          }
+        | {
             Args: {
               p_inc?: number
               p_ip: unknown
@@ -2369,10 +2373,6 @@ export type Database = {
               limit_exceeded: boolean
               usage_count: number
             }[]
-          }
-        | {
-            Args: { p_ip_address: string; p_route: string; p_user_id: string }
-            Returns: undefined
           }
       increment_form_usage: {
         Args: { form_id_input: string }
