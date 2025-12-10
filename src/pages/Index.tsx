@@ -11,6 +11,7 @@ import { UrgencyTimer } from "@/components/UrgencyTimer";
 import { MoneyBackGuarantee } from "@/components/MoneyBackGuarantee";
 import LiveSupportWidget from "@/components/LiveSupportWidget";
 import { LeadCaptureModal } from "@/components/LeadCaptureModal";
+import { StickyBottomCTA } from "@/components/StickyBottomCTA";
 import { Suspense, lazy } from "react";
 
 // Lazy load below-the-fold components for better LCP
@@ -224,6 +225,9 @@ const Index = () => {
       
       {/* Live Support Widget */}
       <LiveSupportWidget />
+      
+      {/* Sticky Bottom CTA with Promo Code */}
+      <StickyBottomCTA />
     </div>
   );
 };
