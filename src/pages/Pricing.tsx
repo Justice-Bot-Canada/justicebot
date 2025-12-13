@@ -11,7 +11,6 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { useSubscription } from "@/hooks/useSubscription";
 import { analytics } from "@/utils/analytics";
 
 const VALID_PROMO_CODES: Record<string, { discount: number; label: string }> = {
@@ -20,11 +19,11 @@ const VALID_PROMO_CODES: Record<string, { discount: number; label: string }> = {
   "DEMO2024": { discount: 0.5, label: "Demo Special 50% OFF" },
 };
 
-// Stripe Price IDs - Replace with actual Stripe price IDs from your dashboard
-const STRIPE_PRICES = {
-  basic: { priceId: "price_basic_monthly", name: "Basic" },
-  professional: { priceId: "price_professional_monthly", name: "Professional" },
-  premium: { priceId: "price_premium_monthly", name: "Premium" },
+// PayPal Hosted Button IDs
+const PAYPAL_BUTTONS = {
+  basic: "XYZABC123", // Replace with actual PayPal button ID
+  professional: "XYZABC456", // Replace with actual PayPal button ID
+  premium: "XYZABC789", // Replace with actual PayPal button ID
 };
 
 const Pricing = () => {
@@ -34,7 +33,6 @@ const Pricing = () => {
   const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount: number; label: string } | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
-  const { subscribed, plan: currentPlan, startCheckout, openCustomerPortal } = useSubscription();
 
   useEffect(() => {
     checkFreeEligibility();
@@ -86,53 +84,16 @@ const Pricing = () => {
     return (numPrice * (1 - appliedPromo.discount)).toFixed(2);
   };
 
-  const handleStripePayment = async (planKey: keyof typeof STRIPE_PRICES, price: string) => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to purchase a premium plan.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const plan = STRIPE_PRICES[planKey];
-    analytics.paymentInitiated(plan.name, price, 'stripe');
-    setLoading(planKey);
+  const handlePayPalPayment = (plan: string, price: string) => {
+    analytics.paymentInitiated(plan, price, 'paypal');
+    // Open PayPal checkout in new tab
+    const paypalUrl = `https://www.paypal.com/webapps/hermes?token=${PAYPAL_BUTTONS[plan.toLowerCase() as keyof typeof PAYPAL_BUTTONS]}`;
+    window.open(paypalUrl, '_blank');
     
-    try {
-      await startCheckout(plan.priceId, plan.name);
-      toast({
-        title: "Redirecting to Checkout",
-        description: "Complete your subscription in the new tab.",
-      });
-    } catch (error) {
-      console.error('Stripe error:', error);
-      analytics.paymentFailed(plan.name, price, error instanceof Error ? error.message : 'Unknown error');
-      toast({
-        title: "Payment Error",
-        description: error instanceof Error ? error.message : "Failed to start checkout. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(null);
-    }
-  };
-
-  const handleManageSubscription = async () => {
-    try {
-      await openCustomerPortal();
-      toast({
-        title: "Opening Subscription Portal",
-        description: "Manage your subscription in the new tab.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to open subscription portal.",
-        variant: "destructive",
-      });
-    }
+    toast({
+      title: "Opening PayPal",
+      description: "Complete your payment in the new tab.",
+    });
   };
 
   const handleETransferPayment = (plan: string, amount: string) => {
@@ -238,11 +199,6 @@ const Pricing = () => {
           "price": "29",
           "priceValidUntil": "2025-12-31",
           "availability": "https://schema.org/InStock"
-        },
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": "4.8",
-          "reviewCount": "127"
         }
       },
       {
@@ -416,28 +372,17 @@ const Pricing = () => {
               </CardContent>
 
               <CardContent className="pt-0 space-y-2">
-                {subscribed && currentPlan === plan.name ? (
-                  <Button
-                    onClick={handleManageSubscription}
-                    className="w-full"
-                    variant="secondary"
-                  >
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    Manage Subscription
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => handleStripePayment(plan.name.toLowerCase() as "basic" | "professional" | "premium", plan.price)}
-                    disabled={loading === plan.name.toLowerCase() || subscribed}
-                    className={`w-full flex items-center justify-center gap-2 ${
-                      plan.popular ? 'bg-primary hover:bg-primary/90' : ''
-                    }`}
-                    variant={plan.popular ? 'default' : 'outline'}
-                  >
-                    <CreditCard className="w-4 h-4" />
-                    {loading === plan.name.toLowerCase() ? "Processing..." : `Subscribe - ${plan.price}/mo`}
-                  </Button>
-                )}
+                <Button
+                  onClick={() => handlePayPalPayment(plan.name, plan.price)}
+                  disabled={loading === plan.name.toLowerCase()}
+                  className={`w-full flex items-center justify-center gap-2 ${
+                    plan.popular ? 'bg-primary hover:bg-primary/90' : ''
+                  }`}
+                  variant={plan.popular ? 'default' : 'outline'}
+                >
+                  <CreditCard className="w-4 h-4" />
+                  {loading === plan.name.toLowerCase() ? "Processing..." : `Pay with PayPal - ${plan.price}/mo`}
+                </Button>
                 
                 <Button
                   onClick={() => handleETransferPayment(plan.name, plan.price)}
@@ -459,19 +404,64 @@ const Pricing = () => {
             </h3>
             <p className="text-sm">
               All plans include access to Canadian legal forms, provincial compliance, 
-              and support for all provinces and territories.
-            </p>
-          </div>
-          
-          <div className="space-y-2">
-            <p>
-              <strong>PayPal:</strong> Instant access • <strong>E-Transfer:</strong> 24-hour activation
-            </p>
-            <p className="text-sm">
-              Questions? Email us at admin@justice-bot.com
+              and support for Ontario courts and tribunals. More provinces coming soon.
             </p>
           </div>
         </div>
+
+        {/* Low Income Section */}
+        <section className="mt-16 max-w-3xl mx-auto">
+          <Card className="border-2 border-dashed border-muted-foreground/30">
+            <CardHeader className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Users className="h-6 w-6 text-primary" />
+                <CardTitle>Low Income? We've Got You Covered</CardTitle>
+              </div>
+              <CardDescription className="text-base">
+                Justice should be accessible to everyone. If you're on Ontario Works, ODSP, 
+                or have limited income, you may qualify for our reduced-cost program.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center space-y-4">
+              <div className="flex flex-wrap justify-center gap-3">
+                <Badge variant="secondary" className="text-sm py-1 px-3">
+                  <DollarSign className="h-3 w-3 mr-1" />
+                  Up to 80% off
+                </Badge>
+                <Badge variant="secondary" className="text-sm py-1 px-3">
+                  <FileText className="h-3 w-3 mr-1" />
+                  Full feature access
+                </Badge>
+                <Badge variant="secondary" className="text-sm py-1 px-3">
+                  <Check className="h-3 w-3 mr-1" />
+                  Simple verification
+                </Badge>
+              </div>
+              <Button variant="outline" size="lg" asChild>
+                <a href="/low-income-approval">
+                  Apply for Low Income Rate
+                </a>
+              </Button>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="mt-16 max-w-3xl mx-auto">
+          <h2 className="text-2xl font-bold text-center mb-8">Frequently Asked Questions</h2>
+          <div className="space-y-4">
+            {faqData.map((faq, index) => (
+              <Card key={index}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg">{faq.question}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{faq.answer}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
       </main>
       <Footer />
     </div>

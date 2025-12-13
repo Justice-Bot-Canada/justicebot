@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useProfile } from "@/hooks/useProfile";
 import { useAuth } from "@/hooks/useAuth";
+import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,15 +9,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import SEOHead from "@/components/SEOHead";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { SubscriptionManager } from "@/components/SubscriptionManager";
-import { User, Mail, Phone, FileText, Settings, CreditCard } from "lucide-react";
+import { User, Mail, Phone, FileText, Settings, CreditCard, Crown, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Profile() {
   const { user } = useAuth();
   const { profile, loading, updateProfile } = useProfile();
+  const { isPremium } = usePremiumAccess();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     first_name: '',
@@ -204,8 +207,57 @@ export default function Profile() {
               </CardContent>
             </Card>
 
-            {/* Subscription Manager */}
-            <SubscriptionManager />
+            {/* Subscription Card */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5" />
+                  Subscription
+                </CardTitle>
+                <CardDescription>
+                  Manage your plan and billing
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-4 bg-muted rounded-lg">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm text-muted-foreground">Current Plan</span>
+                    {isPremium ? (
+                      <Badge className="bg-primary">
+                        <Crown className="w-3 h-3 mr-1" />
+                        Premium
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary">Free</Badge>
+                    )}
+                  </div>
+                  <p className="text-sm">
+                    {isPremium 
+                      ? "You have full access to all premium features." 
+                      : "Upgrade to unlock all forms and premium features."}
+                  </p>
+                </div>
+
+                {!isPremium && (
+                  <Link to="/pricing">
+                    <Button className="w-full">
+                      <Crown className="w-4 h-4 mr-2" />
+                      Upgrade to Premium
+                    </Button>
+                  </Link>
+                )}
+
+                <div className="text-sm text-muted-foreground">
+                  <p>Need help with billing?</p>
+                  <a 
+                    href="mailto:admin@justice-bot.com?subject=Billing%20Support" 
+                    className="text-primary hover:underline inline-flex items-center gap-1"
+                  >
+                    Contact Support <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
