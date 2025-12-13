@@ -56,6 +56,7 @@ export function CaseMeritScore({ caseId, caseType, caseDescription }: CaseMeritS
     try {
       const { data, error } = await supabase.functions.invoke('analyze-case-strength', {
         body: {
+          caseId: caseId, // Pass caseId to fetch evidence from database
           caseDetails: caseData.description || caseDescription || '',
           caseType: caseData.venue || caseType,
           jurisdiction: `${caseData.province}, Canada`
