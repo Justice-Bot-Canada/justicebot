@@ -88,9 +88,9 @@ const LTBHelp = () => {
     <div className="min-h-screen bg-background">
       <CanonicalURL />
       <EnhancedSEO
-        title="How to File an LTB Application in Ontario (Step-by-Step)"
-        description="Complete guide to filing Landlord and Tenant Board applications in Ontario. Learn how to fight evictions, dispute rent increases, and get repairs done. Expert AI guidance starting at $5.99."
-        keywords="how to file LTB application, landlord tenant board process, fight eviction Ontario, tenant rights help, LTB forms guide"
+        title="LTB Help Ontario - Landlord Tenant Board Assistance & Forms"
+        description="Get LTB help in Ontario. Expert guidance for Landlord and Tenant Board applications, eviction disputes, rent issues, and maintenance complaints. AI-powered affordable legal assistance from $5.99."
+        keywords="LTB help, LTB Ontario, landlord tenant board help, LTB application help, LTB forms help, Ontario tenant help, LTB assistance, file LTB application"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
         faqData={faqData}
@@ -107,7 +107,7 @@ const LTBHelp = () => {
                 Landlord & Tenant Board Ontario
               </Badge>
               <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                LTB Help: Protect Your Tenant Rights
+                LTB Help Ontario: Expert Landlord Tenant Board Assistance
               </h1>
               <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
                 Get expert guidance for your Landlord & Tenant Board application. 
