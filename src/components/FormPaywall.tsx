@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,12 +23,10 @@ export default function FormPaywall({
   daysUntilDeadline,
   children,
 }: FormPaywallProps) {
-  const [loading, setLoading] = useState<"subscription" | null>(null);
-  const [paypalLoaded, setPaypalLoaded] = useState(false);
+  const [loading, setLoading] = useState<"subscription" | "form" | null>(null);
   const [hasPurchased, setHasPurchased] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
   const { hasAccess, isPremium } = usePremiumAccess();
-  const paypalButtonRef = useRef<HTMLDivElement>(null);
 
   // Check if user has purchased this specific form
   useEffect(() => {
@@ -61,28 +59,49 @@ export default function FormPaywall({
     checkFormPurchase();
   }, [formId]);
 
-  // Load PayPal SDK
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = "https://www.paypal.com/sdk/js?client-id=BAAX70lJFewN5Sur8CW1Za_Q0USFYAZErHKuZtZ9zEqJ9uncHMycZe2W0IeO5ZPk04uV-59Fm3mNP7nXkE&components=hosted-buttons&disable-funding=venmo&currency=CAD";
-    script.async = true;
-    script.onload = () => setPaypalLoaded(true);
-    document.body.appendChild(script);
+  // Handle one-time form purchase via edge function
+  const handleFormPurchase = async () => {
+    setLoading("subscription");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Sign in required",
+          description: "Please sign in to purchase this form",
+          variant: "destructive",
+        });
+        return;
+      }
 
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
+      const { data, error } = await supabase.functions.invoke('create-paypal-payment', {
+        body: { 
+          formId,
+          formTitle,
+          amount: (formPrice / 100).toFixed(2), // Convert cents to dollars
+          returnUrl: `${window.location.origin}/payment-success?formId=${formId}`,
+          cancelUrl: `${window.location.origin}/payment-cancel`
+        }
+      });
 
-  // Render PayPal hosted button
-  useEffect(() => {
-    if (paypalLoaded && paypalButtonRef.current && (window as any).paypal) {
-      paypalButtonRef.current.innerHTML = '';
-      (window as any).paypal.HostedButtons({
-        hostedButtonId: "PJ7Y4KTDGVJKY",
-      }).render(paypalButtonRef.current);
+      if (error) throw error;
+      
+      if (data?.approvalUrl) {
+        console.log('Redirecting to PayPal:', data.approvalUrl);
+        window.location.href = data.approvalUrl;
+      } else {
+        throw new Error('No approval URL received from PayPal');
+      }
+    } catch (error: any) {
+      console.error("Payment error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to start checkout",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(null);
     }
-  }, [paypalLoaded]);
+  };
 
   // Premium users or users who purchased this form get access
   if (checkingAccess) {
@@ -187,13 +206,18 @@ export default function FormPaywall({
               </li>
             </ul>
 
-            <div ref={paypalButtonRef} className="w-full min-h-[45px]">
-              {!paypalLoaded && (
-                <Button disabled className="w-full" size="lg">
-                  Loading PayPal...
-                </Button>
+            <Button 
+              onClick={handleFormPurchase}
+              disabled={loading !== null}
+              className="w-full"
+              size="lg"
+            >
+              {loading === "subscription" ? (
+                "Processing..."
+              ) : (
+                "Pay with PayPal - $39"
               )}
-            </div>
+            </Button>
           </CardContent>
         </Card>
 
