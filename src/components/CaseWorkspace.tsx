@@ -388,18 +388,77 @@ export function CaseWorkspace({ caseId, onBack }: CaseWorkspaceProps) {
         </Card>
       </div>
 
+      {/* Journey Progress Indicator */}
+      <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-transparent">
+        <CardContent className="py-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-sm font-medium">Your Case Journey</p>
+            <Badge variant="outline" className="text-xs">Follow these steps</Badge>
+          </div>
+          <div className="flex items-center gap-2">
+            {[
+              { step: 1, label: "Overview", tab: "overview" },
+              { step: 2, label: "Upload", tab: "documents" },
+              { step: 3, label: "Evidence", tab: "evidence" },
+              { step: 4, label: "Forms", tab: "forms" },
+              { step: 5, label: "Filing", tab: "guide" }
+            ].map((item, index) => (
+              <div key={item.step} className="flex items-center">
+                <button
+                  onClick={() => setActiveTab(item.tab)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                    activeTab === item.tab 
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                  }`}
+                >
+                  <span className="w-5 h-5 rounded-full bg-background/20 flex items-center justify-center text-[10px]">
+                    {item.step}
+                  </span>
+                  {item.label}
+                </button>
+                {index < 4 && <div className="w-4 h-0.5 bg-muted mx-1" />}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="forms">Forms & Filing</TabsTrigger>
-          <TabsTrigger value="evidence">Evidence Book</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
-          <TabsTrigger value="guide">Filing Guide</TabsTrigger>
+          <TabsTrigger value="overview" className="gap-1">
+            <Info className="h-3.5 w-3.5" />
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="documents" className="gap-1">
+            <Upload className="h-3.5 w-3.5" />
+            Upload Docs
+          </TabsTrigger>
+          <TabsTrigger value="evidence" className="gap-1">
+            <BookOpen className="h-3.5 w-3.5" />
+            Evidence Book
+          </TabsTrigger>
+          <TabsTrigger value="forms" className="gap-1">
+            <FileText className="h-3.5 w-3.5" />
+            Forms & Filing
+          </TabsTrigger>
+          <TabsTrigger value="guide" className="gap-1">
+            <Scale className="h-3.5 w-3.5" />
+            Filing Guide
+          </TabsTrigger>
         </TabsList>
 
-        {/* Overview Tab */}
+        {/* Step 1: Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
+          <Alert className="border-primary/30 bg-primary/5">
+            <Target className="h-4 w-4 text-primary" />
+            <AlertDescription>
+              <strong>Step 1 - Case Overview:</strong> Review your case details and merit score. 
+              When ready, proceed to <button onClick={() => setActiveTab('documents')} className="text-primary font-medium underline">Upload Documents</button>.
+            </AlertDescription>
+          </Alert>
+
           <div className="grid md:grid-cols-2 gap-6">
             <CaseMeritScore 
               caseId={caseId}
@@ -436,10 +495,10 @@ export function CaseWorkspace({ caseId, onBack }: CaseWorkspaceProps) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-primary" />
-                Your Next Steps for {config.label} Case
+                Your Journey for {config.label} Case
               </CardTitle>
               <CardDescription>
-                Follow these steps to progress your case
+                Follow these steps to build and file your case
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -453,17 +512,90 @@ export function CaseWorkspace({ caseId, onBack }: CaseWorkspaceProps) {
                   </div>
                 ))}
               </div>
+              <Button 
+                className="mt-4 w-full" 
+                onClick={() => setActiveTab('documents')}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Continue to Upload Documents
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Forms Tab */}
-        <TabsContent value="forms" className="space-y-6">
-          <Alert>
-            <FileText className="h-4 w-4" />
+        {/* Step 2: Documents Upload Tab */}
+        <TabsContent value="documents" className="space-y-6">
+          <Alert className="border-blue-500/30 bg-blue-500/5">
+            <Upload className="h-4 w-4 text-blue-500" />
             <AlertDescription>
-              <strong>Forms for {config.fullName}:</strong> Below are the relevant forms for your case type. 
-              Other forms have been filtered out to help you focus.
+              <strong>Step 2 - Upload Documents:</strong> Upload all relevant documents for your {config.label} case. 
+              Once uploaded, proceed to <button onClick={() => setActiveTab('evidence')} className="text-primary font-medium underline">Build Evidence Book</button> to organize them.
+            </AlertDescription>
+          </Alert>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FolderOpen className="h-5 w-5" />
+                Documents Needed for {config.label}
+              </CardTitle>
+              <CardDescription>
+                Upload these documents to strengthen your case
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-3 mb-6">
+                {config.documentsNeeded.map((doc, index) => (
+                  <div key={index} className="flex items-center gap-3 p-3 rounded-lg border bg-muted/30">
+                    <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm">{doc}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <EvidenceHub caseId={caseId} />
+
+          <div className="flex justify-end">
+            <Button onClick={() => setActiveTab('evidence')}>
+              Continue to Build Evidence Book
+              <BookOpen className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        </TabsContent>
+
+        {/* Step 3: Evidence Book Tab */}
+        <TabsContent value="evidence" className="space-y-6">
+          <Alert className="border-green-500/30 bg-green-500/5">
+            <BookOpen className="h-4 w-4 text-green-500" />
+            <AlertDescription>
+              <strong>Step 3 - Build Evidence Book:</strong> AI will analyze your documents and help organize them into a compelling evidence book. 
+              When ready, proceed to <button onClick={() => setActiveTab('forms')} className="text-primary font-medium underline">Forms & Filing</button>.
+            </AlertDescription>
+          </Alert>
+
+          <EvidenceAnalyzer 
+            caseId={caseId}
+            caseType={caseType}
+            caseDescription={caseData.description}
+          />
+
+          <div className="flex justify-end">
+            <Button onClick={() => setActiveTab('forms')}>
+              Continue to Forms & Filing
+              <FileText className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        </TabsContent>
+
+        {/* Step 4: Forms Tab */}
+        <TabsContent value="forms" className="space-y-6">
+          <Alert className="border-purple-500/30 bg-purple-500/5">
+            <FileText className="h-4 w-4 text-purple-500" />
+            <AlertDescription>
+              <strong>Step 4 - Forms & Filing:</strong> AI will pre-fill your court forms using your evidence and CanLII case law. 
+              Review and generate official forms, then proceed to <button onClick={() => setActiveTab('guide')} className="text-primary font-medium underline">Filing Guide</button>.
             </AlertDescription>
           </Alert>
 
@@ -471,7 +603,7 @@ export function CaseWorkspace({ caseId, onBack }: CaseWorkspaceProps) {
             <CardHeader>
               <CardTitle>{config.label} Forms</CardTitle>
               <CardDescription>
-                Required and recommended forms for your {config.label} case
+                AI-assisted form generation using your evidence and relevant case law from CanLII
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -482,12 +614,15 @@ export function CaseWorkspace({ caseId, onBack }: CaseWorkspaceProps) {
                       <FileText className="h-5 w-5 text-primary" />
                       <div>
                         <p className="font-medium">{form}</p>
-                        <p className="text-sm text-muted-foreground">Official {config.fullName} form</p>
+                        <p className="text-sm text-muted-foreground">AI will pre-fill using your evidence</p>
                       </div>
                     </div>
                     <div className="flex gap-2">
                       <Button size="sm" variant="outline">Preview</Button>
-                      <Button size="sm">Generate</Button>
+                      <Button size="sm">
+                        <Scale className="h-3.5 w-3.5 mr-1" />
+                        Generate with AI
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -514,44 +649,30 @@ export function CaseWorkspace({ caseId, onBack }: CaseWorkspaceProps) {
               </div>
             </CardContent>
           </Card>
+
+          <div className="flex justify-end">
+            <Button onClick={() => setActiveTab('guide')}>
+              Continue to Filing Guide
+              <Scale className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
         </TabsContent>
 
-        {/* Evidence Tab */}
-        <TabsContent value="evidence" className="space-y-6">
-          <Alert>
-            <BookOpen className="h-4 w-4" />
-            <AlertDescription>
-              <strong>Build Your Evidence Book:</strong> Upload and organize documents that support your {config.label} case. 
-              AI will help categorize and suggest how to present your evidence.
-            </AlertDescription>
-          </Alert>
-
-          <EvidenceAnalyzer 
-            caseId={caseId}
-            caseType={caseType}
-            caseDescription={caseData.description}
-          />
-        </TabsContent>
-
-        {/* Documents Tab */}
-        <TabsContent value="documents" className="space-y-6">
-          <Alert>
-            <FolderOpen className="h-4 w-4" />
-            <AlertDescription>
-              <strong>Document Hub:</strong> All your uploaded evidence and generated documents for this {config.label} case.
-            </AlertDescription>
-          </Alert>
-
-          <EvidenceHub caseId={caseId} />
-        </TabsContent>
-
-        {/* Filing Guide Tab */}
+        {/* Step 5: Filing Guide Tab */}
         <TabsContent value="guide" className="space-y-6">
+          <Alert className="border-orange-500/30 bg-orange-500/5">
+            <Scale className="h-4 w-4 text-orange-500" />
+            <AlertDescription>
+              <strong>Step 5 - Filing Guide:</strong> Complete guide for filing at {config.fullName}. 
+              Follow these procedures for your specific courthouse or tribunal.
+            </AlertDescription>
+          </Alert>
+
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle>Filing Steps</CardTitle>
-                <CardDescription>Step-by-step guide for {config.fullName}</CardDescription>
+                <CardDescription>Step-by-step procedure for {config.fullName}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -571,8 +692,8 @@ export function CaseWorkspace({ caseId, onBack }: CaseWorkspaceProps) {
 
             <Card>
               <CardHeader>
-                <CardTitle>Documents You'll Need</CardTitle>
-                <CardDescription>Gather these before filing</CardDescription>
+                <CardTitle>Required Documents Checklist</CardTitle>
+                <CardDescription>Ensure you have these before filing</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -602,6 +723,20 @@ export function CaseWorkspace({ caseId, onBack }: CaseWorkspaceProps) {
                   </div>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-green-500/30 bg-green-500/5">
+            <CardContent className="py-6 text-center">
+              <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-3" />
+              <h3 className="text-lg font-semibold mb-2">Ready to File?</h3>
+              <p className="text-muted-foreground mb-4">
+                You've completed all preparation steps. Generate your final forms and file with {config.fullName}.
+              </p>
+              <Button size="lg" onClick={() => setActiveTab('forms')}>
+                <FileText className="h-4 w-4 mr-2" />
+                Generate Final Forms
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>
