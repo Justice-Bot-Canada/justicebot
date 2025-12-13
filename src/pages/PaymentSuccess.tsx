@@ -34,7 +34,8 @@ const PaymentSuccess = () => {
         const { data, error } = await supabase.functions.invoke('verify-paypal-payment', {
           body: { 
             paymentId: token,
-            payerId: payerId || undefined
+            payerId: payerId || undefined,
+            formId: formIdParam || undefined
           }
         });
 
