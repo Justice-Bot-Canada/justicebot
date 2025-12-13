@@ -68,16 +68,36 @@ export function FormsList() {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      // Check entitlements table for purchased forms (format: form_<uuid>)
+      const { data: entitlements, error: entError } = await supabase
+        .from('entitlements')
+        .select('product_id')
+        .eq('user_id', user.id);
+
+      if (entError) throw entError;
+      
+      // Extract form IDs from product_id (e.g., "form_abc-123" -> "abc-123")
+      const formIds = new Set(
+        entitlements
+          ?.map(e => e.product_id)
+          .filter(pid => pid?.startsWith('form_'))
+          .map(pid => pid.replace('form_', '')) || []
+      );
+
+      // Also check payments table as fallback
+      const { data: payments, error: payError } = await supabase
         .from('payments')
         .select('form_id')
         .eq('user_id', user.id)
         .eq('status', 'completed')
         .not('form_id', 'is', null);
 
-      if (error) throw error;
-      
-      const formIds = new Set(data?.map(p => p.form_id).filter(Boolean) || []);
+      if (!payError && payments) {
+        payments.forEach(p => {
+          if (p.form_id) formIds.add(p.form_id);
+        });
+      }
+
       setPurchasedFormIds(formIds);
     } catch (error) {
       console.error('Error loading purchased forms:', error);
@@ -115,45 +135,22 @@ export function FormsList() {
     setProcessingPayment(form.id);
 
     try {
-      // Create payment record
-      const { data: paymentData, error: paymentError } = await supabase
-        .from('payments')
-        .insert([{
-          user_id: user.id,
-          form_id: form.id,
-          amount: form.price_cents / 100,
-          amount_cents: form.price_cents,
-          currency: 'CAD',
-          plan_type: 'form_purchase',
-          status: 'pending',
-          payment_id: `form_${form.id}_${Date.now()}`,
-          payment_provider: 'paypal'
-        }])
-        .select()
-        .single();
-
-      if (paymentError) throw paymentError;
-
-      // Call payment function
+      // Call payment function - it handles payment record creation
       const { data: sessionData, error: sessionError } = await supabase.functions.invoke('create-form-payment', {
-        body: {
-          formId: form.id,
-          paymentId: paymentData.id
-        }
+        body: { formId: form.id }
       });
 
       if (sessionError) throw sessionError;
 
       if (sessionData?.url) {
-        window.open(sessionData.url, '_blank');
-        toast.success("Payment window opened. Complete payment to download form.");
+        // Redirect to PayPal in same window for better UX
+        window.location.href = sessionData.url;
       } else {
         throw new Error('No payment URL received');
       }
     } catch (error: any) {
       console.error('Error processing payment:', error);
       toast.error(error.message || 'Failed to process payment');
-    } finally {
       setProcessingPayment(null);
     }
   };

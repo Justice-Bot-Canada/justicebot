@@ -7,25 +7,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Define allowed form prices (in cents) - server-side source of truth
-const FORM_PRICES: Record<string, number> = {
-  'basic_form': 599,      // $5.99
-  'standard_form': 999,   // $9.99
-  'premium_form': 1999,   // $19.99
-  'tribunal_package': 4999, // $49.99
-};
+// Standard form price - $29.99 CAD
+const STANDARD_FORM_PRICE_CENTS = 2999;
 
 const FormPaymentSchema = z.object({
-  formId: z.string().min(1).max(100),
-  amount: z.number().int().positive().max(100000), // max $1000
-  currency: z.string().length(3).optional().default('CAD'),
+  formId: z.string().uuid(),
+  paymentId: z.string().optional(),
 });
-
-interface FormPaymentRequest {
-  formId: string;
-  amount: number;
-  currency?: string;
-}
 
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -93,29 +81,24 @@ serve(async (req) => {
       throw new Error('Invalid request');
     }
 
-    const { formId, amount, currency } = validationResult.data;
+    const { formId } = validationResult.data;
     
-    // CRITICAL: Verify amount matches server-side price
-    const expectedAmount = FORM_PRICES[formId];
-    if (!expectedAmount) {
-      console.error('[SECURITY] Invalid form ID:', {
-        formId,
-        userId: user.id
-      });
-      throw new Error('Invalid request');
-    }
-    
-    if (amount !== expectedAmount) {
-      console.error('[SECURITY] Price manipulation attempt:', {
-        provided: amount,
-        expected: expectedAmount,
-        formId,
-        userId: user.id
-      });
-      throw new Error('Invalid request');
+    // Fetch form from database to get actual price
+    const { data: form, error: formError } = await supabaseClient
+      .from('forms')
+      .select('id, title, price_cents')
+      .eq('id', formId)
+      .single();
+
+    if (formError || !form) {
+      console.error('[SECURITY] Invalid form ID:', { formId, userId: user.id });
+      throw new Error('Form not found');
     }
 
-    logStep("Creating form payment", { formId, amount, currency });
+    const amount = form.price_cents || STANDARD_FORM_PRICE_CENTS;
+    const currency = 'CAD';
+
+    logStep("Creating form payment", { formId, formTitle: form.title, amount, currency });
 
     const accessToken = await getPayPalAccessToken();
 
@@ -157,16 +140,18 @@ serve(async (req) => {
     const order = await orderResponse.json();
     logStep("PayPal order created", { orderId: order.id });
 
-    // Save payment record
+    // Save payment record with form_id
     const { error: paymentError } = await supabaseClient
       .from("payments")
       .insert({
         user_id: user.id,
         payment_id: order.id,
+        form_id: formId,
         amount: amount / 100,
+        amount_cents: amount,
         currency,
         status: "pending",
-        plan_type: `form_${formId}`,
+        plan_type: 'form_purchase',
         payment_provider: "paypal",
       });
 
@@ -184,6 +169,7 @@ serve(async (req) => {
 
     return new Response(
       JSON.stringify({ 
+        url: approvalUrl,
         approvalUrl,
         orderId: order.id 
       }),
