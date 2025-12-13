@@ -14,6 +14,7 @@ import { LeadCaptureModal } from "@/components/LeadCaptureModal";
 import { StickyBottomCTA } from "@/components/StickyBottomCTA";
 import { ProvincesBanner } from "@/components/ProvincesBanner";
 import CrispChat from "@/components/CrispChat";
+import FeatureHighlightBanner from "@/components/FeatureHighlightBanner";
 import { Suspense, lazy } from "react";
 
 // Lazy load below-the-fold components for better LCP
@@ -28,6 +29,7 @@ const DocumentTemplates = lazy(() => import("@/components/DocumentTemplates"));
 const PricingComparison = lazy(() => import("@/components/PricingComparison").then(m => ({ default: m.PricingComparison })));
 const JourneyFlowchart = lazy(() => import("@/components/JourneyFlowchart").then(m => ({ default: m.JourneyFlowchart })));
 const NewsletterBanner = lazy(() => import("@/components/NewsletterBanner").then(m => ({ default: m.NewsletterBanner })));
+const CompetitorComparison = lazy(() => import("@/components/CompetitorComparison"));
 
 const LoadingSection = () => (
   <div className="py-16 flex items-center justify-center">
@@ -107,6 +109,9 @@ const Index = () => {
       <main id="main-content" tabIndex={-1}>
         <HeroSection />
         
+        {/* Feature Highlight Banner - Right after hero */}
+        <FeatureHighlightBanner />
+        
         {/* Urgency Timer */}
         <div className="container mx-auto px-4 py-4">
           <UrgencyTimer />
@@ -165,6 +170,12 @@ const Index = () => {
         <Suspense fallback={<LoadingSection />}>
           <FeaturesSection />
         </Suspense>
+        
+        {/* Competitor Comparison */}
+        <Suspense fallback={<LoadingSection />}>
+          <CompetitorComparison />
+        </Suspense>
+        
         <Suspense fallback={<LoadingSection />}>
           <AppDemoVideo />
         </Suspense>
