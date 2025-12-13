@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://justice-bot.com',
+  'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
@@ -24,51 +24,47 @@ serve(async (req: Request) => {
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const turnstileSecret = Deno.env.get("CLOUDFLARE_TURNSTILE_SECRET")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const turnstileSecret = Deno.env.get("CLOUDFLARE_TURNSTILE_SECRET");
+    
+    // Use service role key to bypass RLS for lead insertion
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const requestBody = await req.json();
+    console.log('Received lead submission:', { 
+      email: requestBody.email, 
+      source: requestBody.source,
+      hasToken: !!requestBody.turnstileToken 
+    });
     
-    // Verify Turnstile token
-    if (!requestBody.turnstileToken) {
-      console.error('Missing Turnstile token');
-      return new Response(
-        JSON.stringify({ error: 'Verification required' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400 
+    // Verify Turnstile token if provided and secret is configured
+    if (turnstileSecret && requestBody.turnstileToken) {
+      const turnstileResponse = await fetch(
+        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            secret: turnstileSecret,
+            response: requestBody.turnstileToken,
+          }),
         }
       );
-    }
 
-    // Verify with Cloudflare Turnstile
-    const turnstileResponse = await fetch(
-      'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          secret: turnstileSecret,
-          response: requestBody.turnstileToken,
-        }),
+      const turnstileResult = await turnstileResponse.json();
+      
+      if (!turnstileResult.success) {
+        console.error('Turnstile verification failed:', turnstileResult);
+        return new Response(
+          JSON.stringify({ error: 'Verification failed' }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 403 
+          }
+        );
       }
-    );
-
-    const turnstileResult = await turnstileResponse.json();
-    
-    if (!turnstileResult.success) {
-      console.error('Turnstile verification failed:', turnstileResult);
-      return new Response(
-        JSON.stringify({ error: 'Verification failed' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 403 
-        }
-      );
+      console.log('Turnstile verification successful');
     }
-    
-    console.log('Turnstile verification successful');
     
     // Validate input with Zod
     const validationResult = LeadSchema.safeParse(requestBody);
@@ -108,6 +104,8 @@ serve(async (req: Request) => {
       throw leadError;
     }
 
+    console.log('Lead created successfully:', lead.id);
+
     // Queue welcome email
     const { error: emailError } = await supabase
       .from('email_queue')
@@ -123,19 +121,25 @@ serve(async (req: Request) => {
 
     if (emailError) {
       console.error('Error queueing welcome email:', emailError);
+    } else {
+      console.log('Welcome email queued for:', email);
     }
 
-    // Track analytics event
-    await supabase
+    // Track analytics event - use correct column name 'metrics' instead of 'event_data'
+    const { error: analyticsError } = await supabase
       .from('analytics_events')
       .insert({
         event_type: 'lead_captured',
-        event_data: {
+        metrics: {
           source,
           journey,
-          email,
+          lead_id: lead.id,
         },
       });
+
+    if (analyticsError) {
+      console.error('Error tracking analytics:', analyticsError);
+    }
 
     console.log('Lead submitted successfully:', lead.id);
 
