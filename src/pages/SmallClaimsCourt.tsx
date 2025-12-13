@@ -88,9 +88,9 @@ const SmallClaimsCourt = () => {
     <div className="min-h-screen bg-background">
       <CanonicalURL />
       <EnhancedSEO
-        title="How to File a Small Claims Court Case in Ontario (Step-by-Step)"
-        description="Complete guide to filing a Small Claims Court case in Ontario. Learn how to file claims under $35,000 for debt collection, contract disputes, and property damage. Expert AI guidance starting at $5.99."
-        keywords="how to file small claims Ontario, small claims court steps, sue for money Ontario, debt collection court, small claims process"
+        title="Small Claims Court Ontario 2025 - File a Claim Up to $35,000"
+        description="Small claims court Ontario help. File claims up to $35,000 for debt collection, contract disputes, property damage. Step-by-step guide with forms 7A, 9A, 10A. Affordable AI legal help from $5.99."
+        keywords="small claims court Ontario, small claims court, how to sue someone Ontario, small claims court forms, small claims Ontario limit, file small claims, debt collection Ontario, sue for money, small claims court fees"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
         faqData={faqData}
@@ -107,7 +107,7 @@ const SmallClaimsCourt = () => {
                 Small Claims Court Ontario
               </Badge>
               <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Small Claims Court Help: Get Your Money Back
+                Small Claims Court Ontario: Sue for Up to $35,000
               </h1>
               <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
                 File your Small Claims Court application with confidence. 

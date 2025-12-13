@@ -76,9 +76,9 @@ const FamilyJourney = () => {
     <>
       <PerformanceMonitor />
       <EnhancedSEO 
-        title="CAS Removal & Family Court Ontario 2025 - Custody Forms & Legal Help"
-        description="What to do when CAS removes your child. Get help with family court Ontario, custody forms (8A, 35.1), supervised access orders Canada & child protection cases. Affordable legal guidance for parents dealing with CAS & custody disputes."
-        keywords="CAS removal what to do, family court Ontario help, custody forms Ontario, supervised access order Canada, Form 8A, Form 35.1, child protection Ontario, CAS legal help, family law Ontario"
+        title="Child Custody Ontario 2025 - Custody Forms, CAS Help & Family Court"
+        description="Child custody help Ontario. Get custody forms (8A, 35.1), fight CAS removal, file for sole or joint custody. Family court procedures, parenting plans, access schedules. Affordable legal guidance from $5.99."
+        keywords="child custody Ontario, custody forms Ontario, how to get custody, sole custody Ontario, joint custody Ontario, CAS removal, family court Ontario, custody agreement, parenting plan Ontario, child access rights"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
         faqData={faqData}
@@ -87,7 +87,7 @@ const FamilyJourney = () => {
           modifiedTime: new Date().toISOString(),
           author: "Justice-Bot Legal Team",
           section: "Family Law",
-          tags: ["Family Law", "Divorce", "Custody", "Ontario", "Legal Process"]
+          tags: ["Child Custody", "Custody Forms", "CAS", "Family Court", "Ontario", "Parenting Plan"]
         }}
       />
       <div className="min-h-screen bg-background">
@@ -95,8 +95,8 @@ const FamilyJourney = () => {
         <main id="main-content" className="container mx-auto px-4 py-8" tabIndex={-1}>
           <div className="max-w-4xl mx-auto">
             <JourneyHeader
-              title="CAS Removal & Family Court Ontario Help - Custody Forms & Child Protection"
-              description="What to do when CAS removes your child or you need help with family court in Ontario. Complete guide for custody forms, supervised access orders, and child protection cases."
+              title="Child Custody Ontario: Get Custody Forms & Family Court Help"
+              description="Complete guide to child custody in Ontario. File for sole or joint custody, get parenting plans, access schedules, and fight CAS removal with affordable AI legal assistance."
               whoIsItFor="Anyone dealing with divorce, custody/access, child support, spousal support, property division, or child protection matters in Ontario"
               whatYouGet={[
                 "Step-by-step guidance for your specific family law matter",
