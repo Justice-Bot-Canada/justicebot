@@ -1208,6 +1208,7 @@ export type Database = {
           household_size: number
           id: string
           phone: string | null
+          proof_of_income_path: string | null
           proof_of_income_url: string
           status: string
           updated_at: string
@@ -1222,6 +1223,7 @@ export type Database = {
           household_size: number
           id?: string
           phone?: string | null
+          proof_of_income_path?: string | null
           proof_of_income_url: string
           status?: string
           updated_at?: string
@@ -1236,6 +1238,7 @@ export type Database = {
           household_size?: number
           id?: string
           phone?: string | null
+          proof_of_income_path?: string | null
           proof_of_income_url?: string
           status?: string
           updated_at?: string
@@ -2191,6 +2194,7 @@ export type Database = {
           household_size: number
           id: string
           phone: string | null
+          proof_of_income_path: string | null
           proof_of_income_url: string
           status: string
           updated_at: string
@@ -2214,6 +2218,7 @@ export type Database = {
           household_size: number
           id: string
           phone: string | null
+          proof_of_income_path: string | null
           proof_of_income_url: string
           status: string
           updated_at: string
@@ -2288,6 +2293,7 @@ export type Database = {
           household_size: number
           id: string
           phone: string | null
+          proof_of_income_path: string | null
           proof_of_income_url: string
           status: string
           updated_at: string
