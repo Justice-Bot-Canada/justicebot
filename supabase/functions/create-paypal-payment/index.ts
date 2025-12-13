@@ -3,7 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://justice-bot.com',
+  'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
@@ -16,7 +16,7 @@ const paypalClientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET')!;
 const isProduction = paypalClientId && !paypalClientId.startsWith('sb-') && !paypalClientId.startsWith('AZ');
 const PAYPAL_BASE_URL = isProduction ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
 
-// Server-side price validation
+// Server-side price validation - including form purchases
 const VALID_PRICES: Record<string, number> = {
   'premium_monthly': 19.99,
   'Premium Monthly': 19.99,
@@ -26,14 +26,20 @@ const VALID_PRICES: Record<string, number> = {
   'Low-Income': 2.99,
   'Low Income': 2.99,
   'one_time_document': 9.99,
-  'One-Time Document': 9.99
+  'One-Time Document': 9.99,
+  'form_purchase': 39.00,
+  'Form Purchase': 39.00
 };
 
-// Input validation schema
+// Input validation schema - supports both old and new format
 const PaymentRequestSchema = z.object({
-  planType: z.string().min(1).max(100),
+  planType: z.string().min(1).max(100).optional(),
+  formId: z.string().uuid().optional(),
+  formTitle: z.string().max(200).optional(),
   amount: z.string().regex(/^\d+\.?\d{0,2}$/),
-  caseId: z.string().uuid().optional()
+  caseId: z.string().uuid().optional(),
+  returnUrl: z.string().url().optional(),
+  cancelUrl: z.string().url().optional()
 });
 
 serve(async (req) => {
@@ -80,13 +86,34 @@ serve(async (req) => {
       });
     }
 
-    const { planType, amount, caseId } = validation.data;
+    const { planType, formId, formTitle, amount, caseId, returnUrl, cancelUrl } = validation.data;
 
-    // Validate price matches plan type
-    const expectedAmount = VALID_PRICES[planType];
+    // Determine the product type
+    const productType = planType || (formId ? 'form_purchase' : 'unknown');
+    const productDescription = formTitle || planType || 'Justice Bot Purchase';
+
+    // For form purchases, fetch price from database
+    let expectedAmount: number | undefined;
+    if (formId) {
+      const { data: formData } = await supabase
+        .from('forms')
+        .select('price_cents')
+        .eq('id', formId)
+        .single();
+      
+      if (formData?.price_cents) {
+        expectedAmount = formData.price_cents / 100;
+      } else {
+        expectedAmount = 39.00; // Default form price
+      }
+    } else {
+      expectedAmount = VALID_PRICES[productType];
+    }
+
     if (!expectedAmount) {
-      console.error('[SECURITY] Invalid plan type:', {
-        planType,
+      console.error('[SECURITY] Invalid product type:', {
+        productType,
+        formId,
         userId: userData.user.id
       });
       return new Response(JSON.stringify({ error: 'Invalid request' }), {
@@ -98,7 +125,7 @@ serve(async (req) => {
     const submittedAmount = parseFloat(amount);
     if (Math.abs(submittedAmount - expectedAmount) > 0.01) {
       console.error('[SECURITY] Price manipulation attempt:', {
-        planType,
+        productType,
         expected: expectedAmount,
         received: submittedAmount,
         userId: userData.user.id
@@ -143,13 +170,13 @@ serve(async (req) => {
           currency_code: 'CAD',
           value: amount
         },
-        description: `Justice Bot - ${planType} Plan`,
-        custom_id: caseId || userData.user.id,
-        reference_id: `${planType}_${Date.now()}`
+        description: `Justice Bot - ${productDescription}`,
+        custom_id: formId || caseId || userData.user.id,
+        reference_id: `${productType}_${formId || ''}_${Date.now()}`
       }],
       application_context: {
-        return_url: `${req.headers.get('origin')}/thank-you?product=${encodeURIComponent(planType)}`,
-        cancel_url: `${req.headers.get('origin')}/payment-cancel`,
+        return_url: returnUrl || `${req.headers.get('origin')}/payment-success?formId=${formId || ''}&product=${encodeURIComponent(productType)}`,
+        cancel_url: cancelUrl || `${req.headers.get('origin')}/payment-cancel`,
         brand_name: 'Justice Bot',
         landing_page: 'BILLING',
         user_action: 'PAY_NOW'
@@ -180,11 +207,12 @@ serve(async (req) => {
       .insert({
         user_id: userData.user.id,
         case_id: caseId,
+        form_id: formId,
         payment_provider: 'paypal',
         payment_id: payment.id,
         amount: parseFloat(amount),
         currency: 'CAD',
-        plan_type: planType,
+        plan_type: productType,
         status: 'pending'
       });
 
