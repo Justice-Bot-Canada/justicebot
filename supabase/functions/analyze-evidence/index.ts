@@ -12,7 +12,7 @@ interface EvidenceItem {
   file_name: string;
   description?: string;
   file_type: string;
-  uploaded_at: string;
+  upload_date: string;
   file_url?: string;
 }
 
@@ -52,7 +52,7 @@ serve(async (req) => {
       .from('evidence')
       .select('*')
       .eq('case_id', caseId)
-      .order('uploaded_at', { ascending: true });
+      .order('upload_date', { ascending: true });
 
     if (evidenceError) throw evidenceError;
 
@@ -83,7 +83,7 @@ serve(async (req) => {
       fileName: item.file_name,
       type: item.file_type,
       description: item.description || 'No description',
-      uploadedAt: item.uploaded_at
+      uploadedAt: item.upload_date
     }));
 
     const systemPrompt = `You are a legal evidence analyst specializing in Canadian law. Analyze uploaded evidence to identify strengths, weaknesses, gaps, and provide strategic recommendations.
