@@ -2107,45 +2107,24 @@ export type Database = {
       }
       low_income_applications_safe: {
         Row: {
-          annual_income: number | null
           created_at: string | null
-          email: string | null
-          employment_status: string | null
-          full_name: string | null
           household_size: number | null
           id: string | null
-          phone: string | null
-          proof_of_income_url: string | null
           status: string | null
-          updated_at: string | null
           user_id: string | null
         }
         Insert: {
-          annual_income?: number | null
           created_at?: string | null
-          email?: string | null
-          employment_status?: string | null
-          full_name?: string | null
           household_size?: number | null
           id?: string | null
-          phone?: string | null
-          proof_of_income_url?: string | null
           status?: string | null
-          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
-          annual_income?: number | null
           created_at?: string | null
-          email?: string | null
-          employment_status?: string | null
-          full_name?: string | null
           household_size?: number | null
           id?: string | null
-          phone?: string | null
-          proof_of_income_url?: string | null
           status?: string | null
-          updated_at?: string | null
           user_id?: string | null
         }
         Relationships: []
