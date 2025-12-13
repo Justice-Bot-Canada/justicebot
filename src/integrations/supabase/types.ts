@@ -110,6 +110,48 @@ export type Database = {
         }
         Relationships: []
       }
+      canlii_case_updates: {
+        Row: {
+          case_id: string
+          citation: string | null
+          court: string | null
+          decision_date: string | null
+          fetched_at: string | null
+          id: string
+          jurisdiction: string | null
+          keywords: string[] | null
+          summary: string | null
+          title: string | null
+          url: string | null
+        }
+        Insert: {
+          case_id: string
+          citation?: string | null
+          court?: string | null
+          decision_date?: string | null
+          fetched_at?: string | null
+          id?: string
+          jurisdiction?: string | null
+          keywords?: string[] | null
+          summary?: string | null
+          title?: string | null
+          url?: string | null
+        }
+        Update: {
+          case_id?: string
+          citation?: string | null
+          court?: string | null
+          decision_date?: string | null
+          fetched_at?: string | null
+          id?: string
+          jurisdiction?: string | null
+          keywords?: string[] | null
+          summary?: string | null
+          title?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
       case_deadlines: {
         Row: {
           case_id: string | null
@@ -1197,6 +1239,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      legal_updates: {
+        Row: {
+          affected_areas: string[] | null
+          created_at: string | null
+          description: string | null
+          effective_date: string | null
+          id: string
+          is_processed: boolean | null
+          jurisdiction: string | null
+          source: string
+          title: string
+          update_type: string
+          url: string | null
+        }
+        Insert: {
+          affected_areas?: string[] | null
+          created_at?: string | null
+          description?: string | null
+          effective_date?: string | null
+          id?: string
+          is_processed?: boolean | null
+          jurisdiction?: string | null
+          source: string
+          title: string
+          update_type: string
+          url?: string | null
+        }
+        Update: {
+          affected_areas?: string[] | null
+          created_at?: string | null
+          description?: string | null
+          effective_date?: string | null
+          id?: string
+          is_processed?: boolean | null
+          jurisdiction?: string | null
+          source?: string
+          title?: string
+          update_type?: string
+          url?: string | null
+        }
+        Relationships: []
       }
       low_income_applications: {
         Row: {
