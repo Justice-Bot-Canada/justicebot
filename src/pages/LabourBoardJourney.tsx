@@ -59,9 +59,9 @@ const LabourBoardJourney = () => {
     <>
       <PerformanceMonitor />
       <EnhancedSEO 
-        title="Labour Board Journey - Employment Disputes & Wrongful Dismissal"
-        description="Step-by-step guidance for filing Ontario Labour Relations Board complaints for wrongful dismissal, employment standards violations, and workplace rights."
-        keywords="labour board ontario, OLRB, wrongful dismissal, employment dispute, workplace rights, unjust termination, employment standards"
+        title="Employment Law Ontario 2025 - Wrongful Dismissal, WSIB & Workers Rights"
+        description="Employment law help Ontario. File for wrongful dismissal, unpaid wages, WSIB claims, workplace harassment. Know your workers rights, ESA violations, severance pay. Affordable legal guidance from $5.99."
+        keywords="employment law Ontario, wrongful dismissal Ontario, WSIB claim, workers rights Ontario, unpaid wages, ESA Ontario, workplace harassment, severance pay, unjust termination, labour board Ontario"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
         faqData={faqData}
@@ -69,8 +69,8 @@ const LabourBoardJourney = () => {
           publishedTime: "2025-01-27T00:00:00Z",
           modifiedTime: new Date().toISOString(),
           author: "Justice-Bot Legal Team",
-          section: "Labour & Employment",
-          tags: ["Labour Board", "OLRB", "Employment Law", "Wrongful Dismissal", "Ontario", "Workplace Rights"]
+          section: "Employment Law",
+          tags: ["Employment Law", "Wrongful Dismissal", "WSIB", "Workers Rights", "Ontario", "ESA", "Unpaid Wages"]
         }}
       />
       <div className="min-h-screen bg-background py-8">
