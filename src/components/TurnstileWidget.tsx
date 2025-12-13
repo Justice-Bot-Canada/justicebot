@@ -53,12 +53,11 @@ export const TurnstileWidget = ({ onSuccess, onError }: TurnstileWidgetProps) =>
   useEffect(() => {
     if (isLoaded && containerRef.current && window.turnstile && !widgetIdRef.current) {
       try {
-        // Get sitekey from environment variable
-        const sitekey = import.meta.env.VITE_TURNSTILE_SITEKEY || '';
+        // Production sitekey - fallback to env variable
+        const sitekey = import.meta.env.VITE_TURNSTILE_SITEKEY || '0x4AAAAAACDu7YkiUswZAh3z';
         
-        if (!sitekey || sitekey === 'YOUR_SITEKEY_HERE') {
-          console.error('⚠️ TURNSTILE NOT CONFIGURED: Add your Cloudflare Turnstile sitekey to .env file');
-          console.error('Get sitekey at: https://dash.cloudflare.com/');
+        if (!sitekey) {
+          console.error('Turnstile sitekey not configured');
           onError?.();
           return;
         }
@@ -66,11 +65,16 @@ export const TurnstileWidget = ({ onSuccess, onError }: TurnstileWidgetProps) =>
         widgetIdRef.current = window.turnstile.render(containerRef.current, {
           sitekey,
           callback: (token: string) => {
+            console.log('Turnstile verification successful');
             onSuccess(token);
           },
           'error-callback': () => {
             console.error('Turnstile verification failed');
             onError?.();
+          },
+          'expired-callback': () => {
+            console.log('Turnstile token expired, re-rendering');
+            widgetIdRef.current = null;
           },
         });
       } catch (error) {
