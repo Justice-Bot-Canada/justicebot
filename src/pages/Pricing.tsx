@@ -11,12 +11,20 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { analytics } from "@/utils/analytics";
 
 const VALID_PROMO_CODES: Record<string, { discount: number; label: string }> = {
   "LAUNCH50": { discount: 0.5, label: "50% OFF First Month" },
   "FIRST50": { discount: 0.5, label: "50% OFF First Month" },
   "DEMO2024": { discount: 0.5, label: "Demo Special 50% OFF" },
+};
+
+// Stripe Price IDs - Replace with actual Stripe price IDs from your dashboard
+const STRIPE_PRICES = {
+  basic: { priceId: "price_basic_monthly", name: "Basic" },
+  professional: { priceId: "price_professional_monthly", name: "Professional" },
+  premium: { priceId: "price_premium_monthly", name: "Premium" },
 };
 
 const Pricing = () => {
@@ -26,10 +34,10 @@ const Pricing = () => {
   const [appliedPromo, setAppliedPromo] = useState<{ code: string; discount: number; label: string } | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { subscribed, plan: currentPlan, startCheckout, openCustomerPortal } = useSubscription();
 
   useEffect(() => {
     checkFreeEligibility();
-    // Check for saved promo code
     const savedPromo = localStorage.getItem("promo-code");
     if (savedPromo && VALID_PROMO_CODES[savedPromo]) {
       setAppliedPromo({ code: savedPromo, ...VALID_PROMO_CODES[savedPromo] });
@@ -78,7 +86,7 @@ const Pricing = () => {
     return (numPrice * (1 - appliedPromo.discount)).toFixed(2);
   };
 
-  const handlePayPalPayment = async (plan: string, amount: string) => {
+  const handleStripePayment = async (planKey: keyof typeof STRIPE_PRICES, price: string) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -88,36 +96,42 @@ const Pricing = () => {
       return;
     }
 
-    analytics.paymentInitiated(plan, amount, 'paypal');
-    setLoading(plan);
+    const plan = STRIPE_PRICES[planKey];
+    analytics.paymentInitiated(plan.name, price, 'stripe');
+    setLoading(planKey);
+    
     try {
-      const { data, error } = await supabase.functions.invoke('create-paypal-payment', {
-        body: {
-          planType: plan,
-          amount: amount.replace('$', ''),
-          caseId: null
-        }
+      await startCheckout(plan.priceId, plan.name);
+      toast({
+        title: "Redirecting to Checkout",
+        description: "Complete your subscription in the new tab.",
       });
-
-      if (error) throw error;
-
-      if (data?.approvalUrl) {
-        window.open(data.approvalUrl, '_blank');
-        toast({
-          title: "Redirecting to PayPal",
-          description: "Complete your payment in the new tab.",
-        });
-      }
     } catch (error) {
-      console.error('Payment error:', error);
-      analytics.paymentFailed(plan, amount, error instanceof Error ? error.message : 'Unknown error');
+      console.error('Stripe error:', error);
+      analytics.paymentFailed(plan.name, price, error instanceof Error ? error.message : 'Unknown error');
       toast({
         title: "Payment Error",
-        description: "Failed to create payment. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to start checkout. Please try again.",
         variant: "destructive",
       });
     } finally {
       setLoading(null);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    try {
+      await openCustomerPortal();
+      toast({
+        title: "Opening Subscription Portal",
+        description: "Manage your subscription in the new tab.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to open subscription portal.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -402,17 +416,28 @@ const Pricing = () => {
               </CardContent>
 
               <CardContent className="pt-0 space-y-2">
-                <Button
-                  onClick={() => handlePayPalPayment(plan.name, plan.price)}
-                  disabled={loading === plan.name}
-                  className={`w-full flex items-center justify-center gap-2 ${
-                    plan.popular ? 'bg-primary hover:bg-primary/90' : ''
-                  }`}
-                  variant={plan.popular ? 'default' : 'outline'}
-                >
-                  <DollarSign className="w-4 h-4" />
-                  {loading === plan.name ? "Processing..." : `Subscribe - ${plan.price}/mo`}
-                </Button>
+                {subscribed && currentPlan === plan.name ? (
+                  <Button
+                    onClick={handleManageSubscription}
+                    className="w-full"
+                    variant="secondary"
+                  >
+                    <CreditCard className="w-4 h-4 mr-2" />
+                    Manage Subscription
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => handleStripePayment(plan.name.toLowerCase() as "basic" | "professional" | "premium", plan.price)}
+                    disabled={loading === plan.name.toLowerCase() || subscribed}
+                    className={`w-full flex items-center justify-center gap-2 ${
+                      plan.popular ? 'bg-primary hover:bg-primary/90' : ''
+                    }`}
+                    variant={plan.popular ? 'default' : 'outline'}
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    {loading === plan.name.toLowerCase() ? "Processing..." : `Subscribe - ${plan.price}/mo`}
+                  </Button>
+                )}
                 
                 <Button
                   onClick={() => handleETransferPayment(plan.name, plan.price)}
