@@ -25,6 +25,13 @@ export const trackEvent = (eventName: string, properties?: Record<string, any>) 
   }
 };
 
+// GA4 Enhanced Ecommerce Events
+const sendGA4Event = (eventName: string, params: Record<string, any>) => {
+  if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', eventName, params);
+  }
+};
+
 // Predefined tracking functions
 export const analytics = {
   // Triage tracking
@@ -45,9 +52,32 @@ export const analytics = {
   lowIncomeApplicationStart: () => trackEvent('low_income_application_start'),
   lowIncomeApplicationComplete: () => trackEvent('low_income_application_complete'),
   
-  // Conversions
-  signUp: (method: string) => trackEvent('sign_up', { method }),
-  purchase: (plan: string, amount: number) => trackEvent('purchase', { plan, value: amount, currency: 'CAD' }),
+  // GA4 Enhanced Conversions - Sign Up
+  signUp: (method: string) => {
+    trackEvent('sign_up', { method });
+    // GA4 recommended event
+    sendGA4Event('sign_up', {
+      method: method,
+    });
+  },
+  
+  // GA4 Enhanced Conversions - Purchase
+  purchase: (plan: string, amount: number, transactionId?: string) => {
+    trackEvent('purchase', { plan, value: amount, currency: 'CAD' });
+    // GA4 recommended ecommerce event
+    sendGA4Event('purchase', {
+      transaction_id: transactionId || `txn_${Date.now()}`,
+      value: amount,
+      currency: 'CAD',
+      items: [{
+        item_id: plan,
+        item_name: plan === 'form_purchase' ? 'Legal Form' : `${plan} Subscription`,
+        category: 'Legal Services',
+        quantity: 1,
+        price: amount,
+      }],
+    });
+  },
   
   // Content engagement
   videoPlay: (videoId: string) => trackEvent('video_play', { video_id: videoId }),
@@ -58,15 +88,70 @@ export const analytics = {
   chatStart: () => trackEvent('chat_start'),
   chatMessage: (messageCount: number) => trackEvent('chat_message', { message_count: messageCount }),
   
-  // Signup tracking
-  signupClick: () => trackEvent('signup_click'),
-  signupAttempt: (email: string) => trackEvent('signup_attempt', { email }),
-  signupComplete: (email: string, method: string) => trackEvent('signup_complete', { email, method }),
+  // GA4 Enhanced - Signup flow
+  signupClick: () => {
+    trackEvent('signup_click');
+    sendGA4Event('generate_lead', { lead_source: 'signup_button' });
+  },
+  signupAttempt: (email: string) => {
+    trackEvent('signup_attempt', { email_domain: email.split('@')[1] });
+  },
+  signupComplete: (email: string, method: string) => {
+    trackEvent('signup_complete', { method });
+    sendGA4Event('sign_up', { method });
+    // Fire conversion for Google Ads
+    sendGA4Event('conversion', { 
+      send_to: 'AW-CONVERSION_ID/CONVERSION_LABEL',
+      value: 0,
+      currency: 'CAD',
+    });
+  },
   signupFailed: (error: string) => trackEvent('signup_failed', { error }),
   
-  // Payment tracking
-  paymentInitiated: (plan: string, amount: string, method: string) => trackEvent('payment_initiated', { plan, amount, method }),
-  paymentCompleted: (plan: string, amount: string, paymentId?: string) => trackEvent('payment_completed', { plan, amount, payment_id: paymentId, value: parseFloat(amount.replace(/[^0-9.]/g, '')), currency: 'CAD' }),
-  paymentAbandoned: (plan: string, amount: string, reason: string) => trackEvent('payment_abandoned', { plan, amount, reason }),
-  paymentFailed: (plan: string, amount: string, error: string) => trackEvent('payment_failed', { plan, amount, error }),
+  // GA4 Enhanced - Payment flow
+  paymentInitiated: (plan: string, amount: string, method: string) => {
+    trackEvent('payment_initiated', { plan, amount, method });
+    sendGA4Event('begin_checkout', {
+      currency: 'CAD',
+      value: parseFloat(amount.replace(/[^0-9.]/g, '')),
+      items: [{
+        item_id: plan,
+        item_name: plan === 'form_purchase' ? 'Legal Form' : `${plan} Subscription`,
+        quantity: 1,
+        price: parseFloat(amount.replace(/[^0-9.]/g, '')),
+      }],
+    });
+  },
+  paymentCompleted: (plan: string, amount: string, paymentId?: string) => {
+    const value = parseFloat(amount.replace(/[^0-9.]/g, ''));
+    trackEvent('payment_completed', { plan, amount, payment_id: paymentId, value, currency: 'CAD' });
+    // GA4 purchase event
+    sendGA4Event('purchase', {
+      transaction_id: paymentId || `txn_${Date.now()}`,
+      value: value,
+      currency: 'CAD',
+      items: [{
+        item_id: plan,
+        item_name: plan === 'form_purchase' ? 'Legal Form' : `${plan} Subscription`,
+        category: 'Legal Services',
+        quantity: 1,
+        price: value,
+      }],
+    });
+  },
+  paymentAbandoned: (plan: string, amount: string, reason: string) => {
+    trackEvent('payment_abandoned', { plan, amount, reason });
+  },
+  paymentFailed: (plan: string, amount: string, error: string) => {
+    trackEvent('payment_failed', { plan, amount, error });
+  },
+
+  // Lead capture
+  leadCaptured: (source: string, journey?: string) => {
+    trackEvent('lead_captured', { source, journey });
+    sendGA4Event('generate_lead', { 
+      lead_source: source,
+      journey: journey,
+    });
+  },
 };

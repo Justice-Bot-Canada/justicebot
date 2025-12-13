@@ -12,6 +12,8 @@ import { MoneyBackGuarantee } from "@/components/MoneyBackGuarantee";
 import LiveSupportWidget from "@/components/LiveSupportWidget";
 import { LeadCaptureModal } from "@/components/LeadCaptureModal";
 import { StickyBottomCTA } from "@/components/StickyBottomCTA";
+import { ProvincesBanner } from "@/components/ProvincesBanner";
+import CrispChat from "@/components/CrispChat";
 import { Suspense, lazy } from "react";
 
 // Lazy load below-the-fold components for better LCP
@@ -100,6 +102,8 @@ const Index = () => {
       <PerformanceMonitor />
       
       <Header />
+      {/* Provinces Coming Soon Banner */}
+      <ProvincesBanner />
       <main id="main-content" tabIndex={-1}>
         <HeroSection />
         
@@ -228,6 +232,9 @@ const Index = () => {
       
       {/* Sticky Bottom CTA with Promo Code */}
       <StickyBottomCTA />
+      
+      {/* Crisp Live Chat Widget */}
+      <CrispChat />
     </div>
   );
 };
