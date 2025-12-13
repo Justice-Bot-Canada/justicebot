@@ -1,49 +1,58 @@
-import { MapPin, ArrowRight } from "lucide-react";
+import { MapPin, ArrowRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function ProvincesBanner() {
   const [dismissed, setDismissed] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
-  if (dismissed) return null;
+  useEffect(() => {
+    // Check if already dismissed this session
+    const wasDismissed = sessionStorage.getItem('provinces-banner-dismissed');
+    if (!wasDismissed) {
+      setIsVisible(true);
+    }
+  }, []);
+
+  const handleDismiss = () => {
+    setDismissed(true);
+    sessionStorage.setItem('provinces-banner-dismissed', 'true');
+  };
+
+  if (dismissed || !isVisible) return null;
 
   return (
-    <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-y border-primary/20">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/20 rounded-full">
-              <MapPin className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <p className="font-semibold text-foreground">
-                🇨🇦 Expanding Across Canada
-              </p>
-              <p className="text-sm text-muted-foreground">
-                British Columbia, Alberta, and Quebec forms coming soon! Currently serving Ontario.
-              </p>
-            </div>
+    <div className="bg-gradient-to-r from-red-50 via-white to-red-50 dark:from-red-950/20 dark:via-background dark:to-red-950/20 border-b border-red-100 dark:border-red-900/30 relative">
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-center sm:text-left">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🇨🇦</span>
+            <span className="font-medium text-foreground">
+              Expanding Across Canada
+            </span>
+            <span className="hidden sm:inline text-muted-foreground">—</span>
           </div>
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setDismissed(true)}
-              className="text-muted-foreground"
-            >
-              Dismiss
-            </Button>
-            <Button 
-              size="sm"
-              onClick={() => window.open('mailto:expand@justice-bot.com?subject=Province Request', '_blank')}
-              className="gap-2"
-            >
-              Request Your Province
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </div>
+          <p className="text-sm text-muted-foreground">
+            BC, Alberta & Quebec coming soon! Currently serving <span className="font-medium text-primary">Ontario</span>.
+          </p>
+          <Button 
+            variant="ghost"
+            size="sm"
+            onClick={() => window.open('mailto:expand@justice-bot.com?subject=Province Request', '_blank')}
+            className="text-primary hover:text-primary/80 gap-1 px-2"
+          >
+            Request your province
+            <ArrowRight className="w-3 h-3" />
+          </Button>
         </div>
       </div>
+      <button
+        onClick={handleDismiss}
+        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-muted-foreground hover:text-foreground transition-colors"
+        aria-label="Dismiss banner"
+      >
+        <X className="w-4 h-4" />
+      </button>
     </div>
   );
 }
