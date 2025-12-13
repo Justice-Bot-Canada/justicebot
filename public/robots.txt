@@ -1,5 +1,5 @@
 # SEO-optimized robots.txt for Justice-Bot
-# Updated: 2025-10-03
+# Updated: 2025-12-13
 
 # Googlebot - full access (Note: Googlebot ignores Crawl-delay)
 User-agent: Googlebot
@@ -89,5 +89,5 @@ Disallow: /favicon.ico
 Disallow: /dev.html
 Disallow: /dev/
 
-# Sitemap location (use non-www for consistency)
-Sitemap: https://justice-bot.com/sitemap.xml
+# Sitemap location (MUST use www for canonical consistency)
+Sitemap: https://www.justice-bot.com/sitemap.xml
