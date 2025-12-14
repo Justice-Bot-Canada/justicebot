@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast-stub';
 import { useAuth } from '@/hooks/useAuth';
 import { usePremiumAccess } from '@/hooks/usePremiumAccess';
+import { OfficialFormFiller } from './OfficialFormFiller';
 
 interface Form {
   id: string;
@@ -282,14 +283,23 @@ ${evidenceText}
                       )}
                     </Button>
 
+                    {/* Official PDF Filler - uses prefilled data */}
+                    {hasFormAccess && (
+                      <OfficialFormFiller
+                        form={form}
+                        caseId={caseId}
+                        prefilledData={hasPrefilledData ? prefilledData[form.id] : {}}
+                      />
+                    )}
+
                     {hasFormAccess && form.pdf_url && (
                       <Button
                         size="sm"
-                        variant="outline"
+                        variant="ghost"
                         onClick={() => handleDownload(form)}
                       >
                         <Download className="h-4 w-4 mr-1" />
-                        Download
+                        Blank Form
                       </Button>
                     )}
 

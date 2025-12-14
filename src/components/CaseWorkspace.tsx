@@ -26,6 +26,7 @@ import { EvidenceHub } from "./EvidenceHub";
 import { EvidenceAnalyzer } from "./EvidenceAnalyzer";
 import { FormsList } from "./FormsList";
 import { FormPrefillPanel } from "./FormPrefillPanel";
+import { ExhibitBookExport } from "./ExhibitBookExport";
 import { toast } from "@/lib/toast-stub";
 
 interface CaseData {
@@ -581,6 +582,9 @@ export function CaseWorkspace({ caseId, onBack }: CaseWorkspaceProps) {
             caseType={caseType}
             caseDescription={caseData.description}
           />
+
+          {/* Premium Exhibit Book Export */}
+          <ExhibitBookExport caseId={caseId} caseTitle={caseData.title} />
 
           <div className="flex justify-end">
             <Button onClick={() => setActiveTab('forms')}>
