@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
+import DOMPurify from 'dompurify';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -209,13 +210,19 @@ export function LegalChatbot() {
     }
   };
 
-  // Format markdown-like content
+  // Format markdown-like content with XSS protection
   const formatContent = (content: string) => {
-    return content
+    const formatted = content
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/^• /gm, '• ')
       .replace(/\n/g, '<br />');
+    
+    // Sanitize to prevent XSS attacks
+    return DOMPurify.sanitize(formatted, {
+      ALLOWED_TAGS: ['strong', 'em', 'br', 'p'],
+      ALLOWED_ATTR: []
+    });
   };
 
   return (
