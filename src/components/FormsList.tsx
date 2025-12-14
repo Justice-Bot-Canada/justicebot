@@ -135,9 +135,12 @@ export function FormsList() {
     setProcessingPayment(form.id);
 
     try {
+      // Get promo code from localStorage if available
+      const promoCode = localStorage.getItem("promo-code") || undefined;
+      
       // Call payment function - it handles payment record creation
       const { data: sessionData, error: sessionError } = await supabase.functions.invoke('create-form-payment', {
-        body: { formId: form.id }
+        body: { formId: form.id, promoCode }
       });
 
       if (sessionError) throw sessionError;

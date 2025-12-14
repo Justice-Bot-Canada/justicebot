@@ -25,6 +25,7 @@ import { CaseMeritScore } from "./CaseMeritScore";
 import { EvidenceHub } from "./EvidenceHub";
 import { EvidenceAnalyzer } from "./EvidenceAnalyzer";
 import { FormsList } from "./FormsList";
+import { FormPrefillPanel } from "./FormPrefillPanel";
 import { toast } from "@/lib/toast-stub";
 
 interface CaseData {
@@ -607,26 +608,12 @@ export function CaseWorkspace({ caseId, onBack }: CaseWorkspaceProps) {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4">
-                {config.forms.map((form, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <FileText className="h-5 w-5 text-primary" />
-                      <div>
-                        <p className="font-medium">{form}</p>
-                        <p className="text-sm text-muted-foreground">AI will pre-fill using your evidence</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button size="sm" variant="outline">Preview</Button>
-                      <Button size="sm">
-                        <Scale className="h-3.5 w-3.5 mr-1" />
-                        Generate with AI
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {/* AI Form Pre-fill Panel with real forms from database */}
+              <FormPrefillPanel 
+                caseId={caseId}
+                caseType={caseType}
+                caseDescription={caseData.description}
+              />
             </CardContent>
           </Card>
 
