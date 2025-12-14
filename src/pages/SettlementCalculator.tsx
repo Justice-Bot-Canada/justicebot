@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { PremiumGate } from '@/components/PremiumGate';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,7 +34,7 @@ interface SettlementAnalysis {
 
 export default function SettlementCalculator() {
   const { toast } = useToast();
-  const { isPremium } = usePremiumAccess();
+  const { hasSettlementCalculator, tier } = usePremiumAccess();
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState<SettlementAnalysis | null>(null);
   
@@ -106,46 +105,51 @@ export default function SettlementCalculator() {
         <Header />
         
         <main className="flex-grow container mx-auto px-4 py-8">
-          <PremiumGate 
-            feature="Settlement Calculator" 
-            showUpgrade={true}
-            fallback={
-              <Card className="max-w-2xl mx-auto mt-8">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calculator className="w-6 h-6" />
-                    Settlement Calculator - Premium Feature
-                  </CardTitle>
-                  <CardDescription>
-                    Available with Monthly or Yearly subscription plans
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-muted-foreground">
-                    The Settlement Calculator provides AI-powered analysis to estimate realistic settlement ranges based on:
-                  </p>
-                  <ul className="space-y-2 ml-4">
-                    <li className="flex items-start gap-2">
-                      <Check className="w-5 h-5 text-primary mt-0.5" />
-                      <span>Canadian legal precedents and case law</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-5 h-5 text-primary mt-0.5" />
-                      <span>Economic and non-economic damages breakdown</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Check className="w-5 h-5 text-primary mt-0.5" />
-                      <span>Negotiation strategies and comparable cases</span>
-                    </li>
-                  </ul>
-                  <Button className="w-full" onClick={() => window.location.href = '/pricing'}>
-                    <Crown className="w-4 h-4 mr-2" />
-                    Upgrade to Access
-                  </Button>
-                </CardContent>
-              </Card>
-            }
-          >
+          {/* Settlement Calculator requires Monthly or Yearly tier - not available for Free or Low-Income */}
+          {!hasSettlementCalculator ? (
+            <Card className="max-w-2xl mx-auto mt-8">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calculator className="w-6 h-6" />
+                  Settlement Calculator - Monthly/Yearly Only
+                </CardTitle>
+                <CardDescription>
+                  {tier === 'free' || tier === 'low-income' 
+                    ? `Your ${tier === 'free' ? 'Free' : 'Low-Income'} plan doesn't include this feature`
+                    : 'Available with Monthly ($19/mo) or Yearly ($99/yr) subscription plans'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    The Settlement Calculator is an advanced feature available only to Monthly and Yearly subscribers.
+                  </AlertDescription>
+                </Alert>
+                <p className="text-muted-foreground">
+                  This AI-powered tool provides:
+                </p>
+                <ul className="space-y-2 ml-4">
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-primary mt-0.5" />
+                    <span>Canadian legal precedents and case law analysis</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-primary mt-0.5" />
+                    <span>Economic and non-economic damages breakdown</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-5 h-5 text-primary mt-0.5" />
+                    <span>Negotiation strategies and comparable cases</span>
+                  </li>
+                </ul>
+                <Button className="w-full" onClick={() => window.location.href = '/pricing'}>
+                  <Crown className="w-4 h-4 mr-2" />
+                  Upgrade to Monthly or Yearly
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-8">
                 <h1 className="text-4xl font-bold mb-4">Settlement Calculator</h1>
@@ -412,7 +416,7 @@ export default function SettlementCalculator() {
                 </div>
               </div>
             </div>
-          </PremiumGate>
+          )}
         </main>
 
         <Footer />

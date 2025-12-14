@@ -13,7 +13,15 @@ const STANDARD_FORM_PRICE_CENTS = 2999;
 const FormPaymentSchema = z.object({
   formId: z.string().uuid(),
   paymentId: z.string().optional(),
+  promoCode: z.string().optional(),
 });
+
+// Valid promo codes with discount percentages
+const VALID_PROMO_CODES: Record<string, number> = {
+  "LAUNCH50": 0.5,
+  "FIRST50": 0.5,
+  "DEMO2024": 0.5,
+};
 
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -81,7 +89,7 @@ serve(async (req) => {
       throw new Error('Invalid request');
     }
 
-    const { formId } = validationResult.data;
+    const { formId, promoCode } = validationResult.data;
     
     // Fetch form from database to get actual price
     const { data: form, error: formError } = await supabaseClient
@@ -95,10 +103,20 @@ serve(async (req) => {
       throw new Error('Form not found');
     }
 
-    const amount = form.price_cents || STANDARD_FORM_PRICE_CENTS;
+    let amount = form.price_cents || STANDARD_FORM_PRICE_CENTS;
+    let discountApplied = false;
+    let discountLabel = '';
+    
+    // Apply promo code discount if valid
+    if (promoCode && VALID_PROMO_CODES[promoCode.toUpperCase()]) {
+      const discount = VALID_PROMO_CODES[promoCode.toUpperCase()];
+      amount = Math.round(amount * (1 - discount));
+      discountApplied = true;
+      discountLabel = `${discount * 100}% off with ${promoCode.toUpperCase()}`;
+      logStep("Promo code applied", { promoCode, discount, originalAmount: form.price_cents, newAmount: amount });
+    }
+    
     const currency = 'CAD';
-
-    logStep("Creating form payment", { formId, formTitle: form.title, amount, currency });
 
     const accessToken = await getPayPalAccessToken();
 
@@ -119,7 +137,9 @@ serve(async (req) => {
                 currency_code: currency,
                 value: (amount / 100).toFixed(2), // Convert cents to dollars
               },
-              description: `Legal Form Access - ${formId}`,
+              description: discountApplied 
+                ? `Legal Form Access - ${form.title} (${discountLabel})`
+                : `Legal Form Access - ${form.title}`,
             },
           ],
           application_context: {
