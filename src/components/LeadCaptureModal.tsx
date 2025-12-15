@@ -7,6 +7,8 @@ import { submitLead } from '@/api/leads';
 import { useToast } from '@/hooks/use-toast';
 import { Gift, X } from 'lucide-react';
 import { TurnstileWidget } from '@/components/TurnstileWidget';
+import { klaviyoIdentify, klaviyoEvents } from '@/components/KlaviyoTracking';
+import { supabase } from '@/integrations/supabase/client';
 
 interface LeadCaptureModalProps {
   trigger?: 'time' | 'scroll' | 'exit' | 'manual';
@@ -99,6 +101,19 @@ export function LeadCaptureModal({ trigger = 'time', delaySeconds = 30 }: LeadCa
         payload: { trigger },
         turnstileToken
       });
+
+      // Sync with Klaviyo (client-side tracking)
+      klaviyoIdentify(email, { '$first_name': name, 'Source': 'lead_capture_modal' });
+      klaviyoEvents.subscribedNewsletter('lead_capture_modal');
+
+      // Also sync via server-side for list subscription
+      try {
+        await supabase.functions.invoke('klaviyo-subscribe', {
+          body: { email, firstName: name, source: 'lead_capture_modal' }
+        });
+      } catch (klaviyoError) {
+        console.warn('Klaviyo sync failed, but lead was captured:', klaviyoError);
+      }
 
       localStorage.setItem('lead_submitted', Date.now().toString());
       
