@@ -1,31 +1,61 @@
 import { useEffect } from 'react';
 
-// Klaviyo Public API Key (safe for client-side)
-const KLAVIYO_PUBLIC_KEY = 'Tr3qJ8';
+// Klaviyo Company ID
+const KLAVIYO_COMPANY_ID = 'Tr3qJ8';
 
 declare global {
   interface Window {
     _learnq: any[];
+    _klOnsite: any[];
     klaviyo: any;
   }
 }
 
 export const KlaviyoTracking = () => {
   useEffect(() => {
-    // Initialize Klaviyo queue
+    // Initialize Klaviyo object on page load (official script)
+    if (!window.klaviyo) {
+      window._klOnsite = window._klOnsite || [];
+      try {
+        window.klaviyo = new Proxy({}, {
+          get: function(_target: any, prop: string | symbol) {
+            return "push" === prop 
+              ? function(...args: any[]) {
+                  window._klOnsite.push.apply(window._klOnsite, args);
+                }
+              : function(...args: any[]) {
+                  const callback = "function" == typeof args[args.length - 1] ? args.pop() : undefined;
+                  const promise = new Promise((resolve) => {
+                    window._klOnsite.push([prop, ...args, function(result: any) {
+                      callback && callback(result);
+                      resolve(result);
+                    }]);
+                  });
+                  return promise;
+                };
+          }
+        });
+      } catch (_e) {
+        window.klaviyo = window.klaviyo || [];
+        window.klaviyo.push = function(...args: any[]) {
+          window._klOnsite.push.apply(window._klOnsite, args);
+        };
+      }
+    }
+
+    // Initialize legacy _learnq for backwards compatibility
     window._learnq = window._learnq || [];
 
     // Load Klaviyo script
     const script = document.createElement('script');
     script.type = 'text/javascript';
     script.async = true;
-    script.src = `https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=${KLAVIYO_PUBLIC_KEY}`;
+    script.src = `https://static.klaviyo.com/onsite/js/${KLAVIYO_COMPANY_ID}/klaviyo.js?company_id=${KLAVIYO_COMPANY_ID}`;
     
     const firstScript = document.getElementsByTagName('script')[0];
     firstScript.parentNode?.insertBefore(script, firstScript);
 
     return () => {
-      // Cleanup if needed
       if (script.parentNode) {
         script.parentNode.removeChild(script);
       }
