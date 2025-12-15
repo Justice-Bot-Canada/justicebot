@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { Suspense, lazy } from "react";
 import { SkipToContent, useFocusManagement, useKeyboardNavigation } from "@/components/AccessibilityFeatures";
+import { KlaviyoTracking } from "@/components/KlaviyoTracking";
 import Index from "./pages/Index";
 import PathwayDecision from "./pages/PathwayDecision";
 import Pricing from "./pages/Pricing";
@@ -132,6 +133,7 @@ const AppContent = () => {
       <div className="min-h-screen">
         <SkipToContent />
         <LiveSupportWidget />
+        <KlaviyoTracking />
       <Routes>
           {/* Main Landing & Getting Started */}
           <Route path="/" element={<Index />} />
