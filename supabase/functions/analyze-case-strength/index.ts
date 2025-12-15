@@ -123,8 +123,8 @@ serve(async (req) => {
       }
     }
 
-    // Determine case type label for context
-    const caseTypeLabel = caseType ? getCaseTypeLabel(caseType) : 'General Legal';
+    // Determine case type label for context with province awareness
+    const caseTypeLabel = caseType ? getCaseTypeLabel(caseType, jurisdiction) : 'General Legal';
 
     // Build comprehensive evidence context
     const evidenceContext = buildEvidenceContext(evidenceFromDb, evidenceAnalysis, evidenceList);
@@ -263,11 +263,67 @@ Remember: This is educational analysis, not legal advice.`;
   }
 });
 
-// Helper function to convert case type codes to readable labels
-function getCaseTypeLabel(caseType: string): string {
-  const labels: Record<string, string> = {
+// Province-specific tribunal name mappings
+const PROVINCE_TRIBUNALS: Record<string, Record<string, string>> = {
+  'ON': {
     'HRTO': 'Human Rights Tribunal of Ontario',
     'LTB': 'Landlord and Tenant Board',
+    'SMALL_CLAIMS': 'Small Claims Court',
+    'FAMILY': 'Ontario Court of Justice - Family',
+    'SUPERIOR': 'Superior Court of Justice',
+    'CRIMINAL': 'Ontario Court of Justice - Criminal',
+    'LABOUR': 'Ontario Labour Relations Board',
+    'WSIB': 'Workplace Safety and Insurance Board'
+  },
+  'BC': {
+    'RTB': 'Residential Tenancy Branch',
+    'BCHRT': 'BC Human Rights Tribunal',
+    'CRT': 'Civil Resolution Tribunal',
+    'SMALL_CLAIMS': 'Small Claims Court',
+    'FAMILY': 'Provincial Court of BC - Family',
+    'SUPREME': 'Supreme Court of British Columbia',
+    'CRIMINAL': 'Provincial Court of BC - Criminal',
+    'LRB': 'Labour Relations Board',
+    'WCB': 'WorkSafeBC'
+  },
+  'AB': {
+    'RTDRS': 'Residential Tenancy Dispute Resolution Service',
+    'AHRC': 'Alberta Human Rights Commission',
+    'SMALL_CLAIMS': 'Provincial Court Civil',
+    'FAMILY': 'Court of King\'s Bench - Family',
+    'KINGS_BENCH': 'Court of King\'s Bench',
+    'CRIMINAL': 'Provincial Court of Alberta - Criminal',
+    'ALRB': 'Alberta Labour Relations Board',
+    'WCB': 'Workers\' Compensation Board'
+  },
+  'QC': {
+    'TAL': 'Tribunal administratif du logement',
+    'CDPDJ': 'Commission des droits de la personne',
+    'SMALL_CLAIMS': 'Small Claims Division',
+    'FAMILY': 'Superior Court - Family',
+    'SUPERIOR': 'Superior Court of Quebec',
+    'CRIMINAL': 'Court of Quebec - Criminal',
+    'TAT': 'Tribunal administratif du travail',
+    'CNESST': 'CNESST'
+  }
+};
+
+// Helper function to convert case type codes to readable labels with province context
+function getCaseTypeLabel(caseType: string, jurisdiction?: string): string {
+  const provinceCode = extractProvinceCode(jurisdiction || '');
+  const provinceTribunals = PROVINCE_TRIBUNALS[provinceCode];
+  
+  if (provinceTribunals) {
+    const tribunalName = provinceTribunals[caseType?.toUpperCase()];
+    if (tribunalName) return tribunalName;
+  }
+  
+  // Fallback to generic labels
+  const genericLabels: Record<string, string> = {
+    'HRTO': 'Human Rights Tribunal',
+    'LTB': 'Landlord and Tenant Board',
+    'RTB': 'Residential Tenancy Branch',
+    'RTDRS': 'Residential Tenancy Dispute Resolution Service',
     'SMALL_CLAIMS': 'Small Claims Court',
     'FAMILY': 'Family Court',
     'SUPERIOR': 'Superior Court',
@@ -275,7 +331,19 @@ function getCaseTypeLabel(caseType: string): string {
     'LABOUR': 'Labour Relations Board',
     'IMMIGRATION': 'Immigration and Refugee Board'
   };
-  return labels[caseType?.toUpperCase()] || caseType || 'General Legal';
+  return genericLabels[caseType?.toUpperCase()] || caseType || 'General Legal';
+}
+
+// Extract province code from jurisdiction string
+function extractProvinceCode(jurisdiction: string): string {
+  const lower = jurisdiction?.toLowerCase() || '';
+  if (lower.includes('ontario') || lower.includes(', on')) return 'ON';
+  if (lower.includes('british columbia') || lower.includes(', bc')) return 'BC';
+  if (lower.includes('alberta') || lower.includes(', ab')) return 'AB';
+  if (lower.includes('quebec') || lower.includes(', qc')) return 'QC';
+  if (lower.includes('manitoba') || lower.includes(', mb')) return 'MB';
+  if (lower.includes('saskatchewan') || lower.includes(', sk')) return 'SK';
+  return 'ON'; // Default
 }
 
 // Build search query for CanLII
