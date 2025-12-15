@@ -44,7 +44,7 @@ const Index = () => {
     "name": "Justice-Bot",
     "applicationCategory": "Legal",
     "operatingSystem": "Web",
-    "description": "AI-powered legal information and form guidance for Canadians in Ontario, Alberta, and British Columbia facing housing, human rights, family, and small claims issues. Not a law firm - a practical tool to help you understand forms and procedures.",
+    "description": "AI-powered legal information and form guidance for Canadians in Ontario, Alberta, British Columbia, and Quebec facing housing, human rights, family, and small claims issues. Not a law firm - a practical tool to help you understand forms and procedures.",
     "url": "https://www.justice-bot.com",
     "image": "https://www.justice-bot.com/justice-bot-logo.jpeg",
     "offers": {
@@ -57,18 +57,19 @@ const Index = () => {
     "areaServed": [
       { "@type": "State", "name": "Ontario" },
       { "@type": "State", "name": "Alberta" },
-      { "@type": "State", "name": "British Columbia" }
+      { "@type": "State", "name": "British Columbia" },
+      { "@type": "State", "name": "Quebec" }
     ]
   };
 
   const faqData = [
     {
       question: "What provinces does Justice-Bot serve?",
-      answer: "Justice-Bot currently serves Ontario, Alberta, and British Columbia with province-specific court forms, tribunal guidance, and legal information. Each province has its own tribunals and procedures, and Justice-Bot provides tailored support for LTB/RTB tenancy disputes, human rights complaints, family court, small claims, and more."
+      answer: "Justice-Bot currently serves Ontario, Alberta, British Columbia, and Quebec with province-specific court forms, tribunal guidance, and legal information. Each province has its own tribunals and procedures, and Justice-Bot provides tailored support for LTB/RTB/TAL tenancy disputes, human rights complaints, family court, small claims, and more."
     },
     {
       question: "Is Justice-Bot really free legal information in Canada?",
-      answer: "Justice-Bot offers free and low-cost legal information tools, form helpers, and process guidance for residents of Ontario, Alberta, and BC. Some tools are free, and advanced AI features are available by subscription starting at $5.99/month. We are not a law firm, but we help you understand your options and prepare."
+      answer: "Justice-Bot offers free and low-cost legal information tools, form helpers, and process guidance for residents of Ontario, Alberta, BC, and Quebec. Some tools are free, and forms are available for just $5.99 each. We are not a law firm, but we help you understand your options and prepare."
     },
     {
       question: "How is Justice-Bot different from Legal Aid?",
@@ -80,7 +81,7 @@ const Index = () => {
     },
     {
       question: "What types of legal issues does Justice-Bot help with?",
-      answer: "Justice-Bot provides legal information and form guidance for Canadians dealing with: tenancy disputes (LTB in Ontario, RTB in BC, RTDRS in Alberta), Human Rights Tribunal complaints, family court matters, small claims court, employment issues, and more. We help you understand procedures and complete forms - we are not lawyers and do not provide legal advice."
+      answer: "Justice-Bot provides legal information and form guidance for Canadians dealing with: tenancy disputes (LTB in Ontario, RTB in BC, RTDRS in Alberta, TAL in Quebec), Human Rights Tribunal complaints, family court matters, small claims court, employment issues, and more. We help you understand procedures and complete forms - we are not lawyers and do not provide legal advice."
     },
     {
       question: "What is Justice-Bot's low-income program?",
@@ -95,9 +96,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <EnhancedSEO
-        title="Legal Help Canada 2025 | Ontario, Alberta, BC Court Forms - Justice-Bot"
-        description="AI-powered legal form helper for Ontario, Alberta & BC. Get court forms, tribunal guidance, and step-by-step help for LTB, RTB, HRTO, family court, small claims. Not a law firm - practical tools to prepare your case."
-        keywords="legal help Canada, Ontario court forms, Alberta legal forms, BC RTB forms, LTB help Ontario, RTDRS Alberta, human rights tribunal Canada, small claims court Canada, family court forms, legal self-help Canada, tenant rights Canada"
+        title="Legal Help Canada 2025 | Ontario, Alberta, BC, Quebec Court Forms - Justice-Bot"
+        description="AI-powered legal form helper for Ontario, Alberta, BC & Quebec. Get court forms for just $5.99 each. LTB, RTB, TAL, HRTO, family court, small claims. Not a law firm - practical tools to prepare your case."
+        keywords="legal help Canada, Ontario court forms, Alberta legal forms, BC RTB forms, Quebec TAL forms, LTB help Ontario, RTDRS Alberta, human rights tribunal Canada, small claims court Canada, family court forms, legal self-help Canada, tenant rights Canada"
         canonicalUrl="https://www.justice-bot.com/"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}

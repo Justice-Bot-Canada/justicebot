@@ -107,7 +107,7 @@ const oneTimePlan = {
   name: 'One-Time Document',
   price: '$5.99',
   duration: 'per form',
-  description: '24-hour access',
+  description: 'Instant access',
   features: [
     'Single document unlock',
     'Full autofill + PDF generation',
