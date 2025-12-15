@@ -14,7 +14,7 @@ const HeroSection = () => {
           <div className="space-y-8">
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-2 mb-2">
-                <span className="text-sm font-semibold text-primary">🍁 Ontario, Canada</span>
+                <span className="text-sm font-semibold text-primary">🇨🇦 Now Serving Ontario, Alberta & BC</span>
               </div>
               <h1 
                 id="hero-heading" 
@@ -24,7 +24,7 @@ const HeroSection = () => {
               >
                 <span className="text-foreground">Affordable Legal Help</span>
                 <br />
-                <span className="text-primary">for Ontario</span>
+                <span className="text-primary">Across Canada</span>
               </h1>
               <p className="text-lg font-semibold text-foreground max-w-lg mb-2">
                 Free plain-language legal help for Ontario tenants, families & human rights issues.
