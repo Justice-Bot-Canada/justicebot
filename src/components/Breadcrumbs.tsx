@@ -24,23 +24,22 @@ export const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
           itemType="https://schema.org/ListItem"
           className="flex items-center"
         >
-          <Link 
-            to="/" 
+          <a 
+            href="https://www.justice-bot.com/"
             itemProp="item"
-            itemID="https://www.justice-bot.com/"
             className="hover:text-foreground transition-colors flex items-center gap-1"
             aria-label="Home"
           >
             <Home className="h-4 w-4" />
             <span itemProp="name" className="sr-only sm:not-sr-only">Home</span>
-          </Link>
+          </a>
           <meta itemProp="position" content="1" />
         </li>
         
         {items.map((item, index) => {
           const itemUrl = item.href 
-            ? `https://www.justice-bot.com${item.href}` 
-            : `https://www.justice-bot.com${window.location.pathname}`;
+            ? `https://www.justice-bot.com${item.href.replace(/\/$/, '')}` 
+            : `https://www.justice-bot.com${typeof window !== 'undefined' ? window.location.pathname.replace(/\/$/, '') : ''}`;
           
           return (
             <li 
@@ -52,17 +51,18 @@ export const Breadcrumbs = ({ items }: BreadcrumbsProps) => {
             >
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
               {item.href ? (
-                <Link 
-                  to={item.href} 
+                <a 
+                  href={itemUrl}
                   itemProp="item"
-                  itemID={itemUrl}
                   className="hover:text-foreground transition-colors"
                 >
                   <span itemProp="name">{item.label}</span>
-                </Link>
+                </a>
               ) : (
                 <>
-                  <span itemProp="item" itemID={itemUrl} className="hidden" />
+                  <a href={itemUrl} itemProp="item" className="hidden" aria-hidden="true">
+                    <span>{item.label}</span>
+                  </a>
                   <span 
                     itemProp="name" 
                     className="text-foreground font-medium"
