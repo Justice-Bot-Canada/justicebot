@@ -7,9 +7,12 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, FileText, Download, Sparkles, CheckCircle, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast-stub';
+import { getFormFields, getTribunalTypeFromFormCode, FormField } from '@/config/formFieldMappings';
 
 interface Form {
   id: string;
@@ -27,88 +30,18 @@ interface OfficialFormFillerProps {
   form: Form;
   caseId: string;
   prefilledData?: PrefilledData;
+  province?: string;
 }
 
-// Common form fields for Ontario court forms
-const FORM_FIELD_TEMPLATES: Record<string, { id: string; label: string; type: 'text' | 'textarea' | 'date' | 'checkbox'; required?: boolean }[]> = {
-  default: [
-    { id: 'applicant_name', label: 'Your Full Legal Name', type: 'text', required: true },
-    { id: 'applicant_address', label: 'Your Address', type: 'text', required: true },
-    { id: 'applicant_phone', label: 'Phone Number', type: 'text' },
-    { id: 'applicant_email', label: 'Email Address', type: 'text' },
-    { id: 'respondent_name', label: 'Respondent Name', type: 'text', required: true },
-    { id: 'respondent_address', label: 'Respondent Address', type: 'text' },
-    { id: 'incident_date', label: 'Date of Incident', type: 'date' },
-    { id: 'description', label: 'Description of Events', type: 'textarea', required: true },
-    { id: 'remedy_sought', label: 'Remedy Sought', type: 'textarea' },
-  ],
-  'LTB': [
-    { id: 'applicant_name', label: 'Tenant Full Name', type: 'text', required: true },
-    { id: 'applicant_address', label: 'Tenant Address', type: 'text', required: true },
-    { id: 'applicant_phone', label: 'Tenant Phone', type: 'text' },
-    { id: 'applicant_email', label: 'Tenant Email', type: 'text' },
-    { id: 'respondent_name', label: 'Landlord Name', type: 'text', required: true },
-    { id: 'respondent_address', label: 'Landlord Address', type: 'text' },
-    { id: 'rental_address', label: 'Rental Unit Address', type: 'text', required: true },
-    { id: 'monthly_rent', label: 'Monthly Rent Amount', type: 'text' },
-    { id: 'lease_start', label: 'Lease Start Date', type: 'date' },
-    { id: 'incident_date', label: 'Date Issue Started', type: 'date' },
-    { id: 'description', label: 'Details of Issue', type: 'textarea', required: true },
-  ],
-  'HRTO': [
-    { id: 'applicant_name', label: 'Applicant Full Name', type: 'text', required: true },
-    { id: 'applicant_address', label: 'Applicant Address', type: 'text', required: true },
-    { id: 'applicant_phone', label: 'Phone', type: 'text' },
-    { id: 'applicant_email', label: 'Email', type: 'text' },
-    { id: 'respondent_name', label: 'Respondent Organization/Person', type: 'text', required: true },
-    { id: 'respondent_address', label: 'Respondent Address', type: 'text' },
-    { id: 'discrimination_ground', label: 'Ground of Discrimination', type: 'text', required: true },
-    { id: 'social_area', label: 'Social Area (employment, housing, services)', type: 'text', required: true },
-    { id: 'incident_date', label: 'Date of Discrimination', type: 'date', required: true },
-    { id: 'description', label: 'Detailed Description of Events', type: 'textarea', required: true },
-    { id: 'remedy_sought', label: 'Remedy Sought', type: 'textarea' },
-  ],
-  'FAMILY': [
-    { id: 'applicant_name', label: 'Your Full Legal Name', type: 'text', required: true },
-    { id: 'applicant_address', label: 'Your Address', type: 'text', required: true },
-    { id: 'spouse_name', label: 'Other Party Name', type: 'text', required: true },
-    { id: 'marriage_date', label: 'Date of Marriage', type: 'date' },
-    { id: 'separation_date', label: 'Date of Separation', type: 'date' },
-    { id: 'children_names', label: 'Names of Children', type: 'textarea' },
-    { id: 'matrimonial_home', label: 'Matrimonial Home Address', type: 'text' },
-    { id: 'annual_income', label: 'Your Annual Income', type: 'text' },
-    { id: 'description', label: 'Issues to be Resolved', type: 'textarea', required: true },
-  ],
-  'SMALL_CLAIMS': [
-    { id: 'plaintiff', label: 'Plaintiff (Your) Full Name', type: 'text', required: true },
-    { id: 'applicant_address', label: 'Your Address', type: 'text', required: true },
-    { id: 'defendant', label: 'Defendant Name', type: 'text', required: true },
-    { id: 'respondent_address', label: 'Defendant Address', type: 'text' },
-    { id: 'amount_claimed', label: 'Amount Claimed ($)', type: 'text', required: true },
-    { id: 'claim_date', label: 'Date of Claim Arising', type: 'date' },
-    { id: 'description', label: 'Details of Claim', type: 'textarea', required: true },
-  ],
-};
-
-export function OfficialFormFiller({ form, caseId, prefilledData = {} }: OfficialFormFillerProps) {
+export function OfficialFormFiller({ form, caseId, prefilledData = {}, province = 'ON' }: OfficialFormFillerProps) {
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<PrefilledData>(prefilledData);
   const [filling, setFilling] = useState(false);
   const [generatedPdfUrl, setGeneratedPdfUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Determine form type from form_code
-  const getFormType = () => {
-    const code = form.form_code.toUpperCase();
-    if (code.includes('T1') || code.includes('T2') || code.includes('T6') || code.includes('L1') || code.includes('LTB')) return 'LTB';
-    if (code.includes('HRTO') || code.includes('FORM 1') || code.includes('F1')) return 'HRTO';
-    if (code.includes('FLR') || code.includes('FAMILY')) return 'FAMILY';
-    if (code.includes('7A') || code.includes('9A') || code.includes('10A') || code.includes('SCC')) return 'SMALL_CLAIMS';
-    return 'default';
-  };
-
-  const formType = getFormType();
-  const fields = FORM_FIELD_TEMPLATES[formType] || FORM_FIELD_TEMPLATES.default;
+  const tribunalType = getTribunalTypeFromFormCode(form.form_code, province);
+  const fields = getFormFields(province, tribunalType);
 
   const handleFieldChange = (fieldId: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [fieldId]: value }));
@@ -217,7 +150,7 @@ export function OfficialFormFiller({ form, caseId, prefilledData = {} }: Officia
               )}
 
               <div className="flex items-center gap-2 mb-4">
-                <Badge variant="secondary">{formType}</Badge>
+                <Badge variant="secondary">{tribunalType}</Badge>
                 <span className="text-sm text-muted-foreground">Form fields for {form.title}</span>
               </div>
 
