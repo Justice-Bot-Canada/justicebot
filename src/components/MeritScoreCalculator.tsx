@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -9,29 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { PROVINCE_CONFIGS, getProvinceTribunals } from "@/config/provinceConfig";
 
-const VENUES = [
-  { value: 'LTB', label: 'Landlord Tenant Board' },
-  { value: 'HRTO', label: 'Human Rights Tribunal' },
-  { value: 'SMALL_CLAIMS', label: 'Small Claims Court' },
-  { value: 'FAMILY', label: 'Family Court' },
-  { value: 'SUPERIOR', label: 'Superior Court' },
-  { value: 'CRIMINAL', label: 'Criminal Court' },
-  { value: 'LABOUR', label: 'Labour Board' },
-];
-
-const PROVINCES = [
-  { value: 'ON', label: 'Ontario' },
-  { value: 'BC', label: 'British Columbia' },
-  { value: 'AB', label: 'Alberta' },
-  { value: 'QC', label: 'Quebec' },
-  { value: 'MB', label: 'Manitoba' },
-  { value: 'SK', label: 'Saskatchewan' },
-  { value: 'NS', label: 'Nova Scotia' },
-  { value: 'NB', label: 'New Brunswick' },
-  { value: 'NL', label: 'Newfoundland' },
-  { value: 'PE', label: 'Prince Edward Island' },
-];
+const PROVINCES = Object.entries(PROVINCE_CONFIGS).map(([code, config]) => ({
+  value: code,
+  label: config.name
+}));
 
 interface AnalysisResult {
   strengthScore: number;
@@ -48,6 +31,19 @@ export default function MeritScoreCalculator() {
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const { toast } = useToast();
+
+  // Get province-specific tribunals - changes when province changes
+  const provinceTribunals = useMemo(() => {
+    const tribunals = getProvinceTribunals(province);
+    return tribunals.map(t => ({ value: t.code, label: t.name }));
+  }, [province]);
+
+  // Reset venue when province changes (venues are province-specific)
+  const handleProvinceChange = (newProvince: string) => {
+    setProvince(newProvince);
+    setVenue(''); // Clear venue selection - user must re-select for new province
+    setResult(null); // Clear previous results
+  };
 
   const handleAnalyze = async () => {
     if (!venue || !description.trim()) {
@@ -108,7 +104,8 @@ export default function MeritScoreCalculator() {
     return "bg-red-50 dark:bg-red-900/20";
   };
 
-  const venueLabel = VENUES.find(v => v.value === venue)?.label || 'Legal';
+  const venueLabel = provinceTribunals.find(v => v.value === venue)?.label || 'Legal';
+  const provinceLabel = PROVINCES.find(p => p.value === province)?.label || province;
 
   return (
     <div className="grid lg:grid-cols-2 gap-8">
@@ -127,7 +124,7 @@ export default function MeritScoreCalculator() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="province">Province</Label>
-              <Select value={province} onValueChange={setProvince}>
+              <Select value={province} onValueChange={handleProvinceChange}>
                 <SelectTrigger id="province">
                   <SelectValue placeholder="Select province" />
                 </SelectTrigger>
@@ -142,10 +139,10 @@ export default function MeritScoreCalculator() {
               <Label htmlFor="venue">Case Type</Label>
               <Select value={venue} onValueChange={setVenue}>
                 <SelectTrigger id="venue">
-                  <SelectValue placeholder="Select type" />
+                  <SelectValue placeholder={provinceTribunals.length ? "Select type" : "Select province first"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {VENUES.map(v => (
+                  {provinceTribunals.map(v => (
                     <SelectItem key={v.value} value={v.value}>{v.label}</SelectItem>
                   ))}
                 </SelectContent>
