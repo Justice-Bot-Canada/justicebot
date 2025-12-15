@@ -242,8 +242,8 @@ const Index = () => {
       <Footer />
       <AccessibilityPanel />
       
-      {/* Exit-Intent Popup */}
-      <LeadCaptureModal trigger="exit" />
+      {/* Lead Capture - Time-based for mobile, Exit-intent for desktop */}
+      <LeadCaptureModal trigger="time" delaySeconds={45} />
       
       {/* Social Proof Ticker */}
       <SocialProofTicker />
