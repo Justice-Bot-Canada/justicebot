@@ -19,7 +19,7 @@ interface FormPaywallProps {
 export default function FormPaywall({
   formId,
   formTitle,
-  formPrice = 3900,
+  formPrice = 599,
   daysUntilDeadline,
   children,
 }: FormPaywallProps) {
@@ -181,7 +181,7 @@ export default function FormPaywall({
             </div>
             <CardDescription>Perfect if you need just this form</CardDescription>
             <div className="mt-4">
-              <div className="text-4xl font-bold">$39</div>
+              <div className="text-4xl font-bold">$5.99</div>
               <div className="text-sm text-muted-foreground">one-time payment</div>
             </div>
           </CardHeader>
@@ -215,7 +215,7 @@ export default function FormPaywall({
               {loading === "subscription" ? (
                 "Processing..."
               ) : (
-                "Pay with PayPal - $39"
+                "Pay with PayPal - $5.99"
               )}
             </Button>
           </CardContent>
@@ -238,7 +238,7 @@ export default function FormPaywall({
             <CardDescription>Access all forms, cancel anytime</CardDescription>
             <div className="mt-4">
               <div className="text-4xl font-bold">$19<span className="text-lg font-normal">/mo</span></div>
-              <div className="text-sm text-green-600 font-medium">Save $20 vs. buying 2 forms</div>
+              <div className="text-sm text-green-600 font-medium">Save money vs. buying 4+ forms</div>
             </div>
           </CardHeader>
 

@@ -14,7 +14,7 @@ const HeroSection = () => {
           <div className="space-y-8">
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-2 mb-2">
-                <span className="text-sm font-semibold text-primary">🇨🇦 Now Serving Ontario, Alberta & BC</span>
+                <span className="text-sm font-semibold text-primary">🇨🇦 Now Serving Ontario, Alberta, BC & Quebec</span>
               </div>
               <h1 
                 id="hero-heading" 
