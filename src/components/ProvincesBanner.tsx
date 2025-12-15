@@ -28,12 +28,12 @@ export function ProvincesBanner() {
           <div className="flex items-center gap-2">
             <span className="text-xl">🇨🇦</span>
             <span className="font-medium text-foreground">
-              Expanding Across Canada
+              Now Serving 3 Provinces!
             </span>
             <span className="hidden sm:inline text-muted-foreground">—</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            BC, Alberta & Quebec coming soon! Currently serving <span className="font-medium text-primary">Ontario</span>.
+            Available in <span className="font-medium text-primary">Ontario</span>, <span className="font-medium text-primary">Alberta</span> & <span className="font-medium text-primary">British Columbia</span>. Quebec coming soon!
           </p>
           <Button 
             variant="ghost"
