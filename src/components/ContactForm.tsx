@@ -140,7 +140,7 @@ export const ContactForm = ({ className }: ContactFormProps) => {
                   <FormItem>
                     <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Your full name" {...field} />
+                      <Input placeholder="Your full name" id="contact-name" autoComplete="name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -156,7 +156,7 @@ export const ContactForm = ({ className }: ContactFormProps) => {
                     <FormControl>
                       <div className="relative">
                         <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input placeholder="your.email@example.com" className="pl-10" {...field} />
+                        <Input placeholder="your.email@example.com" className="pl-10" id="contact-email" autoComplete="email" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -175,7 +175,7 @@ export const ContactForm = ({ className }: ContactFormProps) => {
                     <FormControl>
                       <div className="relative">
                         <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input placeholder="Your organization" className="pl-10" {...field} />
+                        <Input placeholder="Your organization" className="pl-10" id="contact-org" autoComplete="organization" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -192,7 +192,7 @@ export const ContactForm = ({ className }: ContactFormProps) => {
                     <FormControl>
                       <div className="relative">
                         <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input placeholder="+1 (555) 123-4567" className="pl-10" {...field} />
+                        <Input placeholder="+1 (555) 123-4567" className="pl-10" id="contact-phone" autoComplete="tel" {...field} />
                       </div>
                     </FormControl>
                     <FormMessage />
