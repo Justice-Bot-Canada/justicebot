@@ -15,6 +15,7 @@ import { StickyBottomCTA } from "@/components/StickyBottomCTA";
 import { ProvincesBanner } from "@/components/ProvincesBanner";
 import CrispChat from "@/components/CrispChat";
 import FeatureHighlightBanner from "@/components/FeatureHighlightBanner";
+import { ChurnPreventionNudge } from "@/components/ChurnPreventionNudge";
 import { Suspense, lazy } from "react";
 
 // Lazy load below-the-fold components for better LCP
@@ -256,6 +257,9 @@ const Index = () => {
       
       {/* Crisp Live Chat Widget */}
       <CrispChat />
+      
+      {/* Churn Prevention Nudge for returning users */}
+      <ChurnPreventionNudge />
     </div>
   );
 };
