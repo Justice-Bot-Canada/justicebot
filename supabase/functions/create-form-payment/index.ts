@@ -22,6 +22,7 @@ const VALID_PROMO_CODES: Record<string, number> = {
   "FIRST50": 0.5,
   "DEMO2024": 0.5,
   "TRIAGE50": 0.5, // Time-limited offer after triage completion
+  "COMEBACK7": 0.5, // 7-day comeback offer for inactive users
 };
 
 const logStep = (step: string, details?: any) => {
