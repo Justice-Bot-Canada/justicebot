@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +10,7 @@ import CanonicalURL from "@/components/CanonicalURL";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import SmartTriageForm from "@/components/SmartTriageForm";
 import TriageResults from "@/components/TriageResults";
+import { TriageDiscountModal } from "@/components/TriageDiscountModal";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
@@ -42,12 +43,22 @@ const Triage = () => {
   const [triageResult, setTriageResult] = useState<TriageResult | null>(null);
   const [userDescription, setUserDescription] = useState("");
   const [province, setProvince] = useState("Ontario");
+  const [showDiscountModal, setShowDiscountModal] = useState(false);
 
   const handleTriageComplete = (result: TriageResult, description: string, prov: string) => {
     setTriageResult(result);
     setUserDescription(description);
     setProvince(prov);
     setStep(1);
+    
+    // Show discount modal after triage (only once per session)
+    const hasSeenOffer = sessionStorage.getItem('triage_discount_shown');
+    if (!hasSeenOffer) {
+      setTimeout(() => {
+        setShowDiscountModal(true);
+        sessionStorage.setItem('triage_discount_shown', 'true');
+      }, 1500); // Show after slight delay for better UX
+    }
   };
 
   const handleProceed = async () => {
@@ -205,6 +216,11 @@ const Triage = () => {
         </div>
       </main>
       <Footer />
+      
+      <TriageDiscountModal 
+        isOpen={showDiscountModal} 
+        onClose={() => setShowDiscountModal(false)} 
+      />
     </div>
   );
 };
