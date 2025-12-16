@@ -30,29 +30,41 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CREATE-FORM-PAYMENT] ${step}${detailsStr}`);
 };
 
-async function getPayPalAccessToken(): Promise<string> {
-  const paypalClientId = Deno.env.get("PAYPAL_CLIENT_ID");
-  const paypalClientSecret = Deno.env.get("PAYPAL_CLIENT_SECRET");
+// Auto-detect PayPal environment + credentials (supports both sandbox + live)
+const paypalClientId = Deno.env.get("PAYPAL_CLIENT_ID_LIVE") ?? Deno.env.get("PAYPAL_CLIENT_ID") ?? "";
+const paypalClientSecret = Deno.env.get("PAYPAL_CLIENT_SECRET_LIVE") ?? Deno.env.get("PAYPAL_CLIENT_SECRET") ?? "";
+const isProduction = paypalClientId && !paypalClientId.startsWith("sb-") && !paypalClientId.startsWith("AZ");
+const PAYPAL_BASE_URL = Deno.env.get("PAYPAL_API_BASE") ?? (isProduction ? "https://api-m.paypal.com" : "https://api-m.sandbox.paypal.com");
 
-  const authResponse = await fetch(
-    "https://api-m.paypal.com/v1/oauth2/token",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `Basic ${btoa(`${paypalClientId}:${paypalClientSecret}`)}`,
-      },
-      body: "grant_type=client_credentials",
-    }
-  );
+async function getPayPalAccessToken(): Promise<string> {
+  if (!paypalClientId || !paypalClientSecret) {
+    throw new Error("PayPal credentials not configured");
+  }
+
+  const authResponse = await fetch(`${PAYPAL_BASE_URL}/v1/oauth2/token`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: `Basic ${btoa(`${paypalClientId}:${paypalClientSecret}`)}`,
+    },
+    body: "grant_type=client_credentials",
+  });
 
   if (!authResponse.ok) {
+    const errorText = await authResponse.text();
+    logStep("PayPal auth failed", {
+      status: authResponse.status,
+      environment: isProduction ? "PRODUCTION" : "SANDBOX",
+      baseUrl: PAYPAL_BASE_URL,
+      error: errorText.substring(0, 200),
+    });
     throw new Error("Failed to get PayPal access token");
   }
 
   const { access_token } = await authResponse.json();
   return access_token;
 }
+
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -124,7 +136,7 @@ serve(async (req) => {
 
     // Create PayPal order
     const orderResponse = await fetch(
-      "https://api-m.paypal.com/v2/checkout/orders",
+      `${PAYPAL_BASE_URL}/v2/checkout/orders`,
       {
         method: "POST",
         headers: {

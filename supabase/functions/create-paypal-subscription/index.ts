@@ -6,11 +6,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Auto-detect PayPal environment
-const paypalClientId = Deno.env.get("PAYPAL_CLIENT_ID") ?? "";
-const paypalClientSecret = Deno.env.get("PAYPAL_CLIENT_SECRET") ?? "";
+// Auto-detect PayPal environment + prefer LIVE credentials when present
+const paypalClientId = Deno.env.get("PAYPAL_CLIENT_ID_LIVE") ?? Deno.env.get("PAYPAL_CLIENT_ID") ?? "";
+const paypalClientSecret = Deno.env.get("PAYPAL_CLIENT_SECRET_LIVE") ?? Deno.env.get("PAYPAL_CLIENT_SECRET") ?? "";
 const isProduction = paypalClientId && !paypalClientId.startsWith('sb-') && !paypalClientId.startsWith('AZ');
-const PAYPAL_BASE_URL = isProduction ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
+const PAYPAL_BASE_URL = (Deno.env.get("PAYPAL_API_BASE") ?? (isProduction ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com'));
 
 console.log(`PayPal Subscription Mode: ${isProduction ? 'PRODUCTION' : 'SANDBOX'}, URL: ${PAYPAL_BASE_URL}`);
 
