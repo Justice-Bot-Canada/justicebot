@@ -3,22 +3,10 @@ import HeroSection from "@/components/HeroSection";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import LocalBusinessSchema from "@/components/LocalBusinessSchema";
-import MeritScoreCalculator from "@/components/MeritScoreCalculator";
-import { PerformanceMonitor } from "@/components/PerformanceMonitor";
-import { AccessibilityPanel } from "@/components/AccessibilityEnhanced";
-import { SocialProofTicker } from "@/components/SocialProofTicker";
-import { UrgencyTimer } from "@/components/UrgencyTimer";
-import { MoneyBackGuarantee } from "@/components/MoneyBackGuarantee";
-import LiveSupportWidget from "@/components/LiveSupportWidget";
-import { LeadCaptureModal } from "@/components/LeadCaptureModal";
-import { StickyBottomCTA } from "@/components/StickyBottomCTA";
-import { ProvincesBanner } from "@/components/ProvincesBanner";
-import CrispChat from "@/components/CrispChat";
-import FeatureHighlightBanner from "@/components/FeatureHighlightBanner";
-import { ChurnPreventionNudge } from "@/components/ChurnPreventionNudge";
 import { Suspense, lazy } from "react";
 
-// Lazy load below-the-fold components for better LCP
+// Lazy load ALL below-the-fold components for better LCP/FCP
+const MeritScoreCalculator = lazy(() => import("@/components/MeritScoreCalculator"));
 const TriageSection = lazy(() => import("@/components/TriageSection"));
 const FeaturesSection = lazy(() => import("@/components/FeaturesSection"));
 const AppDemoVideo = lazy(() => import("@/components/AppDemoVideo").then(m => ({ default: m.AppDemoVideo })));
@@ -26,15 +14,26 @@ const ExplainerVideo = lazy(() => import("@/components/ExplainerVideo").then(m =
 const InteractiveTutorial = lazy(() => import("@/components/InteractiveTutorial"));
 const TrustSignals = lazy(() => import("@/components/TrustSignals"));
 const SuccessStories = lazy(() => import("@/components/SuccessStories"));
-const DocumentTemplates = lazy(() => import("@/components/DocumentTemplates"));
 const PricingComparison = lazy(() => import("@/components/PricingComparison").then(m => ({ default: m.PricingComparison })));
 const JourneyFlowchart = lazy(() => import("@/components/JourneyFlowchart").then(m => ({ default: m.JourneyFlowchart })));
-const NewsletterBanner = lazy(() => import("@/components/NewsletterBanner").then(m => ({ default: m.NewsletterBanner })));
 const CompetitorComparison = lazy(() => import("@/components/CompetitorComparison"));
+const MoneyBackGuarantee = lazy(() => import("@/components/MoneyBackGuarantee").then(m => ({ default: m.MoneyBackGuarantee })));
+const UrgencyTimer = lazy(() => import("@/components/UrgencyTimer").then(m => ({ default: m.UrgencyTimer })));
+const FeatureHighlightBanner = lazy(() => import("@/components/FeatureHighlightBanner"));
+const ProvincesBanner = lazy(() => import("@/components/ProvincesBanner").then(m => ({ default: m.ProvincesBanner })));
+
+// Lazy load non-critical widgets (load after main content)
+const SocialProofTicker = lazy(() => import("@/components/SocialProofTicker").then(m => ({ default: m.SocialProofTicker })));
+const LeadCaptureModal = lazy(() => import("@/components/LeadCaptureModal").then(m => ({ default: m.LeadCaptureModal })));
+const StickyBottomCTA = lazy(() => import("@/components/StickyBottomCTA").then(m => ({ default: m.StickyBottomCTA })));
+const ChurnPreventionNudge = lazy(() => import("@/components/ChurnPreventionNudge").then(m => ({ default: m.ChurnPreventionNudge })));
+const CrispChat = lazy(() => import("@/components/CrispChat"));
+const LiveSupportWidget = lazy(() => import("@/components/LiveSupportWidget"));
+const AccessibilityPanel = lazy(() => import("@/components/AccessibilityEnhanced").then(m => ({ default: m.AccessibilityPanel })));
 
 const LoadingSection = () => (
-  <div className="py-16 flex items-center justify-center">
-    <div className="animate-pulse">Loading...</div>
+  <div className="py-8 flex items-center justify-center min-h-[100px]">
+    <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
   </div>
 );
 
@@ -107,26 +106,25 @@ const Index = () => {
       />
       <LocalBusinessSchema />
       {/* Critical resource preload for LCP improvement */}
-      <link rel="preload" as="image" href="/hero-desktop.webp" type="image/webp" media="(min-width: 768px)" />
-      <link rel="preload" as="image" href="/hero-mobile.webp" type="image/webp" media="(max-width: 767px)" />
-      {/* Preconnect to external domains */}
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-      <PerformanceMonitor />
-      
       <Header />
-      {/* Provinces Coming Soon Banner */}
-      <ProvincesBanner />
       <main id="main-content" tabIndex={-1}>
         <HeroSection />
         
-        {/* Feature Highlight Banner - Right after hero */}
-        <FeatureHighlightBanner />
+        {/* Lazy load below-hero content */}
+        <Suspense fallback={null}>
+          <ProvincesBanner />
+        </Suspense>
         
-        {/* Urgency Timer */}
-        <div className="container mx-auto px-4 py-4">
-          <UrgencyTimer />
-        </div>
+        <Suspense fallback={null}>
+          <FeatureHighlightBanner />
+        </Suspense>
+        
+        <Suspense fallback={null}>
+          <div className="container mx-auto px-4 py-4">
+            <UrgencyTimer />
+          </div>
+        </Suspense>
+        
         <Suspense fallback={<LoadingSection />}>
           <JourneyFlowchart />
         </Suspense>
@@ -241,25 +239,35 @@ const Index = () => {
         */}
       </main>
       <Footer />
-      <AccessibilityPanel />
       
-      {/* Lead Capture - Time-based for mobile, Exit-intent for desktop */}
-      <LeadCaptureModal trigger="time" delaySeconds={45} />
+      {/* Defer non-critical widgets to after main content renders */}
+      <Suspense fallback={null}>
+        <AccessibilityPanel />
+      </Suspense>
       
-      {/* Social Proof Ticker */}
-      <SocialProofTicker />
+      <Suspense fallback={null}>
+        <LeadCaptureModal trigger="time" delaySeconds={45} />
+      </Suspense>
       
-      {/* Live Support Widget */}
-      <LiveSupportWidget />
+      <Suspense fallback={null}>
+        <SocialProofTicker />
+      </Suspense>
       
-      {/* Sticky Bottom CTA with Promo Code */}
-      <StickyBottomCTA />
+      <Suspense fallback={null}>
+        <LiveSupportWidget />
+      </Suspense>
       
-      {/* Crisp Live Chat Widget */}
-      <CrispChat />
+      <Suspense fallback={null}>
+        <StickyBottomCTA />
+      </Suspense>
       
-      {/* Churn Prevention Nudge for returning users */}
-      <ChurnPreventionNudge />
+      <Suspense fallback={null}>
+        <CrispChat />
+      </Suspense>
+      
+      <Suspense fallback={null}>
+        <ChurnPreventionNudge />
+      </Suspense>
     </div>
   );
 };

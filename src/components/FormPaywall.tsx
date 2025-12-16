@@ -61,7 +61,7 @@ export default function FormPaywall({
 
   // Handle one-time form purchase via edge function
   const handleFormPurchase = async () => {
-    setLoading("subscription");
+    setLoading("form");
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -70,17 +70,15 @@ export default function FormPaywall({
           description: "Please sign in to purchase this form",
           variant: "destructive",
         });
+        setLoading(null);
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke('create-paypal-payment', {
-        body: { 
-          formId,
-          formTitle,
-          amount: (formPrice / 100).toFixed(2), // Convert cents to dollars
-          returnUrl: `${window.location.origin}/payment-success?formId=${formId}`,
-          cancelUrl: `${window.location.origin}/payment-cancel`
-        }
+      // Get promo code from localStorage if available
+      const promoCode = localStorage.getItem('appliedPromoCode') || undefined;
+
+      const { data, error } = await supabase.functions.invoke('create-form-payment', {
+        body: { formId, promoCode }
       });
 
       if (error) throw error;
@@ -212,7 +210,7 @@ export default function FormPaywall({
               className="w-full"
               size="lg"
             >
-              {loading === "subscription" ? (
+              {loading === "form" ? (
                 "Processing..."
               ) : (
                 "Pay with PayPal - $5.99"
