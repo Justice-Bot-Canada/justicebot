@@ -21,6 +21,7 @@ const VALID_PROMO_CODES: Record<string, number> = {
   "LAUNCH50": 0.5,
   "FIRST50": 0.5,
   "DEMO2024": 0.5,
+  "TRIAGE50": 0.5, // Time-limited offer after triage completion
 };
 
 const logStep = (step: string, details?: any) => {
