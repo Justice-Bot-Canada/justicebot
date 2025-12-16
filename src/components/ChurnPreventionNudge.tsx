@@ -16,109 +16,131 @@ interface UnfinishedWork {
 
 export function ChurnPreventionNudge() {
   const { user } = useAuth();
-  const { hasAccess } = usePremiumAccess();
+  const premiumAccess = usePremiumAccess();
+  const hasAccess = premiumAccess?.hasAccess ?? false;
   
   const navigate = useNavigate();
   const [dismissed, setDismissed] = useState(false);
   const [unfinishedWork, setUnfinishedWork] = useState<UnfinishedWork[]>([]);
   const [showDiscountOffer, setShowDiscountOffer] = useState(false);
-  const [daysInactive, setDaysInactive] = useState(0);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
+    // Early return if no user or has access
     if (!user || hasAccess) return;
 
     const checkUnfinishedWork = async () => {
-      const work: UnfinishedWork[] = [];
+      try {
+        const work: UnfinishedWork[] = [];
 
-      // Check for saved triage in localStorage
-      const savedTriage = localStorage.getItem('triageAnswers');
-      if (savedTriage) {
-        work.push({
-          type: 'triage',
-          title: 'Continue your case assessment',
-          path: '/triage'
-        });
-      }
-
-      // Check for incomplete cases in database
-      const { data: cases } = await supabase
-        .from('cases')
-        .select('id, title, status, updated_at')
-        .eq('user_id', user.id)
-        .in('status', ['draft', 'pending', 'active'])
-        .order('updated_at', { ascending: false })
-        .limit(3);
-
-      if (cases && cases.length > 0) {
-        cases.forEach(c => {
-          work.push({
-            type: 'case',
-            title: c.title || 'Untitled Case',
-            path: `/journey?caseId=${c.id}`,
-            lastUpdated: c.updated_at
-          });
-        });
-      }
-
-      // Check for draft documents
-      const { data: docs } = await supabase
-        .from('documents')
-        .select('id, form_key, updated_at')
-        .eq('user_id', user.id)
-        .order('updated_at', { ascending: false })
-        .limit(2);
-
-      if (docs && docs.length > 0) {
-        docs.forEach(d => {
-          work.push({
-            type: 'draft',
-            title: `Draft: ${d.form_key}`,
-            path: '/forms',
-            lastUpdated: d.updated_at
-          });
-        });
-      }
-
-      setUnfinishedWork(work);
-
-      // Check user inactivity for discount offer
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('created_at, updated_at')
-        .eq('user_id', user.id)
-        .single();
-
-      if (profile) {
-        const lastActivity = new Date(profile.updated_at || profile.created_at);
-        const daysSince = Math.floor((Date.now() - lastActivity.getTime()) / (1000 * 60 * 60 * 24));
-        setDaysInactive(daysSince);
-        
-        // Show discount after 3+ days inactive with unfinished work
-        if (daysSince >= 3 && work.length > 0) {
-          setShowDiscountOffer(true);
+        // Check for saved triage in localStorage
+        try {
+          const savedTriage = localStorage.getItem('triageAnswers');
+          if (savedTriage) {
+            work.push({
+              type: 'triage',
+              title: 'Continue your case assessment',
+              path: '/triage'
+            });
+          }
+        } catch {
+          // localStorage not available
         }
+
+        // Check for incomplete cases in database
+        const { data: cases } = await supabase
+          .from('cases')
+          .select('id, title, status, updated_at')
+          .eq('user_id', user.id)
+          .in('status', ['draft', 'pending', 'active'])
+          .order('updated_at', { ascending: false })
+          .limit(3);
+
+        if (cases && cases.length > 0) {
+          cases.forEach(c => {
+            work.push({
+              type: 'case',
+              title: c.title || 'Untitled Case',
+              path: `/journey?caseId=${c.id}`,
+              lastUpdated: c.updated_at
+            });
+          });
+        }
+
+        // Check for draft documents
+        const { data: docs } = await supabase
+          .from('documents')
+          .select('id, form_key, updated_at')
+          .eq('user_id', user.id)
+          .order('updated_at', { ascending: false })
+          .limit(2);
+
+        if (docs && docs.length > 0) {
+          docs.forEach(d => {
+            work.push({
+              type: 'draft',
+              title: `Draft: ${d.form_key}`,
+              path: '/forms',
+              lastUpdated: d.updated_at ?? undefined
+            });
+          });
+        }
+
+        setUnfinishedWork(work);
+
+        // Check user inactivity for discount offer
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('created_at, updated_at')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (profile) {
+          const lastActivity = new Date(profile.updated_at || profile.created_at);
+          const daysSince = Math.floor((Date.now() - lastActivity.getTime()) / (1000 * 60 * 60 * 24));
+          
+          // Show discount after 3+ days inactive with unfinished work
+          if (daysSince >= 3 && work.length > 0) {
+            setShowDiscountOffer(true);
+          }
+        }
+      } catch (err) {
+        console.error('ChurnPreventionNudge error:', err);
+        setError(true);
       }
     };
 
     // Check if already dismissed this session
-    const dismissedKey = `churn_nudge_dismissed_${user.id}`;
-    if (sessionStorage.getItem(dismissedKey)) {
-      setDismissed(true);
-      return;
+    try {
+      const dismissedKey = `churn_nudge_dismissed_${user.id}`;
+      if (sessionStorage.getItem(dismissedKey)) {
+        setDismissed(true);
+        return;
+      }
+    } catch {
+      // sessionStorage not available
     }
 
     checkUnfinishedWork();
-  }, [user, hasAccess]);
+  }, [user?.id, hasAccess]);
 
   const handleDismiss = () => {
-    if (user) {
-      sessionStorage.setItem(`churn_nudge_dismissed_${user.id}`, 'true');
+    try {
+      if (user) {
+        sessionStorage.setItem(`churn_nudge_dismissed_${user.id}`, 'true');
+      }
+    } catch {
+      // sessionStorage not available
     }
     setDismissed(true);
   };
 
   const handleClaimDiscount = () => {
-    localStorage.setItem('promoCode', 'COMEBACK7');
+    try {
+      localStorage.setItem('promoCode', 'COMEBACK7');
+    } catch {
+      // localStorage not available
+    }
     navigate('/pricing');
   };
 
@@ -126,8 +148,8 @@ export function ChurnPreventionNudge() {
     navigate(path);
   };
 
-  // Don't show if dismissed, no user, has premium, or no unfinished work
-  if (dismissed || !user || hasAccess || unfinishedWork.length === 0) {
+  // Don't show if dismissed, error, no user, has premium, or no unfinished work
+  if (dismissed || error || !user || hasAccess || unfinishedWork.length === 0) {
     return null;
   }
 
