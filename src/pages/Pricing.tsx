@@ -21,7 +21,7 @@ const VALID_PROMO_CODES: Record<string, { discount: number; label: string }> = {
 };
 
 // PayPal Subscription Plan ID
-const PAYPAL_PLAN_ID = "P-913106187H1268013NFBA72I";
+const PAYPAL_PLAN_ID = "P-0FR50831D4940483BNFBBB7Y";
 
 const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
