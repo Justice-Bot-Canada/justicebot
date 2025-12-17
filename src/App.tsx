@@ -7,6 +7,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { Suspense, lazy } from "react";
 import { SkipToContent, useFocusManagement, useKeyboardNavigation } from "@/components/AccessibilityFeatures";
 import { KlaviyoTracking } from "@/components/KlaviyoTracking";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import Index from "./pages/Index";
 import PathwayDecision from "./pages/PathwayDecision";
 import Pricing from "./pages/Pricing";
@@ -127,6 +128,7 @@ const queryClient = new QueryClient({
 const AppContent = () => {
   useFocusManagement();
   useKeyboardNavigation();
+  useAnalytics();
   
   return (
     <ErrorBoundary>
