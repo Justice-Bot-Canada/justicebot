@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { analytics } from "@/utils/analytics";
+import PayPalSubscribeButton from "@/components/PayPalSubscribeButton";
 
 const VALID_PROMO_CODES: Record<string, { discount: number; label: string }> = {
   "LAUNCH50": { discount: 0.5, label: "50% OFF First Month" },
@@ -19,12 +20,8 @@ const VALID_PROMO_CODES: Record<string, { discount: number; label: string }> = {
   "DEMO2024": { discount: 0.5, label: "Demo Special 50% OFF" },
 };
 
-// PayPal Hosted Button IDs
-const PAYPAL_BUTTONS = {
-  basic: "XYZABC123", // Replace with actual PayPal button ID
-  professional: "XYZABC456", // Replace with actual PayPal button ID
-  premium: "XYZABC789", // Replace with actual PayPal button ID
-};
+// PayPal Subscription Plan ID
+const PAYPAL_PLAN_ID = "P-913106187H1268013NFBA72I";
 
 const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
@@ -82,18 +79,6 @@ const Pricing = () => {
     if (!appliedPromo) return null;
     const numPrice = parseInt(price.replace('$', ''));
     return (numPrice * (1 - appliedPromo.discount)).toFixed(2);
-  };
-
-  const handlePayPalPayment = (plan: string, price: string) => {
-    analytics.paymentInitiated(plan, price, 'paypal');
-    // Open PayPal checkout in new tab
-    const paypalUrl = `https://www.paypal.com/webapps/hermes?token=${PAYPAL_BUTTONS[plan.toLowerCase() as keyof typeof PAYPAL_BUTTONS]}`;
-    window.open(paypalUrl, '_blank');
-    
-    toast({
-      title: "Opening PayPal",
-      description: "Complete your payment in the new tab.",
-    });
   };
 
   const handleETransferPayment = (plan: string, amount: string) => {
@@ -371,18 +356,8 @@ const Pricing = () => {
                 </ul>
               </CardContent>
 
-              <CardContent className="pt-0 space-y-2">
-                <Button
-                  onClick={() => handlePayPalPayment(plan.name, plan.price)}
-                  disabled={loading === plan.name.toLowerCase()}
-                  className={`w-full flex items-center justify-center gap-2 ${
-                    plan.popular ? 'bg-primary hover:bg-primary/90' : ''
-                  }`}
-                  variant={plan.popular ? 'default' : 'outline'}
-                >
-                  <CreditCard className="w-4 h-4" />
-                  {loading === plan.name.toLowerCase() ? "Processing..." : `Pay with PayPal - ${plan.price}/mo`}
-                </Button>
+              <CardContent className="pt-0 space-y-3">
+                <PayPalSubscribeButton planId={PAYPAL_PLAN_ID} />
                 
                 <Button
                   onClick={() => handleETransferPayment(plan.name, plan.price)}
