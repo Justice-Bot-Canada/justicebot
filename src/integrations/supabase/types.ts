@@ -41,6 +41,39 @@ export type Database = {
         }
         Relationships: []
       }
+      admins_access_audit: {
+        Row: {
+          accessed_at: string
+          accessed_by: string | null
+          action: string
+          details: Json | null
+          id: string
+          ip: string | null
+          success: boolean
+          user_agent: string | null
+        }
+        Insert: {
+          accessed_at?: string
+          accessed_by?: string | null
+          action: string
+          details?: Json | null
+          id?: string
+          ip?: string | null
+          success: boolean
+          user_agent?: string | null
+        }
+        Update: {
+          accessed_at?: string
+          accessed_by?: string | null
+          action?: string
+          details?: Json | null
+          id?: string
+          ip?: string | null
+          success?: boolean
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       analytics_events: {
         Row: {
           created_at: string
@@ -2141,6 +2174,24 @@ export type Database = {
       }
     }
     Views: {
+      admins_public_meta: {
+        Row: {
+          granted_at: string | null
+          revoked_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          granted_at?: string | null
+          revoked_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          granted_at?: string | null
+          revoked_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       legal_pathways_admin_view: {
         Row: {
           case_id: string | null
@@ -2263,6 +2314,7 @@ export type Database = {
       }
     }
     Functions: {
+      _request_context: { Args: never; Returns: Json }
       admin_delete_low_income_application: {
         Args: { p_admin_note?: string; p_id: string }
         Returns: undefined
@@ -2341,6 +2393,20 @@ export type Database = {
       ensure_admin_bypass_policies: {
         Args: { target_schemas?: string[] }
         Returns: undefined
+      }
+      get_admins_public_meta: {
+        Args: never
+        Returns: {
+          granted_at: string | null
+          revoked_at: string | null
+          user_id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "admins_public_meta"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       get_all_admins: {
         Args: never
@@ -2453,6 +2519,10 @@ export type Database = {
       is_owner: { Args: never; Returns: boolean }
       lia_log: {
         Args: { action: string; application_id: string; details: Json }
+        Returns: undefined
+      }
+      log_admins_access: {
+        Args: { p_action: string; p_details?: Json; p_success: boolean }
         Returns: undefined
       }
       make_user_admin: { Args: { p_email: string }; Returns: undefined }
