@@ -99,7 +99,7 @@ export const TurnstileWidget = ({ onSuccess, onError }: TurnstileWidgetProps) =>
   useEffect(() => {
     if (isLoaded && containerRef.current && window.turnstile && !widgetIdRef.current) {
       try {
-        const sitekey = import.meta.env.VITE_TURNSTILE_SITEKEY || '0x4AAAAAACDu7QoIMEUzUdsnnDP2-uM-Nug';
+        const sitekey = import.meta.env.VITE_TURNSTILE_SITEKEY || '0x4AAAAAACDu7YkiUswZAh3z';
         
         if (!sitekey) {
           console.error('Turnstile sitekey not configured');
