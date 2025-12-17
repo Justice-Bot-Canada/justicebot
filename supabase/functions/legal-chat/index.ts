@@ -95,6 +95,11 @@ const systemPrompt = `You are Justice-Bot, a knowledgeable legal assistant speci
 - Keep paragraphs short and scannable
 - Include specific next steps when possible`;
 
+    // Filter to only include user messages (not the initial assistant message)
+    const userMessages = messages.filter((m: { role: string }) => m.role === 'user' || m.role === 'assistant');
+    
+    console.log("Calling AI gateway with", userMessages.length, "messages");
+    
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -105,13 +110,18 @@ const systemPrompt = `You are Justice-Bot, a knowledgeable legal assistant speci
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
-          ...messages,
+          ...userMessages,
         ],
         stream: true,
       }),
     });
 
+    console.log("AI gateway response status:", response.status);
+
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("AI gateway error:", response.status, errorText);
+      
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }), {
           status: 429,
@@ -124,9 +134,7 @@ const systemPrompt = `You are Justice-Bot, a knowledgeable legal assistant speci
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      return new Response(JSON.stringify({ error: "AI service error" }), {
+      return new Response(JSON.stringify({ error: "AI service temporarily unavailable", details: errorText }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

@@ -125,8 +125,14 @@ export function LegalChatbot() {
         return;
       }
 
-      if (!response.ok || !response.body) {
-        throw new Error('Failed to connect');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Chat API error:', response.status, errorData);
+        throw new Error(errorData.error || 'Failed to connect');
+      }
+      
+      if (!response.body) {
+        throw new Error('No response stream');
       }
 
       const reader = response.body.getReader();
@@ -175,9 +181,10 @@ export function LegalChatbot() {
       setIsLoading(false);
     } catch (error) {
       console.error('Chat error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       toast({
-        title: "Connection error",
-        description: "Failed to get response. Please try again.",
+        title: "Chat error",
+        description: errorMessage === 'Failed to connect' ? "Failed to get response. Please try again." : errorMessage,
         variant: "destructive",
       });
       setMessages(newMessages);
