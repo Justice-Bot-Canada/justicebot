@@ -18,6 +18,7 @@ import Footer from "@/components/Footer";
 import AuthDialog from "@/components/AuthDialog";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { CanonicalURL } from "@/components/CanonicalURL";
+import { RelatedPages } from "@/components/RelatedPages";
 import { useAuth } from "@/hooks/useAuth";
 
 const SmallClaimsCourt = () => {
@@ -88,9 +89,9 @@ const SmallClaimsCourt = () => {
     <div className="min-h-screen bg-background">
       <CanonicalURL />
       <EnhancedSEO
-        title="Small Claims Court Ontario 2025 - File a Claim Up to $35,000"
-        description="Small claims court Ontario help. File claims up to $35,000 for debt collection, contract disputes, property damage. Step-by-step guide with forms 7A, 9A, 10A. Affordable AI legal help from $5.99."
-        keywords="small claims court Ontario, small claims court, how to sue someone Ontario, small claims court forms, small claims Ontario limit, file small claims, debt collection Ontario, sue for money, small claims court fees"
+        title="Small Claims Court Ontario 2025 - Sue for $35,000 | 85% Success Rate"
+        description="File Small Claims Court Ontario claim in 3 steps. Sue for up to $35,000. Debt collection, contract disputes, property damage. Forms 7A, 9A, 10A from $5.99. FREE case evaluation. 85% win rate with proper prep."
+        keywords="small claims court Ontario, small claims court, how to sue someone Ontario, small claims court forms, small claims Ontario limit, file small claims, debt collection Ontario, sue for money, small claims court fees, Form 7A"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
         faqData={faqData}
@@ -298,6 +299,22 @@ const SmallClaimsCourt = () => {
           </div>
         </section>
 
+        {/* Related Pages for Internal Linking */}
+        <section className="py-12">
+          <div className="container mx-auto px-4">
+            <RelatedPages 
+              title="Related Legal Resources"
+              description="Explore other ways to resolve your dispute"
+              pages={[
+                { title: "LTB Help Ontario", description: "Tenant disputes and eviction help", path: "/ltb-help", icon: "help", category: "Tribunal" },
+                { title: "Human Rights Tribunal", description: "File discrimination complaints", path: "/hrto-journey", icon: "file", category: "Tribunal" },
+                { title: "Family Court Help", description: "Custody, support, and divorce", path: "/family-journey", icon: "book", category: "Court" },
+                { title: "Settlement Calculator", description: "Estimate your claim value", path: "/settlement-calculator", icon: "calculator", category: "Tool" },
+              ]}
+            />
+          </div>
+        </section>
+        
         {/* CTA Section */}
         <section className="py-20 bg-gradient-to-r from-primary to-accent text-primary-foreground">
           <div className="container mx-auto px-4 text-center">

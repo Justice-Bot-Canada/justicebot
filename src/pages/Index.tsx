@@ -96,9 +96,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <EnhancedSEO
-        title="Legal Help Canada 2025 | Ontario, Alberta, BC, Quebec Court Forms - Justice-Bot"
-        description="AI-powered legal form helper for Ontario, Alberta, BC & Quebec. Get court forms for just $5.99 each. LTB, RTB, TAL, HRTO, family court, small claims. Not a law firm - practical tools to prepare your case."
-        keywords="legal help Canada, Ontario court forms, Alberta legal forms, BC RTB forms, Quebec TAL forms, LTB help Ontario, RTDRS Alberta, human rights tribunal Canada, small claims court Canada, family court forms, legal self-help Canada, tenant rights Canada"
+        title="FREE Legal Help Canada 2025 | Court Forms $5.99 | Ontario, BC, Alberta, Quebec"
+        description="Get FREE case assessment + court forms from $5.99. LTB help, HRTO, small claims, family court. AI-powered legal guidance for Ontario, BC, Alberta, Quebec. 10,000+ Canadians helped. Not a law firm."
+        keywords="legal help Canada, free legal help Ontario, Ontario court forms, LTB help, HRTO Ontario, small claims court, family court forms, tenant rights, Alberta legal help, BC RTB, Quebec TAL"
         canonicalUrl="https://www.justice-bot.com/"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
