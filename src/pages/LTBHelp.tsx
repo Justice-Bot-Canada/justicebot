@@ -18,6 +18,7 @@ import Footer from "@/components/Footer";
 import AuthDialog from "@/components/AuthDialog";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { CanonicalURL } from "@/components/CanonicalURL";
+import { RelatedPages } from "@/components/RelatedPages";
 import { useAuth } from "@/hooks/useAuth";
 
 const LTBHelp = () => {
@@ -88,9 +89,9 @@ const LTBHelp = () => {
     <div className="min-h-screen bg-background">
       <CanonicalURL />
       <EnhancedSEO
-        title="LTB Help Ontario - Landlord Tenant Board Assistance & Forms"
-        description="Get LTB help in Ontario. Expert guidance for Landlord and Tenant Board applications, eviction disputes, rent issues, and maintenance complaints. AI-powered affordable legal assistance from $5.99."
-        keywords="LTB help, LTB Ontario, landlord tenant board help, LTB application help, LTB forms help, Ontario tenant help, LTB assistance, file LTB application"
+        title="LTB Help Ontario 2025 - FREE Case Assessment | Fight Evictions & Get Repairs"
+        description="Need LTB help? Get FREE case assessment + forms from $5.99. 75% tenant success rate. File T2, T6, fight N4 evictions, force repairs. Step-by-step guidance for Landlord Tenant Board Ontario."
+        keywords="LTB help, LTB Ontario, landlord tenant board help, LTB application help, LTB forms help, Ontario tenant help, LTB assistance, file LTB application, T2 form, T6 form, N4 eviction"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
         faqData={faqData}
@@ -298,6 +299,22 @@ const LTBHelp = () => {
           </div>
         </section>
 
+        {/* Related Pages for Internal Linking */}
+        <section className="py-12">
+          <div className="container mx-auto px-4">
+            <RelatedPages 
+              title="Related LTB Resources"
+              description="More guides to help with your tenant case"
+              pages={[
+                { title: "How to File T2 Form", description: "Fight landlord violations and bad faith evictions", path: "/how-to-file-t2-ontario", icon: "file", category: "Forms" },
+                { title: "How to File T6 Form", description: "Force repairs when landlord refuses to fix", path: "/how-to-file-t6-ontario", icon: "file", category: "Forms" },
+                { title: "Fight N4 Eviction", description: "Challenge unfair eviction notices", path: "/how-to-fight-n4-eviction-ontario", icon: "help", category: "Guide" },
+                { title: "Small Claims Court", description: "Sue for damages up to $35,000", path: "/small-claims", icon: "calculator", category: "Court" },
+              ]}
+            />
+          </div>
+        </section>
+        
         {/* CTA Section */}
         <section className="py-20 bg-gradient-to-r from-primary to-accent text-primary-foreground">
           <div className="container mx-auto px-4 text-center">
