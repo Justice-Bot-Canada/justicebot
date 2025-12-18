@@ -2294,6 +2294,42 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles_public: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          display_name: string | null
+          first_name: string | null
+          id: string | null
+          last_name: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          first_name?: string | null
+          id?: string | null
+          last_name?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          first_name?: string | null
+          id?: string | null
+          last_name?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles_public_view: {
         Row: {
           avatar_url: string | null
@@ -2339,6 +2375,30 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "low_income_applications"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      admin_list_profiles_guard: {
+        Args: { p_limit?: number; p_offset?: number; p_search?: string }
+        Returns: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          display_name: string | null
+          email: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          onboarding_completed: boolean | null
+          phone: string | null
+          signup_number: number | null
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
           isOneToOne: false
           isSetofReturn: true
         }
