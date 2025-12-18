@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Check, CreditCard, FileText, Zap, Mail, DollarSign, Users, Sparkles, X } from "lucide-react";
+import { Check, CreditCard, FileText, Zap, Mail, DollarSign, Users, Sparkles, X, Clock } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { analytics } from "@/utils/analytics";
-import PayPalSubscribeButton from "@/components/PayPalSubscribeButton";
+import PayPalTrialButton from "@/components/PayPalTrialButton";
 
 const VALID_PROMO_CODES: Record<string, { discount: number; label: string }> = {
   "LAUNCH50": { discount: 0.5, label: "50% OFF First Month" },
@@ -20,8 +20,9 @@ const VALID_PROMO_CODES: Record<string, { discount: number; label: string }> = {
   "DEMO2024": { discount: 0.5, label: "Demo Special 50% OFF" },
 };
 
-// PayPal Subscription Plan ID
-const PAYPAL_PLAN_ID = "P-2GT19989129104740NFBBDVY";
+// PayPal Subscription Plan ID with 5-day trial
+// IMPORTANT: You must create this plan in PayPal with a 5-day trial period
+const PAYPAL_TRIAL_PLAN_ID = "P-2GT19989129104740NFBBDVY";
 
 const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
@@ -278,28 +279,41 @@ const Pricing = () => {
           </div>
         )}
 
-        {/* Hero Banner */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">
-            Simple, Transparent Pricing
-          </h1>
-          <p className="text-xl text-muted-foreground mb-6">
-            Choose the plan that fits your legal needs. All plans include access to Canadian legal forms.
+        {/* Free Trial Hero Banner */}
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-8 mb-12 text-white text-center shadow-xl">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Clock className="w-8 h-8" />
+            <h1 className="text-3xl md:text-4xl font-bold">
+              Try FREE for 5 Days
+            </h1>
+          </div>
+          <p className="text-xl text-white/90 mb-4">
+            Full access to all premium features. No charge until trial ends.
           </p>
-          <div className="flex items-center justify-center gap-4 text-sm text-gray-600 dark:text-gray-300">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
+            <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
+              <Check className="w-4 h-4" />
+              <span>Cancel anytime</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
               <CreditCard className="w-4 h-4" />
-              <span>PayPal accepted</span>
+              <span>Card required for trial</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4" />
-              <span>E-transfer available</span>
-            </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
               <Zap className="w-4 h-4" />
               <span>Instant access</span>
             </div>
           </div>
+        </div>
+
+        {/* Subtitle */}
+        <div className="text-center mb-12">
+          <h2 className="text-2xl font-semibold mb-2">
+            Choose Your Plan After Trial
+          </h2>
+          <p className="text-muted-foreground">
+            All plans include a 5-day free trial. Pick the one that fits your legal needs.
+          </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -357,7 +371,7 @@ const Pricing = () => {
               </CardContent>
 
               <CardContent className="pt-0 space-y-3">
-                <PayPalSubscribeButton planId={PAYPAL_PLAN_ID} />
+                <PayPalTrialButton planId={PAYPAL_TRIAL_PLAN_ID} trialDays={5} />
                 
                 <Button
                   onClick={() => handleETransferPayment(plan.name, plan.price)}

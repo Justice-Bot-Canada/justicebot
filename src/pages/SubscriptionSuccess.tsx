@@ -19,6 +19,7 @@ export default function SubscriptionSuccess() {
 
   const subscriptionId = searchParams.get('subscription_id') || searchParams.get('token');
   const planType = searchParams.get('plan');
+  const isTrial = searchParams.get('trial') === 'true';
 
   useEffect(() => {
     const verifySubscription = async () => {
@@ -38,8 +39,10 @@ export default function SubscriptionSuccess() {
         if (data.success) {
           setVerified(true);
           toast({
-            title: 'Subscription Activated!',
-            description: 'Your premium access has been granted.',
+            title: isTrial ? '🎉 Free Trial Started!' : 'Subscription Activated!',
+            description: isTrial 
+              ? 'Enjoy 5 days of full premium access. No charge until trial ends!'
+              : 'Your premium access has been granted.',
           });
           
           // Refresh user premium status
@@ -58,9 +61,10 @@ export default function SubscriptionSuccess() {
     };
 
     verifySubscription();
-  }, [subscriptionId, toast]);
+  }, [subscriptionId, toast, isTrial]);
 
   const getPlanName = (plan: string | null) => {
+    if (isTrial) return '5-Day Free Trial';
     switch (plan) {
       case 'low-income': return 'Low-Income Plan';
       case 'monthly': return 'Monthly Access';
@@ -96,12 +100,25 @@ export default function SubscriptionSuccess() {
                   <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
                     <CheckCircle2 className="w-8 h-8 text-green-600" />
                   </div>
-                  <CardTitle className="text-green-700">Subscription Activated!</CardTitle>
+                  <CardTitle className="text-green-700">
+                    {isTrial ? '🎉 Free Trial Started!' : 'Subscription Activated!'}
+                  </CardTitle>
                   <CardDescription>
-                    Welcome to {getPlanName(planType)}
+                    {isTrial 
+                      ? 'You have 5 days of full premium access - completely free!'
+                      : `Welcome to ${getPlanName(planType)}`}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {isTrial && (
+                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                      <p className="text-sm text-blue-800 dark:text-blue-200 text-center">
+                        <strong>💡 Reminder:</strong> Your card won't be charged during the trial. 
+                        Cancel anytime before the trial ends to avoid billing.
+                      </p>
+                    </div>
+                  )}
+                  
                   <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg">
                     <h3 className="font-semibold mb-3 flex items-center gap-2">
                       <Crown className="w-5 h-5 text-amber-600" />
@@ -124,24 +141,10 @@ export default function SubscriptionSuccess() {
                         <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
                         <span>Form Intelligence with autofill</span>
                       </li>
-                      {(planType === 'yearly' || planType === 'monthly') && (
-                        <li className="flex items-start gap-2">
-                          <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
-                          <span>Evidence Strategist & Organizer</span>
-                        </li>
-                      )}
-                      {planType === 'yearly' && (
-                        <>
-                          <li className="flex items-start gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
-                            <span>Settlement Calculator (Premium Only)</span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
-                            <span>Unlimited AI document generation</span>
-                          </li>
-                        </>
-                      )}
+                      <li className="flex items-start gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 shrink-0" />
+                        <span>Evidence Strategist & Organizer</span>
+                      </li>
                     </ul>
                   </div>
 

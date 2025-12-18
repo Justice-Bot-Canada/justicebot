@@ -4,7 +4,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Lock, Crown, Gift, Users } from 'lucide-react';
+import { Lock, Crown, Sparkles, Check } from 'lucide-react';
+import PayPalTrialButton from '@/components/PayPalTrialButton';
+
+// PayPal plan ID with 5-day trial
+const PAYPAL_TRIAL_PLAN_ID = "P-2GT19989129104740NFBBDVY";
 
 interface PremiumGateProps {
   children: ReactNode;
@@ -60,10 +64,16 @@ export const PremiumGate = ({ children, feature, fallback, showUpgrade = true }:
   return (
     <Card className="mx-auto max-w-md">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Lock className="w-5 h-5 text-amber-500" />
-          Premium Feature
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Lock className="w-5 h-5 text-amber-500" />
+            Premium Feature
+          </CardTitle>
+          <Badge className="bg-gradient-to-r from-green-500 to-emerald-600 text-white">
+            <Sparkles className="w-3 h-3 mr-1" />
+            5 Days Free
+          </Badge>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="text-center">
@@ -71,25 +81,31 @@ export const PremiumGate = ({ children, feature, fallback, showUpgrade = true }:
           <p className="text-muted-foreground mb-4">
             <strong>{feature}</strong> is a premium feature.
           </p>
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <p>✨ Professional PDF generation</p>
-            <p>🤖 Smart form pre-filling</p>
-            <p>🏆 Priority support</p>
-            <p>📊 Advanced case tracking</p>
+          <div className="space-y-2 text-sm text-left">
+            <p className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-green-500" />
+              Professional PDF generation
+            </p>
+            <p className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-green-500" />
+              Smart form pre-filling
+            </p>
+            <p className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-green-500" />
+              Priority support
+            </p>
+            <p className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-green-500" />
+              Advanced case tracking
+            </p>
           </div>
         </div>
         
         {showUpgrade && (
-          <div className="space-y-3">
-            <Button 
-              onClick={() => window.location.href = '/pricing'} 
-              className="w-full bg-amber-500 hover:bg-amber-600 text-white"
-            >
-              <Crown className="w-4 h-4 mr-2" />
-              Upgrade to Premium
-            </Button>
+          <div className="space-y-3 pt-2">
+            <PayPalTrialButton planId={PAYPAL_TRIAL_PLAN_ID} trialDays={5} />
             <div className="text-center text-xs text-muted-foreground">
-              Starting at $9.99/month or $2.99/month for low-income applicants
+              No charge for 5 days. Cancel anytime.
             </div>
           </div>
         )}
