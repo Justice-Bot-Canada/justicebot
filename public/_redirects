@@ -1,6 +1,7 @@
 # Static files - serve as-is
 /sitemap.xml   /sitemap.xml   200
 /robots.txt    /robots.txt    200
+/manifest.json /manifest.json 200
 
 # Force www and HTTPS version (canonical domain) - CRITICAL for SEO
 # These MUST come before any other redirects
@@ -8,7 +9,13 @@ https://justice-bot.com/* https://www.justice-bot.com/:splat 301!
 http://justice-bot.com/* https://www.justice-bot.com/:splat 301!
 http://www.justice-bot.com/* https://www.justice-bot.com/:splat 301!
 
+# Remove trailing slashes (prevents duplicate content)
+/*/ /:splat 301!
+
 # 301 Redirects - permanent redirects for SEO (prevents duplicate content)
+/index.html         /                   301
+/index              /                   301
+/home               /                   301
 /terms-of-use       /terms              301
 /termsofservice     /terms              301
 /signup             /welcome            301
@@ -18,7 +25,6 @@ http://www.justice-bot.com/* https://www.justice-bot.com/:splat 301!
 /small-claims       /small-claims-journey 301
 
 # Proper 404s for non-existent pages (prevents soft 404s in Google Search Console)
-# These pages don't exist or were removed - return actual 404 status
 /account            /not-found          404
 /timeline           /not-found          404
 /demo-video         /not-found          404

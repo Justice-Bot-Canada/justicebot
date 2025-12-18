@@ -8,6 +8,7 @@ import { Suspense, lazy } from "react";
 import { SkipToContent, useFocusManagement, useKeyboardNavigation } from "@/components/AccessibilityFeatures";
 import { KlaviyoTracking } from "@/components/KlaviyoTracking";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { CanonicalURL } from "@/components/CanonicalURL";
 import Index from "./pages/Index";
 import PathwayDecision from "./pages/PathwayDecision";
 import Pricing from "./pages/Pricing";
@@ -133,6 +134,7 @@ const AppContent = () => {
   return (
     <ErrorBoundary>
       <div className="min-h-screen">
+        <CanonicalURL />
         <SkipToContent />
         <LiveSupportWidget />
         <KlaviyoTracking />
