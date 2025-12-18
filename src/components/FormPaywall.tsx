@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Lock, Zap, Clock } from "lucide-react";
+import { Check, Lock, Zap, Clock, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
+import PayPalTrialButton from "@/components/PayPalTrialButton";
 
 interface FormPaywallProps {
   formId: string;
@@ -114,13 +115,14 @@ export default function FormPaywall({
     return <>{children}</>;
   }
 
+  // PayPal plan ID with 5-day trial
+  const PAYPAL_TRIAL_PLAN_ID = "P-2GT19989129104740NFBBDVY";
+
   const handleSubscription = async () => {
     setLoading("subscription");
     try {
-      const PAYPAL_MONTHLY_PLAN_ID = "P-85C49396FY903261CNESQ7AA";
-      
       const { data, error } = await supabase.functions.invoke('create-paypal-subscription', {
-        body: { planId: PAYPAL_MONTHLY_PLAN_ID }
+        body: { planId: PAYPAL_TRIAL_PLAN_ID }
       });
 
       if (error) throw error;
@@ -219,24 +221,24 @@ export default function FormPaywall({
           </CardContent>
         </Card>
 
-        {/* Monthly Subscription */}
+        {/* Free Trial / Subscription */}
         <Card className="relative border-primary ring-2 ring-primary/20">
           <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-            <Badge className="bg-primary">
-              <Zap className="w-3 h-3 mr-1" />
-              Best Value
+            <Badge className="bg-gradient-to-r from-green-500 to-emerald-600">
+              <Sparkles className="w-3 h-3 mr-1" />
+              5-Day FREE Trial
             </Badge>
           </div>
 
           <CardHeader>
             <div className="flex items-center justify-between mb-2">
               <CardTitle className="text-2xl">Unlimited</CardTitle>
-              <Badge variant="outline">Monthly</Badge>
+              <Badge variant="outline">Try Free</Badge>
             </div>
-            <CardDescription>Access all forms, cancel anytime</CardDescription>
+            <CardDescription>Full access for 5 days, then $19/mo</CardDescription>
             <div className="mt-4">
-              <div className="text-4xl font-bold">$19<span className="text-lg font-normal">/mo</span></div>
-              <div className="text-sm text-green-600 font-medium">Save money vs. buying 4+ forms</div>
+              <div className="text-4xl font-bold text-green-600">FREE</div>
+              <div className="text-sm text-muted-foreground">for 5 days, then $19/mo</div>
             </div>
           </CardHeader>
 
@@ -256,29 +258,11 @@ export default function FormPaywall({
               </li>
               <li className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-sm">Case tracking & deadline reminders</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-sm">Cancel anytime, no commitment</span>
+                <span className="text-sm">Cancel anytime - no charge if cancelled before trial ends</span>
               </li>
             </ul>
 
-            <Button 
-              onClick={handleSubscription} 
-              disabled={loading !== null}
-              className="w-full bg-primary hover:bg-primary/90"
-              size="lg"
-            >
-              {loading === "subscription" ? (
-                "Processing..."
-              ) : (
-                <>
-                  <Zap className="w-4 h-4 mr-2" />
-                  Subscribe for $19/mo
-                </>
-              )}
-            </Button>
+            <PayPalTrialButton planId={PAYPAL_TRIAL_PLAN_ID} trialDays={5} />
           </CardContent>
         </Card>
       </div>
