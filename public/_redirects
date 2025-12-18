@@ -16,6 +16,22 @@ http://www.justice-bot.com/* https://www.justice-bot.com/:splat 301!
 /index.html         /                   301
 /index              /                   301
 /home               /                   301
+
+# Legacy city pages (old sitemap URLs) -> current LTB city pages
+/legal-help-toronto       /ltb-toronto        301
+/legal-help-ottawa        /ltb-ottawa         301
+/legal-help-mississauga   /ltb-mississauga    301
+/legal-help-brampton      /ltb-brampton       301
+/legal-help-hamilton      /ltb-hamilton       301
+/legal-help-london        /ltb-london         301
+/legal-help-markham       /ltb-markham        301
+/legal-help-vaughan       /ltb-vaughan        301
+/legal-help-kitchener     /ltb-kitchener      301
+/legal-help-windsor       /ltb-windsor        301
+
+# Any other legacy /legal-help-* URLs
+/legal-help-*             /triage             301
+
 /terms-of-use       /terms              301
 /termsofservice     /terms              301
 /signup             /welcome            301
