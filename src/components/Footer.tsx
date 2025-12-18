@@ -127,11 +127,11 @@ const Footer = () => {
               <span className="text-sm text-background/80 font-semibold">Connect With Us:</span>
               <div className="flex flex-wrap justify-center gap-3">
                 <a 
-                  href="https://www.facebook.com/JusticeBotOfficial" 
+                  href="https://www.facebook.com/profile.php?id=61579916761955"
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 px-3 py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-background/50"
-                  aria-label="Follow us on Facebook"
+                  aria-label="Follow Justice-Bot on Facebook"
                 >
                   <Facebook className="w-4 h-4" />
                   <span className="text-sm">Facebook</span>

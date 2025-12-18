@@ -10,14 +10,10 @@ interface OrganizationSchemaProps {
 
 export const OrganizationSchema = ({
   name = "Justice-Bot",
-  description = "AI-powered legal assistance for Ontario residents. Free legal help with LTB forms, family court, HRTO applications, and more.",
-  url = "https://justice-bot.com",
-  logo = "https://justice-bot.com/justice-bot-logo.jpeg",
-  sameAs = [
-    "https://twitter.com/justicebot",
-    "https://www.facebook.com/justicebot",
-    "https://www.linkedin.com/company/justicebot"
-  ]
+  description = "AI-powered legal information and form-help software for Canadians. Not a law firm and not legal advice.",
+  url = "https://www.justice-bot.com",
+  logo = "https://www.justice-bot.com/justice-bot-logo.jpeg",
+  sameAs = ["https://www.facebook.com/profile.php?id=61579916761955"],
 }: OrganizationSchemaProps) => {
   const schemaData = {
     "@context": "https://schema.org",
