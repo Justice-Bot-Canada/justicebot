@@ -2243,30 +2243,6 @@ export type Database = {
         }
         Relationships: []
       }
-      low_income_applications_safe: {
-        Row: {
-          created_at: string | null
-          household_size: number | null
-          id: string | null
-          status: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          household_size?: number | null
-          id?: string | null
-          status?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          household_size?: number | null
-          id?: string | null
-          status?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
       my_payments: {
         Row: {
           amount: number | null
