@@ -114,15 +114,18 @@ export default function FormPaywall({
   if (isPremium || hasAccess || hasPurchased) {
     return <>{children}</>;
   }
-
-  // PayPal plan ID with 5-day trial
-  const PAYPAL_TRIAL_PLAN_ID = "P-2GT19989129104740NFBBDVY";
+  // PayPal plan IDs
+  const PAYPAL_PLAN_IDS = {
+    basic: "P-913106187H1268013NFBA72I",
+    professional: "P-0FR50831D4940483BNFBBB7Y",
+    premium: "P-2GT19989129104740NFBBDVY",
+  };
 
   const handleSubscription = async () => {
     setLoading("subscription");
     try {
       const { data, error } = await supabase.functions.invoke('create-paypal-subscription', {
-        body: { planId: PAYPAL_TRIAL_PLAN_ID }
+        body: { planId: PAYPAL_PLAN_IDS.professional }
       });
 
       if (error) throw error;
@@ -262,7 +265,7 @@ export default function FormPaywall({
               </li>
             </ul>
 
-            <PayPalTrialButton planId={PAYPAL_TRIAL_PLAN_ID} trialDays={5} />
+            <PayPalTrialButton planId={PAYPAL_PLAN_IDS.professional} trialDays={5} />
           </CardContent>
         </Card>
       </div>
