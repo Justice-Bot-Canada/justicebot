@@ -65,11 +65,11 @@ export function usePremiumAccess(): PremiumAccess {
       if (error) throw error;
       setIsFreeUser(freeEligible === true);
 
-      // Get user signup number for display (first 500 get free access)
+      // Get user signup number for display (first 200 get free access)
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('*')
-        .eq('id', user.id)
+        .select('signup_number')
+        .eq('user_id', user.id)
         .maybeSingle();
 
       if (profileData && 'signup_number' in profileData) {
