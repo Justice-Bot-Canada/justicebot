@@ -17,7 +17,7 @@ http://www.justice-bot.com/* https://www.justice-bot.com/:splat 301!
 /index              /                   301
 /home               /                   301
 
-# Legacy city pages (old sitemap URLs) -> current LTB city pages
+# Legacy city pages (old sitemap URLs) -> current LTB city pages (Ontario)
 /legal-help-toronto       /ltb-toronto        301
 /legal-help-ottawa        /ltb-ottawa         301
 /legal-help-mississauga   /ltb-mississauga    301
@@ -29,7 +29,14 @@ http://www.justice-bot.com/* https://www.justice-bot.com/:splat 301!
 /legal-help-kitchener     /ltb-kitchener      301
 /legal-help-windsor       /ltb-windsor        301
 
-# Any other legacy /legal-help-* URLs
+# Non-Ontario cities -> redirect to triage (fixes soft 404s)
+/legal-help-edmonton      /triage             301
+/legal-help-vancouver     /triage             301
+/legal-help-calgary       /triage             301
+/legal-help-montreal      /triage             301
+/legal-help-winnipeg      /triage             301
+
+# Any other legacy /legal-help-* URLs -> triage
 /legal-help-*             /triage             301
 
 /terms-of-use       /terms              301
