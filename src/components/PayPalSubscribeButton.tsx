@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-const PAYPAL_CLIENT_ID = "AXJLz1toBVLEsWU8FUMZ0jdPSYD5AGCsjzsmm684QRadoAzbSFNNSTDdwBht84dg7z2Xz5plJ_7wLH_P";
+const PAYPAL_CLIENT_ID = "AS7gni64FdKWkeMYxUGCFStgDXhtyG0SooKeyMu-NwVDwFzrRC8iMfPmesMmSrGXZUQqYz69EsiQ9ril";
 
 const PayPalSubscribeButton = ({ planId, containerId }: PayPalSubscribeButtonProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
