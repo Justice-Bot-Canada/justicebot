@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { analytics } from "@/utils/analytics";
 
 interface PayPalSubscribeButtonProps {
   planId: string;
@@ -71,12 +72,15 @@ const PayPalSubscribeButton = ({ planId, containerId }: PayPalSubscribeButtonPro
           label: "subscribe",
         },
         createSubscription: function (data: any, actions: any) {
+          // Track payment initiation
+          analytics.paymentInitiated(planId, '0', 'paypal');
           return actions.subscription.create({
             plan_id: planId,
           });
         },
         onApprove: function (data: any) {
           console.log("Subscription approved:", data.subscriptionID);
+          analytics.paymentCompleted(planId, '0', data.subscriptionID);
           toast({
             title: "Subscription Successful!",
             description: `Your subscription ID: ${data.subscriptionID}. Welcome to Justice-Bot!`,
@@ -86,6 +90,7 @@ const PayPalSubscribeButton = ({ planId, containerId }: PayPalSubscribeButtonPro
         },
         onError: function (err: any) {
           console.error("PayPal error:", err);
+          analytics.paymentFailed(planId, '0', err?.message || 'unknown_error');
           toast({
             title: "Payment Error",
             description: "Something went wrong with your payment. Please try again.",
@@ -93,6 +98,7 @@ const PayPalSubscribeButton = ({ planId, containerId }: PayPalSubscribeButtonPro
           });
         },
         onCancel: function () {
+          analytics.paymentAbandoned(planId, '0', 'user_cancelled');
           toast({
             title: "Payment Cancelled",
             description: "You cancelled the payment. No charges were made.",

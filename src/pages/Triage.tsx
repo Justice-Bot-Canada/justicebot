@@ -13,6 +13,7 @@ import TriageResults from "@/components/TriageResults";
 import { TriageDiscountModal } from "@/components/TriageDiscountModal";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { analytics, trackEvent } from "@/utils/analytics";
 
 interface FormRecommendation {
   formCode: string;
@@ -50,6 +51,14 @@ const Triage = () => {
     setUserDescription(description);
     setProvince(prov);
     setStep(1);
+    
+    // Track triage completion
+    analytics.triageComplete(result.venue);
+    trackEvent('triage_complete', { 
+      venue: result.venue, 
+      confidence: result.confidence,
+      province: prov 
+    });
     
     // Show discount modal after triage (only once per session)
     const hasSeenOffer = sessionStorage.getItem('triage_discount_shown');

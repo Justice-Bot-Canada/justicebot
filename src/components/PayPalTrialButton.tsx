@@ -3,6 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Shield, CreditCard } from "lucide-react";
+import { analytics, trackEvent } from "@/utils/analytics";
 
 interface PayPalTrialButtonProps {
   planId: string;
@@ -70,12 +71,17 @@ const PayPalTrialButton = ({ planId, trialDays = 5 }: PayPalTrialButtonProps) =>
           label: "subscribe",
         },
         createSubscription: function (data: any, actions: any) {
+          // Track trial initiation
+          analytics.paymentInitiated(planId, '0', 'paypal_trial');
+          trackEvent('trial_started', { plan_id: planId, trial_days: trialDays });
           return actions.subscription.create({
             plan_id: planId,
           });
         },
         onApprove: function (data: any) {
           console.log("Trial subscription approved:", data.subscriptionID);
+          analytics.paymentCompleted(planId, '0', data.subscriptionID);
+          trackEvent('trial_completed', { subscription_id: data.subscriptionID, trial_days: trialDays });
           toast({
             title: "🎉 Free Trial Started!",
             description: `Your ${trialDays}-day free trial has begun! You won't be charged until the trial ends.`,
@@ -85,6 +91,8 @@ const PayPalTrialButton = ({ planId, trialDays = 5 }: PayPalTrialButtonProps) =>
         },
         onError: function (err: any) {
           console.error("PayPal error:", err);
+          analytics.paymentFailed(planId, '0', err?.message || 'unknown_error');
+          trackEvent('trial_error', { error: err?.message || 'unknown' });
           toast({
             title: "Payment Error",
             description: "Something went wrong. Please try again.",
@@ -92,6 +100,8 @@ const PayPalTrialButton = ({ planId, trialDays = 5 }: PayPalTrialButtonProps) =>
           });
         },
         onCancel: function () {
+          analytics.paymentAbandoned(planId, '0', 'user_cancelled_trial');
+          trackEvent('trial_cancelled', { plan_id: planId });
           setShowPayPal(false);
           toast({
             title: "Trial Setup Cancelled",
@@ -103,6 +113,7 @@ const PayPalTrialButton = ({ planId, trialDays = 5 }: PayPalTrialButtonProps) =>
   }, [sdkReady, planId, showPayPal, toast, navigate, trialDays]);
 
   const handleStartTrial = () => {
+    trackEvent('trial_button_click', { plan_id: planId, trial_days: trialDays });
     setShowPayPal(true);
   };
 
