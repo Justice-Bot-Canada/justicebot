@@ -22,13 +22,8 @@ const HeroSection = () => {
             </div>
 
             <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-2">
-                  <span className="text-sm font-semibold text-primary">🇨🇦 Ontario, Alberta, BC & Quebec</span>
-                </div>
-                <div className="inline-flex items-center gap-2 bg-accent/10 border border-accent/30 rounded-full px-4 py-2">
-                  <span className="text-sm font-bold italic text-accent-foreground">"Ignorance is not an option"</span>
-                </div>
+              <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-2">
+                <span className="text-sm font-semibold text-primary">🇨🇦 Ontario, Alberta, BC & Quebec</span>
               </div>
               <h1 
                 id="hero-heading" 
@@ -36,9 +31,7 @@ const HeroSection = () => {
                 role="heading"
                 aria-level={1}
               >
-                <span className="text-foreground">Understand Your Options.</span>
-                <br />
-                <span className="text-primary">Prepare With Confidence.</span>
+                <span className="text-foreground">Ignorance Is Not an Option.</span>
               </h1>
               <p className="text-xl text-muted-foreground leading-relaxed max-w-lg">
                 Built for self-represented Canadians navigating tribunals and courts. 
