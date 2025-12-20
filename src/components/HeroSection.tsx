@@ -32,6 +32,8 @@ const HeroSection = () => {
                 aria-level={1}
               >
                 <span className="text-foreground">Ignorance Is Not an Option.</span>
+                <br />
+                <span className="text-primary">Your Rights Should Not Be Either.</span>
               </h1>
               <p className="text-xl text-muted-foreground leading-relaxed max-w-lg">
                 Built for self-represented Canadians navigating tribunals and courts. 
