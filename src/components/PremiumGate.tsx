@@ -6,9 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Lock, Crown, Sparkles, Check } from 'lucide-react';
 import PayPalTrialButton from '@/components/PayPalTrialButton';
-
-// PayPal plan ID with 5-day trial
-const PAYPAL_TRIAL_PLAN_ID = "P-2GT19989129104740NFBBDVY";
+// PayPal plan IDs
+const PAYPAL_PLAN_IDS = {
+  basic: "P-913106187H1268013NFBA72I",
+  professional: "P-0FR50831D4940483BNFBBB7Y",
+  premium: "P-2GT19989129104740NFBBDVY",
+};
 
 interface PremiumGateProps {
   children: ReactNode;
@@ -103,7 +106,7 @@ export const PremiumGate = ({ children, feature, fallback, showUpgrade = true }:
         
         {showUpgrade && (
           <div className="space-y-3 pt-2">
-            <PayPalTrialButton planId={PAYPAL_TRIAL_PLAN_ID} trialDays={5} />
+            <PayPalTrialButton planId={PAYPAL_PLAN_IDS.professional} trialDays={5} />
             <div className="text-center text-xs text-muted-foreground">
               No charge for 5 days. Cancel anytime.
             </div>

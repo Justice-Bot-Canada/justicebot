@@ -20,9 +20,12 @@ const VALID_PROMO_CODES: Record<string, { discount: number; label: string }> = {
   "DEMO2024": { discount: 0.5, label: "Demo Special 50% OFF" },
 };
 
-// PayPal Subscription Plan ID with 5-day trial
-// IMPORTANT: You must create this plan in PayPal with a 5-day trial period
-const PAYPAL_TRIAL_PLAN_ID = "P-2GT19989129104740NFBBDVY";
+// PayPal Live Subscription Plan IDs
+const PAYPAL_PLAN_IDS = {
+  basic: "P-913106187H1268013NFBA72I",
+  professional: "P-0FR50831D4940483BNFBBB7Y",
+  premium: "P-2GT19989129104740NFBBDVY",
+};
 
 const Pricing = () => {
   const [loading, setLoading] = useState<string | null>(null);
@@ -98,6 +101,7 @@ const Pricing = () => {
   const plans = [
     {
       name: "Basic",
+      key: "basic" as const,
       description: "Essential legal document tools",
       price: "$19",
       period: "per month",
@@ -112,6 +116,7 @@ const Pricing = () => {
     },
     {
       name: "Professional",
+      key: "professional" as const,
       description: "Advanced features for active cases",
       price: "$29",
       period: "per month",
@@ -130,6 +135,7 @@ const Pricing = () => {
     },
     {
       name: "Premium",
+      key: "premium" as const,
       description: "Complete legal toolkit with priority support",
       price: "$49",
       period: "per month",
@@ -371,7 +377,7 @@ const Pricing = () => {
               </CardContent>
 
               <CardContent className="pt-0 space-y-3">
-                <PayPalTrialButton planId={PAYPAL_TRIAL_PLAN_ID} trialDays={5} />
+                <PayPalTrialButton planId={PAYPAL_PLAN_IDS[plan.key]} trialDays={5} />
                 
                 <Button
                   onClick={() => handleETransferPayment(plan.name, plan.price)}
