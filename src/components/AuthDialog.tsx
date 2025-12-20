@@ -28,6 +28,9 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    
+    // Track login attempt
+    analytics.signupAttempt(email);
 
     try {
       const { error } = await supabase.auth.signInWithPassword({
@@ -36,12 +39,14 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       });
 
       if (error) {
+        analytics.signupFailed(`login_${error.message}`);
         toast({
           title: "Error",
           description: error.message,
           variant: "destructive",
         });
       } else {
+        analytics.signUp('email_login');
         toast({
           title: "Success",
           description: "Signed in successfully!",
@@ -49,6 +54,7 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         onOpenChange(false);
       }
     } catch (error) {
+      analytics.signupFailed('login_unexpected_error');
       toast({
         title: "Error",
         description: "An unexpected error occurred",

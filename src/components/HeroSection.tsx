@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle, Shield } from "lucide-react";
+import { trackEvent } from "@/utils/analytics";
 
 const HeroSection = () => {
   return (
@@ -65,7 +66,10 @@ const HeroSection = () => {
                 variant="cta" 
                 size="lg" 
                 className="group text-lg px-10 py-7 shadow-xl w-full sm:w-auto"
-                onClick={() => window.location.href = '/triage'}
+                onClick={() => {
+                  trackEvent('cta_click', { button: 'hero_triage', location: 'hero' });
+                  window.location.href = '/triage';
+                }}
                 aria-describedby="cta-description"
               >
                 Get a Free Case Overview

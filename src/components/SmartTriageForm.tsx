@@ -27,6 +27,7 @@ import {
 import { useDropzone } from "react-dropzone";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/lib/toast-stub";
+import { analytics, trackEvent } from "@/utils/analytics";
 
 interface FormRecommendation {
   formCode: string;
@@ -135,6 +136,10 @@ const SmartTriageForm: React.FC<SmartTriageFormProps> = ({
       toast.error("Please provide more detail about your legal issue (at least 20 characters)");
       return;
     }
+
+    // Track triage form submission
+    analytics.triageStart();
+    trackEvent('triage_submit', { province, description_length: description.length });
 
     setLoading(true);
     setAnalyzing(true);
