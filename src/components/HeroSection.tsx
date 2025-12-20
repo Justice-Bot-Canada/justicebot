@@ -1,36 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle, Shield } from "lucide-react";
 import { trackEvent } from "@/utils/analytics";
-
 const HeroSection = () => {
-  return (
-    <section 
-      className="relative min-h-[80vh] bg-gradient-to-br from-background via-trust-light/5 to-background"
-      aria-labelledby="hero-heading"
-      role="banner"
-    >
+  return <section className="relative min-h-[80vh] bg-gradient-to-br from-background via-trust-light/5 to-background" aria-labelledby="hero-heading" role="banner">
       <div className="container mx-auto px-4 py-16">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
             {/* Trust block - immediately visible */}
             <div className="bg-muted/50 border border-border/50 rounded-lg p-4 text-center">
-              <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">Not a lawyer. Not filing for you.</strong>
-                <br />
-                Justice-Bot helps you understand your options and prepare — you decide what to do next.
-              </p>
+              
             </div>
 
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-2">
                 <span className="text-sm font-semibold text-primary">🇨🇦 Ontario, Alberta, BC & Quebec</span>
               </div>
-              <h1 
-                id="hero-heading" 
-                className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight"
-                role="heading"
-                aria-level={1}
-              >
+              <h1 id="hero-heading" className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight" role="heading" aria-level={1}>
                 <span className="text-foreground">Ignorance Is Not an Option.</span>
                 <br />
                 <span className="text-primary">Your Rights Should Not Be Either.</span>
@@ -62,21 +47,15 @@ const HeroSection = () => {
 
             {/* Single dominant CTA */}
             <div className="space-y-4">
-              <Button 
-                variant="cta" 
-                size="lg" 
-                className="group text-lg px-10 py-7 shadow-xl w-full sm:w-auto"
-                onClick={() => {
-                  trackEvent('cta_click', { button: 'hero_triage', location: 'hero' });
-                  window.location.href = '/triage';
-                }}
-                aria-describedby="cta-description"
-              >
+              <Button variant="cta" size="lg" className="group text-lg px-10 py-7 shadow-xl w-full sm:w-auto" onClick={() => {
+              trackEvent('cta_click', {
+                button: 'hero_triage',
+                location: 'hero'
+              });
+              window.location.href = '/triage';
+            }} aria-describedby="cta-description">
                 Get a Free Case Overview
-                <ArrowRight 
-                  className="w-5 h-5 group-hover:translate-x-1 transition-transform" 
-                  aria-hidden="true"
-                />
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
               </Button>
               <span id="cta-description" className="sr-only">
                 Start with a free assessment of your legal situation
@@ -93,22 +72,13 @@ const HeroSection = () => {
             <div className="pt-4 border-t border-border/50">
               <p className="text-sm text-muted-foreground mb-2">Already know what you need?</p>
               <div className="flex flex-wrap gap-3 text-sm">
-                <a 
-                  href="/forms" 
-                  className="text-primary hover:underline"
-                >
+                <a href="/forms" className="text-primary hover:underline">
                   Browse forms →
                 </a>
-                <a 
-                  href="/pricing" 
-                  className="text-primary hover:underline"
-                >
+                <a href="/pricing" className="text-primary hover:underline">
                   View pricing →
                 </a>
-                <a 
-                  href="/legal-chat" 
-                  className="text-primary hover:underline"
-                >
+                <a href="/legal-chat" className="text-primary hover:underline">
                   Ask a question →
                 </a>
               </div>
@@ -118,38 +88,20 @@ const HeroSection = () => {
           <div className="relative" role="img" aria-labelledby="hero-image-desc">
             <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-accent/20 rounded-2xl blur-3xl" aria-hidden="true"></div>
             <picture className="relative block rounded-2xl shadow-2xl w-full max-w-lg mx-auto">
-              <source 
-                media="(min-width: 768px)" 
-                srcSet="/hero-desktop.webp" 
-                type="image/webp"
-              />
-              <img 
-                src="/hero-mobile.webp" 
-                alt="Modern courthouse with classical columns and steps, representing legal clarity and justice in the digital age"
-                className="rounded-2xl w-full h-auto"
-                loading="eager"
-                fetchPriority="high"
-                width={800}
-                height={450}
-                decoding="async"
-              />
+              <source media="(min-width: 768px)" srcSet="/hero-desktop.webp" type="image/webp" />
+              <img src="/hero-mobile.webp" alt="Modern courthouse with classical columns and steps, representing legal clarity and justice in the digital age" className="rounded-2xl w-full h-auto" loading="eager" fetchPriority="high" width={800} height={450} decoding="async" />
             </picture>
             <p id="hero-image-desc" className="sr-only">
               A modern courthouse building symbolizing the bridge between traditional legal processes and modern digital assistance
             </p>
             
             {/* Disclaimer moved below image, less prominent */}
-            <div 
-              className="mt-4 text-xs text-muted-foreground text-center max-w-md mx-auto"
-              role="note"
-            >
+            <div className="mt-4 text-xs text-muted-foreground text-center max-w-md mx-auto" role="note">
               Justice-Bot is a legal information tool, not a law firm. We help you prepare and understand your options.
             </div>
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default HeroSection;
