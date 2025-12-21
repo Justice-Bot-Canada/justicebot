@@ -19,7 +19,8 @@ import {
   Briefcase,
   Shield,
   Gavel,
-  Info
+  Info,
+  Loader2
 } from "lucide-react";
 
 interface FormRecommendation {
@@ -51,6 +52,7 @@ interface TriageResultsProps {
   onProceed: () => void;
   onBack: () => void;
   onSelectForm: (form: FormRecommendation) => void;
+  isLoading?: boolean;
 }
 
 const venueIcons: Record<string, React.ElementType> = {
@@ -96,6 +98,7 @@ const TriageResults: React.FC<TriageResultsProps> = ({
   onProceed,
   onBack,
   onSelectForm,
+  isLoading = false,
 }) => {
   const VenueIcon = venueIcons[result.venue] || Scale;
   const venueColor = venueColors[result.venue] || "bg-gray-50 text-gray-700 border-gray-200";
@@ -321,13 +324,22 @@ const TriageResults: React.FC<TriageResultsProps> = ({
 
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-4">
-        <Button variant="outline" onClick={onBack} className="flex-1">
+        <Button variant="outline" onClick={onBack} className="flex-1" disabled={isLoading}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Revise My Description
         </Button>
-        <Button onClick={onProceed} className="flex-1">
-          Proceed to Forms
-          <ArrowRight className="h-4 w-4 ml-2" />
+        <Button onClick={onProceed} className="flex-1" disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Creating Case & Uploading...
+            </>
+          ) : (
+            <>
+              Proceed to Forms
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </>
+          )}
         </Button>
       </div>
 

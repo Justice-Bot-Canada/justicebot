@@ -11,8 +11,9 @@ import EnhancedSEO from "@/components/EnhancedSEO";
 import SmartTriageForm from "@/components/SmartTriageForm";
 import TriageResults from "@/components/TriageResults";
 import { TriageDiscountModal } from "@/components/TriageDiscountModal";
+import { TriageDocumentUpload, PendingDocument } from "@/components/TriageDocumentUpload";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { analytics, trackEvent } from "@/utils/analytics";
 
 interface FormRecommendation {
@@ -45,6 +46,8 @@ const Triage = () => {
   const [userDescription, setUserDescription] = useState("");
   const [province, setProvince] = useState("Ontario");
   const [showDiscountModal, setShowDiscountModal] = useState(false);
+  const [pendingDocuments, setPendingDocuments] = useState<PendingDocument[]>([]);
+  const [isSavingDocuments, setIsSavingDocuments] = useState(false);
 
   const handleTriageComplete = (result: TriageResult, description: string, prov: string) => {
     setTriageResult(result);
@@ -79,6 +82,8 @@ const Triage = () => {
 
     if (!triageResult) return;
 
+    setIsSavingDocuments(true);
+
     try {
       // Create a case with triage data
       const { data: caseData, error: caseError } = await supabase
@@ -104,11 +109,73 @@ const Triage = () => {
 
       if (caseError) throw caseError;
 
-      toast.success("Case created successfully");
+      // Upload pending documents to evidence
+      if (pendingDocuments.length > 0) {
+        for (const doc of pendingDocuments) {
+          try {
+            // Update status
+            setPendingDocuments(prev => 
+              prev.map(d => d.id === doc.id ? { ...d, status: 'uploading' as const, progress: 20 } : d)
+            );
+
+            // Upload file to storage
+            const filePath = `${user.id}/${caseData.id}/${Date.now()}_${doc.file.name}`;
+            const { error: uploadError } = await supabase.storage
+              .from('evidence')
+              .upload(filePath, doc.file);
+
+            if (uploadError) throw uploadError;
+
+            setPendingDocuments(prev => 
+              prev.map(d => d.id === doc.id ? { ...d, progress: 60 } : d)
+            );
+
+            // Create evidence record
+            const { data: evidenceData, error: evidenceError } = await supabase
+              .from('evidence')
+              .insert({
+                case_id: caseData.id,
+                file_name: doc.file.name,
+                file_path: filePath,
+                file_type: doc.file.type,
+                description: `Uploaded during triage - ${triageResult.venueTitle}`,
+                upload_date: new Date().toISOString()
+              })
+              .select()
+              .single();
+
+            if (evidenceError) throw evidenceError;
+
+            setPendingDocuments(prev => 
+              prev.map(d => d.id === doc.id ? { ...d, status: 'uploaded' as const, progress: 100 } : d)
+            );
+
+            // Queue AI analysis (async, don't wait)
+            supabase.functions.invoke('analyze-document', {
+              body: {
+                fileContent: '',
+                fileName: doc.file.name,
+                fileType: doc.file.type,
+                caseId: caseData.id
+              }
+            }).catch(err => console.warn('Document analysis queued:', err));
+
+          } catch (docError) {
+            console.error('Error uploading document:', doc.file.name, docError);
+            setPendingDocuments(prev => 
+              prev.map(d => d.id === doc.id ? { ...d, status: 'error' as const, error: 'Upload failed' } : d)
+            );
+          }
+        }
+      }
+
+      toast.success("Case created with documents!");
       navigate(`/form-selector?venue=${triageResult.venue}&caseId=${caseData.id}`);
     } catch (error) {
       console.error("Error creating case:", error);
       toast.error("Failed to create case");
+    } finally {
+      setIsSavingDocuments(false);
     }
   };
 
@@ -211,7 +278,17 @@ const Triage = () => {
                 onProceed={handleProceed}
                 onBack={() => setStep(0)}
                 onSelectForm={handleSelectForm}
+                isLoading={isSavingDocuments}
               />
+
+              {/* Document Upload Section */}
+              <div className="mt-6">
+                <TriageDocumentUpload
+                  documents={pendingDocuments}
+                  onDocumentsChange={setPendingDocuments}
+                  disabled={isSavingDocuments}
+                />
+              </div>
               
               <div className="mt-8">
                 <RelatedPages 

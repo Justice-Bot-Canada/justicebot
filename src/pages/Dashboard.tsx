@@ -21,6 +21,8 @@ import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import CaseManager from "@/components/CaseManager";
 import CaseCalendar from "@/components/CaseCalendar";
 import { DocumentAnalyzer } from "@/components/DocumentAnalyzer";
+import { EvidenceHub } from "@/components/EvidenceHub";
+import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
 import CaseProgressTracker from "@/components/CaseProgressTracker";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -37,6 +39,7 @@ const Dashboard = () => {
   const [activeCaseId, setActiveCaseId] = useState<string | null>(null);
   const [hasExistingCases, setHasExistingCases] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showBookWizard, setShowBookWizard] = useState(false);
 
   // Check if user has existing cases
   useEffect(() => {
@@ -215,13 +218,44 @@ const Dashboard = () => {
 
           <TabsContent value="documents" className="mt-6">
             {activeCaseId ? (
-              <DocumentAnalyzer caseId={activeCaseId} />
+              <div className="space-y-6">
+                {/* Evidence Hub - Main document library */}
+                <EvidenceHub caseId={activeCaseId} />
+                
+                {/* Book of Documents Builder Button */}
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-semibold flex items-center gap-2">
+                          <FileText className="h-5 w-5" />
+                          Book of Documents
+                        </h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Generate a professionally formatted book of documents with index and page numbers
+                        </p>
+                      </div>
+                      <Button onClick={() => setShowBookWizard(true)}>
+                        Build Book of Documents
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                {/* Book of Documents Wizard Dialog */}
+                <BookOfDocumentsWizard 
+                  caseId={activeCaseId} 
+                  open={showBookWizard}
+                  onOpenChange={setShowBookWizard}
+                />
+              </div>
             ) : (
               <Card>
                 <CardContent className="pt-6 text-center text-muted-foreground">
                   <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
                   <p className="mb-2 font-medium">No case selected</p>
-                  <p className="text-sm">Go to the <strong>Cases</strong> tab to create or select a case first</p>
+                  <p className="text-sm">Go to the <strong>Cases</strong> tab to create or select a case first.</p>
+                  <p className="text-sm mt-2">Documents uploaded during triage will appear here once you select the case.</p>
                 </CardContent>
               </Card>
             )}
