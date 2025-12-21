@@ -9,9 +9,9 @@ export default function HowToFileT2Ontario() {
   return (
     <>
       <Helmet>
-        <title>How to File a T2 in Ontario (2025) – Complete Step-by-Step Tenant Guide | Justice-Bot</title>
-        <meta name="description" content="Complete 2025 guide to filing a T2 application in Ontario for tenant rights violations. Learn when to file, how to build evidence, and what remedies you can win at the LTB." />
-        <meta name="keywords" content="T2 application Ontario, file T2, tenant rights Ontario, LTB T2, harassment T2, repairs T2, privacy violations" />
+        <title>Filing a T2 Against Landlord Ontario 2025 | Win Damages & Rent Abatement</title>
+        <meta name="description" content="File T2 against your landlord TODAY. Harassment? No repairs? Privacy violations? Our FREE guide shows exactly how to file, what evidence you need & what you can win. $5.99 form help." />
+        <meta name="keywords" content="filing a t2 against landlord, form t2 ltb, T2 application Ontario, file T2 harassment, LTB T2 repairs, tenant rights violations Ontario" />
         <link rel="canonical" href="https://www.justice-bot.com/how-to-file-t2-ontario" />
         
         <meta property="og:title" content="How to File a T2 in Ontario (2025) – Complete Step-by-Step Tenant Guide" />

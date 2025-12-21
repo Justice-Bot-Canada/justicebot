@@ -94,9 +94,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <EnhancedSEO
-        title="FREE Legal Help Canada 2025 | Court Forms $5.99 | Nationwide Coverage"
-        description="Get FREE case assessment + court forms from $5.99. LTB, HRTO, RTB, RTDRS, TAL + more. AI-powered legal guidance for all provinces. 10,000+ Canadians helped. Not a law firm."
-        keywords="legal help Canada, free legal help, Canadian court forms, LTB help, HRTO Ontario, RTDRS Alberta, BC RTB, Quebec TAL, tenant rights Canada, human rights complaint, small claims court"
+        title="Justice Bot | FREE Legal Help Canada 2025 | Court Forms $5.99"
+        description="Justice Bot: Canada's #1 AI legal assistant. FREE case assessment + LTB T2 forms, HRTO, eviction defence & more from $5.99. Stop landlord abuse. Fight N4 notices. 10,000+ helped."
+        keywords="justice bot, legal help Canada, free legal help, LTB T2 form, filing a T2 against landlord, form t2 ltb, how to fight an n8, how to stop eviction ontario, tenant rights Canada"
         canonicalUrl="https://www.justice-bot.com/"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}

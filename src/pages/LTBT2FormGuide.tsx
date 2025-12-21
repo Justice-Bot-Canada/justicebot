@@ -11,10 +11,10 @@ const LTBT2FormGuide = () => {
   return (
     <>
       <SEOHead
-        title="How to File LTB T2 Form Ontario 2025 | Step-by-Step Tenant Rights Guide"
-        description="Complete guide to filing LTB T2 form in Ontario. Learn when to use T2 application, how to complete it correctly, filing deadlines, and what evidence you need. Free T2 form template."
+        title="LTB T2 Form 2025 | File T2 Against Landlord Ontario | FREE Guide"
+        description="Filing a T2 against landlord? Complete LTB T2 form guide with FREE template. Harassment, repairs, privacy violations - file in 24 hours. Win rent abatement & damages. Step-by-step 2025."
         canonicalUrl="https://justice-bot.com/ltb-t2-form-guide"
-        keywords="LTB T2 form, how to file T2 form Ontario, T2 application tenant rights, LTB forms Ontario, Landlord Tenant Board T2"
+        keywords="LTB T2 form, form t2 ltb, filing a t2 against landlord, how to file T2 Ontario, T2 application tenant rights, landlord harassment T2"
       />
       
       <ArticleSchema

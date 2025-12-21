@@ -9,9 +9,9 @@ export default function TemplateLibrary() {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Legal Document Templates Library"
-        description="Download professional legal document templates for Ontario tribunals. Free and premium templates for LTB, HRTO, Small Claims Court applications."
-        keywords="legal templates, document templates, LTB forms, HRTO forms, small claims forms, legal documents Ontario"
+        title="Demand Letter Template Ontario 2025 | FREE Legal Document Templates"
+        description="FREE demand letter template Ontario + 50+ legal document templates. Letters to landlord, witness statements, evidence organizers for LTB, HRTO & Small Claims. Download instantly."
+        keywords="demand letter template ontario, legal templates Ontario, LTB letter template, landlord demand letter, legal documents Ontario, witness statement template"
       />
       <Header />
       <main className="container mx-auto px-4 py-12">

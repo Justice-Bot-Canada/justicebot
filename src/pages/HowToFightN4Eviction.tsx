@@ -9,9 +9,9 @@ export default function HowToFightN4Eviction() {
   return (
     <>
       <Helmet>
-        <title>How to Fight an N4 Eviction Notice in Ontario (2025 Guide) | Justice-Bot</title>
-        <meta name="description" content="Received an N4 eviction notice? Learn how to fight it, challenge the amount, file T2/T6, and protect your family. N4 is NOT an eviction order." />
-        <meta name="keywords" content="N4 eviction Ontario, fight N4, N4 notice, eviction defence Ontario, LTB N4, stop eviction Ontario, N4 arrears" />
+        <title>How to Fight an N4 Eviction 2025 | Stop Eviction Order Ontario | FREE Guide</title>
+        <meta name="description" content="Got an N4? DON'T PANIC - you can fight it! Learn 7 ways to stop eviction in Ontario. Challenge arrears, file T2/T6 counterclaims, request relief. N4 ≠ eviction. FREE defence guide." />
+        <meta name="keywords" content="how to fight an n4, how to stop an eviction order in ontario, N4 eviction Ontario, fight N4 notice, stop eviction Ontario, N4 defence, LTB eviction" />
         <link rel="canonical" href="https://www.justice-bot.com/how-to-fight-n4-eviction-ontario" />
         
         <meta property="og:title" content="How to Fight an N4 Eviction Notice in Ontario (2025 Guide)" />

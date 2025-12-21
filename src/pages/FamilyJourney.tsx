@@ -76,8 +76,8 @@ const FamilyJourney = () => {
     <>
       <PerformanceMonitor />
       <EnhancedSEO 
-        title="Child Custody Ontario 2025 - Custody Forms, CAS Help & Family Court"
-        description="Child custody help Ontario. Get custody forms (8A, 35.1), fight CAS removal, file for sole or joint custody. Family court procedures, parenting plans, access schedules. Affordable legal guidance from $5.99."
+        title="How to Get Custody of Child Ontario 2025 | File for Full Custody Guide"
+        description="How to file for full custody in Ontario. Sole vs joint custody, parenting plans, Form 8A & 35.1 guide. Fight CAS removal. Get custody of your child with step-by-step help from $5.99."
         keywords="child custody Ontario, custody forms Ontario, how to get custody, sole custody Ontario, joint custody Ontario, CAS removal, family court Ontario, custody agreement, parenting plan Ontario, child access rights"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
