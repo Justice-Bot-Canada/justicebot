@@ -247,86 +247,63 @@ const Pricing = () => {
     <div className="min-h-screen bg-background">
       <CanonicalURL />
       <EnhancedSEO
-        title="Legal Document Pricing - $19, $29, $49/month Plans"
-        description="Justice-Bot tiered pricing for Canadian legal services. Choose from Basic ($19), Professional ($29), or Premium ($49) monthly plans. Flexible legal document solutions for every need."
-        keywords="legal services pricing Canada, affordable legal help Ontario, legal document pricing, law help subscription, Canadian legal services cost, tiered legal pricing"
+        title="Pricing | Justice-Bot Legal Tools"
+        description="Canadian legal document plans: Basic $19, Professional $29, Premium $49/month. 5-day free trial. No hidden fees. Cancel anytime."
+        keywords="legal services pricing Canada, affordable legal help Ontario, legal document pricing"
         structuredData={productStructuredData}
         breadcrumbs={breadcrumbs}
         faqData={faqData}
       />
       <Header />
-      <main className="container mx-auto px-4 py-16">
-        {/* Promo Banner */}
-        {appliedPromo ? (
-          <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 mb-8 max-w-2xl mx-auto">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Sparkles className="w-6 h-6 text-green-500" />
-                <div>
-                  <p className="font-bold text-green-700 dark:text-green-400">{appliedPromo.label}</p>
-                  <p className="text-sm text-green-600 dark:text-green-500">Code: {appliedPromo.code}</p>
-                </div>
-              </div>
-              <Button variant="ghost" size="sm" onClick={handleRemovePromo}>
-                <X className="w-4 h-4" />
-              </Button>
+      <main className="container mx-auto px-4 py-12">
+        {/* Hero Section */}
+        <div className="text-center mb-10">
+          <h1 className="text-3xl md:text-4xl font-bold mb-3">Simple, Transparent Pricing</h1>
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            Choose the plan that fits your legal needs. All plans include a 5-day free trial.
+          </p>
+        </div>
+
+        {/* Free Trial Banner */}
+        <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 mb-10 max-w-2xl mx-auto flex items-center justify-between flex-wrap gap-4">
+          <div className="flex items-center gap-3">
+            <div className="bg-primary text-primary-foreground rounded-full p-2">
+              <Zap className="w-5 h-5" />
             </div>
+            <div>
+              <p className="font-semibold">5-Day Free Trial</p>
+              <p className="text-sm text-muted-foreground">Full access. No charge until trial ends.</p>
+            </div>
+          </div>
+          <Badge variant="secondary" className="flex items-center gap-1">
+            <CreditCard className="w-3 h-3" />
+            Card required
+          </Badge>
+        </div>
+
+        {/* Promo Code Input */}
+        {appliedPromo ? (
+          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 mb-8 max-w-md mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-green-500" />
+              <span className="font-medium text-green-700 dark:text-green-400">{appliedPromo.label}</span>
+            </div>
+            <Button variant="ghost" size="sm" onClick={handleRemovePromo}>
+              <X className="w-4 h-4" />
+            </Button>
           </div>
         ) : (
-          <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 mb-8 max-w-2xl mx-auto">
-            <div className="flex flex-col sm:flex-row items-center gap-3">
-              <Sparkles className="w-6 h-6 text-primary flex-shrink-0" />
-              <p className="text-sm font-medium">Have a promo code?</p>
-              <div className="flex items-center gap-2 flex-1">
-                <Input
-                  placeholder="Enter code (e.g., LAUNCH50)"
-                  value={promoCode}
-                  onChange={(e) => setPromoCode(e.target.value)}
-                  className="max-w-48"
-                  onKeyDown={(e) => e.key === 'Enter' && handleApplyPromo()}
-                />
-                <Button onClick={handleApplyPromo} size="sm">Apply</Button>
-              </div>
-            </div>
+          <div className="flex items-center justify-center gap-2 mb-8">
+            <Input
+              placeholder="Promo code"
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value)}
+              className="max-w-32 h-9"
+              onKeyDown={(e) => e.key === 'Enter' && handleApplyPromo()}
+            />
+            <Button onClick={handleApplyPromo} size="sm" variant="outline">Apply</Button>
           </div>
         )}
-
-        {/* Free Trial Hero Banner */}
-        <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl p-8 mb-12 text-white text-center shadow-xl">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Clock className="w-8 h-8" />
-            <h1 className="text-3xl md:text-4xl font-bold">
-              Try FREE for 5 Days
-            </h1>
-          </div>
-          <p className="text-xl text-white/90 mb-4">
-            Full access to all premium features. No charge until trial ends.
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
-            <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
-              <Check className="w-4 h-4" />
-              <span>Cancel anytime</span>
-            </div>
-            <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
-              <CreditCard className="w-4 h-4" />
-              <span>Card required for trial</span>
-            </div>
-            <div className="flex items-center gap-2 bg-white/20 rounded-full px-4 py-2">
-              <Zap className="w-4 h-4" />
-              <span>Instant access</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Subtitle */}
-        <div className="text-center mb-12">
-          <h2 className="text-2xl font-semibold mb-2">
-            Choose Your Plan After Trial
-          </h2>
-          <p className="text-muted-foreground">
-            All plans include a 5-day free trial. Pick the one that fits your legal needs.
-          </p>
-        </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {plans.map((plan) => (
