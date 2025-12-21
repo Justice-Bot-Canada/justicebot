@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { analytics } from "@/utils/analytics";
-import PayPalTrialButton from "@/components/PayPalTrialButton";
+import StripeTrialButton from "@/components/StripeTrialButton";
 
 const VALID_PROMO_CODES: Record<string, { discount: number; label: string }> = {
   "LAUNCH50": { discount: 0.5, label: "50% OFF First Month" },
@@ -20,11 +20,11 @@ const VALID_PROMO_CODES: Record<string, { discount: number; label: string }> = {
   "DEMO2024": { discount: 0.5, label: "Demo Special 50% OFF" },
 };
 
-// PayPal Live Subscription Plan IDs
-const PAYPAL_PLAN_IDS = {
-  basic: "P-913106187H1268013NFBA72I",
-  professional: "P-0FR50831D4940483BNFBBB7Y",
-  premium: "P-2GT19989129104740NFBBDVY",
+// Stripe Price IDs - REPLACE THESE with your actual Stripe price IDs from the dashboard
+const STRIPE_PRICE_IDS = {
+  basic: "price_REPLACE_WITH_BASIC_PRICE_ID",
+  professional: "price_REPLACE_WITH_PROFESSIONAL_PRICE_ID", 
+  premium: "price_REPLACE_WITH_PREMIUM_PRICE_ID",
 };
 
 const Pricing = () => {
@@ -383,7 +383,11 @@ const Pricing = () => {
               </CardContent>
 
               <CardContent className="pt-0 space-y-3">
-                <PayPalTrialButton planId={PAYPAL_PLAN_IDS[plan.key]} trialDays={5} />
+                <StripeTrialButton 
+                  priceId={STRIPE_PRICE_IDS[plan.key]} 
+                  planKey={plan.key}
+                  trialDays={5} 
+                />
                 
                 <Button
                   onClick={() => handleETransferPayment(plan.name, plan.price)}
@@ -408,6 +412,9 @@ const Pricing = () => {
               and support for Ontario courts and tribunals. More provinces coming soon.
             </p>
           </div>
+          <p className="text-sm">
+            Secure payments powered by Stripe. 5-day free trial on all plans.
+          </p>
         </div>
 
         {/* Low Income Section */}
