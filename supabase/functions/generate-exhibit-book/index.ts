@@ -13,10 +13,20 @@ const corsHeaders = {
 // - Readable documents
 // - Each item identified by order and page number
 
+interface ExhibitOverride {
+  evidence_id: string;
+  description?: string;
+  relevance?: string;
+  incident_date?: string;
+  order?: number;
+}
+
 interface ExhibitBookRequest {
   caseId: string;
   includeTableOfContents?: boolean;
   numberingStyle?: 'alphabetical' | 'numerical';
+  caseDescription?: string;
+  exhibitOverrides?: ExhibitOverride[];
   organizationAnswers?: {
     sortBy: 'chronological' | 'category' | 'importance';
     includeWitnessList: boolean;
@@ -118,6 +128,8 @@ serve(async (req) => {
       caseId, 
       includeTableOfContents = true, 
       numberingStyle = 'alphabetical',
+      caseDescription,
+      exhibitOverrides,
       organizationAnswers 
     }: ExhibitBookRequest = await req.json();
 
@@ -178,17 +190,38 @@ serve(async (req) => {
       });
     }
 
+    // Apply exhibit overrides from user if provided
+    let processedEvidence = evidenceData.map((item: any) => {
+      const override = exhibitOverrides?.find(o => o.evidence_id === item.id);
+      if (override) {
+        return {
+          ...item,
+          description: override.description || item.description,
+          user_relevance: override.relevance,
+          override_date: override.incident_date,
+          order_override: override.order
+        };
+      }
+      return item;
+    });
+
     // Sort evidence CHRONOLOGICALLY (Ontario requirement: oldest first)
     const sortBy = organizationAnswers?.sortBy || 'chronological';
-    let sortedEvidence = [...evidenceData];
+    let sortedEvidence = [...processedEvidence];
 
     sortedEvidence.sort((a, b) => {
-      // Extract incident date from metadata (primary) or upload date (fallback)
+      // Use override date if provided, else extract from metadata
       const getDate = (item: any): Date => {
+        if (item.override_date) return new Date(item.override_date);
         const dates = item.evidence_metadata?.[0]?.dates;
         const incidentDate = dates?.incident || dates?.captured || dates?.document_date;
         return new Date(incidentDate || item.upload_date);
       };
+      
+      // If order overrides exist, use them first
+      if (a.order_override !== undefined && b.order_override !== undefined) {
+        return a.order_override - b.order_override;
+      }
       
       if (sortBy === 'chronological') {
         return getDate(a).getTime() - getDate(b).getTime();
@@ -197,7 +230,6 @@ serve(async (req) => {
         const catB = b.evidence_metadata?.[0]?.category || 'zzz';
         const catCompare = catA.localeCompare(catB);
         if (catCompare !== 0) return catCompare;
-        // Within same category, sort chronologically
         return getDate(a).getTime() - getDate(b).getTime();
       }
       return getDate(a).getTime() - getDate(b).getTime();

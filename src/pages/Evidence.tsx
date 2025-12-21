@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, BookOpen, Download } from "lucide-react";
+import { ArrowLeft, BookOpen } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -11,6 +11,7 @@ import { EvidenceAnalyzer } from "@/components/EvidenceAnalyzer";
 import { PremiumGate } from "@/components/PremiumGate";
 import { CaseMeritScore } from "@/components/CaseMeritScore";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
 import { supabase } from "@/integrations/supabase/client";
 
 const Evidence = () => {
@@ -19,6 +20,7 @@ const Evidence = () => {
   const [searchParams] = useSearchParams();
   const caseId = searchParams.get('caseId');
   const [caseData, setCaseData] = useState<any>(null);
+  const [bookWizardOpen, setBookWizardOpen] = useState(false);
 
   // Load case data for analyzer context
   useEffect(() => {
@@ -103,11 +105,22 @@ const Evidence = () => {
                   One upload. One place. Zero confusion. All your evidence, automatically organized.
                 </p>
               </div>
-              <Button variant="outline" className="gap-2">
+              <Button 
+                variant="outline" 
+                className="gap-2"
+                onClick={() => setBookWizardOpen(true)}
+              >
                 <BookOpen className="h-4 w-4" />
-                Generate Exhibit Book
+                Generate Book of Documents
               </Button>
             </div>
+
+            <BookOfDocumentsWizard
+              caseId={caseId}
+              caseTitle={caseData?.title}
+              open={bookWizardOpen}
+              onOpenChange={setBookWizardOpen}
+            />
           </div>
 
           <Alert className="mb-6">
