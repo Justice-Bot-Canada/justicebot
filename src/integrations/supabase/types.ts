@@ -2415,16 +2415,10 @@ export type Database = {
       get_admins_public_meta: {
         Args: never
         Returns: {
-          granted_at: string | null
-          revoked_at: string | null
-          user_id: string | null
+          granted_at: string
+          revoked_at: string
+          user_id: string
         }[]
-        SetofOptions: {
-          from: "*"
-          to: "admins_public_meta"
-          isOneToOne: false
-          isSetofReturn: true
-        }
       }
       get_all_admins: {
         Args: never
