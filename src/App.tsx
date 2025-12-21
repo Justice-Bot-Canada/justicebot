@@ -9,6 +9,8 @@ import { SkipToContent, useFocusManagement, useKeyboardNavigation } from "@/comp
 import { KlaviyoTracking } from "@/components/KlaviyoTracking";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { CanonicalURL } from "@/components/CanonicalURL";
+import { ConsentProvider } from "@/hooks/useConsent";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import Index from "./pages/Index";
 import PathwayDecision from "./pages/PathwayDecision";
 import Pricing from "./pages/Pricing";
@@ -286,7 +288,10 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <BrowserRouter>
-          <AppContent />
+          <ConsentProvider>
+            <AppContent />
+            <CookieConsentBanner />
+          </ConsentProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
