@@ -1,0 +1,16 @@
+{
+  "NB-RTB-APPLICATION": {
+    "id": "NB-RTB-APPLICATION",
+    "name": "NB Rentalsman — Dispute Application",
+    "category": "tenancy",
+    "url": "https://www2.gnb.ca/content/gnb/en/services/services_renderer.201445.Residential_Tenancies_Tribunal.html",
+    "description": "File a dispute with New Brunswick Residential Tenancies Tribunal"
+  },
+  "NB-HRC-COMPLAINT": {
+    "id": "NB-HRC-COMPLAINT",
+    "name": "New Brunswick Human Rights Commission — Complaint",
+    "category": "human_rights",
+    "url": "https://www2.gnb.ca/content/gnb/en/departments/nbhrc/complaint.html",
+    "description": "File a human rights complaint in New Brunswick"
+  }
+}

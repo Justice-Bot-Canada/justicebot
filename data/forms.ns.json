@@ -1,0 +1,23 @@
+{
+  "NS-RTB-TENANT": {
+    "id": "NS-RTB-TENANT",
+    "name": "NS Access NS — Tenant Application",
+    "category": "tenancy",
+    "url": "https://novascotia.ca/sns/access/land/residential-tenancies.asp",
+    "description": "Apply to Nova Scotia Residential Tenancies Program as a tenant"
+  },
+  "NS-RTB-LANDLORD": {
+    "id": "NS-RTB-LANDLORD",
+    "name": "NS Access NS — Landlord Application",
+    "category": "tenancy",
+    "url": "https://novascotia.ca/sns/access/land/residential-tenancies.asp",
+    "description": "Apply to Nova Scotia Residential Tenancies Program as a landlord"
+  },
+  "NS-NSHRC-COMPLAINT": {
+    "id": "NS-NSHRC-COMPLAINT",
+    "name": "Nova Scotia Human Rights Commission — Complaint Form",
+    "category": "human_rights",
+    "url": "https://humanrights.novascotia.ca/complaints",
+    "description": "File a human rights complaint in Nova Scotia"
+  }
+}

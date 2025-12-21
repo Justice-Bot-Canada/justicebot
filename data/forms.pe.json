@@ -1,0 +1,16 @@
+{
+  "PE-IRAC-APPLICATION": {
+    "id": "PE-IRAC-APPLICATION",
+    "name": "PEI IRAC — Rental Application",
+    "category": "tenancy",
+    "url": "https://www.irac.pe.ca/rental/",
+    "description": "File a rental dispute with PEI Island Regulatory and Appeals Commission"
+  },
+  "PE-HRC-COMPLAINT": {
+    "id": "PE-HRC-COMPLAINT",
+    "name": "PEI Human Rights Commission — Complaint",
+    "category": "human_rights",
+    "url": "https://www.peihumanrights.ca/complaint-process",
+    "description": "File a human rights complaint in Prince Edward Island"
+  }
+}
