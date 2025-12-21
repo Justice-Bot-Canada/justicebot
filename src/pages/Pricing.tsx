@@ -20,11 +20,11 @@ const VALID_PROMO_CODES: Record<string, { discount: number; label: string }> = {
   "DEMO2024": { discount: 0.5, label: "Demo Special 50% OFF" },
 };
 
-// Stripe Price IDs - REPLACE THESE with your actual Stripe price IDs from the dashboard
+// Stripe Price IDs for monthly subscriptions
 const STRIPE_PRICE_IDS = {
-  basic: "price_REPLACE_WITH_BASIC_PRICE_ID",
-  professional: "price_REPLACE_WITH_PROFESSIONAL_PRICE_ID", 
-  premium: "price_REPLACE_WITH_PREMIUM_PRICE_ID",
+  basic: "price_1SgdrpL0pLShFbLtWKJfGCO3",
+  professional: "price_1SgdzJL0pLShFbLtcFrnbeiV", 
+  premium: "price_1Sge6YL0pLShFbLtR8BpRnuM",
 };
 
 const Pricing = () => {
