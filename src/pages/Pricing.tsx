@@ -41,6 +41,12 @@ const Pricing = () => {
     if (savedPromo && VALID_PROMO_CODES[savedPromo]) {
       setAppliedPromo({ code: savedPromo, ...VALID_PROMO_CODES[savedPromo] });
     }
+    
+    // Fire view_item for each plan when pricing page loads (GA4 Purchase Journey)
+    plans.forEach(plan => {
+      const price = parseInt(plan.price.replace('$', ''));
+      analytics.viewItem(plan.key, plan.name, price);
+    });
   }, [user]);
 
   const checkFreeEligibility = async () => {

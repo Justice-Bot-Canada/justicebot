@@ -30,10 +30,51 @@ const sendGA4Event = (eventName: string, params: Record<string, any>) => {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', eventName, params);
   }
+  // Console log in development
+  if (import.meta.env.DEV) {
+    console.log('[GA4 Ecommerce]', eventName, params);
+  }
 };
+
+// Helper to create item object for GA4 ecommerce
+const createItem = (planKey: string, planName: string, price: number) => ({
+  item_id: planKey,
+  item_name: `${planName} Subscription`,
+  item_category: 'Legal Services',
+  item_category2: 'Subscription',
+  price: price,
+  quantity: 1,
+});
 
 // Predefined tracking functions
 export const analytics = {
+  // GA4 Ecommerce: view_item (required for Purchase Journey)
+  viewItem: (planKey: string, planName: string, price: number) => {
+    sendGA4Event('view_item', {
+      currency: 'CAD',
+      value: price,
+      items: [createItem(planKey, planName, price)],
+    });
+  },
+
+  // GA4 Ecommerce: add_to_cart (required for Purchase Journey)
+  addToCart: (planKey: string, planName: string, price: number) => {
+    sendGA4Event('add_to_cart', {
+      currency: 'CAD',
+      value: price,
+      items: [createItem(planKey, planName, price)],
+    });
+  },
+
+  // GA4 Ecommerce: begin_checkout (required for Purchase Journey)
+  beginCheckout: (planKey: string, planName: string, price: number) => {
+    sendGA4Event('begin_checkout', {
+      currency: 'CAD',
+      value: price,
+      items: [createItem(planKey, planName, price)],
+    });
+  },
+
   // Triage tracking
   triageStart: () => trackEvent('triage_start'),
   triageComplete: (venue: string) => trackEvent('triage_complete', { venue }),

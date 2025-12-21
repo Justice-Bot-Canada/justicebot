@@ -71,7 +71,8 @@ const PayPalTrialButton = ({ planId, trialDays = 5 }: PayPalTrialButtonProps) =>
           label: "subscribe",
         },
         createSubscription: function (data: any, actions: any) {
-          // Track trial initiation
+          // Track begin_checkout for GA4 Purchase Journey
+          analytics.beginCheckout(planId, planId, 0);
           analytics.paymentInitiated(planId, '0', 'paypal_trial');
           trackEvent('trial_started', { plan_id: planId, trial_days: trialDays });
           return actions.subscription.create({
@@ -113,6 +114,8 @@ const PayPalTrialButton = ({ planId, trialDays = 5 }: PayPalTrialButtonProps) =>
   }, [sdkReady, planId, showPayPal, toast, navigate, trialDays]);
 
   const handleStartTrial = () => {
+    // Track add_to_cart for GA4 Purchase Journey
+    analytics.addToCart(planId, planId, 0);
     trackEvent('trial_button_click', { plan_id: planId, trial_days: trialDays });
     setShowPayPal(true);
   };
