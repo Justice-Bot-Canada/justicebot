@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Send, Loader2, Bot, User, Sparkles } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 type Message = { role: 'user' | 'assistant'; content: string };
 
@@ -32,19 +33,74 @@ export function EnhancedAIChatbot() {
     setIsLoading(true);
 
     try {
-      const CHAT_URL = `https://vkzquzjtewqhcisvhsvg.supabase.co/functions/v1/ai-legal-triage`;
-      
-      const response = await fetch(CHAT_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrenF1emp0ZXdxaGNpc3Zoc3ZnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg1OTYwODEsImV4cCI6MjA3NDE3MjA4MX0.g2NbpEw7MXx1p7ipGhtEVfkbtEwfd9Ebuw2nO44F584`
-        },
-        body: JSON.stringify({ messages: [...messages, userMessage] })
+      // Use supabase client to invoke edge function
+      const { data: session } = await supabase.auth.getSession();
+      const accessToken = session?.session?.access_token;
+
+      // Call edge function using the supabase client's functions.invoke
+      const response = await supabase.functions.invoke('ai-legal-triage', {
+        body: { messages: [...messages, userMessage] }
       });
 
-      if (response.status === 429 || response.status === 402) {
-        const error = await response.json();
+      if (response.error) {
+        // Handle rate limit errors
+        if (response.error.message?.includes('429') || response.error.message?.includes('402')) {
+          toast({
+            title: "Rate Limit",
+            description: "Service temporarily busy. Please try again in a moment.",
+            variant: "destructive"
+          });
+          setIsLoading(false);
+          return;
+        }
+        throw new Error(response.error.message || 'Failed to get response');
+      }
+
+      // Check if response is streaming (text/event-stream) or JSON
+      const responseData = response.data;
+
+      // If we got a direct error response
+      if (responseData?.error) {
+        toast({
+          title: "Error",
+          description: responseData.error,
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // For streaming responses, we need to handle differently
+      // Since supabase.functions.invoke doesn't support streaming directly,
+      // we'll fall back to fetch for streaming support
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      
+      if (!currentSession?.access_token) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to use the AI assistant.",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Use fetch for streaming support with proper auth
+      const streamResponse = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-legal-triage`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentSession.access_token}`,
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+          },
+          body: JSON.stringify({ messages: [...messages, userMessage] })
+        }
+      );
+
+      if (streamResponse.status === 429 || streamResponse.status === 402) {
+        const error = await streamResponse.json();
         toast({
           title: "Rate Limit",
           description: error.error,
@@ -54,11 +110,11 @@ export function EnhancedAIChatbot() {
         return;
       }
 
-      if (!response.ok || !response.body) {
+      if (!streamResponse.ok || !streamResponse.body) {
         throw new Error('Failed to get response');
       }
 
-      const reader = response.body.getReader();
+      const reader = streamResponse.body.getReader();
       const decoder = new TextDecoder();
       let assistantContent = '';
       let textBuffer = '';

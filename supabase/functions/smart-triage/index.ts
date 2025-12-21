@@ -1,16 +1,19 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://justice-bot.com",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface TriageRequest {
-  description: string;
-  province: string;
-  evidenceDescriptions?: string[];
-  previousAnswers?: Record<string, string>;
-}
+// Input validation schema with size limits
+const TriageRequestSchema = z.object({
+  description: z.string().min(10, "Description must be at least 10 characters").max(5000, "Description exceeds maximum length"),
+  province: z.string().max(50).optional().default("ON"),
+  evidenceDescriptions: z.array(z.string().max(500)).max(20).optional(),
+  previousAnswers: z.record(z.string().max(1000)).optional(),
+  turnstileToken: z.string().optional()
+});
 
 interface FormRecommendation {
   formCode: string;
@@ -121,13 +124,55 @@ serve(async (req) => {
   }
 
   try {
-    const { description, province, evidenceDescriptions, previousAnswers }: TriageRequest = await req.json();
-
-    if (!description || description.trim().length < 10) {
+    const requestBody = await req.json();
+    
+    // Validate input with Zod schema
+    const validationResult = TriageRequestSchema.safeParse(requestBody);
+    if (!validationResult.success) {
+      console.error('Triage validation error:', validationResult.error.errors);
       return new Response(
-        JSON.stringify({ error: "Please provide a detailed description of your legal issue" }),
+        JSON.stringify({ 
+          error: 'Invalid input',
+          details: validationResult.error.errors.map(e => e.message).join(', ')
+        }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    const { description, province, evidenceDescriptions, previousAnswers, turnstileToken } = validationResult.data;
+
+    // Verify Turnstile token if secret is configured (bot protection)
+    const turnstileSecret = Deno.env.get("CLOUDFLARE_TURNSTILE_SECRET");
+    if (turnstileSecret) {
+      if (!turnstileToken) {
+        return new Response(
+          JSON.stringify({ error: "Verification required" }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      const turnstileResponse = await fetch(
+        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            secret: turnstileSecret,
+            response: turnstileToken,
+          }),
+        }
+      );
+
+      const turnstileResult = await turnstileResponse.json();
+      
+      if (!turnstileResult.success) {
+        console.error('Turnstile verification failed:', turnstileResult);
+        return new Response(
+          JSON.stringify({ error: 'Verification failed' }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      console.log('Turnstile verification successful');
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
