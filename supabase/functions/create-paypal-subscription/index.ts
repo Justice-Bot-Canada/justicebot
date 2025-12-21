@@ -1,10 +1,14 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// Secure CORS - only allow production + localhost
+const ALLOWED_ORIGINS = ['https://justice-bot.com', 'https://www.justice-bot.com', 'http://localhost:8080', 'http://localhost:5173'];
+
+const getCorsHeaders = (origin?: string | null) => ({
+  'Access-Control-Allow-Origin': origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+});
 
 // Auto-detect PayPal environment + prefer LIVE credentials when present
 const paypalClientId = Deno.env.get("PAYPAL_CLIENT_ID_LIVE") ?? Deno.env.get("PAYPAL_CLIENT_ID") ?? "";
@@ -24,6 +28,8 @@ const logStep = (step: string, details?: any) => {
 };
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req.headers.get('Origin'));
+  
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
