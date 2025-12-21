@@ -1,0 +1,65 @@
+{
+  "MB-RTB-FORM1": {
+    "id": "MB-RTB-FORM1",
+    "name": "MB RTB Form 1 — Standard Residential Tenancy Agreement",
+    "category": "tenancy",
+    "url": "https://www.gov.mb.ca/cca/rtb/forms/part1to8/form1.doc",
+    "description": "Standard tenancy agreement landlords must use at beginning of tenancy"
+  },
+  "MB-RTB-FORM1.1": {
+    "id": "MB-RTB-FORM1.1",
+    "name": "MB RTB Form 1.1 — Tenancy Agreement (With Tenant Services)",
+    "category": "tenancy",
+    "url": "https://www.gov.mb.ca/cca/rtb/forms/part1to8/form1.1.doc",
+    "description": "Tenancy agreement for tenancies that include tenant services"
+  },
+  "MB-RTB-FORM2": {
+    "id": "MB-RTB-FORM2",
+    "name": "MB RTB Form 2 — Mobile Home Sites Tenancy Agreement",
+    "category": "tenancy",
+    "url": "https://www.gov.mb.ca/cca/rtb/forms/part1to8/form2.doc",
+    "description": "Standard tenancy agreement for mobile home sites"
+  },
+  "MB-RTB-FORM3": {
+    "id": "MB-RTB-FORM3",
+    "name": "MB RTB Form 3 — Assignment or Subletting Agreement",
+    "category": "tenancy",
+    "url": "https://www.gov.mb.ca/cca/rtb/forms/part1to8/form3.doc",
+    "description": "Form for subletting or assigning a tenancy"
+  },
+  "MB-RTB-FORM5": {
+    "id": "MB-RTB-FORM5",
+    "name": "MB RTB Form 5 — Rental Unit Condition Report",
+    "category": "tenancy",
+    "url": "https://www.gov.mb.ca/cca/rtb/forms/part1to8/form5.doc",
+    "description": "Record condition of rental unit at move-in and move-out"
+  },
+  "MB-RTB-NOTICE-TENANT": {
+    "id": "MB-RTB-NOTICE-TENANT",
+    "name": "MB RTB Form 2 — Notice to New Tenant",
+    "category": "tenancy",
+    "url": "https://www.gov.mb.ca/cca/rtb/forms/part9/form2.doc",
+    "description": "Landlords must provide this to all new tenants"
+  },
+  "MB-RTB-RENT-INCREASE": {
+    "id": "MB-RTB-RENT-INCREASE",
+    "name": "MB RTB Form 1A — Notice of Rent Increase",
+    "category": "tenancy",
+    "url": "https://www.gov.mb.ca/cca/rtb/forms/part9/form1a.doc",
+    "description": "Form to notify tenants of rent increases"
+  },
+  "MB-RTB-ABOVE-GUIDELINE": {
+    "id": "MB-RTB-ABOVE-GUIDELINE",
+    "name": "MB RTB Form 3 — Application for Above-Guideline Rent Increase",
+    "category": "tenancy",
+    "url": "https://www.gov.mb.ca/cca/rtb/forms/part9/form3.doc",
+    "description": "Apply for rent increase above the annual guideline"
+  },
+  "MB-HRC-COMPLAINT": {
+    "id": "MB-HRC-COMPLAINT",
+    "name": "Manitoba Human Rights Commission — Complaint Form",
+    "category": "human_rights",
+    "url": "https://www.manitobahumanrights.ca/v1/complaints/index.html",
+    "description": "File a human rights complaint in Manitoba"
+  }
+}

@@ -72,8 +72,8 @@ const HeroSection = () => {
               </h1>
               
               <p className="text-xl text-muted-foreground leading-relaxed max-w-lg animate-fade-in">
-                AI-powered legal tools for tenants, workers, and families across 
-                <strong className="text-foreground"> Ontario, BC, Alberta & Quebec</strong>.
+                AI-powered legal tools for tenants, workers, and families 
+                <strong className="text-foreground"> across Canada</strong>.
                 Court forms from <strong className="text-primary">$5.99</strong>.
               </p>
             </div>
@@ -141,16 +141,16 @@ const HeroSection = () => {
               </div>
             </div>
 
-            {/* Province badges */}
+            {/* Nationwide badge */}
             <div className="pt-4 border-t border-border/50 animate-fade-in">
-              <p className="text-xs text-muted-foreground mb-2">Serving all major provinces:</p>
-              <div className="flex flex-wrap gap-2">
-                {['Ontario', 'British Columbia', 'Alberta', 'Quebec'].map(province => (
-                  <span key={province} className="px-3 py-1 bg-muted rounded-full text-xs font-medium">
-                    🇨🇦 {province}
-                  </span>
-                ))}
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">🇨🇦</span>
+                <span className="text-sm font-semibold text-foreground">Nationwide Coverage</span>
+                <span className="text-xs text-muted-foreground">• All 10 provinces + 3 territories</span>
               </div>
+              <p className="text-xs text-muted-foreground">
+                Forms & procedures for ON, BC, AB, QC, MB, SK, NS, NB, NL, PE, YT, NT, NU
+              </p>
             </div>
           </div>
 

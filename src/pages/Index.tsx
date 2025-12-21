@@ -44,7 +44,7 @@ const Index = () => {
     "name": "Justice-Bot",
     "applicationCategory": "Legal",
     "operatingSystem": "Web",
-    "description": "AI-powered legal information and form guidance for Canadians in Ontario, Alberta, British Columbia, and Quebec facing housing, human rights, family, and small claims issues. Not a law firm - a practical tool to help you understand forms and procedures.",
+    "description": "AI-powered legal information and form guidance for Canadians nationwide. Covering all provinces and territories with tenancy, human rights, family, and small claims guidance. Not a law firm - a practical tool to help you understand forms and procedures.",
     "url": "https://www.justice-bot.com",
     "image": "https://www.justice-bot.com/justice-bot-logo.jpeg",
     "offers": {
@@ -54,12 +54,10 @@ const Index = () => {
       "availability": "https://schema.org/InStock",
       "priceValidUntil": "2025-12-31"
     },
-    "areaServed": [
-      { "@type": "State", "name": "Ontario" },
-      { "@type": "State", "name": "Alberta" },
-      { "@type": "State", "name": "British Columbia" },
-      { "@type": "State", "name": "Quebec" }
-    ]
+    "areaServed": {
+      "@type": "Country",
+      "name": "Canada"
+    }
   };
 
   const faqData = [
@@ -96,9 +94,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <EnhancedSEO
-        title="FREE Legal Help Canada 2025 | Court Forms $5.99 | Ontario, BC, Alberta, Quebec"
-        description="Get FREE case assessment + court forms from $5.99. LTB help, HRTO, small claims, family court. AI-powered legal guidance for Ontario, BC, Alberta, Quebec. 10,000+ Canadians helped. Not a law firm."
-        keywords="legal help Canada, free legal help Ontario, Ontario court forms, LTB help, HRTO Ontario, small claims court, family court forms, tenant rights, Alberta legal help, BC RTB, Quebec TAL"
+        title="FREE Legal Help Canada 2025 | Court Forms $5.99 | Nationwide Coverage"
+        description="Get FREE case assessment + court forms from $5.99. LTB, HRTO, RTB, RTDRS, TAL + more. AI-powered legal guidance for all provinces. 10,000+ Canadians helped. Not a law firm."
+        keywords="legal help Canada, free legal help, Canadian court forms, LTB help, HRTO Ontario, RTDRS Alberta, BC RTB, Quebec TAL, tenant rights Canada, human rights complaint, small claims court"
         canonicalUrl="https://www.justice-bot.com/"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}

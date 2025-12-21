@@ -1,0 +1,103 @@
+{
+  "BC-BCHRT-1.1": {
+    "id": "BC-BCHRT-1.1",
+    "name": "BCHRT Form 1.1 — Human Rights Complaint (Individual)",
+    "category": "human_rights",
+    "url": "https://www.bchrt.bc.ca/app/uploads/sites/876/2024/07/form-1.1-print.pdf",
+    "online_url": "https://intake.bchrt.bc.ca/hrt/hrt",
+    "description": "File a human rights complaint for an individual"
+  },
+  "BC-BCHRT-1.2": {
+    "id": "BC-BCHRT-1.2",
+    "name": "BCHRT Form 1.2 — Authorization to File for Another Person",
+    "category": "human_rights",
+    "url": "https://www.bchrt.bc.ca/app/uploads/sites/876/2023/03/form_1_2_electronic.pdf",
+    "description": "Authorization to file a complaint on behalf of another person"
+  },
+  "BC-BCHRT-1.3": {
+    "id": "BC-BCHRT-1.3",
+    "name": "BCHRT Form 1.3 — Complaint for Group or Class",
+    "category": "human_rights",
+    "url": "https://www.bchrt.bc.ca/app/uploads/sites/876/2024/07/Form-1.3-print.pdf",
+    "online_url": "https://intake.bchrt.bc.ca/hrt/hrt-group",
+    "description": "File a human rights complaint for a group or class of people"
+  },
+  "BC-BCHRT-1.4": {
+    "id": "BC-BCHRT-1.4",
+    "name": "BCHRT Form 1.4 — Retaliation Complaint",
+    "category": "human_rights",
+    "url": "https://www.bchrt.bc.ca/app/uploads/sites/876/2024/07/Form-1.4-print.pdf",
+    "online_url": "https://intake.bchrt.bc.ca/hrt/hrt-retaliation",
+    "description": "File a retaliation complaint"
+  },
+  "BC-BCHRT-2": {
+    "id": "BC-BCHRT-2",
+    "name": "BCHRT Form 2 — Complaint Response",
+    "category": "human_rights",
+    "url": "https://www.bchrt.bc.ca/app/uploads/sites/876/2023/03/form_2_electronic.pdf",
+    "description": "Respond to a human rights complaint"
+  },
+  "BC-BCHRT-3": {
+    "id": "BC-BCHRT-3",
+    "name": "BCHRT Form 3 — Amendment Form",
+    "category": "human_rights",
+    "url": "https://www.bchrt.bc.ca/app/uploads/sites/876/2023/07/form_3.pdf",
+    "description": "Change or amend a complaint or complaint response"
+  },
+  "BC-BCHRT-6": {
+    "id": "BC-BCHRT-6",
+    "name": "BCHRT Form 6 — Complaint Withdrawal",
+    "category": "human_rights",
+    "url": "https://www.bchrt.bc.ca/app/uploads/sites/876/2023/03/form_6_electronic.pdf",
+    "description": "Withdraw all or part of your complaint"
+  },
+  "BC-BCHRT-7.1": {
+    "id": "BC-BCHRT-7.1",
+    "name": "BCHRT Form 7.1 — General Application",
+    "category": "human_rights",
+    "url": "https://www.bchrt.bc.ca/app/uploads/sites/876/2023/03/form_7_1_print.pdf",
+    "description": "Apply to the Tribunal about a complaint already filed"
+  },
+  "BC-BCHRT-7.2": {
+    "id": "BC-BCHRT-7.2",
+    "name": "BCHRT Form 7.2 — Dismissal Application",
+    "category": "human_rights",
+    "url": "https://www.bchrt.bc.ca/app/uploads/sites/876/2023/03/form_7_2_print.pdf",
+    "description": "Apply to dismiss a complaint"
+  },
+  "BC-BCHRT-8": {
+    "id": "BC-BCHRT-8",
+    "name": "BCHRT Form 8 — Order to Attend Hearing",
+    "category": "human_rights",
+    "url": "https://www.bchrt.bc.ca/app/uploads/sites/876/2023/03/form_8_electronic.pdf",
+    "description": "Obtain an order for a witness to attend hearing"
+  },
+  "BC-BCHRT-9.1": {
+    "id": "BC-BCHRT-9.1",
+    "name": "BCHRT Form 9.1 — Complainant Document Disclosure",
+    "category": "human_rights",
+    "url": "https://www.bchrt.bc.ca/app/uploads/sites/876/2023/03/form_9_1_electronic.pdf",
+    "description": "Complainant lists and shares documents relating to the complaint"
+  },
+  "BC-BCHRT-9.2": {
+    "id": "BC-BCHRT-9.2",
+    "name": "BCHRT Form 9.2 — Respondent Document Disclosure",
+    "category": "human_rights",
+    "url": "https://www.bchrt.bc.ca/app/uploads/sites/876/2023/03/form_9_2_electronic.pdf",
+    "description": "Respondent lists and shares documents relating to the complaint"
+  },
+  "BC-BCHRT-10": {
+    "id": "BC-BCHRT-10",
+    "name": "BCHRT Form 10 — Request for Accommodation",
+    "category": "human_rights",
+    "url": "https://www.bchrt.bc.ca/app/uploads/sites/876/2024/11/BCHRT-Form-10-November-15-2024.pdf",
+    "description": "Request accommodation for disability or other needs"
+  },
+  "BC-RTB-DISPUTE": {
+    "id": "BC-RTB-DISPUTE",
+    "name": "BC RTB — Application for Dispute Resolution",
+    "category": "tenancy",
+    "url": "https://www2.gov.bc.ca/gov/content/housing-tenancy/residential-tenancies/solving-problems/dispute-resolution",
+    "description": "Apply for dispute resolution with the BC Residential Tenancy Branch"
+  }
+}

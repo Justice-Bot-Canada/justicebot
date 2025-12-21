@@ -1,0 +1,58 @@
+{
+  "QC-TAL-DEMANDE": {
+    "id": "QC-TAL-DEMANDE",
+    "name": "TAL — Demande au Tribunal / Application to Tribunal",
+    "category": "tenancy",
+    "url": "https://www.tal.gouv.qc.ca/fr/formulaires-de-demande-au-tribunal/demande",
+    "description": "Demande générale au Tribunal administratif du logement / General application to the housing tribunal",
+    "french_name": "Demande au Tribunal administratif du logement"
+  },
+  "QC-TAL-REPONSE": {
+    "id": "QC-TAL-REPONSE",
+    "name": "TAL — Réponse / Response",
+    "category": "tenancy",
+    "url": "https://www.tal.gouv.qc.ca/fr/formulaires",
+    "description": "Réponse à une demande / Response to an application",
+    "french_name": "Réponse à une demande"
+  },
+  "QC-TAL-FIXATION-LOYER": {
+    "id": "QC-TAL-FIXATION-LOYER",
+    "name": "TAL — Demande de fixation de loyer / Rent Fixing Application",
+    "category": "tenancy",
+    "url": "https://www.tal.gouv.qc.ca/fr/formulaires",
+    "description": "Demande pour fixer le loyer / Application to fix rent amount",
+    "french_name": "Demande de fixation de loyer"
+  },
+  "QC-TAL-RESILIATION": {
+    "id": "QC-TAL-RESILIATION",
+    "name": "TAL — Demande de résiliation de bail / Lease Termination",
+    "category": "tenancy",
+    "url": "https://www.tal.gouv.qc.ca/fr/formulaires",
+    "description": "Demande de résiliation du bail / Application to terminate lease",
+    "french_name": "Demande de résiliation de bail"
+  },
+  "QC-TAL-RECOUVREMENT": {
+    "id": "QC-TAL-RECOUVREMENT",
+    "name": "TAL — Recouvrement de loyer / Rent Recovery",
+    "category": "tenancy",
+    "url": "https://www.tal.gouv.qc.ca/fr/formulaires",
+    "description": "Demande de recouvrement de loyer / Application to recover unpaid rent",
+    "french_name": "Demande de recouvrement de loyer"
+  },
+  "QC-CDPDJ-PLAINTE": {
+    "id": "QC-CDPDJ-PLAINTE",
+    "name": "CDPDJ — Plainte pour discrimination / Discrimination Complaint",
+    "category": "human_rights",
+    "url": "https://www.cdpdj.qc.ca/fr/porter-plainte",
+    "description": "Porter plainte pour discrimination auprès de la CDPDJ / File a discrimination complaint",
+    "french_name": "Plainte à la Commission des droits de la personne"
+  },
+  "QC-BAIL": {
+    "id": "QC-BAIL",
+    "name": "Bail résidentiel / Residential Lease",
+    "category": "tenancy",
+    "url": "https://www.quebec.ca/habitation-territoire/location/bail",
+    "description": "Formulaire de bail obligatoire au Québec / Mandatory lease form in Quebec",
+    "french_name": "Bail résidentiel"
+  }
+}

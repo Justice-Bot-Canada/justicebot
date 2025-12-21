@@ -1,0 +1,72 @@
+{
+  "AB-RTDRS-LANDLORD-TERMINATION": {
+    "id": "AB-RTDRS-LANDLORD-TERMINATION",
+    "name": "RTDRS — Landlord's Application for Termination and Unpaid Rent",
+    "category": "tenancy",
+    "url": "https://cfr.forms.gov.ab.ca/Form/RTDR0007",
+    "description": "Used by landlords when their tenant is still residing in the rental premises"
+  },
+  "AB-RTDRS-LANDLORD-DAMAGES": {
+    "id": "AB-RTDRS-LANDLORD-DAMAGES",
+    "name": "RTDRS — Landlord's Application for Damages",
+    "category": "tenancy",
+    "url": "https://cfr.forms.gov.ab.ca/Form/RTDR0006",
+    "description": "Used by landlords when their tenant no longer resides in the rental premises"
+  },
+  "AB-RTDRS-TENANT": {
+    "id": "AB-RTDRS-TENANT",
+    "name": "RTDRS — Tenant's Application",
+    "category": "tenancy",
+    "url": "https://cfr.forms.gov.ab.ca/Form/RTDR0008",
+    "description": "Application for tenants to file disputes with the RTDRS"
+  },
+  "AB-RTDRS-FEE-WAIVER": {
+    "id": "AB-RTDRS-FEE-WAIVER",
+    "name": "RTDRS — Fee Waiver Form",
+    "category": "tenancy",
+    "url": "https://cfr.forms.gov.ab.ca/form/RTDRS12875",
+    "description": "Apply for a fee waiver for RTDRS applications"
+  },
+  "AB-RTDRS-SERVICE-LANDLORD": {
+    "id": "AB-RTDRS-SERVICE-LANDLORD",
+    "name": "RTDRS — Declaration of Service by Landlord",
+    "category": "tenancy",
+    "url": "https://cfr.forms.gov.ab.ca/Form/RTDR0002",
+    "description": "Declaration that landlord has served documents to tenant"
+  },
+  "AB-RTDRS-SERVICE-TENANT": {
+    "id": "AB-RTDRS-SERVICE-TENANT",
+    "name": "RTDRS — Declaration of Service by Tenant",
+    "category": "tenancy",
+    "url": "https://cfr.forms.gov.ab.ca/Form/RTDR0003",
+    "description": "Declaration that tenant has served documents to landlord"
+  },
+  "AB-RTDRS-EVIDENCE-TOC": {
+    "id": "AB-RTDRS-EVIDENCE-TOC",
+    "name": "RTDRS — Evidence Table of Contents",
+    "category": "tenancy",
+    "url": "https://cfr.forms.gov.ab.ca/Form/RTDR12006",
+    "description": "Organize your evidence for RTDRS hearing"
+  },
+  "AB-RTDRS-WITHDRAWAL": {
+    "id": "AB-RTDRS-WITHDRAWAL",
+    "name": "RTDRS — Notice of Withdrawal",
+    "category": "tenancy",
+    "url": "https://cfr.forms.gov.ab.ca/Form/RTDR11148",
+    "description": "Withdraw your RTDRS application"
+  },
+  "AB-RTDRS-AUDIO": {
+    "id": "AB-RTDRS-AUDIO",
+    "name": "RTDRS — Audio Recording Request Form",
+    "category": "tenancy",
+    "url": "https://cfr.forms.gov.ab.ca/Form/RTDR11149",
+    "description": "Request audio recording of your hearing"
+  },
+  "AB-AHRC-COMPLAINT": {
+    "id": "AB-AHRC-COMPLAINT",
+    "name": "Alberta Human Rights Commission — Complaint Form",
+    "category": "human_rights",
+    "url": "https://www.albertahumanrights.ab.ca/complaints/Pages/complaints.aspx",
+    "description": "File a human rights complaint in Alberta"
+  }
+}

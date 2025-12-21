@@ -1,0 +1,16 @@
+{
+  "NL-RTB-APPLICATION": {
+    "id": "NL-RTB-APPLICATION",
+    "name": "NL Residential Tenancies — Application",
+    "category": "tenancy",
+    "url": "https://www.gov.nl.ca/dgsnl/landlord/",
+    "description": "File an application with Newfoundland Residential Tenancies"
+  },
+  "NL-HRC-COMPLAINT": {
+    "id": "NL-HRC-COMPLAINT",
+    "name": "Newfoundland Human Rights Commission — Complaint",
+    "category": "human_rights",
+    "url": "https://thinkhumanrights.ca/for-the-public/filing-a-complaint/",
+    "description": "File a human rights complaint in Newfoundland and Labrador"
+  }
+}
