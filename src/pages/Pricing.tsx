@@ -402,7 +402,37 @@ const Pricing = () => {
           ))}
         </div>
 
-        <div className="text-center mt-12 text-gray-600 dark:text-gray-300 space-y-3">
+        {/* Transparent Pricing Section */}
+        <div className="mt-16 max-w-4xl mx-auto">
+          <h3 className="text-xl font-bold text-center mb-6">Transparent Pricing — No Hidden Fees</h3>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-muted/50 rounded-lg p-4 text-center">
+              <Check className="w-6 h-6 text-green-500 mx-auto mb-2" />
+              <p className="font-medium text-sm">No Setup Fees</p>
+              <p className="text-xs text-muted-foreground">Start using immediately</p>
+            </div>
+            <div className="bg-muted/50 rounded-lg p-4 text-center">
+              <Check className="w-6 h-6 text-green-500 mx-auto mb-2" />
+              <p className="font-medium text-sm">No Hidden Charges</p>
+              <p className="text-xs text-muted-foreground">What you see is what you pay</p>
+            </div>
+            <div className="bg-muted/50 rounded-lg p-4 text-center">
+              <Check className="w-6 h-6 text-green-500 mx-auto mb-2" />
+              <p className="font-medium text-sm">Cancel Anytime</p>
+              <p className="text-xs text-muted-foreground">No cancellation fees</p>
+            </div>
+            <div className="bg-muted/50 rounded-lg p-4 text-center">
+              <Check className="w-6 h-6 text-green-500 mx-auto mb-2" />
+              <p className="font-medium text-sm">Billed Monthly</p>
+              <p className="text-xs text-muted-foreground">After 5-day free trial</p>
+            </div>
+          </div>
+          <p className="text-center text-xs text-muted-foreground mt-4">
+            All prices in CAD. Tax may apply based on your province. Your card will be charged after the 5-day trial ends unless you cancel.
+          </p>
+        </div>
+
+        <div className="text-center mt-12 text-muted-foreground space-y-3">
           <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg max-w-2xl mx-auto">
             <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
               🇨🇦 Built for Canadians
