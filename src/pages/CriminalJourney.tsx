@@ -68,9 +68,9 @@ const CriminalJourney = () => {
     <>
       <PerformanceMonitor />
       <EnhancedSEO 
-        title="Criminal Law Journey - Justice Bot"
-        description="Step-by-step guidance for navigating criminal charges and court proceedings in Ontario"
-        keywords="criminal law, criminal charges, court proceedings, Ontario criminal law, legal representation"
+        title="Criminal Trial Process Ontario 2025 | Bail, Charges & Court Guide"
+        description="Facing criminal charges in Ontario? Understand the criminal trial process step-by-step. Bail conditions (Form 5.1, 11, 32), first appearance, disclosure & defence. Get help navigating court."
+        keywords="criminal trial process ontario, criminal charges Ontario, bail conditions, Ontario criminal court, first court appearance, criminal defence Ontario"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
         faqData={faqData}
