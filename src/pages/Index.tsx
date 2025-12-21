@@ -14,7 +14,7 @@ const ExplainerVideo = lazy(() => import("@/components/ExplainerVideo").then(m =
 const InteractiveTutorial = lazy(() => import("@/components/InteractiveTutorial"));
 const TrustSignals = lazy(() => import("@/components/TrustSignals"));
 const SuccessStories = lazy(() => import("@/components/SuccessStories"));
-const PricingComparison = lazy(() => import("@/components/PricingComparison").then(m => ({ default: m.PricingComparison })));
+const PricingTeaser = lazy(() => import("@/components/PricingTeaser").then(m => ({ default: m.PricingTeaser })));
 const JourneyFlowchart = lazy(() => import("@/components/JourneyFlowchart").then(m => ({ default: m.JourneyFlowchart })));
 const CompetitorComparison = lazy(() => import("@/components/CompetitorComparison"));
 const MoneyBackGuarantee = lazy(() => import("@/components/MoneyBackGuarantee").then(m => ({ default: m.MoneyBackGuarantee })));
@@ -127,7 +127,7 @@ const Index = () => {
           <JourneyFlowchart />
         </Suspense>
         <Suspense fallback={<LoadingSection />}>
-          <PricingComparison />
+          <PricingTeaser />
         </Suspense>
         <Suspense fallback={<LoadingSection />}>
           <ExplainerVideo />
