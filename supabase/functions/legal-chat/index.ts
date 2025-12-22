@@ -2,11 +2,23 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+const allowedOrigins = [
+  'https://justice-bot.com',
+  'https://www.justice-bot.com',
+  'http://localhost:8080',
+  'http://localhost:5173'
+];
+
+function getCorsHeaders(origin?: string | null) {
+  const allowedOrigin = origin && allowedOrigins.includes(origin) 
+    ? origin 
+    : 'https://justice-bot.com';
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  };
+}
 
 // Input validation schema
 const ChatRequestSchema = z.object({
@@ -17,6 +29,9 @@ const ChatRequestSchema = z.object({
 });
 
 serve(async (req) => {
+  const origin = req.headers.get('Origin');
+  const corsHeaders = getCorsHeaders(origin);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }

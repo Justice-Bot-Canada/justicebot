@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { Mail, Phone, Building } from "lucide-react";
 import { TurnstileWidget } from "@/components/TurnstileWidget";
+import { supabase } from "@/integrations/supabase/client";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100, "Name must be less than 100 characters"),
@@ -47,7 +48,7 @@ export const ContactForm = ({ className }: ContactFormProps) => {
     },
   });
 
-  const onSubmit = async (data: ContactFormData) => {
+  const onSubmit = async (formData: ContactFormData) => {
     if (!turnstileToken) {
       toast({
         title: "Verification required",
@@ -60,22 +61,13 @@ export const ContactForm = ({ className }: ContactFormProps) => {
     setIsSubmitting(true);
     
     try {
-      const response = await fetch(
-        `https://vkzquzjtewqhcisvhsvg.supabase.co/functions/v1/submit-contact`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ ...data, turnstileToken }),
-        }
-      );
+      const { error } = await supabase.functions.invoke('submit-contact', {
+        body: { ...formData, turnstileToken }
+      });
 
-      if (!response.ok) {
-        throw new Error('Failed to submit contact form');
+      if (error) {
+        throw error;
       }
-
-      const result = await response.json();
       
       toast({
         title: "Message sent successfully!",
