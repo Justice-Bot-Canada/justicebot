@@ -21,6 +21,7 @@ const MoneyBackGuarantee = lazy(() => import("@/components/MoneyBackGuarantee").
 const UrgencyTimer = lazy(() => import("@/components/UrgencyTimer").then(m => ({ default: m.UrgencyTimer })));
 const FeatureHighlightBanner = lazy(() => import("@/components/FeatureHighlightBanner"));
 const ProvincesBanner = lazy(() => import("@/components/ProvincesBanner").then(m => ({ default: m.ProvincesBanner })));
+const QuickToolsSection = lazy(() => import("@/components/QuickToolsSection"));
 
 // Lazy load non-critical widgets (load after main content)
 const SocialProofTicker = lazy(() => import("@/components/SocialProofTicker").then(m => ({ default: m.SocialProofTicker })));
@@ -123,6 +124,9 @@ const Index = () => {
           </div>
         </Suspense>
         
+        <Suspense fallback={<LoadingSection />}>
+          <QuickToolsSection />
+        </Suspense>
         <Suspense fallback={<LoadingSection />}>
           <JourneyFlowchart />
         </Suspense>
