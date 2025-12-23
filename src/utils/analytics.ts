@@ -129,7 +129,7 @@ export const analytics = {
   chatStart: () => trackEvent('chat_start'),
   chatMessage: (messageCount: number) => trackEvent('chat_message', { message_count: messageCount }),
   
-  // GA4 Enhanced - Signup flow
+  // GA4 Enhanced - Signup flow (KEY EVENT for conversions)
   signupClick: () => {
     trackEvent('signup_click');
     sendGA4Event('generate_lead', { lead_source: 'signup_button' });
@@ -138,13 +138,19 @@ export const analytics = {
     trackEvent('signup_attempt', { email_domain: email.split('@')[1] });
   },
   signupComplete: (email: string, method: string) => {
-    trackEvent('signup_complete', { method });
-    sendGA4Event('sign_up', { method });
-    // Fire conversion for Google Ads
-    sendGA4Event('conversion', { 
-      send_to: 'AW-CONVERSION_ID/CONVERSION_LABEL',
-      value: 0,
-      currency: 'CAD',
+    // Primary sign_up event - mark as KEY EVENT in GA4
+    trackEvent('sign_up', { method });
+    
+    // GA4 recommended sign_up event (mark this as key event in GA4 admin)
+    sendGA4Event('sign_up', { 
+      method: method,
+      user_email_domain: email.split('@')[1],
+    });
+    
+    // Custom conversion event for tracking
+    sendGA4Event('user_signup_complete', {
+      method: method,
+      signup_page: window.location.pathname,
     });
   },
   signupFailed: (error: string) => trackEvent('signup_failed', { error }),
