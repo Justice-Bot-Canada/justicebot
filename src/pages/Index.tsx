@@ -23,13 +23,8 @@ const FeatureHighlightBanner = lazy(() => import("@/components/FeatureHighlightB
 const ProvincesBanner = lazy(() => import("@/components/ProvincesBanner").then(m => ({ default: m.ProvincesBanner })));
 const QuickToolsSection = lazy(() => import("@/components/QuickToolsSection"));
 
-// Lazy load non-critical widgets (load after main content)
-const SocialProofTicker = lazy(() => import("@/components/SocialProofTicker").then(m => ({ default: m.SocialProofTicker })));
-const LeadCaptureModal = lazy(() => import("@/components/LeadCaptureModal").then(m => ({ default: m.LeadCaptureModal })));
-const StickyBottomCTA = lazy(() => import("@/components/StickyBottomCTA").then(m => ({ default: m.StickyBottomCTA })));
-const ChurnPreventionNudge = lazy(() => import("@/components/ChurnPreventionNudge").then(m => ({ default: m.ChurnPreventionNudge })));
+// Lazy load only essential widgets - removed excessive popups for cleaner UX
 const CrispChat = lazy(() => import("@/components/CrispChat"));
-const LiveSupportWidget = lazy(() => import("@/components/LiveSupportWidget"));
 const AccessibilityPanel = lazy(() => import("@/components/AccessibilityEnhanced").then(m => ({ default: m.AccessibilityPanel })));
 
 const LoadingSection = () => (
@@ -242,33 +237,14 @@ const Index = () => {
       </main>
       <Footer />
       
-      {/* Defer non-critical widgets to after main content renders */}
+      {/* Only essential widgets - removed excessive popups */}
       <Suspense fallback={null}>
         <AccessibilityPanel />
       </Suspense>
       
-      <Suspense fallback={null}>
-        <LeadCaptureModal trigger="time" delaySeconds={45} />
-      </Suspense>
-      
-      <Suspense fallback={null}>
-        <SocialProofTicker />
-      </Suspense>
-      
-      <Suspense fallback={null}>
-        <LiveSupportWidget />
-      </Suspense>
-      
-      <Suspense fallback={null}>
-        <StickyBottomCTA />
-      </Suspense>
-      
+      {/* Crisp for live chat support */}
       <Suspense fallback={null}>
         <CrispChat />
-      </Suspense>
-      
-      <Suspense fallback={null}>
-        <ChurnPreventionNudge />
       </Suspense>
     </div>
   );
