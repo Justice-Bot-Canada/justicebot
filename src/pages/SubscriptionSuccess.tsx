@@ -17,40 +17,79 @@ export default function SubscriptionSuccess() {
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const sessionId = searchParams.get('session_id');
   const subscriptionId = searchParams.get('subscription_id') || searchParams.get('token');
   const planType = searchParams.get('plan');
   const isTrial = searchParams.get('trial') === 'true';
 
   useEffect(() => {
     const verifySubscription = async () => {
-      if (!subscriptionId) {
-        setError('No subscription ID found');
-        setVerifying(false);
-        return;
-      }
-
+      // For Stripe, we verify via session_id or just check subscription status
+      // For PayPal, we use subscriptionId
+      
       try {
-        const { data, error } = await supabase.functions.invoke('verify-subscription-status', {
-          body: { subscriptionId }
-        });
-
-        if (error) throw error;
-
-        if (data.success) {
-          setVerified(true);
-          toast({
-            title: isTrial ? '🎉 Free Trial Started!' : 'Subscription Activated!',
-            description: isTrial 
-              ? 'Enjoy 5 days of full premium access. No charge until trial ends!'
-              : 'Your premium access has been granted.',
-          });
+        // If coming from Stripe checkout, use check-stripe-subscription
+        if (sessionId) {
+          const { data, error } = await supabase.functions.invoke('check-stripe-subscription');
           
-          // Refresh user premium status
-          setTimeout(() => {
-            window.location.href = '/dashboard';
-          }, 3000);
+          if (error) throw error;
+
+          if (data.subscribed) {
+            setVerified(true);
+            toast({
+              title: data.is_trial ? '🎉 Free Trial Started!' : 'Subscription Activated!',
+              description: data.is_trial 
+                ? 'Enjoy 5 days of full premium access. No charge until trial ends!'
+                : 'Your premium access has been granted.',
+            });
+            
+            setTimeout(() => {
+              window.location.href = '/dashboard';
+            }, 3000);
+          } else {
+            // Try again after a short delay (webhook might not have processed yet)
+            setTimeout(async () => {
+              const { data: retryData } = await supabase.functions.invoke('check-stripe-subscription');
+              if (retryData?.subscribed) {
+                setVerified(true);
+                toast({
+                  title: retryData.is_trial ? '🎉 Free Trial Started!' : 'Subscription Activated!',
+                  description: 'Your premium access has been granted.',
+                });
+                setTimeout(() => window.location.href = '/dashboard', 2000);
+              } else {
+                setError('Subscription verification pending. Please refresh or check your email.');
+              }
+              setVerifying(false);
+            }, 3000);
+            return;
+          }
+        } 
+        // Legacy PayPal flow
+        else if (subscriptionId) {
+          const { data, error } = await supabase.functions.invoke('verify-subscription-status', {
+            body: { subscriptionId }
+          });
+
+          if (error) throw error;
+
+          if (data.success) {
+            setVerified(true);
+            toast({
+              title: isTrial ? '🎉 Free Trial Started!' : 'Subscription Activated!',
+              description: isTrial 
+                ? 'Enjoy 5 days of full premium access. No charge until trial ends!'
+                : 'Your premium access has been granted.',
+            });
+            
+            setTimeout(() => {
+              window.location.href = '/dashboard';
+            }, 3000);
+          } else {
+            setError(data.message || 'Subscription verification failed');
+          }
         } else {
-          setError(data.message || 'Subscription verification failed');
+          setError('No subscription information found');
         }
       } catch (err) {
         console.error('Verification error:', err);
