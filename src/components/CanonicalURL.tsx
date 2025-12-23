@@ -9,9 +9,9 @@ import { useLocation } from "react-router-dom";
 export const CanonicalURL = () => {
   const location = useLocation();
   
-  // Build canonical URL - always use www, https, no trailing slash, no query params
+  // Build canonical URL - https, no www, no trailing slash, no query params
   const cleanPath = location.pathname.replace(/\/$/, '');
-  const canonicalUrl = `https://www.justice-bot.com${cleanPath}`;
+  const canonicalUrl = `https://justice-bot.com${cleanPath}`;
   
   return (
     <Helmet>
