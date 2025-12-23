@@ -9,8 +9,17 @@ const allowedOrigins = [
   'http://localhost:5173'
 ];
 
+// Also allow Lovable preview URLs
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return false;
+  if (allowedOrigins.includes(origin)) return true;
+  // Allow Lovable preview URLs
+  if (origin.endsWith('.lovableproject.com')) return true;
+  return false;
+}
+
 function getCorsHeaders(origin?: string | null) {
-  const allowedOrigin = origin && allowedOrigins.includes(origin) 
+  const allowedOrigin = origin && isAllowedOrigin(origin) 
     ? origin 
     : 'https://justice-bot.com';
   return {
