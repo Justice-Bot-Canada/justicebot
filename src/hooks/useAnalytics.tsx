@@ -18,12 +18,8 @@ export function useAnalytics() {
   const { hasConsent, consent } = useConsent();
 
   const trackPageView = useCallback(async () => {
-    // Only track if user has given consent
-    if (!hasConsent) {
-      return;
-    }
-
-    // Send to Google Analytics
+    // ALWAYS send page_view to GA4 for proper landing page attribution
+    // This fixes "(not set)" landing page issue - GA4 needs page_view at session start
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'page_view', {
         page_path: location.pathname + location.search,
@@ -32,26 +28,25 @@ export function useAnalytics() {
       });
     }
 
-    // Also track to Supabase (anonymized - no user_id if not logged in)
-    try {
-      await supabase.from('analytics_events').insert([{
-        user_id: user?.id || null,
-        event_type: 'page_view',
-        page_url: location.pathname,
-        // Only track user agent if consent given
-        user_agent: hasConsent ? navigator.userAgent : null,
-      }]);
-    } catch (error) {
-      console.error('Analytics tracking error:', error);
+    // Only track to Supabase if user has given consent
+    if (hasConsent) {
+      try {
+        await supabase.from('analytics_events').insert([{
+          user_id: user?.id || null,
+          event_type: 'page_view',
+          page_url: location.pathname,
+          user_agent: navigator.userAgent,
+        }]);
+      } catch (error) {
+        console.error('Analytics tracking error:', error);
+      }
     }
   }, [location.pathname, location.search, user?.id, hasConsent]);
 
+  // Track page views on route changes - don't wait for consent for GA4
   useEffect(() => {
-    // Only track after consent status is determined
-    if (consent !== 'pending') {
-      trackPageView();
-    }
-  }, [trackPageView, consent]);
+    trackPageView();
+  }, [trackPageView]);
 
   const trackEvent = async (eventType: string, eventData?: Record<string, unknown>) => {
     // Only track if user has given consent
