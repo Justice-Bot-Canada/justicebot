@@ -60,3 +60,6 @@ http://www.justice-bot.com/* https://www.justice-bot.com/:splat 301!
 /entitlements       /not-found          404
 /founders-story     /not-found          404
 
+# SPA fallback - all other routes go to index.html
+/*                  /index.html         200
+

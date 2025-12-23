@@ -19,17 +19,45 @@ const Welcome = () => {
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [justSignedUp, setJustSignedUp] = useState(false);
+  const [processingVerification, setProcessingVerification] = useState(false);
 
-  // Check if this is a fresh signup (came from auth dialog) vs email verification click
+  // Handle email verification callback - Supabase sends hash fragments
   useEffect(() => {
-    // If URL has hash with access_token, user clicked email verification link
-    const hasAuthHash = location.hash.includes('access_token') || location.hash.includes('type=signup');
-    
-    if (!hasAuthHash && !user && !loading) {
-      // User just signed up and was redirected here - show email verification prompt
+    const handleAuthCallback = async () => {
+      // Check if URL has hash with access_token (email verification click)
+      const hashParams = new URLSearchParams(location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      const type = hashParams.get('type');
+      
+      if (accessToken && type === 'signup') {
+        setProcessingVerification(true);
+        // Supabase client will automatically pick up the tokens from the URL
+        // Just wait for the auth state to update
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (session) {
+          setVerified(true);
+          setProcessingVerification(false);
+          // Clear the hash from URL for cleaner look
+          window.history.replaceState(null, '', '/welcome');
+        } else if (error) {
+          console.error('Auth callback error:', error);
+          setProcessingVerification(false);
+        }
+      }
+    };
+
+    handleAuthCallback();
+  }, [location.hash]);
+
+  // Check if user just signed up (stored in sessionStorage)
+  useEffect(() => {
+    const signupPending = sessionStorage.getItem('justSignedUp') === 'true';
+    if (signupPending && !user && !loading) {
       setJustSignedUp(true);
+      // Clear the flag so it doesn't persist across sessions
+      sessionStorage.removeItem('justSignedUp');
     }
-  }, [location, user, loading]);
+  }, [user, loading]);
 
   useEffect(() => {
     const checkOnboarding = async () => {
@@ -65,7 +93,7 @@ const Welcome = () => {
     setShowOnboarding(false);
   };
 
-  if (loading) {
+  if (loading || processingVerification) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -73,8 +101,12 @@ const Welcome = () => {
           <Card className="max-w-2xl mx-auto text-center py-12">
             <CardContent>
               <Loader2 className="mx-auto h-12 w-12 text-primary mb-4 animate-spin" />
-              <h3 className="text-lg font-semibold mb-2">Verifying your account...</h3>
-              <p className="text-muted-foreground">Please wait a moment</p>
+              <h3 className="text-lg font-semibold mb-2">
+                {processingVerification ? "Completing your verification..." : "Verifying your account..."}
+              </h3>
+              <p className="text-muted-foreground">
+                {processingVerification ? "Just a moment while we set up your account" : "Please wait a moment"}
+              </p>
             </CardContent>
           </Card>
         </main>
@@ -84,7 +116,7 @@ const Welcome = () => {
   }
 
   // Show email verification instructions if user just signed up
-  if (justSignedUp || (!user && !loading)) {
+  if (justSignedUp) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -132,6 +164,37 @@ const Welcome = () => {
                     Return to Home
                   </Button>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+        <Footer />
+        <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
+      </div>
+    );
+  }
+
+  // If not logged in and not just signed up, show sign in prompt
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 py-20">
+          <Card className="max-w-2xl mx-auto text-center py-12">
+            <CardHeader>
+              <CardTitle className="text-3xl mb-2">Welcome to Justice-Bot</CardTitle>
+              <CardDescription className="text-lg">
+                Sign in to access your account
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button onClick={() => setShowAuthDialog(true)} variant="default">
+                  Sign In
+                </Button>
+                <Button onClick={() => navigate("/")} variant="outline">
+                  Return to Home
+                </Button>
               </div>
             </CardContent>
           </Card>

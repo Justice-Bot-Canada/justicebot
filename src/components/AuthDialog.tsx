@@ -108,7 +108,8 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         });
       } else {
         analytics.signupComplete(email, 'email');
-        // Close dialog and navigate to welcome page which shows email verification instructions
+        // Store signup flag in sessionStorage and redirect to welcome page
+        sessionStorage.setItem('justSignedUp', 'true');
         onOpenChange(false);
         window.location.href = '/welcome';
       }
