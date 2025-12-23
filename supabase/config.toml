@@ -122,3 +122,9 @@ verify_jwt = true
 
 [functions.generate-exhibit-book]
 verify_jwt = true
+
+[functions.multi-agent-analysis]
+verify_jwt = true
+
+[functions.marketing-automation]
+verify_jwt = false
