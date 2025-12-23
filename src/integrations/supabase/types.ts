@@ -2270,6 +2270,27 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles_directory: {
+        Row: {
+          avatar_url: string | null
+          bio_preview: string | null
+          display_name: string | null
+          id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio_preview?: never
+          display_name?: string | null
+          id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio_preview?: never
+          display_name?: string | null
+          id?: string | null
+        }
+        Relationships: []
+      }
       profiles_public: {
         Row: {
           avatar_url: string | null
@@ -2541,6 +2562,21 @@ export type Database = {
       revoke_admin_role: {
         Args: { revoke_reason?: string; target_user_id: string }
         Returns: undefined
+      }
+      search_profiles_directory: {
+        Args: { p_limit?: number; p_offset?: number; p_query?: string }
+        Returns: {
+          avatar_url: string | null
+          bio_preview: string | null
+          display_name: string | null
+          id: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "profiles_directory"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       user_has_role: { Args: { target_role: string }; Returns: boolean }
     }
