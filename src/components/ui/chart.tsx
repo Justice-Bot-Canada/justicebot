@@ -58,33 +58,44 @@ const ChartContainer = React.forwardRef<
 });
 ChartContainer.displayName = "Chart";
 
+/**
+ * ChartStyle generates CSS custom properties for chart colors.
+ * Uses useEffect + DOM insertion instead of dangerouslySetInnerHTML for better security.
+ * Note: ChartConfig values are controlled (from typed config), not user input.
+ */
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(([_, config]) => config.theme || config.color);
 
-  if (!colorConfig.length) {
-    return null;
-  }
+  React.useEffect(() => {
+    if (!colorConfig.length) return;
 
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
-  })
-  .join("\n")}
-}
-`,
-          )
-          .join("\n"),
-      }}
-    />
-  );
+    const cssContent = Object.entries(THEMES)
+      .map(([theme, prefix]) => {
+        const colorRules = colorConfig
+          .map(([key, itemConfig]) => {
+            const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
+            return color ? `  --color-${key}: ${color};` : null;
+          })
+          .filter(Boolean)
+          .join("\n");
+        return `${prefix} [data-chart=${id}] {\n${colorRules}\n}`;
+      })
+      .join("\n");
+
+    const styleElement = document.createElement("style");
+    styleElement.setAttribute("data-chart-style", id);
+    styleElement.textContent = cssContent;
+    document.head.appendChild(styleElement);
+
+    return () => {
+      const existingStyle = document.querySelector(`style[data-chart-style="${id}"]`);
+      if (existingStyle) {
+        existingStyle.remove();
+      }
+    };
+  }, [id, colorConfig]);
+
+  return null;
 };
 
 const ChartTooltip = RechartsPrimitive.Tooltip;

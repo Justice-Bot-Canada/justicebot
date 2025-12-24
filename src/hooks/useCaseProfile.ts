@@ -36,16 +36,21 @@ export interface CaseProfile {
 
 const STORAGE_KEY = 'justice_bot_case_profile';
 
+/**
+ * Security: Using sessionStorage instead of localStorage for case profiles.
+ * This ensures sensitive legal data is cleared when the browser/tab closes,
+ * reducing risk from device access or XSS attacks.
+ */
 export function useCaseProfile(caseId?: string) {
   const { user } = useAuth();
   const [caseProfile, setCaseProfile] = useState<CaseProfile | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Load from localStorage or database on mount
+  // Load from sessionStorage or database on mount
   useEffect(() => {
-    // If no caseId, try localStorage
+    // If no caseId, try sessionStorage
     if (!caseId) {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = sessionStorage.getItem(STORAGE_KEY);
       if (stored) {
         try {
           setCaseProfile(JSON.parse(stored));
@@ -77,7 +82,7 @@ export function useCaseProfile(caseId?: string) {
         if (data?.triage) {
           const profile = data.triage as unknown as CaseProfile;
           setCaseProfile(profile);
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+          sessionStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
         }
       } catch (error) {
         if (!cancelled) {
@@ -99,7 +104,7 @@ export function useCaseProfile(caseId?: string) {
 
   const saveCaseProfile = async (profile: CaseProfile, caseIdToUpdate?: string) => {
     setCaseProfile(profile);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
 
     // Sync to database if user is logged in and caseId provided
     if (user && caseIdToUpdate) {
@@ -120,7 +125,7 @@ export function useCaseProfile(caseId?: string) {
 
   const clearCaseProfile = () => {
     setCaseProfile(null);
-    localStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem(STORAGE_KEY);
   };
 
   return {
