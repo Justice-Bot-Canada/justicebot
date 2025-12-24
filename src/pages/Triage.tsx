@@ -89,7 +89,7 @@ const Triage = () => {
     pendingDocuments.length >= 3
   );
 
-  const handleProceed = async (goToBookOfDocs = false) => {
+  const handleProceed = async (goToBookOfDocs = false, preselectFormCode?: string) => {
     if (!user) {
       toast.error("Please sign in to continue");
       navigate("/");
@@ -191,7 +191,14 @@ const Triage = () => {
           ? `&recommendedForm=${encodeURIComponent(preselectFormCode.trim())}`
           : '';
 
-        navigate(`/forms/${triageResult.venue}?caseId=${caseData.id}${recommendedForm}`);
+        navigate(`/forms/${triageResult.venue}?caseId=${caseData.id}${recommendedForm}`, {
+          state: {
+            caseId: caseData.id,
+            userInput: userDescription,
+            province,
+            triageResult,
+          }
+        });
       }
     } catch (error) {
       console.error("Error creating case:", error);
@@ -206,15 +213,13 @@ const Triage = () => {
   };
 
   const handleSelectForm = (form: FormRecommendation) => {
-    // Navigate directly to form with context
     if (!user) {
       toast.error("Please sign in to access forms");
       navigate("/");
       return;
     }
-    
-    // For now, proceed to form selector with form pre-selected
-    handleProceed();
+
+    handleProceed(false, form.formCode);
   };
 
   const structuredData = {

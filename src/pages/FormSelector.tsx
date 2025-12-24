@@ -153,6 +153,7 @@ const FormSelector = () => {
     // Navigate to form filling with pre-fill data
     navigate(`/form/${form.id}`, {
       state: {
+        caseId,
         prefillData: triageData?.userInput || "",
         location: triageData?.location || {},
         triageResult: triageData?.triageResult || {}
