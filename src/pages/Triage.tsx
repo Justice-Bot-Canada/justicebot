@@ -12,8 +12,10 @@ import SmartTriageForm from "@/components/SmartTriageForm";
 import TriageResults from "@/components/TriageResults";
 import { TriageDiscountModal } from "@/components/TriageDiscountModal";
 import { TriageDocumentUpload, PendingDocument } from "@/components/TriageDocumentUpload";
+import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ArrowLeft, Loader2, BookOpen, FileCheck, ArrowRight } from "lucide-react";
 import { analytics, trackEvent } from "@/utils/analytics";
 
 interface FormRecommendation {
@@ -48,11 +50,15 @@ const Triage = () => {
   const [showDiscountModal, setShowDiscountModal] = useState(false);
   const [pendingDocuments, setPendingDocuments] = useState<PendingDocument[]>([]);
   const [isSavingDocuments, setIsSavingDocuments] = useState(false);
+  const [createdCaseId, setCreatedCaseId] = useState<string | null>(null);
+  const [showBookWizard, setShowBookWizard] = useState(false);
+  const [uploadedEvidenceCount, setUploadedEvidenceCount] = useState(0);
 
-  const handleTriageComplete = (result: TriageResult, description: string, prov: string) => {
+  const handleTriageComplete = (result: TriageResult, description: string, prov: string, evidenceCount?: number) => {
     setTriageResult(result);
     setUserDescription(description);
     setProvince(prov);
+    setUploadedEvidenceCount(evidenceCount || 0);
     setStep(1);
     
     // Track triage completion
@@ -60,20 +66,30 @@ const Triage = () => {
     trackEvent('triage_complete', { 
       venue: result.venue, 
       confidence: result.confidence,
-      province: prov 
+      province: prov,
+      evidenceCount: evidenceCount || 0
     });
     
-    // Show discount modal after triage (only once per session)
+    // Show discount modal after triage (only once per session) - but not if they have evidence ready
+    const hasEvidenceReady = result.flags?.includes('evidence-ready') || result.flags?.includes('book-of-documents-recommended');
     const hasSeenOffer = sessionStorage.getItem('triage_discount_shown');
-    if (!hasSeenOffer) {
+    if (!hasSeenOffer && !hasEvidenceReady) {
       setTimeout(() => {
         setShowDiscountModal(true);
         sessionStorage.setItem('triage_discount_shown', 'true');
-      }, 1500); // Show after slight delay for better UX
+      }, 1500);
     }
   };
+  
+  // Check if user should be prompted to build Book of Documents
+  const shouldShowBookOfDocuments = triageResult && (
+    triageResult.flags?.includes('evidence-ready') ||
+    triageResult.flags?.includes('book-of-documents-recommended') ||
+    uploadedEvidenceCount >= 3 ||
+    pendingDocuments.length >= 3
+  );
 
-  const handleProceed = async () => {
+  const handleProceed = async (goToBookOfDocs = false) => {
     if (!user) {
       toast.error("Please sign in to continue");
       navigate("/");
@@ -108,17 +124,17 @@ const Triage = () => {
         .single();
 
       if (caseError) throw caseError;
+      
+      setCreatedCaseId(caseData.id);
 
       // Upload pending documents to evidence
       if (pendingDocuments.length > 0) {
         for (const doc of pendingDocuments) {
           try {
-            // Update status
             setPendingDocuments(prev => 
               prev.map(d => d.id === doc.id ? { ...d, status: 'uploading' as const, progress: 20 } : d)
             );
 
-            // Upload file to storage
             const filePath = `${user.id}/${caseData.id}/${Date.now()}_${doc.file.name}`;
             const { error: uploadError } = await supabase.storage
               .from('evidence')
@@ -130,8 +146,7 @@ const Triage = () => {
               prev.map(d => d.id === doc.id ? { ...d, progress: 60 } : d)
             );
 
-            // Create evidence record
-            const { data: evidenceData, error: evidenceError } = await supabase
+            const { error: evidenceError } = await supabase
               .from('evidence')
               .insert({
                 case_id: caseData.id,
@@ -140,9 +155,7 @@ const Triage = () => {
                 file_type: doc.file.type,
                 description: `Uploaded during triage - ${triageResult.venueTitle}`,
                 upload_date: new Date().toISOString()
-              })
-              .select()
-              .single();
+              });
 
             if (evidenceError) throw evidenceError;
 
@@ -150,7 +163,7 @@ const Triage = () => {
               prev.map(d => d.id === doc.id ? { ...d, status: 'uploaded' as const, progress: 100 } : d)
             );
 
-            // Queue AI analysis (async, don't wait)
+            // Queue AI analysis (async)
             supabase.functions.invoke('analyze-document', {
               body: {
                 fileContent: '',
@@ -170,13 +183,22 @@ const Triage = () => {
       }
 
       toast.success("Case created with documents!");
-      navigate(`/form-selector?venue=${triageResult.venue}&caseId=${caseData.id}`);
+      
+      if (goToBookOfDocs) {
+        setShowBookWizard(true);
+      } else {
+        navigate(`/form-selector?venue=${triageResult.venue}&caseId=${caseData.id}`);
+      }
     } catch (error) {
       console.error("Error creating case:", error);
       toast.error("Failed to create case");
     } finally {
       setIsSavingDocuments(false);
     }
+  };
+
+  const handleBuildBookOfDocuments = () => {
+    handleProceed(true);
   };
 
   const handleSelectForm = (form: FormRecommendation) => {
@@ -281,14 +303,67 @@ const Triage = () => {
                 isLoading={isSavingDocuments}
               />
 
-              {/* Document Upload Section */}
-              <div className="mt-6">
-                <TriageDocumentUpload
-                  documents={pendingDocuments}
-                  onDocumentsChange={setPendingDocuments}
-                  disabled={isSavingDocuments}
-                />
-              </div>
+              {/* Book of Documents Prompt - shown when user has substantial evidence */}
+              {shouldShowBookOfDocuments && (
+                <Card className="mt-6 border-primary/50 bg-primary/5">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-primary">
+                      <BookOpen className="h-5 w-5" />
+                      Ready to Build Your Book of Documents
+                    </CardTitle>
+                    <CardDescription>
+                      You've uploaded {uploadedEvidenceCount + pendingDocuments.length} document(s) including completed forms. 
+                      Organize your evidence into a professional Book of Documents for your hearing.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Button 
+                        onClick={handleBuildBookOfDocuments} 
+                        className="flex-1"
+                        disabled={isSavingDocuments}
+                      >
+                        {isSavingDocuments ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Creating Case...
+                          </>
+                        ) : (
+                          <>
+                            <BookOpen className="h-4 w-4 mr-2" />
+                            Build Book of Documents
+                          </>
+                        )}
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => handleProceed(false)}
+                        disabled={isSavingDocuments}
+                        className="flex-1"
+                      >
+                        <FileCheck className="h-4 w-4 mr-2" />
+                        Continue to Forms
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      The Book of Documents wizard will help you organize, label, and compile your evidence 
+                      into a tribunal-ready format with proper exhibit labels and indexing.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Document Upload Section - only show if not enough docs for Book */}
+              {!shouldShowBookOfDocuments && (
+                <div className="mt-6">
+                  <TriageDocumentUpload
+                    documents={pendingDocuments}
+                    onDocumentsChange={setPendingDocuments}
+                    disabled={isSavingDocuments}
+                  />
+                </div>
+              )}
               
               <div className="mt-8">
                 <RelatedPages 
@@ -307,6 +382,16 @@ const Triage = () => {
         isOpen={showDiscountModal} 
         onClose={() => setShowDiscountModal(false)} 
       />
+      
+      {/* Book of Documents Wizard */}
+      {createdCaseId && (
+        <BookOfDocumentsWizard
+          caseId={createdCaseId}
+          caseTitle={triageResult?.venueTitle}
+          open={showBookWizard}
+          onOpenChange={setShowBookWizard}
+        />
+      )}
     </div>
   );
 };

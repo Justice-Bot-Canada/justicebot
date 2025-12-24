@@ -53,7 +53,7 @@ interface TriageResult {
 }
 
 interface SmartTriageFormProps {
-  onTriageComplete: (result: TriageResult, description: string, province: string) => void;
+  onTriageComplete: (result: TriageResult, description: string, province: string, evidenceCount?: number) => void;
   initialDescription?: string;
 }
 
@@ -215,7 +215,7 @@ const SmartTriageForm: React.FC<SmartTriageFormProps> = ({
       // Small delay to show 100% progress
       await new Promise((resolve) => setTimeout(resolve, 300));
 
-      onTriageComplete(data, description, province);
+      onTriageComplete(data, description, province, uploadedFiles.length);
       toast.success("Analysis complete!");
     } catch (error: any) {
       console.error("Triage error:", error);
