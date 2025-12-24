@@ -75,8 +75,9 @@ const FormSelector = () => {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const caseId = searchParams.get('caseId');
+  const recommendedForm = searchParams.get('recommendedForm');
   const { caseProfile } = useCaseProfile(caseId || undefined);
-  
+
   const [forms, setForms] = useState<FormInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedForm, setSelectedForm] = useState<FormInfo | null>(null);
@@ -88,10 +89,24 @@ const FormSelector = () => {
     fetchForms();
   }, [venue]);
 
+  // Auto-select form from query param (?recommendedForm=...)
+  useEffect(() => {
+    if (!recommendedForm || forms.length === 0 || selectedForm) return;
+
+    const matchingForm = forms.find(f =>
+      f.form_code.toLowerCase().includes(recommendedForm.toLowerCase())
+    );
+
+    if (matchingForm) {
+      setSelectedForm(matchingForm);
+      toast.success(`Selected: ${matchingForm.title}`);
+    }
+  }, [recommendedForm, forms, selectedForm]);
+
   // Auto-select form from case profile
   useEffect(() => {
     if (caseProfile?.recommendedForm && forms.length > 0 && !selectedForm) {
-      const matchingForm = forms.find(f => 
+      const matchingForm = forms.find(f =>
         f.form_code.toLowerCase().includes(caseProfile.recommendedForm.toLowerCase())
       );
       if (matchingForm) {
