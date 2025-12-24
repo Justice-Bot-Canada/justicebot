@@ -13,9 +13,11 @@ import TriageResults from "@/components/TriageResults";
 import { TriageDiscountModal } from "@/components/TriageDiscountModal";
 import { TriageDocumentUpload, PendingDocument } from "@/components/TriageDocumentUpload";
 import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
+import AuthDialog from "@/components/AuthDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, Loader2, BookOpen, FileCheck, ArrowRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Loader2, BookOpen, FileCheck, ArrowRight, UserPlus, Shield, Sparkles, CheckCircle } from "lucide-react";
 import { analytics, trackEvent } from "@/utils/analytics";
 
 interface FormRecommendation {
@@ -53,6 +55,7 @@ const Triage = () => {
   const [createdCaseId, setCreatedCaseId] = useState<string | null>(null);
   const [showBookWizard, setShowBookWizard] = useState(false);
   const [uploadedEvidenceCount, setUploadedEvidenceCount] = useState(0);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   const handleTriageComplete = (result: TriageResult, description: string, prov: string, evidenceCount?: number) => {
     setTriageResult(result);
@@ -302,24 +305,91 @@ const Triage = () => {
 
           {step === 1 && triageResult && (
             <>
+              {/* Create Free Account CTA for anonymous users */}
+              {!user && (
+                <Card className="mb-6 border-primary bg-gradient-to-r from-primary/10 via-primary/5 to-background overflow-hidden">
+                  <CardContent className="p-6">
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                      <div className="flex-shrink-0 p-3 rounded-full bg-primary/20">
+                        <Sparkles className="h-8 w-8 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-lg font-semibold">Save Your Case Overview — It's Free!</h3>
+                          <Badge variant="secondary" className="text-xs">100% Free</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Create your free account to save this analysis, upload documents, and track your legal journey.
+                        </p>
+                        <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3 text-green-500" />
+                            Save case overview
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3 text-green-500" />
+                            Upload evidence
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3 text-green-500" />
+                            Track deadlines
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3 text-green-500" />
+                            AI form assistance
+                          </span>
+                        </div>
+                      </div>
+                      <Button 
+                        size="lg" 
+                        onClick={() => setShowAuthDialog(true)}
+                        className="whitespace-nowrap"
+                      >
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Create Free Account
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               <TriageResults
                 result={triageResult}
                 description={userDescription}
                 province={province}
-                onProceed={() => setStep(2)}
+                onProceed={() => user ? setStep(2) : setShowAuthDialog(true)}
                 onBack={() => setStep(0)}
                 onSelectForm={handleSelectForm}
                 isLoading={isSavingDocuments}
               />
 
-              {/* Document Upload Section */}
-              <div className="mt-6">
-                <TriageDocumentUpload
-                  documents={pendingDocuments}
-                  onDocumentsChange={setPendingDocuments}
-                  disabled={isSavingDocuments}
-                />
-              </div>
+              {/* Document Upload Section - only for logged in users */}
+              {user && (
+                <div className="mt-6">
+                  <TriageDocumentUpload
+                    documents={pendingDocuments}
+                    onDocumentsChange={setPendingDocuments}
+                    disabled={isSavingDocuments}
+                  />
+                </div>
+              )}
+
+              {/* Prompt to sign up to upload documents */}
+              {!user && (
+                <Card className="mt-6 border-dashed">
+                  <CardContent className="p-6 text-center">
+                    <Shield className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
+                    <h4 className="font-medium mb-1">Ready to Upload Evidence?</h4>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Create a free account to securely upload and store your documents
+                    </p>
+                    <Button variant="outline" onClick={() => setShowAuthDialog(true)}>
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Sign Up to Upload
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
               
               <div className="mt-8">
                 <RelatedPages 
@@ -412,6 +482,12 @@ const Triage = () => {
       <TriageDiscountModal 
         isOpen={showDiscountModal} 
         onClose={() => setShowDiscountModal(false)} 
+      />
+      
+      {/* Auth Dialog for signup */}
+      <AuthDialog 
+        open={showAuthDialog} 
+        onOpenChange={setShowAuthDialog} 
       />
       
       {/* Book of Documents Wizard */}
