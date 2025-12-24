@@ -110,7 +110,7 @@ const Triage = () => {
           description: userDescription,
           venue: triageResult.venue,
           province: province,
-          status: 'active',
+          status: 'pending',
           triage: {
             venue: triageResult.venue,
             venueTitle: triageResult.venueTitle,
@@ -124,14 +124,14 @@ const Triage = () => {
         .single();
 
       if (caseError) throw caseError;
-      
+
       setCreatedCaseId(caseData.id);
 
       // Upload pending documents to evidence
       if (pendingDocuments.length > 0) {
         for (const doc of pendingDocuments) {
           try {
-            setPendingDocuments(prev => 
+            setPendingDocuments(prev =>
               prev.map(d => d.id === doc.id ? { ...d, status: 'uploading' as const, progress: 20 } : d)
             );
 
@@ -142,7 +142,7 @@ const Triage = () => {
 
             if (uploadError) throw uploadError;
 
-            setPendingDocuments(prev => 
+            setPendingDocuments(prev =>
               prev.map(d => d.id === doc.id ? { ...d, progress: 60 } : d)
             );
 
@@ -159,7 +159,7 @@ const Triage = () => {
 
             if (evidenceError) throw evidenceError;
 
-            setPendingDocuments(prev => 
+            setPendingDocuments(prev =>
               prev.map(d => d.id === doc.id ? { ...d, status: 'uploaded' as const, progress: 100 } : d)
             );
 
@@ -175,7 +175,7 @@ const Triage = () => {
 
           } catch (docError) {
             console.error('Error uploading document:', doc.file.name, docError);
-            setPendingDocuments(prev => 
+            setPendingDocuments(prev =>
               prev.map(d => d.id === doc.id ? { ...d, status: 'error' as const, error: 'Upload failed' } : d)
             );
           }
@@ -183,11 +183,15 @@ const Triage = () => {
       }
 
       toast.success("Case created with documents!");
-      
+
       if (goToBookOfDocs) {
         setShowBookWizard(true);
       } else {
-        navigate(`/form-selector?venue=${triageResult.venue}&caseId=${caseData.id}`);
+        const recommendedForm = typeof preselectFormCode === 'string' && preselectFormCode.trim().length > 0
+          ? `&recommendedForm=${encodeURIComponent(preselectFormCode.trim())}`
+          : '';
+
+        navigate(`/forms/${triageResult.venue}?caseId=${caseData.id}${recommendedForm}`);
       }
     } catch (error) {
       console.error("Error creating case:", error);
