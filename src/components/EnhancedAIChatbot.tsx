@@ -9,6 +9,9 @@ import { supabase } from '@/integrations/supabase/client';
 
 type Message = { role: 'user' | 'assistant'; content: string };
 
+const MAX_MESSAGE_LENGTH = 2000;
+const MIN_MESSAGE_INTERVAL = 1000; // 1 second
+
 export function EnhancedAIChatbot() {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -18,6 +21,7 @@ export function EnhancedAIChatbot() {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [lastMessageTime, setLastMessageTime] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -27,6 +31,27 @@ export function EnhancedAIChatbot() {
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
+    // Client-side validation
+    if (input.length > MAX_MESSAGE_LENGTH) {
+      toast({
+        title: "Message too long",
+        description: `Please keep your message under ${MAX_MESSAGE_LENGTH} characters.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Rate limiting
+    if (Date.now() - lastMessageTime < MIN_MESSAGE_INTERVAL) {
+      toast({
+        title: "Please wait",
+        description: "Please wait a moment before sending another message.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLastMessageTime(Date.now());
     const userMessage: Message = { role: 'user', content: input };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
@@ -167,7 +192,10 @@ export function EnhancedAIChatbot() {
 
       setIsLoading(false);
     } catch (error) {
-      console.error('Chat error:', error);
+      // Only log in development
+      if (import.meta.env.DEV) {
+        console.error('Chat error:', error);
+      }
       toast({
         title: "Error",
         description: "Failed to get response. Please try again.",
