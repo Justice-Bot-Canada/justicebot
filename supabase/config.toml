@@ -1,7 +1,27 @@
 project_id = "vkzquzjtewqhcisvhsvg"
 
-# JWT verification is ENABLED by default for all functions
-# Only public contact forms should bypass authentication
+# ============================================================================
+# JWT VERIFICATION CONFIGURATION
+# ============================================================================
+# 
+# SECURITY REQUIREMENTS:
+# - verify_jwt = true (DEFAULT): Requires valid Authorization header with JWT
+# - verify_jwt = false: ONLY for public endpoints (webhooks, contact forms)
+#
+# CRITICAL FUNCTIONS (MUST keep verify_jwt = true):
+# - ai-legal-triage, legal-chat: AI/LLM calls (cost exposure risk)
+# - analyze-* family: Analysis functions (API cost exposure)
+# - create-paypal-payment, create-stripe-checkout: Payment creation
+# - generate-document: Document generation
+#
+# PUBLIC FUNCTIONS (verify_jwt = false is acceptable):
+# - submit-contact, submit-feedback, submit-lead: Public forms
+# - paypal-webhook: Payment webhook (verifies PayPal signature internally)
+# - process-email-queue, send-deadline-notifications: Background jobs
+# - sweep-canlii-updates: Scheduled data scraper
+# - smart-triage: Public triage (has input validation + rate limits)
+# - marketing-automation: Background email automation
+# ============================================================================
 
 [functions.analyze-legal-case-ai]
 verify_jwt = true

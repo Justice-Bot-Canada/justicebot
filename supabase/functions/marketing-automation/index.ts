@@ -1,10 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders, corsHeaders } from "../_shared/cors.ts";
 
 interface EmailSequence {
   id: string;
@@ -74,8 +70,11 @@ const EMAIL_SEQUENCES: EmailSequence[] = [
 ];
 
 serve(async (req) => {
+  const origin = req.headers.get("Origin");
+  const responseHeaders = getCorsHeaders(origin);
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: responseHeaders });
   }
 
   try {
@@ -88,30 +87,30 @@ serve(async (req) => {
 
     switch (action) {
       case 'trigger_sequence':
-        return await triggerSequence(supabaseClient, data);
+        return await triggerSequence(supabaseClient, data, responseHeaders);
       
       case 'process_scheduled':
-        return await processScheduledEmails(supabaseClient);
+        return await processScheduledEmails(supabaseClient, responseHeaders);
       
       case 'check_inactive':
-        return await checkInactiveUsers(supabaseClient);
+        return await checkInactiveUsers(supabaseClient, responseHeaders);
       
       case 'generate_content':
-        return await generateEmailContent(data);
+        return await generateEmailContent(data, responseHeaders);
       
       case 'get_sequences':
         return new Response(
           JSON.stringify({ success: true, sequences: EMAIL_SEQUENCES }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { headers: { ...responseHeaders, 'Content-Type': 'application/json' } }
         );
       
       case 'analytics':
-        return await getAutomationAnalytics(supabaseClient, data);
+        return await getAutomationAnalytics(supabaseClient, data, responseHeaders);
       
       default:
         return new Response(
           JSON.stringify({ success: false, error: 'Unknown action' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 400, headers: { ...responseHeaders, 'Content-Type': 'application/json' } }
         );
     }
 
@@ -124,7 +123,11 @@ serve(async (req) => {
   }
 });
 
-async function triggerSequence(supabase: any, data: { userId: string; email: string; trigger: string; metadata?: any }) {
+async function triggerSequence(
+  supabase: any, 
+  data: { userId: string; email: string; trigger: string; metadata?: any },
+  headers: Record<string, string>
+) {
   const { userId, email, trigger, metadata } = data;
   
   // Find matching sequence
@@ -132,7 +135,7 @@ async function triggerSequence(supabase: any, data: { userId: string; email: str
   if (!sequence) {
     return new Response(
       JSON.stringify({ success: false, error: `No sequence found for trigger: ${trigger}` }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...headers, 'Content-Type': 'application/json' } }
     );
   }
 
@@ -176,11 +179,11 @@ async function triggerSequence(supabase: any, data: { userId: string; email: str
       sequence: sequence.name,
       emailsScheduled: scheduledEmails.length 
     }),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    { headers: { ...headers, 'Content-Type': 'application/json' } }
   );
 }
 
-async function processScheduledEmails(supabase: any) {
+async function processScheduledEmails(supabase: any, headers: Record<string, string>) {
   const now = new Date().toISOString();
   
   // Get emails that are scheduled and due
@@ -195,14 +198,14 @@ async function processScheduledEmails(supabase: any) {
     console.error('Error fetching scheduled emails:', fetchError);
     return new Response(
       JSON.stringify({ success: false, error: fetchError.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...headers, 'Content-Type': 'application/json' } }
     );
   }
 
   if (!dueEmails?.length) {
     return new Response(
       JSON.stringify({ success: true, processed: 0, message: 'No emails due' }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { headers: { ...headers, 'Content-Type': 'application/json' } }
     );
   }
 
@@ -272,11 +275,11 @@ async function processScheduledEmails(supabase: any) {
 
   return new Response(
     JSON.stringify({ success: true, processed: dueEmails.length, sent, failed }),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    { headers: { ...headers, 'Content-Type': 'application/json' } }
   );
 }
 
-async function checkInactiveUsers(supabase: any) {
+async function checkInactiveUsers(supabase: any, headers: Record<string, string>) {
   // Find users who haven't logged in for 7 days
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -319,23 +322,23 @@ async function checkInactiveUsers(supabase: any) {
         email: user.email,
         trigger: 'inactive',
         metadata: { lastActive: sevenDaysAgo.toISOString() }
-      });
+      }, headers);
       triggered++;
     }
   }
 
   return new Response(
     JSON.stringify({ success: true, inactiveCount: inactiveUsers.length, triggered }),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    { headers: { ...headers, 'Content-Type': 'application/json' } }
   );
 }
 
-async function generateEmailContent(data: { template: string; context?: any }) {
+async function generateEmailContent(data: { template: string; context?: any }, headers: Record<string, string>) {
   const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
   if (!LOVABLE_API_KEY) {
     return new Response(
       JSON.stringify({ success: false, error: 'LOVABLE_API_KEY not configured' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...headers, 'Content-Type': 'application/json' } }
     );
   }
 
@@ -348,7 +351,7 @@ async function generateEmailContent(data: { template: string; context?: any }) {
 
   return new Response(
     JSON.stringify({ success: true, content }),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    { headers: { ...headers, 'Content-Type': 'application/json' } }
   );
 }
 
@@ -439,7 +442,7 @@ function getDefaultTemplate(template: string, vars: any): string {
   `;
 }
 
-async function getAutomationAnalytics(supabase: any, data: { days?: number }) {
+async function getAutomationAnalytics(supabase: any, data: { days?: number }, headers: Record<string, string>) {
   const days = data.days || 30;
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - days);
@@ -452,7 +455,7 @@ async function getAutomationAnalytics(supabase: any, data: { days?: number }) {
   if (error) {
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { status: 500, headers: { ...headers, 'Content-Type': 'application/json' } }
     );
   }
 
@@ -481,6 +484,6 @@ async function getAutomationAnalytics(supabase: any, data: { days?: number }) {
         byTemplate
       }
     }),
-    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    { headers: { ...headers, 'Content-Type': 'application/json' } }
   );
 }

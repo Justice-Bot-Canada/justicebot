@@ -16,6 +16,11 @@ declare global {
   }
 }
 
+/**
+ * PayPal Client ID - This is a PUBLIC key, safe to include in client code.
+ * PayPal Client IDs are designed for browser-side use; the secret key remains server-side only.
+ * This follows PayPal's SDK integration pattern.
+ */
 const PAYPAL_CLIENT_ID = "AS7gni64FdKWkeMYxUGCFStgDXhtyG0SooKeyMu-NwVDwFzrRC8iMfPmesMmSrGXZUQqYz69EsiQ9ril";
 
 const PayPalTrialButton = ({ planId, trialDays = 5 }: PayPalTrialButtonProps) => {
