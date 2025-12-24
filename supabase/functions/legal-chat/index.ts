@@ -164,7 +164,7 @@ const systemPrompt = `You are Justice-Bot, a knowledgeable legal information ass
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      return new Response(JSON.stringify({ error: "AI service temporarily unavailable", details: errorText }), {
+      return new Response(JSON.stringify({ error: "AI service temporarily unavailable. Please try again." }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -175,7 +175,7 @@ const systemPrompt = `You are Justice-Bot, a knowledgeable legal information ass
     });
   } catch (error) {
     console.error("Legal chat error:", error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
+    return new Response(JSON.stringify({ error: "An error occurred. Please try again." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

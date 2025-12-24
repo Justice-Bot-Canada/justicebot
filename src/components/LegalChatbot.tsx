@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
-import DOMPurify from 'dompurify';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -217,19 +217,13 @@ export function LegalChatbot() {
     }
   };
 
-  // Format markdown-like content with XSS protection
-  const formatContent = (content: string) => {
-    const formatted = content
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/^• /gm, '• ')
-      .replace(/\n/g, '<br />');
-    
-    // Sanitize to prevent XSS attacks
-    return DOMPurify.sanitize(formatted, {
-      ALLOWED_TAGS: ['strong', 'em', 'br', 'p'],
-      ALLOWED_ATTR: []
-    });
+  // Markdown components for react-markdown (XSS-safe by default)
+  const markdownComponents = {
+    strong: ({ children }: { children?: React.ReactNode }) => <strong className="font-semibold">{children}</strong>,
+    em: ({ children }: { children?: React.ReactNode }) => <em className="italic">{children}</em>,
+    p: ({ children }: { children?: React.ReactNode }) => <p className="mb-2 last:mb-0">{children}</p>,
+    ul: ({ children }: { children?: React.ReactNode }) => <ul className="list-disc pl-4 mb-2">{children}</ul>,
+    li: ({ children }: { children?: React.ReactNode }) => <li className="mb-1">{children}</li>,
   };
 
   return (
@@ -312,10 +306,11 @@ export function LegalChatbot() {
                     : 'bg-muted/70 border'
                 )}
               >
-                <div 
-                  className="text-sm leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: formatContent(message.content) }}
-                />
+                <div className="text-sm leading-relaxed prose prose-sm max-w-none dark:prose-invert">
+                  <ReactMarkdown components={markdownComponents}>
+                    {message.content}
+                  </ReactMarkdown>
+                </div>
                 {message.role === 'assistant' && index > 0 && (
                   <Button
                     variant="ghost"
