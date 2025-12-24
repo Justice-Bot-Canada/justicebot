@@ -102,25 +102,44 @@ const SmartTriageForm: React.FC<SmartTriageFormProps> = ({
     "CAS has contacted me about my children",
   ];
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {
+    // Handle rejected files
+    if (rejectedFiles.length > 0) {
+      rejectedFiles.forEach(({ file, errors }) => {
+        const errorMessages = errors.map((e: any) => {
+          if (e.code === 'file-too-large') return `${file.name} is too large (max 10MB)`;
+          if (e.code === 'file-invalid-type') return `${file.name} is not a supported file type`;
+          if (e.code === 'too-many-files') return 'Too many files (max 5)';
+          return e.message;
+        });
+        toast.error(errorMessages.join(', '));
+      });
+    }
+
     const newFiles = acceptedFiles.slice(0, 5 - uploadedFiles.length);
-    setUploadedFiles(prev => [...prev, ...newFiles]);
-    
-    // Generate descriptions for uploaded files
-    newFiles.forEach(file => {
-      const fileType = file.type.includes('image') ? 'Image' : 
-                       file.type.includes('pdf') ? 'PDF Document' : 'Document';
-      setEvidenceDescriptions(prev => [...prev, `${fileType}: ${file.name}`]);
-    });
+    if (newFiles.length > 0) {
+      setUploadedFiles(prev => [...prev, ...newFiles]);
+      
+      // Generate descriptions for uploaded files
+      newFiles.forEach(file => {
+        const fileType = file.type.includes('image') ? 'Image' : 
+                         file.type.includes('pdf') ? 'PDF Document' : 'Document';
+        setEvidenceDescriptions(prev => [...prev, `${fileType}: ${file.name}`]);
+      });
+      toast.success(`${newFiles.length} file(s) added`);
+    }
   }, [uploadedFiles]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'image/*': ['.jpeg', '.jpg', '.png', '.gif'],
+      'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp', '.heic', '.bmp', '.tiff'],
       'application/pdf': ['.pdf'],
       'application/msword': ['.doc'],
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
+      'text/plain': ['.txt'],
+      'text/rtf': ['.rtf'],
+      'application/rtf': ['.rtf'],
     },
     maxFiles: 5,
     maxSize: 10 * 1024 * 1024, // 10MB
