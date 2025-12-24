@@ -2433,6 +2433,14 @@ export type Database = {
         Args: { target_schemas?: string[] }
         Returns: undefined
       }
+      get_admins_meta_secure: {
+        Args: never
+        Returns: {
+          granted_at: string
+          revoked_at: string
+          user_id: string
+        }[]
+      }
       get_admins_public_meta: {
         Args: never
         Returns: {
