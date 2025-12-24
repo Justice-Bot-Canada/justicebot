@@ -202,40 +202,125 @@ export const analytics = {
     });
   },
 
-  // Pipeline Conversion Events (6 key events)
+  // Pipeline Conversion Events (6 key events + 1 global)
+  
+  // Global: journey_started - fires when any journey page loads
+  journeyStarted: (journey: string, entryPoint: string, userLoggedIn: boolean) => {
+    const payload = {
+      journey,
+      entry_point: entryPoint,
+      user_logged_in: userLoggedIn,
+    };
+    trackEvent('journey_started', payload);
+    sendGA4Event('journey_started', payload);
+  },
+
   // 1. /urgent-triage → journey page loaded
-  urgentRouted: (journey: string, scenario: string) => {
-    trackEvent('urgent_routed', { journey, scenario });
-    sendGA4Event('urgent_routed', { journey, scenario, source: 'urgent_triage' });
+  urgentRouted: (data: {
+    detectedTrigger: string;
+    recommendedJourney: string;
+    secondaryFlag?: string[];
+    timeToRouteSeconds: number;
+    userLoggedIn: boolean;
+  }) => {
+    const payload = {
+      route: '/urgent-triage',
+      detected_trigger: data.detectedTrigger,
+      recommended_journey: data.recommendedJourney,
+      secondary_flag: data.secondaryFlag || [],
+      time_to_route_seconds: data.timeToRouteSeconds,
+      user_logged_in: data.userLoggedIn,
+    };
+    trackEvent('urgent_routed', payload);
+    sendGA4Event('urgent_routed', payload);
   },
   
   // 2. /find-my-path → journey clicked
-  pathSelected: (journey: string, category: string) => {
-    trackEvent('path_selected', { journey, category });
-    sendGA4Event('path_selected', { journey, category, source: 'find_my_path' });
+  pathSelected: (data: {
+    legalDomain: string;
+    selectedJourney: string;
+    confidenceLevel?: 'low' | 'medium' | 'high';
+    userLoggedIn: boolean;
+  }) => {
+    const payload = {
+      route: '/find-my-path',
+      legal_domain: data.legalDomain,
+      selected_journey: data.selectedJourney,
+      confidence_level: data.confidenceLevel || 'medium',
+      user_logged_in: data.userLoggedIn,
+    };
+    trackEvent('path_selected', payload);
+    sendGA4Event('path_selected', payload);
   },
   
   // 3. /upload-first → AI returns pathway
-  docAnalyzed: (pathway: string, documentType: string, confidence: number) => {
-    trackEvent('doc_analyzed', { pathway, documentType, confidence });
-    sendGA4Event('doc_analyzed', { pathway, documentType, confidence, source: 'upload_first' });
+  docAnalyzed: (data: {
+    documentType: string;
+    issuesDetected: string[];
+    recommendedJourney: string[];
+    confidenceScore: number;
+    userLoggedIn: boolean;
+  }) => {
+    const payload = {
+      route: '/upload-first',
+      document_type: data.documentType,
+      issues_detected: data.issuesDetected,
+      recommended_journey: data.recommendedJourney,
+      confidence_score: data.confidenceScore,
+      user_logged_in: data.userLoggedIn,
+    };
+    trackEvent('doc_analyzed', payload);
+    sendGA4Event('doc_analyzed', payload);
   },
   
-  // 4. /triage → merit + tribunal shown (already exists as triageComplete, adding alias)
-  triageCompleted: (venue: string, confidence: number) => {
-    trackEvent('triage_completed', { venue, confidence });
-    sendGA4Event('triage_completed', { venue, confidence, source: 'triage' });
+  // 4. /triage → merit + tribunal shown
+  triageCompleted: (data: {
+    recommendedJourney: string;
+    meritScore: number;
+    groundsDetected?: string[];
+    dualPathway: boolean;
+    userLoggedIn: boolean;
+  }) => {
+    const payload = {
+      route: '/triage',
+      recommended_journey: data.recommendedJourney,
+      merit_score: data.meritScore,
+      grounds_detected: data.groundsDetected || [],
+      dual_pathway: data.dualPathway,
+      user_logged_in: data.userLoggedIn,
+    };
+    trackEvent('triage_completed', payload);
+    sendGA4Event('triage_completed', payload);
   },
   
   // 5. /explain-my-options → clicks triage or upload
-  educationConverted: (destination: string, tribunalViewed?: string) => {
-    trackEvent('education_converted', { destination, tribunalViewed });
-    sendGA4Event('education_converted', { destination, tribunalViewed, source: 'explain_my_options' });
+  educationConverted: (data: {
+    destination: string;
+    timeOnPageSeconds: number;
+    userLoggedIn: boolean;
+  }) => {
+    const payload = {
+      route: '/explain-my-options',
+      destination: data.destination,
+      time_on_page_seconds: data.timeOnPageSeconds,
+      user_logged_in: data.userLoggedIn,
+    };
+    trackEvent('education_converted', payload);
+    sendGA4Event('education_converted', payload);
   },
   
   // 6. /case-demo → account created
-  demoSignup: (demoId: string) => {
-    trackEvent('demo_signup', { demoId });
-    sendGA4Event('demo_signup', { demoId, source: 'case_demo' });
+  demoSignup: (data: {
+    demoCase: string;
+    userLoggedIn: boolean;
+  }) => {
+    const payload = {
+      route: '/case-demo',
+      demo_case: data.demoCase,
+      conversion_source: 'demo',
+      user_logged_in: data.userLoggedIn,
+    };
+    trackEvent('demo_signup', payload);
+    sendGA4Event('demo_signup', payload);
   },
 };

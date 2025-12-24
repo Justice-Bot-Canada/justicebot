@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { AlertTriangle, Home, Briefcase, Users, Scale, FileWarning, ArrowRight, Clock, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { analytics } from "@/utils/analytics";
+import { useAuth } from "@/hooks/useAuth";
 
 interface UrgentScenario {
   id: string;
@@ -72,16 +73,33 @@ const urgentScenarios: UrgentScenario[] = [
 
 const UrgentTriage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [selectedScenario, setSelectedScenario] = useState<UrgentScenario | null>(null);
+  const startTime = useRef(Date.now());
 
   const handleScenarioSelect = (scenario: UrgentScenario) => {
     setSelectedScenario(scenario);
   };
 
   const handleContinue = (path: string) => {
-    // Track conversion: urgent_routed
+    // Track conversion: urgent_routed with rich payload
     if (selectedScenario) {
-      analytics.urgentRouted(path, selectedScenario.id);
+      const timeToRoute = Math.round((Date.now() - startTime.current) / 1000);
+      analytics.urgentRouted({
+        detectedTrigger: selectedScenario.id,
+        recommendedJourney: path.replace('/', '').replace('-journey', '').toUpperCase(),
+        secondaryFlag: selectedScenario.secondaryPath 
+          ? [selectedScenario.secondaryPath.replace('/', '').replace('-journey', '').toUpperCase()] 
+          : [],
+        timeToRouteSeconds: timeToRoute,
+        userLoggedIn: !!user,
+      });
+      // Also fire journey_started
+      analytics.journeyStarted(
+        path.replace('/', '').replace('-journey', '').toUpperCase(),
+        '/urgent-triage',
+        !!user
+      );
     }
     navigate(path);
   };

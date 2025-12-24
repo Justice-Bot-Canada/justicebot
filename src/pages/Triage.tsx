@@ -66,7 +66,14 @@ const Triage = () => {
     
     // Track triage completion
     analytics.triageComplete(result.venue);
-    analytics.triageCompleted(result.venue, result.confidence); // Pipeline event
+    // Pipeline event with rich payload
+    analytics.triageCompleted({
+      recommendedJourney: result.venue,
+      meritScore: Math.round(result.confidence),
+      groundsDetected: result.flags || [],
+      dualPathway: (result.alternativeVenues?.length || 0) > 0,
+      userLoggedIn: !!user,
+    });
     trackEvent('triage_complete', { 
       venue: result.venue, 
       confidence: result.confidence,

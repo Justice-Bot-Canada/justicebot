@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { analytics } from "@/utils/analytics";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Tribunal {
   id: string;
@@ -166,7 +167,9 @@ const tribunals: Tribunal[] = [
 
 const ExplainMyOptions = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [expandedTribunal, setExpandedTribunal] = useState<string | null>(null);
+  const [pageLoadTime] = useState(Date.now());
 
   return (
     <div className="min-h-screen bg-background">
@@ -286,7 +289,17 @@ const ExplainMyOptions = () => {
                     <Button 
                       className="w-full mt-6"
                       onClick={() => {
-                        analytics.educationConverted(tribunal.path, tribunal.id);
+                        const timeOnPage = Math.round((Date.now() - pageLoadTime) / 1000);
+                        analytics.educationConverted({
+                          destination: tribunal.path,
+                          timeOnPageSeconds: timeOnPage,
+                          userLoggedIn: !!user,
+                        });
+                        analytics.journeyStarted(
+                          tribunal.id.toUpperCase(),
+                          '/explain-my-options',
+                          !!user
+                        );
                         navigate(tribunal.path);
                       }}
                     >
@@ -305,13 +318,23 @@ const ExplainMyOptions = () => {
           <h3 className="text-xl font-semibold mb-4">Ready to find your path?</h3>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" onClick={() => {
-              analytics.educationConverted('/find-my-path', expandedTribunal || undefined);
+              const timeOnPage = Math.round((Date.now() - pageLoadTime) / 1000);
+              analytics.educationConverted({
+                destination: '/find-my-path',
+                timeOnPageSeconds: timeOnPage,
+                userLoggedIn: !!user,
+              });
               navigate("/find-my-path");
             }}>
               Find My Legal Path
             </Button>
             <Button size="lg" variant="outline" onClick={() => {
-              analytics.educationConverted('/triage', expandedTribunal || undefined);
+              const timeOnPage = Math.round((Date.now() - pageLoadTime) / 1000);
+              analytics.educationConverted({
+                destination: '/triage',
+                timeOnPageSeconds: timeOnPage,
+                userLoggedIn: !!user,
+              });
               navigate("/triage");
             }}>
               Get AI Recommendations

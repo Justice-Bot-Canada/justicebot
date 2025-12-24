@@ -130,7 +130,10 @@ const CaseDemo = () => {
 
   const handleSignupClick = () => {
     if (demoId) {
-      analytics.demoSignup(demoId);
+      analytics.demoSignup({
+        demoCase: demoId,
+        userLoggedIn: true, // Will be true after signup
+      });
     }
     setShowAuthDialog(true);
   };
