@@ -69,6 +69,26 @@ const Header = () => {
               <div className="relative group">
                 <button 
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+                  aria-label="Get started with your legal issue"
+                  aria-haspopup="true"
+                >
+                  Get Help
+                </button>
+                <div className="absolute left-0 top-full mt-2 w-56 bg-background border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                  <div className="py-2">
+                    <a href="/urgent-triage" className="block px-4 py-2 text-sm hover:bg-muted font-medium text-destructive">🚨 I Need Help NOW</a>
+                    <a href="/find-my-path" className="block px-4 py-2 text-sm hover:bg-muted">🧭 Find My Legal Path</a>
+                    <a href="/upload-first" className="block px-4 py-2 text-sm hover:bg-muted">📂 Upload Documents</a>
+                    <a href="/explain-my-options" className="block px-4 py-2 text-sm hover:bg-muted">🧠 Explain My Options</a>
+                    <a href="/triage" className="block px-4 py-2 text-sm hover:bg-muted">AI Case Triage</a>
+                    <a href="/case-demo" className="block px-4 py-2 text-sm hover:bg-muted">🧪 Try a Demo Case</a>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="relative group">
+                <button 
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
                   aria-label="Legal areas we help with"
                   aria-haspopup="true"
                 >
@@ -229,7 +249,13 @@ const Header = () => {
             aria-label="Mobile navigation menu"
           >
             <nav className="flex flex-col gap-2 mt-4" role="navigation">
-              <div className="text-xs font-semibold text-muted-foreground px-2 pt-2">Legal Areas</div>
+              <div className="text-xs font-semibold text-muted-foreground px-2 pt-2">Get Help</div>
+              <a href="/urgent-triage" className="text-sm text-destructive hover:text-destructive/80 font-medium transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>🚨 I Need Help NOW</a>
+              <a href="/find-my-path" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>🧭 Find My Legal Path</a>
+              <a href="/upload-first" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>📂 Upload Documents</a>
+              <a href="/explain-my-options" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>🧠 Explain My Options</a>
+              
+              <div className="text-xs font-semibold text-muted-foreground px-2 pt-3">Legal Areas</div>
               <a href="/ltb-journey" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>Landlord-Tenant</a>
               <a href="/family-journey" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>Family Court</a>
               <a href="/criminal-journey" className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1" onClick={() => setMobileMenuOpen(false)}>Criminal Law</a>

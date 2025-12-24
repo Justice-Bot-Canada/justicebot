@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { UserJourney } from "@/components/UserJourney";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
+import { CrossTribunalBanner } from "@/components/CrossTribunalBanner";
 
 const HRTOJourney = () => {
   const navigate = useNavigate();
@@ -115,6 +116,8 @@ const HRTOJourney = () => {
               Complete guide to filing a human rights complaint in Canada. Get step-by-step help with HRTO Form 1, Schedule A, and Form 2 for discrimination at work, housing discrimination, or harassment cases at Ontario tribunal. Affordable legal support available.
             </p>
           </div>
+
+          <CrossTribunalBanner currentTribunal="hrto" />
 
           <UserJourney 
             venue="hrto"

@@ -71,6 +71,11 @@ import Journey from "./pages/Journey";
 import CriminalCourtGuide from "./pages/CriminalCourtGuide";
 import CriminalCourtMistakes from "./pages/CriminalCourtMistakes";
 import DemoJourney from "./pages/DemoJourney";
+import UrgentTriage from "./pages/UrgentTriage";
+import FindMyPath from "./pages/FindMyPath";
+import UploadFirst from "./pages/UploadFirst";
+import ExplainMyOptions from "./pages/ExplainMyOptions";
+import CaseDemo from "./pages/CaseDemo";
 import TenantRightsGuide from "./pages/TenantRightsGuide";
 import FamilyLawGuide from "./pages/FamilyLawGuide";
 import HumanRightsGuide from "./pages/HumanRightsGuide";
@@ -146,6 +151,12 @@ const AppContent = () => {
           <Route path="/demo-journey" element={<DemoJourney />} />
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/triage" element={<Triage />} />
+          <Route path="/urgent-triage" element={<UrgentTriage />} />
+          <Route path="/find-my-path" element={<FindMyPath />} />
+          <Route path="/upload-first" element={<UploadFirst />} />
+          <Route path="/explain-my-options" element={<ExplainMyOptions />} />
+          <Route path="/case-demo" element={<CaseDemo />} />
+          <Route path="/case-demo/:caseType" element={<CaseDemo />} />
           <Route path="/journey" element={<Journey />} />
           <Route path="/pricing" element={<Pricing />} />
 
