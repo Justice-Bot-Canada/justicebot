@@ -33,15 +33,27 @@ export function PathwayRecommendation({ pathway, caseId, caseData }: PathwayProp
   const navigate = useNavigate();
 
   const handleStartForm = async (form: RecommendedForm) => {
-    // Navigate to form builder with case context for autofill
-    navigate(`/form-builder/${form.code}`, {
-      state: {
-        caseId,
-        caseData,
-        pathway: pathway.id,
-        autoFill: true
-      }
-    });
+    // Navigate to form page with case context for autofill
+    // If we have a formId, use it; otherwise navigate to the forms list for the venue
+    if (form.formId) {
+      navigate(`/form/${form.formId}`, {
+        state: {
+          caseId,
+          caseData,
+          pathway: pathway.id,
+          autoFill: true
+        }
+      });
+    } else {
+      // Navigate to forms list for this pathway type
+      navigate(`/forms/${pathway.id}`, {
+        state: {
+          caseId,
+          caseData,
+          recommendedForm: form.code
+        }
+      });
+    }
   };
 
   const handleStartJourney = () => {

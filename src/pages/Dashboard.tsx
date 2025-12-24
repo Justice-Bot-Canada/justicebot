@@ -219,24 +219,63 @@ const Dashboard = () => {
           <TabsContent value="documents" className="mt-6">
             {activeCaseId ? (
               <div className="space-y-6">
+                {/* Case Preparation Guide */}
+                <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-primary" />
+                      📋 Case Preparation Guide
+                    </CardTitle>
+                    <CardDescription>
+                      Follow these steps to prepare your case for the tribunal or court
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <div className="p-4 bg-background rounded-lg border">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm flex items-center justify-center font-bold">1</span>
+                          <h4 className="font-semibold">Upload Evidence</h4>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Upload all documents, photos, emails, and evidence related to your case</p>
+                      </div>
+                      <div className="p-4 bg-background rounded-lg border">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm flex items-center justify-center font-bold">2</span>
+                          <h4 className="font-semibold">Organize & Label</h4>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Add descriptions and tags to each document for easy reference</p>
+                      </div>
+                      <div className="p-4 bg-background rounded-lg border">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm flex items-center justify-center font-bold">3</span>
+                          <h4 className="font-semibold">Build Book of Documents</h4>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Generate a professional exhibit book with table of contents</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* Evidence Hub - Main document library */}
                 <EvidenceHub caseId={activeCaseId} />
                 
                 {/* Book of Documents Builder Button */}
-                <Card>
+                <Card className="border-2 border-primary/30">
                   <CardContent className="pt-6">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div>
-                        <h3 className="font-semibold flex items-center gap-2">
-                          <FileText className="h-5 w-5" />
-                          Book of Documents
+                        <h3 className="font-semibold text-lg flex items-center gap-2">
+                          <FileText className="h-5 w-5 text-primary" />
+                          📚 Book of Documents Wizard
                         </h3>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Generate a professionally formatted book of documents with index and page numbers
+                          Generate a professionally formatted book of documents with index, page numbers, and exhibit labels. Required for most tribunal hearings.
                         </p>
                       </div>
-                      <Button onClick={() => setShowBookWizard(true)}>
+                      <Button onClick={() => setShowBookWizard(true)} size="lg" className="shrink-0">
                         Build Book of Documents
+                        <ArrowRight className="h-4 w-4 ml-2" />
                       </Button>
                     </div>
                   </CardContent>
