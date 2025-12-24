@@ -54,8 +54,22 @@ export function PathwayRecommendation({ pathway, caseId, caseData }: PathwayProp
       'superior': '/superior-court-journey'
     };
     
-    const journeyPath = journeyMap[pathway.id] || '/dashboard';
-    navigate(journeyPath, { state: { caseId } });
+    const pathwayId = pathway.id?.toLowerCase() || '';
+    const journeyPath = journeyMap[pathwayId];
+    
+    console.log('PathwayRecommendation: handleStartJourney called', {
+      pathwayId: pathway.id,
+      normalizedId: pathwayId,
+      journeyPath,
+      caseId
+    });
+    
+    if (journeyPath) {
+      navigate(journeyPath, { state: { caseId } });
+    } else {
+      console.error('Unknown pathway:', pathway.id);
+      navigate('/dashboard', { state: { caseId } });
+    }
   };
 
   const suitabilityColor = {
