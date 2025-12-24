@@ -297,73 +297,20 @@ const Triage = () => {
                 result={triageResult}
                 description={userDescription}
                 province={province}
-                onProceed={handleProceed}
+                onProceed={() => setStep(2)}
                 onBack={() => setStep(0)}
                 onSelectForm={handleSelectForm}
                 isLoading={isSavingDocuments}
               />
 
-              {/* Book of Documents Prompt - shown when user has substantial evidence */}
-              {shouldShowBookOfDocuments && (
-                <Card className="mt-6 border-primary/50 bg-primary/5">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2 text-primary">
-                      <BookOpen className="h-5 w-5" />
-                      Ready to Build Your Book of Documents
-                    </CardTitle>
-                    <CardDescription>
-                      You've uploaded {uploadedEvidenceCount + pendingDocuments.length} document(s) including completed forms. 
-                      Organize your evidence into a professional Book of Documents for your hearing.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <Button 
-                        onClick={handleBuildBookOfDocuments} 
-                        className="flex-1"
-                        disabled={isSavingDocuments}
-                      >
-                        {isSavingDocuments ? (
-                          <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Creating Case...
-                          </>
-                        ) : (
-                          <>
-                            <BookOpen className="h-4 w-4 mr-2" />
-                            Build Book of Documents
-                          </>
-                        )}
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        onClick={() => handleProceed(false)}
-                        disabled={isSavingDocuments}
-                        className="flex-1"
-                      >
-                        <FileCheck className="h-4 w-4 mr-2" />
-                        Continue to Forms
-                        <ArrowRight className="h-4 w-4 ml-2" />
-                      </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      The Book of Documents wizard will help you organize, label, and compile your evidence 
-                      into a tribunal-ready format with proper exhibit labels and indexing.
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Document Upload Section - only show if not enough docs for Book */}
-              {!shouldShowBookOfDocuments && (
-                <div className="mt-6">
-                  <TriageDocumentUpload
-                    documents={pendingDocuments}
-                    onDocumentsChange={setPendingDocuments}
-                    disabled={isSavingDocuments}
-                  />
-                </div>
-              )}
+              {/* Document Upload Section */}
+              <div className="mt-6">
+                <TriageDocumentUpload
+                  documents={pendingDocuments}
+                  onDocumentsChange={setPendingDocuments}
+                  disabled={isSavingDocuments}
+                />
+              </div>
               
               <div className="mt-8">
                 <RelatedPages 
@@ -373,6 +320,81 @@ const Triage = () => {
                 />
               </div>
             </>
+          )}
+
+          {/* Step 2: After pathway selection - Book of Documents or Forms */}
+          {step === 2 && triageResult && (
+            <Card className="border-primary/50 bg-primary/5">
+              <CardHeader>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => setStep(1)}
+                  className="w-fit mb-2"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Results
+                </Button>
+                <CardTitle className="flex items-center gap-2 text-primary">
+                  <BookOpen className="h-5 w-5" />
+                  {shouldShowBookOfDocuments 
+                    ? "Build Your Book of Documents" 
+                    : "Proceed with Your Case"}
+                </CardTitle>
+                <CardDescription>
+                  {shouldShowBookOfDocuments 
+                    ? `You've uploaded ${uploadedEvidenceCount + pendingDocuments.length} document(s). Organize your evidence into a professional Book of Documents for your ${triageResult.venueTitle} hearing.`
+                    : `Create your case and proceed to fill out the required forms for ${triageResult.venueTitle}.`}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {shouldShowBookOfDocuments && (
+                    <Button 
+                      onClick={handleBuildBookOfDocuments} 
+                      className="flex-1"
+                      disabled={isSavingDocuments}
+                    >
+                      {isSavingDocuments ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Creating Case...
+                        </>
+                      ) : (
+                        <>
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          Build Book of Documents
+                        </>
+                      )}
+                    </Button>
+                  )}
+                  <Button 
+                    variant={shouldShowBookOfDocuments ? "outline" : "default"}
+                    onClick={() => handleProceed(false)}
+                    disabled={isSavingDocuments}
+                    className="flex-1"
+                  >
+                    {isSavingDocuments ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Creating Case...
+                      </>
+                    ) : (
+                      <>
+                        <FileCheck className="h-4 w-4 mr-2" />
+                        {shouldShowBookOfDocuments ? "Skip to Forms" : "Continue to Forms"}
+                        <ArrowRight className="h-4 w-4 ml-2" />
+                      </>
+                    )}
+                  </Button>
+                </div>
+                {shouldShowBookOfDocuments && (
+                  <p className="text-xs text-muted-foreground">
+                    The Book of Documents wizard will help you organize, label, and compile your evidence 
+                    into a tribunal-ready format with proper exhibit labels and indexing.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
           )}
         </div>
       </main>
