@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { analytics } from "@/utils/analytics";
 
 interface Tribunal {
   id: string;
@@ -284,7 +285,10 @@ const ExplainMyOptions = () => {
 
                     <Button 
                       className="w-full mt-6"
-                      onClick={() => navigate(tribunal.path)}
+                      onClick={() => {
+                        analytics.educationConverted(tribunal.path, tribunal.id);
+                        navigate(tribunal.path);
+                      }}
                     >
                       Start {tribunal.name} Journey
                       <ArrowRight className="w-4 h-4 ml-2" />
@@ -300,10 +304,16 @@ const ExplainMyOptions = () => {
         <div className="mt-12 text-center">
           <h3 className="text-xl font-semibold mb-4">Ready to find your path?</h3>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" onClick={() => navigate("/find-my-path")}>
+            <Button size="lg" onClick={() => {
+              analytics.educationConverted('/find-my-path', expandedTribunal || undefined);
+              navigate("/find-my-path");
+            }}>
               Find My Legal Path
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate("/triage")}>
+            <Button size="lg" variant="outline" onClick={() => {
+              analytics.educationConverted('/triage', expandedTribunal || undefined);
+              navigate("/triage");
+            }}>
               Get AI Recommendations
             </Button>
           </div>

@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDropzone } from "react-dropzone";
-import { Upload, FileText, AlertCircle, ArrowRight, Loader2, CheckCircle } from "lucide-react";
+import { Upload, FileText, AlertCircle, ArrowRight, Loader2, CheckCircle, Shield, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { analytics } from "@/utils/analytics";
 
 interface DetectedDocument {
   type: string;
@@ -94,6 +95,11 @@ const UploadFirst = () => {
       setAnalysisComplete(true);
       toast.success("Document analysis complete!");
       
+      // Track conversion: doc_analyzed
+      detected.forEach(doc => {
+        analytics.docAnalyzed(doc.suggestedPath, doc.type, doc.confidence);
+      });
+      
     } catch (error) {
       console.error("Analysis error:", error);
       toast.error("Failed to analyze documents. Please try again.");
@@ -119,11 +125,24 @@ const UploadFirst = () => {
       <main className="container mx-auto px-4 py-8 max-w-3xl">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
-            Upload Your Documents
+            Let AI Read Your Documents
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Show us what you received. We'll identify the document type and guide you to the right legal pathway.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
+            Upload what you received — eviction notice, termination letter, court form. 
+            We'll analyze it and show you your legal options.
           </p>
+          
+          {/* Trust signals */}
+          <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Shield className="w-4 h-4 text-green-500" />
+              Secure & encrypted
+            </span>
+            <span className="flex items-center gap-1">
+              <Eye className="w-4 h-4 text-primary" />
+              AI reads instantly
+            </span>
+          </div>
         </div>
 
         {/* Upload Area */}
@@ -224,6 +243,14 @@ const UploadFirst = () => {
                   </div>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+              <h4 className="font-semibold text-sm mb-2">What happens next:</h4>
+              <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                <span>You'll see your tribunal + recommended forms + next steps</span>
+              </div>
             </div>
 
             <div className="mt-4 p-4 bg-accent/10 rounded-lg">

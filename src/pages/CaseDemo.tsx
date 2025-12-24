@@ -1,10 +1,14 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, CheckCircle, AlertTriangle, Scale, FileText, Clock } from "lucide-react";
+import { ArrowRight, CheckCircle, AlertTriangle, Scale, FileText, Clock, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
+import { analytics } from "@/utils/analytics";
+import { useState } from "react";
+import AuthDialog from "@/components/AuthDialog";
+import { useAuth } from "@/hooks/useAuth";
 
 interface DemoCase {
   id: string;
@@ -119,8 +123,17 @@ When Maria filed a T2 at the LTB for harassment, the landlord retaliated with an
 const CaseDemo = () => {
   const { demoId } = useParams<{ demoId: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
   
   const demoCase = demoId ? demoCases[demoId] : null;
+
+  const handleSignupClick = () => {
+    if (demoId) {
+      analytics.demoSignup(demoId);
+    }
+    setShowAuthDialog(true);
+  };
   
   // If no specific demo, show demo selection
   if (!demoCase) {
@@ -170,10 +183,21 @@ const CaseDemo = () => {
 
           <div className="mt-8 text-center">
             <p className="text-muted-foreground mb-4">Ready to analyze your own situation?</p>
-            <Button size="lg" onClick={() => navigate("/triage")}>
-              Start Your Case Assessment
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              {!user ? (
+                <Button size="lg" onClick={handleSignupClick}>
+                  <UserPlus className="w-5 h-5 mr-2" />
+                  Create Free Account
+                </Button>
+              ) : (
+                <Button size="lg" onClick={() => navigate("/triage")}>
+                  Start Your Case Assessment
+                </Button>
+              )}
+            </div>
           </div>
+          
+          <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
         </main>
 
         <Footer />
@@ -308,15 +332,24 @@ const CaseDemo = () => {
         <div className="text-center mt-8">
           <h3 className="text-xl font-semibold mb-4">Ready to analyze your situation?</h3>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" onClick={() => navigate("/triage")}>
-              Start Your Case Assessment
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
+            {!user ? (
+              <Button size="lg" onClick={handleSignupClick}>
+                <UserPlus className="w-5 h-5 mr-2" />
+                Create Free Account
+              </Button>
+            ) : (
+              <Button size="lg" onClick={() => navigate("/triage")}>
+                Start Your Case Assessment
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            )}
             <Button size="lg" variant="outline" onClick={() => navigate("/case-demo")}>
               View More Examples
             </Button>
           </div>
         </div>
+        
+        <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
       </main>
 
       <Footer />

@@ -201,4 +201,41 @@ export const analytics = {
       journey: journey,
     });
   },
+
+  // Pipeline Conversion Events (6 key events)
+  // 1. /urgent-triage → journey page loaded
+  urgentRouted: (journey: string, scenario: string) => {
+    trackEvent('urgent_routed', { journey, scenario });
+    sendGA4Event('urgent_routed', { journey, scenario, source: 'urgent_triage' });
+  },
+  
+  // 2. /find-my-path → journey clicked
+  pathSelected: (journey: string, category: string) => {
+    trackEvent('path_selected', { journey, category });
+    sendGA4Event('path_selected', { journey, category, source: 'find_my_path' });
+  },
+  
+  // 3. /upload-first → AI returns pathway
+  docAnalyzed: (pathway: string, documentType: string, confidence: number) => {
+    trackEvent('doc_analyzed', { pathway, documentType, confidence });
+    sendGA4Event('doc_analyzed', { pathway, documentType, confidence, source: 'upload_first' });
+  },
+  
+  // 4. /triage → merit + tribunal shown (already exists as triageComplete, adding alias)
+  triageCompleted: (venue: string, confidence: number) => {
+    trackEvent('triage_completed', { venue, confidence });
+    sendGA4Event('triage_completed', { venue, confidence, source: 'triage' });
+  },
+  
+  // 5. /explain-my-options → clicks triage or upload
+  educationConverted: (destination: string, tribunalViewed?: string) => {
+    trackEvent('education_converted', { destination, tribunalViewed });
+    sendGA4Event('education_converted', { destination, tribunalViewed, source: 'explain_my_options' });
+  },
+  
+  // 6. /case-demo → account created
+  demoSignup: (demoId: string) => {
+    trackEvent('demo_signup', { demoId });
+    sendGA4Event('demo_signup', { demoId, source: 'case_demo' });
+  },
 };
