@@ -57,8 +57,10 @@ const FormBuilder = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { caseProfile } = useCaseProfile();
-  
+
+  const caseId = location.state?.caseId as string | undefined;
+  const { caseProfile } = useCaseProfile(caseId);
+
   const [form, setForm] = useState<FormInfo | null>(null);
   const [fields, setFields] = useState<FormField[]>([]);
   const [formData, setFormData] = useState<Record<string, any>>({});
