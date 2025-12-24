@@ -10,6 +10,7 @@ import EnhancedSEO from "@/components/EnhancedSEO";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { analytics } from "@/utils/analytics";
+import { useAuth } from "@/hooks/useAuth";
 
 interface DetectedDocument {
   type: string;
@@ -32,6 +33,7 @@ const documentPatterns: { pattern: RegExp; type: string; path: string; pathName:
 
 const UploadFirst = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [files, setFiles] = useState<File[]>([]);
   const [analyzing, setAnalyzing] = useState(false);
   const [detectedDocuments, setDetectedDocuments] = useState<DetectedDocument[]>([]);
@@ -95,9 +97,16 @@ const UploadFirst = () => {
       setAnalysisComplete(true);
       toast.success("Document analysis complete!");
       
-      // Track conversion: doc_analyzed
+      // Track conversion: doc_analyzed with rich payload
+      const allJourneys = detected.map(d => d.suggestedPath.replace('/', '').replace('-journey', '').toUpperCase());
       detected.forEach(doc => {
-        analytics.docAnalyzed(doc.suggestedPath, doc.type, doc.confidence);
+        analytics.docAnalyzed({
+          documentType: doc.type,
+          issuesDetected: [doc.description],
+          recommendedJourney: allJourneys,
+          confidenceScore: doc.confidence / 100,
+          userLoggedIn: !!user,
+        });
       });
       
     } catch (error) {

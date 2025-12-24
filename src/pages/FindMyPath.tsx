@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { analytics } from "@/utils/analytics";
+import { useAuth } from "@/hooks/useAuth";
 
 interface LegalCategory {
   id: string;
@@ -126,6 +127,7 @@ const legalCategories: LegalCategory[] = [
 
 const FindMyPath = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<LegalCategory | null>(null);
 
   return (
@@ -205,7 +207,17 @@ const FindMyPath = () => {
                         key={oIndex}
                         className="w-full text-left p-4 border rounded-lg hover:bg-muted/50 hover:border-primary transition-all"
                         onClick={() => {
-                          analytics.pathSelected(option.path, selectedCategory.id);
+                          analytics.pathSelected({
+                            legalDomain: selectedCategory.id,
+                            selectedJourney: option.path.replace('/', '').replace('-journey', '').toUpperCase(),
+                            confidenceLevel: 'medium',
+                            userLoggedIn: !!user,
+                          });
+                          analytics.journeyStarted(
+                            option.path.replace('/', '').replace('-journey', '').toUpperCase(),
+                            '/find-my-path',
+                            !!user
+                          );
                           navigate(option.path);
                         }}
                       >
