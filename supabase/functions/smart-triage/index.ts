@@ -139,41 +139,9 @@ serve(async (req) => {
       );
     }
 
-    const { description, province, evidenceDescriptions, previousAnswers, turnstileToken } = validationResult.data;
+    const { description, province, evidenceDescriptions, previousAnswers } = validationResult.data;
 
-    // Verify Turnstile token if secret is configured (bot protection)
-    const turnstileSecret = Deno.env.get("CLOUDFLARE_TURNSTILE_SECRET");
-    if (turnstileSecret) {
-      if (!turnstileToken) {
-        return new Response(
-          JSON.stringify({ error: "Verification required" }),
-          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      const turnstileResponse = await fetch(
-        'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            secret: turnstileSecret,
-            response: turnstileToken,
-          }),
-        }
-      );
-
-      const turnstileResult = await turnstileResponse.json();
-      
-      if (!turnstileResult.success) {
-        console.error('Turnstile verification failed:', turnstileResult);
-        return new Response(
-          JSON.stringify({ error: 'Verification failed' }),
-          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      console.log('Turnstile verification successful');
-    }
+    // Turnstile verification removed - causing issues in preview environments
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
