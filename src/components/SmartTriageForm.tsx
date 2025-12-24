@@ -28,6 +28,7 @@ import { useDropzone } from "react-dropzone";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/lib/toast-stub";
 import { analytics, trackEvent } from "@/utils/analytics";
+import { TurnstileWidget } from "@/components/TurnstileWidget";
 
 interface FormRecommendation {
   formCode: string;
@@ -91,6 +92,10 @@ const SmartTriageForm: React.FC<SmartTriageFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [progress, setProgress] = useState(0);
+
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [requiresVerification, setRequiresVerification] = useState(false);
+  const [turnstileError, setTurnstileError] = useState(false);
 
   // Suggested prompts based on common issues
   const suggestedPrompts = [
@@ -175,9 +180,14 @@ const SmartTriageForm: React.FC<SmartTriageFormProps> = ({
       return;
     }
 
+    if (requiresVerification && !turnstileToken) {
+      toast.error("Please complete the verification to continue");
+      return;
+    }
+
     // Track triage form submission
     analytics.triageStart();
-    trackEvent('triage_submit', { province, description_length: description.length });
+    trackEvent("triage_submit", { province, description_length: description.length });
 
     setLoading(true);
     setAnalyzing(true);
@@ -185,30 +195,41 @@ const SmartTriageForm: React.FC<SmartTriageFormProps> = ({
 
     // Simulate progress for better UX
     const progressInterval = setInterval(() => {
-      setProgress(prev => Math.min(prev + 10, 90));
+      setProgress((prev) => Math.min(prev + 10, 90));
     }, 300);
 
     try {
-      const { data, error } = await supabase.functions.invoke('smart-triage', {
+      const { data, error } = await supabase.functions.invoke("smart-triage", {
         body: {
           description,
           province,
           evidenceDescriptions: evidenceDescriptions.length > 0 ? evidenceDescriptions : undefined,
-        }
+          turnstileToken: turnstileToken || undefined,
+        },
       });
 
       if (error) throw error;
 
       setProgress(100);
-      
+
       // Small delay to show 100% progress
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       onTriageComplete(data, description, province);
       toast.success("Analysis complete!");
-
-    } catch (error) {
+    } catch (error: any) {
       console.error("Triage error:", error);
+
+      const msg = String(error?.message || "");
+      const status = error?.status || error?.context?.status;
+
+      if (status === 403 || msg.includes("Verification required")) {
+        setRequiresVerification(true);
+        setTurnstileToken(null);
+        toast.error("Please complete the verification and try again.");
+        return;
+      }
+
       toast.error("Failed to analyze your case. Please try again.");
     } finally {
       clearInterval(progressInterval);
@@ -360,10 +381,40 @@ const SmartTriageForm: React.FC<SmartTriageFormProps> = ({
             </div>
           )}
 
+          {/* Verification (only shown if required by backend) */}
+          {requiresVerification && (
+            <div className="space-y-2">
+              <div className="text-sm text-muted-foreground">
+                Please verify you’re human to continue.
+              </div>
+              {!turnstileError ? (
+                <TurnstileWidget
+                  onSuccess={(token) => {
+                    setTurnstileToken(token);
+                    toast.success("Verification complete");
+                  }}
+                  onError={() => {
+                    setTurnstileError(true);
+                    toast.error("Verification failed. Please refresh and try again.");
+                  }}
+                />
+              ) : (
+                <div className="text-sm text-destructive">
+                  Verification unavailable right now.
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Submit Button */}
           <Button
             onClick={handleSubmit}
-            disabled={loading || description.trim().length < 20}
+            disabled={
+              loading ||
+              description.trim().length < 20 ||
+              (requiresVerification && !turnstileToken) ||
+              (requiresVerification && turnstileError)
+            }
             className="w-full"
             size="lg"
           >
