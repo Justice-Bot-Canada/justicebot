@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Loader2, ArrowRight } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
-import DOMPurify from 'dompurify';
+import ReactMarkdown from 'react-markdown';
 
 export default function SEOPage() {
   const { slug } = useParams();
@@ -95,15 +95,9 @@ export default function SEOPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <Card className="p-8">
-                <article 
-                  className="prose prose-lg max-w-none"
-                  dangerouslySetInnerHTML={{ 
-                    __html: DOMPurify.sanitize(page.content, {
-                      ALLOWED_TAGS: ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'strong', 'em', 'a', 'br', 'blockquote', 'code', 'pre'],
-                      ALLOWED_ATTR: ['href', 'target', 'rel', 'class']
-                    })
-                  }}
-                />
+                <article className="prose prose-lg max-w-none">
+                  <ReactMarkdown>{page.content || ''}</ReactMarkdown>
+                </article>
               </Card>
 
               {/* FAQ Section */}
