@@ -153,49 +153,70 @@ serve(async (req) => {
       .map(([venue, data]) => `${data.venueTitle} (${venue}):\n${data.forms.map(f => `  - ${f.code}: ${f.title} - Use for: ${f.use}`).join('\n')}`)
       .join('\n\n');
 
+    // Analyze uploaded evidence to detect already-completed forms and documents
     const evidenceContext = evidenceDescriptions?.length 
-      ? `\n\nUser has uploaded evidence:\n${evidenceDescriptions.map((e, i) => `${i+1}. ${e}`).join('\n')}`
+      ? `\n\nUser has uploaded the following evidence/documents:\n${evidenceDescriptions.map((e, i) => `${i+1}. ${e}`).join('\n')}`
       : '';
+
+    // Check if user has already uploaded completed forms
+    const hasCompletedForms = evidenceDescriptions?.some(e => 
+      /form\s*1|application|response|reply|submission/i.test(e)
+    ) || false;
+    
+    const hasMultipleDocuments = (evidenceDescriptions?.length || 0) >= 3;
 
     const systemPrompt = `You are an expert Canadian legal triage assistant specializing in Ontario law. Your role is to analyze a user's legal situation and recommend the most appropriate legal venue and forms.
 
 AVAILABLE LEGAL VENUES AND FORMS:
 ${formContext}
 
-IMPORTANT GUIDELINES:
-1. Always consider limitation periods and filing deadlines
-2. Human Rights complaints must be filed within 1 year of the incident
-3. LTB applications have specific time limits depending on the issue
-4. Small Claims Court is for monetary disputes under $35,000
-5. Consider whether the user is a plaintiff/applicant or defendant/respondent
-6. Identify if there are multiple legal issues that might require different venues
-7. Flag urgent matters (eviction notices, short deadlines, safety concerns)
-8. Province: ${province}
+CRITICAL ANALYSIS INSTRUCTIONS:
+1. CAREFULLY analyze the uploaded evidence/documents to determine what the user has ALREADY completed
+2. If evidence shows completed forms (e.g., "Form 1", "Application", "Response"), recognize these as DONE
+3. If user has uploaded responses from opposing parties, they are likely mid-process - adjust recommendations
+4. Focus on NEXT actions, not actions already taken
+5. If user has compiled substantial evidence (3+ documents), recommend organizing into a Book of Documents/Exhibits
+6. Consider limitation periods and filing deadlines
+7. Human Rights complaints must be filed within 1 year of the incident
+8. LTB applications have specific time limits depending on the issue
+9. Small Claims Court is for monetary disputes under $35,000
+10. Province: ${province}
+
+EVIDENCE ANALYSIS FLAGS:
+- hasCompletedForms: ${hasCompletedForms}
+- documentCount: ${evidenceDescriptions?.length || 0}
+- hasMultipleDocuments: ${hasMultipleDocuments}
+
+IMPORTANT: If the user has already uploaded completed tribunal forms (Form 1, Application, etc.), DO NOT tell them to complete these forms again. Instead:
+- Acknowledge what they've already done
+- Recommend organizing evidence into a Book of Documents/Exhibits
+- Focus on timeline analysis and strategy
+- Suggest next procedural steps (mediation, hearing prep, etc.)
 
 RESPONSE FORMAT (JSON):
 {
   "venue": "venue_code (e.g., ltb, hrto, small-claims, family, criminal, labour, wsib, superior-court, divisional)",
   "venueTitle": "Full name of venue",
   "confidence": 0-100,
-  "reasoning": "Clear explanation of why this venue is appropriate",
-  "urgentDeadlines": ["Array of time-sensitive deadlines"],
+  "reasoning": "Clear explanation of why this venue is appropriate AND acknowledgment of what user has already done",
+  "urgentDeadlines": ["Array of time-sensitive deadlines based on their current stage"],
   "recommendedForms": [
     {
       "formCode": "Form code",
       "formTitle": "Full title",
       "confidence": 0-100,
-      "reason": "Why this form is needed",
+      "reason": "Why this form is needed - mark as 'Already completed based on uploaded evidence' if detected",
       "tribunalType": "Tribunal type for database lookup",
       "priority": "primary|secondary|optional"
     }
   ],
-  "nextSteps": ["Ordered list of recommended actions"],
-  "followUpQuestions": ["Questions to clarify the situation if needed"],
-  "flags": ["urgent", "safety", "deadline", "complex", etc.],
+  "nextSteps": ["Ordered list of REMAINING actions - skip completed steps, focus on what's next"],
+  "followUpQuestions": ["Questions to clarify timeline or strategy if needed"],
+  "flags": ["urgent", "safety", "deadline", "complex", "evidence-ready", "book-of-documents-recommended", etc.],
   "alternativeVenues": [{"venue": "code", "reason": "why this might also apply"}]
 }`;
 
-    const userPrompt = `Analyze this legal situation and recommend the best venue and forms:
+    const userPrompt = `Analyze this legal situation and recommend the best venue and forms. PAY CLOSE ATTENTION to what the user has already completed based on their uploaded evidence.
 
 USER'S DESCRIPTION:
 ${description}
@@ -203,7 +224,13 @@ ${evidenceContext}
 
 ${previousAnswers ? `ADDITIONAL CONTEXT FROM USER RESPONSES:\n${JSON.stringify(previousAnswers, null, 2)}` : ''}
 
-Provide your analysis in the specified JSON format. Be thorough but practical. Focus on actionable recommendations.`;
+IMPORTANT: If the user mentions they've already filed forms or uploaded completed applications:
+1. DO NOT recommend they complete forms they've already done
+2. Focus on next procedural steps (awaiting hearing, mediation, evidence organization)
+3. If they have substantial evidence, recommend creating a Book of Documents/Exhibits
+4. Analyze dates and timelines from their evidence to identify deadlines
+
+Provide your analysis in the specified JSON format. Be thorough but practical. Focus on ACTIONABLE NEXT STEPS, not steps already completed.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
