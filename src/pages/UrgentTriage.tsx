@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AlertTriangle, Home, Briefcase, Users, Scale, FileWarning, ArrowRight } from "lucide-react";
+import { AlertTriangle, Home, Briefcase, Users, Scale, FileWarning, ArrowRight, Clock, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
+import { analytics } from "@/utils/analytics";
 
 interface UrgentScenario {
   id: string;
@@ -78,14 +79,18 @@ const UrgentTriage = () => {
   };
 
   const handleContinue = (path: string) => {
+    // Track conversion: urgent_routed
+    if (selectedScenario) {
+      analytics.urgentRouted(path, selectedScenario.id);
+    }
     navigate(path);
   };
 
   const getUrgencyColor = (level: string) => {
     switch (level) {
-      case "critical": return "border-destructive bg-destructive/10";
-      case "high": return "border-orange-500 bg-orange-500/10";
-      default: return "border-yellow-500 bg-yellow-500/10";
+      case "critical": return "border-destructive bg-destructive/5 hover:bg-destructive/10";
+      case "high": return "border-orange-500 bg-orange-500/5 hover:bg-orange-500/10";
+      default: return "border-yellow-500 bg-yellow-500/5 hover:bg-yellow-500/10";
     }
   };
 
@@ -100,18 +105,25 @@ const UrgentTriage = () => {
       <Header />
       
       <main className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Emergency Header */}
+        {/* Emergency Header - Improved Copy */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-destructive/10 text-destructive px-4 py-2 rounded-full mb-4">
             <AlertTriangle className="w-5 h-5" />
-            <span className="font-semibold">Urgent Legal Situation?</span>
+            <span className="font-semibold">You're not late. You're in the right place.</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
-            Tell us what happened
+            What happened?
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Select the situation that best describes your emergency. We'll guide you to the right legal pathway immediately.
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-2">
+            Select your situation below. We'll get you to the right legal pathway.
           </p>
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <Clock className="w-4 h-4" />
+            <span>Takes about 2 minutes</span>
+            <span className="mx-2">•</span>
+            <Shield className="w-4 h-4" />
+            <span>Free & confidential</span>
+          </div>
         </div>
 
         {!selectedScenario ? (

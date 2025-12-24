@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
+import { analytics } from "@/utils/analytics";
 
 interface LegalCategory {
   id: string;
@@ -203,7 +204,10 @@ const FindMyPath = () => {
                       <button
                         key={oIndex}
                         className="w-full text-left p-4 border rounded-lg hover:bg-muted/50 hover:border-primary transition-all"
-                        onClick={() => navigate(option.path)}
+                        onClick={() => {
+                          analytics.pathSelected(option.path, selectedCategory.id);
+                          navigate(option.path);
+                        }}
                       >
                         <div className="flex justify-between items-center">
                           <span className="font-medium">{option.label}</span>

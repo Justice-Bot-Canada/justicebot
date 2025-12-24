@@ -66,6 +66,7 @@ const Triage = () => {
     
     // Track triage completion
     analytics.triageComplete(result.venue);
+    analytics.triageCompleted(result.venue, result.confidence); // Pipeline event
     trackEvent('triage_complete', { 
       venue: result.venue, 
       confidence: result.confidence,
