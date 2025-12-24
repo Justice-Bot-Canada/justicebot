@@ -40,11 +40,15 @@ I can help you understand:
 _Remember: I provide information, not legal advice. For complex matters, consult a lawyer._`
 };
 
+const MAX_MESSAGE_LENGTH = 2000;
+const MIN_MESSAGE_INTERVAL = 1000; // 1 second
+
 export function LegalChatbot() {
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [lastMessageTime, setLastMessageTime] = useState(0);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { toast } = useToast();
@@ -72,6 +76,27 @@ export function LegalChatbot() {
   };
 
   const streamChat = async (userMessage: string) => {
+    // Client-side validation
+    if (userMessage.length > MAX_MESSAGE_LENGTH) {
+      toast({
+        title: "Message too long",
+        description: `Please keep your message under ${MAX_MESSAGE_LENGTH} characters.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Rate limiting
+    if (Date.now() - lastMessageTime < MIN_MESSAGE_INTERVAL) {
+      toast({
+        title: "Please wait",
+        description: "Please wait a moment before sending another message.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLastMessageTime(Date.now());
     const newMessages = [...messages, { role: 'user' as const, content: userMessage }];
     setMessages(newMessages);
     setIsLoading(true);
@@ -126,9 +151,9 @@ export function LegalChatbot() {
       }
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('Chat API error:', response.status, errorData);
-        throw new Error(errorData.error || 'Failed to connect');
+        // Log details for debugging but don't expose to user
+        console.error('Chat API error:', response.status);
+        throw new Error('Failed to connect');
       }
       
       if (!response.body) {
@@ -180,11 +205,13 @@ export function LegalChatbot() {
 
       setIsLoading(false);
     } catch (error) {
-      console.error('Chat error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      // Only log in development, show generic message to user
+      if (import.meta.env.DEV) {
+        console.error('Chat error:', error);
+      }
       toast({
         title: "Chat error",
-        description: errorMessage === 'Failed to connect' ? "Failed to get response. Please try again." : errorMessage,
+        description: "Failed to get response. Please try again.",
         variant: "destructive",
       });
       setMessages(newMessages);
