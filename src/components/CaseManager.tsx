@@ -583,43 +583,57 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
               </Card>
 
               {/* Legal Pathways Section */}
-              {pathways.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Target className="h-5 w-5" />
-                      Available Legal Pathways
-                    </CardTitle>
-                    <CardDescription>Choose the best pathway for your case</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {pathways.map((pathway) => (
-                      <div 
-                        key={pathway.id} 
-                        className="p-4 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
-                        onClick={() => setShowPathwayGuide(true)}
-                      >
-                        <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-semibold">{getPathwayTitle(pathway.pathway_type)}</h4>
+              <Card className="border-primary/20 bg-primary/5">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Target className="h-5 w-5 text-primary" />
+                    Legal Pathways & Next Steps
+                  </CardTitle>
+                  <CardDescription>View recommended venues and start your journey</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Primary action - View Pathways */}
+                  <Button 
+                    className="w-full" 
+                    size="lg"
+                    onClick={() => navigate(`/pathway/${selectedCase.id}`)}
+                  >
+                    <Target className="h-5 w-5 mr-2" />
+                    View Legal Pathways (LTB, HRTO, Small Claims)
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+
+                  {pathways.length > 0 && (
+                    <div className="space-y-3 pt-2">
+                      <p className="text-sm text-muted-foreground font-medium">Saved pathway recommendations:</p>
+                      {pathways.map((pathway) => (
+                        <div 
+                          key={pathway.id} 
+                          className="p-4 border rounded-lg hover:bg-background cursor-pointer transition-colors bg-background/50"
+                          onClick={() => setShowPathwayGuide(true)}
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <h4 className="font-semibold">{getPathwayTitle(pathway.pathway_type)}</h4>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className={getScoreColor(pathway.confidence_score)}>
+                                {pathway.confidence_score}% Confidence
+                              </Badge>
+                              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            {pathway.recommendation.substring(0, 150)}...
+                          </p>
                           <div className="flex items-center gap-2">
-                            <Badge variant="outline" className={getScoreColor(pathway.confidence_score)}>
-                              {pathway.confidence_score}% Confidence
-                            </Badge>
-                            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                            <Scale className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm">{pathway.relevant_laws?.[0] || 'View details'}</span>
                           </div>
                         </div>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          {pathway.recommendation.substring(0, 150)}...
-                        </p>
-                        <div className="flex items-center gap-2">
-                          <Scale className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">{pathway.relevant_laws[0]}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              )}
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           ) : (
             <Card>
