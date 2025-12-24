@@ -102,44 +102,63 @@ const SmartTriageForm: React.FC<SmartTriageFormProps> = ({
     "CAS has contacted me about my children",
   ];
 
-  const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {
-    // Handle rejected files
-    if (rejectedFiles.length > 0) {
-      rejectedFiles.forEach(({ file, errors }) => {
-        const errorMessages = errors.map((e: any) => {
-          if (e.code === 'file-too-large') return `${file.name} is too large (max 10MB)`;
-          if (e.code === 'file-invalid-type') return `${file.name} is not a supported file type`;
-          if (e.code === 'too-many-files') return 'Too many files (max 5)';
-          return e.message;
-        });
-        toast.error(errorMessages.join(', '));
-      });
+  const handleDropAccepted = useCallback((acceptedFiles: File[]) => {
+    const remainingSlots = Math.max(0, 5 - uploadedFiles.length);
+    const newFiles = acceptedFiles.slice(0, remainingSlots);
+
+    if (newFiles.length === 0) {
+      toast.error("No files were added (limit reached or file not accepted)");
+      return;
     }
 
-    const newFiles = acceptedFiles.slice(0, 5 - uploadedFiles.length);
-    if (newFiles.length > 0) {
-      setUploadedFiles(prev => [...prev, ...newFiles]);
-      
-      // Generate descriptions for uploaded files
-      newFiles.forEach(file => {
-        const fileType = file.type.includes('image') ? 'Image' : 
-                         file.type.includes('pdf') ? 'PDF Document' : 'Document';
-        setEvidenceDescriptions(prev => [...prev, `${fileType}: ${file.name}`]);
-      });
-      toast.success(`${newFiles.length} file(s) added`);
+    setUploadedFiles((prev) => [...prev, ...newFiles]);
+
+    newFiles.forEach((file) => {
+      const fileType = file.type.includes("image")
+        ? "Image"
+        : file.type.includes("pdf")
+          ? "PDF Document"
+          : "Document";
+      setEvidenceDescriptions((prev) => [...prev, `${fileType}: ${file.name}`]);
+    });
+
+    toast.success(`${newFiles.length} file(s) added`);
+  }, [uploadedFiles.length]);
+
+  const handleDropRejected = useCallback((rejections: any[]) => {
+    if (!rejections?.length) {
+      toast.error("File was not accepted");
+      return;
     }
-  }, [uploadedFiles]);
+
+    const first = rejections[0];
+    const fileName = first?.file?.name || "File";
+    const errors = (first?.errors || []) as Array<{ code?: string; message?: string }>;
+
+    const msg = errors
+      .map((e) => {
+        if (e.code === "file-too-large") return `${fileName} is too large (max 10MB)`;
+        if (e.code === "file-invalid-type") return `${fileName} is not a supported file type`;
+        if (e.code === "too-many-files") return "Too many files (max 5)";
+        return e.message || "File rejected";
+      })
+      .join(", ");
+
+    toast.error(msg);
+  }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
+    onDropAccepted: handleDropAccepted,
+    onDropRejected: handleDropRejected,
+    onFileDialogCancel: () => toast.error("File selection cancelled"),
     accept: {
-      'image/*': ['.jpeg', '.jpg', '.png', '.gif', '.webp', '.heic', '.bmp', '.tiff'],
-      'application/pdf': ['.pdf'],
-      'application/msword': ['.doc'],
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
-      'text/plain': ['.txt'],
-      'text/rtf': ['.rtf'],
-      'application/rtf': ['.rtf'],
+      "image/*": [".jpeg", ".jpg", ".png", ".gif", ".webp", ".bmp", ".tiff"],
+      "application/pdf": [".pdf"],
+      "application/msword": [".doc"],
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+      "text/plain": [".txt"],
+      "text/rtf": [".rtf"],
+      "application/rtf": [".rtf"],
     },
     maxFiles: 5,
     maxSize: 10 * 1024 * 1024, // 10MB
