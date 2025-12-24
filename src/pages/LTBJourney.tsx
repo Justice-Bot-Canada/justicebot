@@ -8,6 +8,7 @@ import EnhancedSEO from "@/components/EnhancedSEO";
 import { UserJourney } from "@/components/UserJourney";
 import { PerformanceMonitor } from "@/components/PerformanceMonitor";
 import { PremiumGate } from "@/components/PremiumGate";
+import { CrossTribunalBanner } from "@/components/CrossTribunalBanner";
 
 const LTBJourney = () => {
   const navigate = useNavigate();
@@ -109,6 +110,8 @@ const LTBJourney = () => {
               Complete guide to filing Landlord Tenant Board applications in Ontario. Get help with T2 forms (tenant rights), T6 forms (maintenance), N4/N12 eviction notices, and protect your tenant rights in Canada with affordable legal support.
             </p>
           </div>
+
+          <CrossTribunalBanner currentTribunal="ltb" />
 
           <PremiumGate feature="LTB Legal Journey Guide">
             <UserJourney 
