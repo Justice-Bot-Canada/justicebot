@@ -166,15 +166,21 @@ const Triage = () => {
               prev.map(d => d.id === doc.id ? { ...d, status: 'uploaded' as const, progress: 100 } : d)
             );
 
-            // Queue AI analysis (async)
-            supabase.functions.invoke('analyze-document', {
-              body: {
-                fileContent: '',
-                fileName: doc.file.name,
-                fileType: doc.file.type,
-                caseId: caseData.id
+            // Queue AI analysis (async) - read file content first
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+              const content = e.target?.result as string;
+              if (content && content.length > 0) {
+                supabase.functions.invoke('analyze-document', {
+                  body: {
+                    fileContent: content.substring(0, 50000),
+                    fileName: doc.file.name,
+                    caseId: caseData.id
+                  }
+                }).catch(err => console.warn('Document analysis queued:', err));
               }
-            }).catch(err => console.warn('Document analysis queued:', err));
+            };
+            reader.readAsText(doc.file);
 
           } catch (docError) {
             console.error('Error uploading document:', doc.file.name, docError);
