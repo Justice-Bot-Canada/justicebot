@@ -12,15 +12,34 @@ import { PremiumGate } from "@/components/PremiumGate";
 import { CaseMeritScore } from "@/components/CaseMeritScore";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
+import { EvidenceBundlePaywall } from "@/components/paywalls";
+import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import { supabase } from "@/integrations/supabase/client";
 
 const Evidence = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { hasAccess, isFreeUser, tier } = usePremiumAccess();
   const [searchParams] = useSearchParams();
   const caseId = searchParams.get('caseId');
   const [caseData, setCaseData] = useState<any>(null);
   const [bookWizardOpen, setBookWizardOpen] = useState(false);
+  const [showBundlePaywall, setShowBundlePaywall] = useState(false);
+
+  const isPremium = hasAccess && (tier === 'monthly' || tier === 'yearly');
+
+  const handleBookClick = () => {
+    if (!isPremium && !isFreeUser) {
+      setShowBundlePaywall(true);
+      return;
+    }
+    setBookWizardOpen(true);
+  };
+
+  const handleBundlePaywallConfirm = () => {
+    setShowBundlePaywall(false);
+    setBookWizardOpen(true);
+  };
 
   // Load case data for analyzer context
   useEffect(() => {
@@ -108,12 +127,18 @@ const Evidence = () => {
               <Button 
                 variant="outline" 
                 className="gap-2"
-                onClick={() => setBookWizardOpen(true)}
+                onClick={handleBookClick}
               >
                 <BookOpen className="h-4 w-4" />
                 Generate Book of Documents
               </Button>
             </div>
+
+            <EvidenceBundlePaywall
+              open={showBundlePaywall}
+              onOpenChange={setShowBundlePaywall}
+              onConfirm={handleBundlePaywallConfirm}
+            />
 
             <BookOfDocumentsWizard
               caseId={caseId}
