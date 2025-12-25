@@ -8,8 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Loader2, FileText, Download, Copy } from 'lucide-react';
 import { useSmartDocument, DocumentType, ToneType, CaseContext } from '@/hooks/useSmartDocument';
 import { toast } from '@/hooks/use-toast';
+import { DocumentGenerationPaywall } from '@/components/paywalls';
+import { usePremiumAccess } from '@/hooks/usePremiumAccess';
 
 export function SmartDocumentGenerator() {
+  const { hasAccess, isFreeUser } = usePremiumAccess();
+  const [showPaywall, setShowPaywall] = useState(false);
   const { loading, document: generatedDoc, generateDocument, clearDocument } = useSmartDocument();
   
   const [documentType, setDocumentType] = useState<DocumentType>('demand_letter');
@@ -27,7 +31,7 @@ export function SmartDocumentGenerator() {
     desiredOutcome: '',
   });
 
-  const handleGenerate = async () => {
+  const handleGenerateClick = () => {
     if (!caseContext.facts || !caseContext.issues) {
       toast({
         title: "Missing Information",
@@ -37,7 +41,18 @@ export function SmartDocumentGenerator() {
       return;
     }
 
-    await generateDocument({ documentType, tone, caseContext });
+    // Check if user has access, if not show paywall
+    if (!hasAccess && !isFreeUser) {
+      setShowPaywall(true);
+      return;
+    }
+
+    generateDocument({ documentType, tone, caseContext });
+  };
+
+  const handlePaywallConfirm = () => {
+    setShowPaywall(false);
+    generateDocument({ documentType, tone, caseContext });
   };
 
   const handleCopy = () => {
@@ -210,7 +225,7 @@ export function SmartDocumentGenerator() {
             </div>
 
             <Button 
-              onClick={handleGenerate} 
+              onClick={handleGenerateClick} 
               disabled={loading}
               className="w-full"
               size="lg"
@@ -227,6 +242,13 @@ export function SmartDocumentGenerator() {
                 </>
               )}
             </Button>
+
+            <DocumentGenerationPaywall
+              open={showPaywall}
+              onOpenChange={setShowPaywall}
+              onConfirm={handlePaywallConfirm}
+              documentType={documentType.replace('_', ' ')}
+            />
           </CardContent>
         </Card>
 

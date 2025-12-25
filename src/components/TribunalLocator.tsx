@@ -25,6 +25,8 @@ import L from "leaflet";
 import { toast } from "@/lib/toast-stub";
 import { DeadlineTimeline } from "./DeadlineTimeline";
 import { FilingInstructions } from "./FilingInstructions";
+import { FilingInstructionsPaywall } from "@/components/paywalls";
+import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 
 // Fix for default markers in react-leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -177,6 +179,9 @@ const TribunalLocator: React.FC<TribunalLocatorProps> = ({
   caseDescription = "",
   onCourtSelected
 }) => {
+  const { hasAccess, isFreeUser } = usePremiumAccess();
+  const [showFilingPaywall, setShowFilingPaywall] = useState(false);
+  const [filingUnlocked, setFilingUnlocked] = useState(false);
   const [searchAddress, setSearchAddress] = useState(`${userMunicipality}, ${userProvince}`);
   const [customAddress, setCustomAddress] = useState("");
   const [isEditingAddress, setIsEditingAddress] = useState(false);
@@ -184,6 +189,13 @@ const TribunalLocator: React.FC<TribunalLocatorProps> = ({
   const [filteredCourts, setFilteredCourts] = useState<Court[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
+
+  // Check access on mount
+  useEffect(() => {
+    if (hasAccess || isFreeUser) {
+      setFilingUnlocked(true);
+    }
+  }, [hasAccess, isFreeUser]);
 
   useEffect(() => {
     // Filter courts based on venue type and province
@@ -536,14 +548,29 @@ const TribunalLocator: React.FC<TribunalLocatorProps> = ({
 
       <TabsContent value="filing">
         {selectedCourt ? (
-          <FilingInstructions 
-            venue={venue || 'general'}
-            courtName={selectedCourt.name}
-            filingUrl={selectedCourt.filingUrl}
-            filingRequirements={selectedCourt.filingRequirements}
-            serviceMethods={selectedCourt.serviceMethods}
-            deadlineWarning={selectedCourt.deadlineWarning}
-          />
+          filingUnlocked ? (
+            <FilingInstructions 
+              venue={venue || 'general'}
+              courtName={selectedCourt.name}
+              filingUrl={selectedCourt.filingUrl}
+              filingRequirements={selectedCourt.filingRequirements}
+              serviceMethods={selectedCourt.serviceMethods}
+              deadlineWarning={selectedCourt.deadlineWarning}
+            />
+          ) : (
+            <Card>
+              <CardContent className="text-center py-12">
+                <FileText className="h-16 w-16 mx-auto mb-4 text-primary opacity-60" />
+                <h3 className="text-xl font-semibold mb-2">Step-by-Step Filing Help</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  Get personalized filing checklists, service requirements, and what happens next.
+                </p>
+                <Button onClick={() => setShowFilingPaywall(true)}>
+                  Unlock Filing Instructions
+                </Button>
+              </CardContent>
+            </Card>
+          )
         ) : (
           <Card>
             <CardContent className="text-center py-8">
@@ -554,6 +581,15 @@ const TribunalLocator: React.FC<TribunalLocatorProps> = ({
             </CardContent>
           </Card>
         )}
+        <FilingInstructionsPaywall
+          open={showFilingPaywall}
+          onOpenChange={setShowFilingPaywall}
+          onConfirm={() => {
+            setShowFilingPaywall(false);
+            setFilingUnlocked(true);
+          }}
+          tribunal={venue || "your tribunal"}
+        />
       </TabsContent>
 
       <TabsContent value="timeline">
