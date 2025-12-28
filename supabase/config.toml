@@ -148,3 +148,9 @@ verify_jwt = true
 
 [functions.marketing-automation]
 verify_jwt = false
+
+[functions.formal-merit-score]
+verify_jwt = true
+
+[functions.pathway-router]
+verify_jwt = false

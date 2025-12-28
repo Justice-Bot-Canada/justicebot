@@ -91,8 +91,9 @@ export function usePathwayRouter(options?: UsePathwayRouterOptions) {
   };
 }
 
-// Tribunal display names
+// Tribunal display names - all provinces
 export const tribunalNames: Record<string, string> = {
+  // Ontario
   LTB: "Landlord and Tenant Board",
   HRTO: "Human Rights Tribunal of Ontario",
   SMALL_CLAIMS: "Small Claims Court",
@@ -102,7 +103,50 @@ export const tribunalNames: Record<string, string> = {
   CAS: "Child Protection Court",
   CRIMINAL: "Criminal Court",
   OIPRD: "Office of the Independent Police Review Director",
+  // British Columbia
+  RTB: "Residential Tenancy Branch",
+  BCHRT: "BC Human Rights Tribunal",
+  CRT: "Civil Resolution Tribunal",
+  PROVINCIAL: "Provincial Court of BC",
+  SUPREME: "Supreme Court of British Columbia",
+  LRB: "Labour Relations Board",
+  // Alberta
+  RTDRS: "Residential Tenancy Dispute Resolution Service",
+  AHRC: "Alberta Human Rights Commission",
+  KINGS_BENCH: "Court of King's Bench",
+  ALRB: "Alberta Labour Relations Board",
+  // Quebec
+  TAL: "Tribunal administratif du logement",
+  CDPDJ: "Commission des droits de la personne",
+  TAT: "Tribunal administratif du travail",
+  // Manitoba
+  RTB_MB: "Residential Tenancies Branch",
+  MHRC: "Manitoba Human Rights Commission",
+  // Saskatchewan
+  ORT: "Office of Residential Tenancies",
+  SHRC: "Saskatchewan Human Rights Commission",
+  // Nova Scotia
+  RTB_NS: "Residential Tenancies Program",
+  NSHRC: "Nova Scotia Human Rights Commission",
+  // New Brunswick
+  RTB_NB: "Residential Tenancies Tribunal",
+  NBHRC: "New Brunswick Human Rights Commission",
+  // Newfoundland
+  RTT: "Residential Tenancies Tribunal",
+  NLHRC: "Newfoundland and Labrador Human Rights Commission",
+  // PEI
+  IRAC: "Island Regulatory and Appeals Commission",
+  PEIHRC: "PEI Human Rights Commission",
+  // Territories
+  RTO: "Rental Officer",
   CONSULTATION: "Legal Consultation Recommended",
+  // Federal
+  IRB: "Immigration and Refugee Board",
+  CHRT: "Canadian Human Rights Tribunal",
+  FCA: "Federal Court of Appeal",
+  TAX_COURT: "Tax Court of Canada",
+  CIRB: "Canada Industrial Relations Board",
+  CRTC: "CRTC",
 };
 
 // Pathway journey URLs
@@ -116,5 +160,7 @@ export const pathwayUrls: Record<string, string> = {
   "cas-journey": "/cas-journey",
   "criminal-journey": "/criminal-journey",
   "police-accountability-journey": "/police-accountability-journey",
+  "immigration-journey": "/immigration-journey",
+  "accountability-journey": "/accountability-journey",
   "find-my-path": "/find-my-path",
 };
