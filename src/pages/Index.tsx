@@ -154,7 +154,9 @@ const Index = () => {
                 Get an instant AI-powered assessment of your legal case merit score
               </p>
             </div>
-            <MeritScoreCalculator />
+            <Suspense fallback={<LoadingSection />}>
+              <MeritScoreCalculator />
+            </Suspense>
           </div>
         </section>
 
@@ -165,7 +167,9 @@ const Index = () => {
         {/* Money-Back Guarantee */}
         <section className="py-8 px-4 bg-background">
           <div className="max-w-4xl mx-auto">
-            <MoneyBackGuarantee />
+            <Suspense fallback={<LoadingSection />}>
+              <MoneyBackGuarantee />
+            </Suspense>
           </div>
         </section>
         
