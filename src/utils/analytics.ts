@@ -1,6 +1,8 @@
 // Analytics utility for tracking user interactions
 // Compatible with Google Analytics 4 and Plausible
 
+import { getCurrentUTMParams, isClinicTraffic, getClinicCampaign } from './utmTracking';
+
 declare global {
   interface Window {
     gtag?: (...args: any[]) => void;
@@ -8,31 +10,49 @@ declare global {
   }
 }
 
+// Helper to attach UTM params to all events
+const attachUTMParams = (properties?: Record<string, any>): Record<string, any> => {
+  const utm = getCurrentUTMParams();
+  const utmParams: Record<string, any> = {};
+  
+  if (utm.utm_source) utmParams.utm_source = utm.utm_source;
+  if (utm.utm_medium) utmParams.utm_medium = utm.utm_medium;
+  if (utm.utm_campaign) utmParams.utm_campaign = utm.utm_campaign;
+  if (utm.utm_term) utmParams.utm_term = utm.utm_term;
+  if (utm.utm_content) utmParams.utm_content = utm.utm_content;
+  
+  return { ...properties, ...utmParams };
+};
+
 export const trackEvent = (eventName: string, properties?: Record<string, any>) => {
+  const enrichedProps = attachUTMParams(properties);
+  
   // Google Analytics 4
   if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', eventName, properties);
+    window.gtag('event', eventName, enrichedProps);
   }
   
   // Plausible Analytics
   if (typeof window !== 'undefined' && window.plausible) {
-    window.plausible(eventName, { props: properties });
+    window.plausible(eventName, { props: enrichedProps });
   }
   
   // Console log in development
   if (import.meta.env.DEV) {
-    console.log('[Analytics]', eventName, properties);
+    console.log('[Analytics]', eventName, enrichedProps);
   }
 };
 
 // GA4 Enhanced Ecommerce Events
 const sendGA4Event = (eventName: string, params: Record<string, any>) => {
+  const enrichedParams = attachUTMParams(params);
+  
   if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', eventName, params);
+    window.gtag('event', eventName, enrichedParams);
   }
   // Console log in development
   if (import.meta.env.DEV) {
-    console.log('[GA4 Ecommerce]', eventName, params);
+    console.log('[GA4 Ecommerce]', eventName, enrichedParams);
   }
 };
 
@@ -322,5 +342,83 @@ export const analytics = {
     };
     trackEvent('demo_signup', payload);
     sendGA4Event('demo_signup', payload);
+  },
+
+  // ==========================================
+  // CLINIC OUTREACH CONVERSION EVENTS
+  // Mark these as KEY EVENTS in GA4 Admin
+  // ==========================================
+
+  // Clinic visitor arrived (fires on landing with clinic UTM)
+  clinicVisitorArrived: () => {
+    if (!isClinicTraffic()) return;
+    
+    const campaign = getClinicCampaign();
+    const payload = {
+      clinic_campaign: campaign,
+      landing_page: window.location.pathname,
+    };
+    trackEvent('clinic_visitor_arrived', payload);
+    sendGA4Event('clinic_visitor_arrived', payload);
+  },
+
+  // Clinic visitor started assessment (KEY CONVERSION)
+  clinicAssessmentStart: () => {
+    const campaign = getClinicCampaign();
+    const payload = {
+      clinic_campaign: campaign,
+      is_clinic_traffic: isClinicTraffic(),
+    };
+    trackEvent('clinic_assessment_start', payload);
+    sendGA4Event('clinic_assessment_start', payload);
+  },
+
+  // Clinic visitor completed assessment (KEY CONVERSION)
+  clinicAssessmentComplete: (venue: string) => {
+    const campaign = getClinicCampaign();
+    const payload = {
+      clinic_campaign: campaign,
+      is_clinic_traffic: isClinicTraffic(),
+      venue,
+    };
+    trackEvent('clinic_assessment_complete', payload);
+    sendGA4Event('clinic_assessment_complete', payload);
+  },
+
+  // Clinic visitor signed up (KEY CONVERSION)
+  clinicSignupComplete: (method: string) => {
+    const campaign = getClinicCampaign();
+    const payload = {
+      clinic_campaign: campaign,
+      is_clinic_traffic: isClinicTraffic(),
+      method,
+    };
+    trackEvent('clinic_signup_complete', payload);
+    sendGA4Event('clinic_signup_complete', payload);
+  },
+
+  // Clinic visitor generated document (KEY CONVERSION)
+  clinicDocumentGenerated: (documentType: string) => {
+    const campaign = getClinicCampaign();
+    const payload = {
+      clinic_campaign: campaign,
+      is_clinic_traffic: isClinicTraffic(),
+      document_type: documentType,
+    };
+    trackEvent('clinic_document_generated', payload);
+    sendGA4Event('clinic_document_generated', payload);
+  },
+
+  // Clinic visitor dropped off (for funnel analysis)
+  clinicDropoff: (lastPage: string, timeOnSiteSeconds: number) => {
+    const campaign = getClinicCampaign();
+    const payload = {
+      clinic_campaign: campaign,
+      is_clinic_traffic: isClinicTraffic(),
+      last_page: lastPage,
+      time_on_site_seconds: timeOnSiteSeconds,
+    };
+    trackEvent('clinic_dropoff', payload);
+    sendGA4Event('clinic_dropoff', payload);
   },
 };
