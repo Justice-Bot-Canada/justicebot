@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -84,6 +84,7 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
   const [exhibitItems, setExhibitItems] = useState<ExhibitItem[]>([]);
   const [generatedBook, setGeneratedBook] = useState<GeneratedBook | null>(null);
 
+  const caseDescriptionRef = useRef<HTMLTextAreaElement | null>(null);
   // Case details
   const [caseDescription, setCaseDescription] = useState('');
   const [caseType, setCaseType] = useState('');
@@ -330,6 +331,7 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
                 <div className="space-y-2">
                   <Label>Case Description *</Label>
                   <Textarea
+                    ref={caseDescriptionRef}
                     placeholder="Describe your case in detail. What happened? What issues are you presenting to the tribunal? What outcome are you seeking?"
                     value={caseDescription}
                     onChange={(e) => setCaseDescription(e.target.value)}
@@ -397,7 +399,16 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
               </div>
 
               <div className="flex justify-end">
-                <Button onClick={() => goToStep('evidence-review')} disabled={!caseDescription.trim()}>
+                <Button
+                  onClick={() => {
+                    if (!caseDescription.trim()) {
+                      toast.error('Please add a brief case description to continue');
+                      caseDescriptionRef.current?.focus();
+                      return;
+                    }
+                    goToStep('evidence-review');
+                  }}
+                >
                   Review Evidence
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
