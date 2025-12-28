@@ -22,11 +22,11 @@ const UrgencyTimer = lazy(() => import("@/components/UrgencyTimer").then(m => ({
 const FeatureHighlightBanner = lazy(() => import("@/components/FeatureHighlightBanner"));
 const ProvincesBanner = lazy(() => import("@/components/ProvincesBanner").then(m => ({ default: m.ProvincesBanner })));
 const QuickToolsSection = lazy(() => import("@/components/QuickToolsSection"));
+const ConversionFAQ = lazy(() => import("@/components/ConversionFAQ"));
 
 // Lazy load only essential widgets - removed excessive popups for cleaner UX
 const CrispChat = lazy(() => import("@/components/CrispChat"));
 const AccessibilityPanel = lazy(() => import("@/components/AccessibilityEnhanced").then(m => ({ default: m.AccessibilityPanel })));
-
 const LoadingSection = () => (
   <div className="py-8 flex items-center justify-center min-h-[100px]">
     <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -184,6 +184,11 @@ const Index = () => {
         {/* Competitor Comparison */}
         <Suspense fallback={<LoadingSection />}>
           <CompetitorComparison />
+        </Suspense>
+        
+        {/* Conversion-focused FAQ - handles objections */}
+        <Suspense fallback={<LoadingSection />}>
+          <ConversionFAQ />
         </Suspense>
         
         <Suspense fallback={<LoadingSection />}>
