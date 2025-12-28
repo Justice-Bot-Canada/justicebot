@@ -63,6 +63,7 @@ import PaymentPolicy from "./pages/PaymentPolicy";
 import Roadmap from "./pages/Roadmap";
 import Troubleshooting from "./pages/Troubleshooting";
 import MediaInquiries from "./pages/MediaInquiries";
+import Press from "./pages/Press";
 import GovernmentInquiries from "./pages/GovernmentInquiries";
 import LegalUpdates from "./pages/LegalUpdates";
 import CourtInformation from "./pages/CourtInformation";
@@ -257,6 +258,7 @@ const AppContent = () => {
           <Route path="/clinics" element={<Clinics />} />
           <Route path="/referrals" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Referrals /></Suspense></ProtectedRoute>} />
           <Route path="/media-inquiries" element={<MediaInquiries />} />
+          <Route path="/press" element={<Press />} />
           <Route path="/government-inquiries" element={<GovernmentInquiries />} />
           <Route path="/legal-updates" element={<LegalUpdates />} />
 
