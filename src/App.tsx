@@ -52,6 +52,7 @@ import About from "./pages/About";
 import FAQ from "./pages/FAQ";
 import WhatWeDo from "./pages/WhatWeDo";
 import Partners from "./pages/Partners";
+import Clinics from "./pages/Clinics";
 import Team from "./pages/Team";
 import Blog from "./pages/Blog";
 import BlogList from "./pages/BlogList";
@@ -253,6 +254,7 @@ const AppContent = () => {
           <Route path="/roadmap" element={<Roadmap />} />
           <Route path="/troubleshooting" element={<Troubleshooting />} />
           <Route path="/partners" element={<Partners />} />
+          <Route path="/clinics" element={<Clinics />} />
           <Route path="/referrals" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Referrals /></Suspense></ProtectedRoute>} />
           <Route path="/media-inquiries" element={<MediaInquiries />} />
           <Route path="/government-inquiries" element={<GovernmentInquiries />} />
