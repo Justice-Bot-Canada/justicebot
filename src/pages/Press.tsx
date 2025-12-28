@@ -52,13 +52,12 @@ const Press = () => {
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
               Press & Media
             </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Justice-Bot is a Canadian civic-technology initiative focused on improving legal literacy 
-              and early legal navigation for people who are self-represented or unsure where to start.
-            </p>
-            <p className="text-lg text-muted-foreground mt-4 max-w-3xl mx-auto">
-              Built from lived experience, Justice-Bot helps people understand the nature of their legal issue, 
-              identify appropriate pathways, and prepare for next steps — in plain language.
+            <blockquote className="text-xl md:text-2xl text-foreground font-medium max-w-3xl mx-auto leading-relaxed border-l-4 border-primary pl-6 text-left italic mb-6">
+              "Justice-Bot is built on a simple principle: when people are expected to follow the law, ignorance should not be an option."
+            </blockquote>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Justice-Bot is a Canadian civic-technology initiative focused on early legal literacy 
+              and legal navigation for self-represented individuals.
             </p>
             <p className="text-sm text-muted-foreground mt-4 italic">
               Justice-Bot does not provide legal advice or legal representation.

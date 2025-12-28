@@ -39,8 +39,11 @@ const HeroSection = () => {
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-              Get an instant legal roadmap — <strong className="text-foreground">no lawyer needed.</strong>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto italic">
+              When people are expected to follow the law, ignorance should not be an option.
+            </p>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mt-2">
+              Justice-Bot helps people understand their legal situation and next steps in plain language.
             </p>
           </div>
 
