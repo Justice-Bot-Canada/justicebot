@@ -30,9 +30,9 @@ const Press = () => {
   ];
 
   const mediaAssets = [
-    { icon: FileText, label: "Press Kit (PDF)", href: "#", description: "Download our media package" },
+    { icon: FileText, label: "Press Kit (PDF)", href: "/Justice-Bot-Press-Kit.pdf", description: "Download our media package", download: true },
     { icon: User, label: "Founder Bio", href: "/about", description: "Background on Justice-Bot's creator" },
-    { icon: Image, label: "Screenshots & Visuals", href: "#", description: "Product images for publications" },
+    { icon: Image, label: "Screenshots & Visuals", href: "/press-screenshots", description: "Product images for publications" },
     { icon: Globe, label: "Website", href: "https://www.justice-bot.com", description: "justice-bot.com" },
   ];
 
@@ -177,8 +177,12 @@ const Press = () => {
             <CardContent>
               <div className="grid md:grid-cols-2 gap-4">
                 {mediaAssets.map((asset, index) => (
-                  <div 
-                    key={index} 
+                  <a 
+                    key={index}
+                    href={asset.href}
+                    target={asset.href.startsWith('http') ? '_blank' : undefined}
+                    rel={asset.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                    download={asset.download || undefined}
                     className="flex items-start gap-3 p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
                   >
                     <asset.icon className="h-5 w-5 text-primary mt-0.5" />
@@ -186,7 +190,7 @@ const Press = () => {
                       <h3 className="font-medium text-foreground">{asset.label}</h3>
                       <p className="text-sm text-muted-foreground">{asset.description}</p>
                     </div>
-                  </div>
+                  </a>
                 ))}
               </div>
             </CardContent>
