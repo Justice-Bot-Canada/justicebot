@@ -1699,6 +1699,122 @@ export type Database = {
         }
         Relationships: []
       }
+      pathway_routing_results: {
+        Row: {
+          alternative_pathways: Json | null
+          case_id: string | null
+          confidence_score: number
+          created_at: string
+          facts: Json
+          id: string
+          matched_rules: Json
+          reasoning: string[]
+          recommended_forms: string[]
+          recommended_pathway: string
+          recommended_tribunal: string
+          user_id: string | null
+        }
+        Insert: {
+          alternative_pathways?: Json | null
+          case_id?: string | null
+          confidence_score: number
+          created_at?: string
+          facts: Json
+          id?: string
+          matched_rules: Json
+          reasoning?: string[]
+          recommended_forms?: string[]
+          recommended_pathway: string
+          recommended_tribunal: string
+          user_id?: string | null
+        }
+        Update: {
+          alternative_pathways?: Json | null
+          case_id?: string | null
+          confidence_score?: number
+          created_at?: string
+          facts?: Json
+          id?: string
+          matched_rules?: Json
+          reasoning?: string[]
+          recommended_forms?: string[]
+          recommended_pathway?: string
+          recommended_tribunal?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pathway_routing_results_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pathway_rules: {
+        Row: {
+          amount_max: number | null
+          amount_min: number | null
+          category: string | null
+          created_at: string
+          filing_fee: string | null
+          id: string
+          is_active: boolean
+          issue_keywords: string[]
+          pathway_id: string
+          priority: number
+          province: string | null
+          reasoning: string
+          recommended_forms: string[]
+          rule_name: string
+          success_rate: number | null
+          timeframe: string | null
+          tribunal: string
+          updated_at: string
+        }
+        Insert: {
+          amount_max?: number | null
+          amount_min?: number | null
+          category?: string | null
+          created_at?: string
+          filing_fee?: string | null
+          id?: string
+          is_active?: boolean
+          issue_keywords?: string[]
+          pathway_id: string
+          priority?: number
+          province?: string | null
+          reasoning: string
+          recommended_forms?: string[]
+          rule_name: string
+          success_rate?: number | null
+          timeframe?: string | null
+          tribunal: string
+          updated_at?: string
+        }
+        Update: {
+          amount_max?: number | null
+          amount_min?: number | null
+          category?: string | null
+          created_at?: string
+          filing_fee?: string | null
+          id?: string
+          is_active?: boolean
+          issue_keywords?: string[]
+          pathway_id?: string
+          priority?: number
+          province?: string | null
+          reasoning?: string
+          recommended_forms?: string[]
+          rule_name?: string
+          success_rate?: number | null
+          timeframe?: string | null
+          tribunal?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_audit: {
         Row: {
           created_at: string

@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Home, Users, Briefcase, Scale, Baby, Shield, ChevronRight, ArrowLeft } from "lucide-react";
+import { Home, Users, Briefcase, Scale, Baby, Shield, ChevronRight, ArrowLeft, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { analytics } from "@/utils/analytics";
 import { useAuth } from "@/hooks/useAuth";
+import { SmartPathwayRouter } from "@/components/SmartPathwayRouter";
 
 interface LegalCategory {
   id: string;
@@ -148,37 +150,54 @@ const FindMyPath = () => {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             {selectedCategory 
               ? `Let's narrow down your ${selectedCategory.title.toLowerCase()} issue`
-              : "Select the category that best describes your legal situation"
+              : "Describe your situation or select a category to get started"
             }
           </p>
         </div>
 
-        {!selectedCategory ? (
-          /* Category Selection */
-          <div className="grid md:grid-cols-2 gap-4">
-            {legalCategories.map((category) => {
-              const Icon = category.icon;
-              return (
-                <Card
-                  key={category.id}
-                  className="p-6 cursor-pointer transition-all hover:shadow-lg hover:border-primary"
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 rounded-full bg-primary/10">
-                      <Icon className="w-6 h-6 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold mb-1">{category.title}</h3>
-                      <p className="text-sm text-muted-foreground">{category.description}</p>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                  </div>
-                </Card>
-              );
-            })}
-          </div>
-        ) : (
+        <Tabs defaultValue="smart" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="smart" className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              AI-Powered Routing
+            </TabsTrigger>
+            <TabsTrigger value="manual" className="flex items-center gap-2">
+              <Scale className="w-4 h-4" />
+              Browse Categories
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="smart">
+            <SmartPathwayRouter />
+          </TabsContent>
+
+          <TabsContent value="manual">
+            {!selectedCategory ? (
+              /* Category Selection */
+              <div className="grid md:grid-cols-2 gap-4">
+                {legalCategories.map((category) => {
+                  const Icon = category.icon;
+                  return (
+                    <Card
+                      key={category.id}
+                      className="p-6 cursor-pointer transition-all hover:shadow-lg hover:border-primary"
+                      onClick={() => setSelectedCategory(category)}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="p-3 rounded-full bg-primary/10">
+                          <Icon className="w-6 h-6 text-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold mb-1">{category.title}</h3>
+                          <p className="text-sm text-muted-foreground">{category.description}</p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            ) : (
           /* Questions */
           <div>
             <Button 
@@ -236,6 +255,8 @@ const FindMyPath = () => {
             </Card>
           </div>
         )}
+          </TabsContent>
+        </Tabs>
 
         {/* Alternative Paths */}
         <div className="mt-8 p-6 bg-muted/30 rounded-lg">
