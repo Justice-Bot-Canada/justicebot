@@ -3,6 +3,7 @@ import HeroSection from "@/components/HeroSection";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import LocalBusinessSchema from "@/components/LocalBusinessSchema";
+import ClinicWelcomeBanner from "@/components/ClinicWelcomeBanner";
 import { Suspense, lazy } from "react";
 
 // Lazy load ALL below-the-fold components for better LCP/FCP
@@ -100,6 +101,7 @@ const Index = () => {
       />
       <LocalBusinessSchema />
       {/* Critical resource preload for LCP improvement */}
+      <ClinicWelcomeBanner />
       <Header />
       <main id="main-content" tabIndex={-1}>
         <HeroSection />

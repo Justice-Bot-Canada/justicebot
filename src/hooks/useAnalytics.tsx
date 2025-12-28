@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useLocation } from 'react-router-dom';
 import { useConsent } from '@/hooks/useConsent';
 import type { Json } from '@/integrations/supabase/types';
+import { getCurrentUTMParams, storeUTMParams, parseUTMParams } from '@/utils/utmTracking';
 
 // Declare gtag for TypeScript
 declare global {
@@ -18,6 +19,16 @@ export function useAnalytics() {
   const { hasConsent, consent } = useConsent();
 
   const trackPageView = useCallback(async () => {
+    // Capture and store UTM params on every page view
+    const urlParams = parseUTMParams();
+    const hasUrlParams = Object.values(urlParams).some(v => v !== null);
+    if (hasUrlParams) {
+      storeUTMParams(urlParams);
+    }
+    
+    // Get current UTM params (from URL or storage) to include in page_view
+    const utm = getCurrentUTMParams();
+    
     // ALWAYS send page_view to GA4 for proper landing page attribution
     // This fixes "(not set)" landing page issue - GA4 needs page_view at session start
     if (typeof window !== 'undefined' && window.gtag) {
@@ -25,6 +36,12 @@ export function useAnalytics() {
         page_path: location.pathname + location.search,
         page_title: document.title,
         page_location: window.location.href,
+        // Include UTM params in page_view for attribution
+        ...(utm.utm_source && { utm_source: utm.utm_source }),
+        ...(utm.utm_medium && { utm_medium: utm.utm_medium }),
+        ...(utm.utm_campaign && { utm_campaign: utm.utm_campaign }),
+        ...(utm.utm_term && { utm_term: utm.utm_term }),
+        ...(utm.utm_content && { utm_content: utm.utm_content }),
       });
     }
 
