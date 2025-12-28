@@ -260,6 +260,7 @@ const AppContent = () => {
           <Route path="/media-inquiries" element={<MediaInquiries />} />
           <Route path="/press" element={<Press />} />
           <Route path="/government-inquiries" element={<GovernmentInquiries />} />
+          <Route path="/government" element={<GovernmentInquiries />} />
           <Route path="/legal-updates" element={<LegalUpdates />} />
 
           {/* Legal & Policies */}
