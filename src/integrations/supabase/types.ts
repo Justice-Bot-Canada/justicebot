@@ -1232,6 +1232,80 @@ export type Database = {
         }
         Relationships: []
       }
+      legal_documents: {
+        Row: {
+          citation: string | null
+          content_hash: string | null
+          content_html: string | null
+          content_text: string | null
+          court: string | null
+          created_at: string | null
+          decision_date: string | null
+          external_id: string | null
+          id: string
+          is_processed: boolean | null
+          judges: string[] | null
+          keywords: string[] | null
+          metadata: Json | null
+          parties: Json | null
+          source_id: string | null
+          summary: string | null
+          title: string
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          citation?: string | null
+          content_hash?: string | null
+          content_html?: string | null
+          content_text?: string | null
+          court?: string | null
+          created_at?: string | null
+          decision_date?: string | null
+          external_id?: string | null
+          id?: string
+          is_processed?: boolean | null
+          judges?: string[] | null
+          keywords?: string[] | null
+          metadata?: Json | null
+          parties?: Json | null
+          source_id?: string | null
+          summary?: string | null
+          title: string
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          citation?: string | null
+          content_hash?: string | null
+          content_html?: string | null
+          content_text?: string | null
+          court?: string | null
+          created_at?: string | null
+          decision_date?: string | null
+          external_id?: string | null
+          id?: string
+          is_processed?: boolean | null
+          judges?: string[] | null
+          keywords?: string[] | null
+          metadata?: Json | null
+          parties?: Json | null
+          source_id?: string | null
+          summary?: string | null
+          title?: string
+          updated_at?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_documents_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "legal_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       legal_pathways: {
         Row: {
           case_id: string
@@ -1269,6 +1343,157 @@ export type Database = {
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      legal_sources: {
+        Row: {
+          base_url: string
+          code: string
+          country: string
+          court_level: string | null
+          created_at: string | null
+          doc_selector: string | null
+          id: string
+          is_active: boolean | null
+          jurisdiction: string | null
+          last_sweep_at: string | null
+          listing_selector: string | null
+          listing_url: string | null
+          metadata: Json | null
+          name: string
+          rate_limit_ms: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          base_url: string
+          code: string
+          country?: string
+          court_level?: string | null
+          created_at?: string | null
+          doc_selector?: string | null
+          id?: string
+          is_active?: boolean | null
+          jurisdiction?: string | null
+          last_sweep_at?: string | null
+          listing_selector?: string | null
+          listing_url?: string | null
+          metadata?: Json | null
+          name: string
+          rate_limit_ms?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          base_url?: string
+          code?: string
+          country?: string
+          court_level?: string | null
+          created_at?: string | null
+          doc_selector?: string | null
+          id?: string
+          is_active?: boolean | null
+          jurisdiction?: string | null
+          last_sweep_at?: string | null
+          listing_selector?: string | null
+          listing_url?: string | null
+          metadata?: Json | null
+          name?: string
+          rate_limit_ms?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      legal_sweep_queue: {
+        Row: {
+          attempts: number | null
+          created_at: string | null
+          error: string | null
+          id: string
+          last_attempt_at: string | null
+          metadata: Json | null
+          priority: number | null
+          source_id: string | null
+          status: string | null
+          url: string
+        }
+        Insert: {
+          attempts?: number | null
+          created_at?: string | null
+          error?: string | null
+          id?: string
+          last_attempt_at?: string | null
+          metadata?: Json | null
+          priority?: number | null
+          source_id?: string | null
+          status?: string | null
+          url: string
+        }
+        Update: {
+          attempts?: number | null
+          created_at?: string | null
+          error?: string | null
+          id?: string
+          last_attempt_at?: string | null
+          metadata?: Json | null
+          priority?: number | null
+          source_id?: string | null
+          status?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_sweep_queue_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "legal_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      legal_sweep_runs: {
+        Row: {
+          completed_at: string | null
+          docs_found: number | null
+          docs_new: number | null
+          docs_updated: number | null
+          errors: Json | null
+          id: string
+          metadata: Json | null
+          source_id: string | null
+          started_at: string | null
+          status: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          docs_found?: number | null
+          docs_new?: number | null
+          docs_updated?: number | null
+          errors?: Json | null
+          id?: string
+          metadata?: Json | null
+          source_id?: string | null
+          started_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          docs_found?: number | null
+          docs_new?: number | null
+          docs_updated?: number | null
+          errors?: Json | null
+          id?: string
+          metadata?: Json | null
+          source_id?: string | null
+          started_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_sweep_runs_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "legal_sources"
             referencedColumns: ["id"]
           },
         ]
@@ -2619,6 +2844,8 @@ export type Database = {
           id: string
         }[]
       }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
       user_has_role: { Args: { target_role: string }; Returns: boolean }
     }
     Enums: {
