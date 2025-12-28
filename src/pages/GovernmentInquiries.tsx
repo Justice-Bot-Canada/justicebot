@@ -25,9 +25,16 @@ const GovernmentInquiries = () => {
             <h1 className="text-4xl font-bold">Government & Public Institutions</h1>
           </div>
 
-          <p className="text-lg text-muted-foreground mb-8">
-            Information for government agencies, tribunals, courts, and public service organizations.
-          </p>
+          <div className="mb-8 space-y-4">
+            <p className="text-lg text-foreground font-medium">
+              Justice-Bot is grounded in the belief that meaningful access to justice requires understanding. 
+              When individuals are expected to engage with legal and administrative systems, lack of information 
+              should not be a barrier.
+            </p>
+            <p className="text-muted-foreground">
+              Information for government agencies, tribunals, courts, and public service organizations.
+            </p>
+          </div>
 
           {/* Important Disclaimer */}
           <Alert className="mb-8 border-primary/50 bg-primary/5">
