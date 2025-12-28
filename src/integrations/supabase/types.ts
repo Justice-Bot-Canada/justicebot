@@ -1435,6 +1435,45 @@ export type Database = {
         }
         Relationships: []
       }
+      page_views: {
+        Row: {
+          anon_id: string | null
+          country: string | null
+          id: string
+          occurred_at: string
+          path: string
+          referrer: string | null
+          session_id: string | null
+          site: string
+          url: string
+          user_agent: string | null
+        }
+        Insert: {
+          anon_id?: string | null
+          country?: string | null
+          id?: string
+          occurred_at?: string
+          path: string
+          referrer?: string | null
+          session_id?: string | null
+          site?: string
+          url: string
+          user_agent?: string | null
+        }
+        Update: {
+          anon_id?: string | null
+          country?: string | null
+          id?: string
+          occurred_at?: string
+          path?: string
+          referrer?: string | null
+          session_id?: string | null
+          site?: string
+          url?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       payment_audit: {
         Row: {
           created_at: string
