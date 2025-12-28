@@ -35,7 +35,7 @@ const HeroSection = () => {
               <span className="text-foreground">Justice-Bot:</span>
               <br />
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Your Legal Ally in Ontario
+                Your Legal Ally in Canada
               </span>
             </h1>
             
