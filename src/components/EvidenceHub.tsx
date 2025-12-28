@@ -127,13 +127,21 @@ export function EvidenceHub({ caseId, onEvidenceSelect, selectionMode = false }:
   const onDrop = async (acceptedFiles: File[]) => {
     setUploading(true);
 
+    // Get current user ID for storage path
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error('You must be logged in to upload evidence');
+      setUploading(false);
+      return;
+    }
+
     for (const file of acceptedFiles) {
       try {
         const fileId = crypto.randomUUID();
         setUploadProgress(prev => ({ ...prev, [fileId]: 0 }));
 
-        // Upload to Supabase Storage
-        const filePath = `${caseId}/${fileId}-${file.name}`;
+        // Upload to Supabase Storage - path must start with user ID for RLS
+        const filePath = `${user.id}/${caseId}/${fileId}-${file.name}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from('evidence')
           .upload(filePath, file, {
