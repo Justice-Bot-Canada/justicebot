@@ -7,17 +7,24 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, ArrowRight, Scale, Clock, DollarSign, CheckCircle, AlertTriangle, FileText, Sparkles } from "lucide-react";
+import { Loader2, ArrowRight, Scale, Clock, DollarSign, CheckCircle, AlertTriangle, FileText, Sparkles, TrendingUp } from "lucide-react";
 import { usePathwayRouter, PathwayResult, tribunalNames, pathwayUrls } from "@/hooks/usePathwayRouter";
+import { useFormalMeritScore, MeritScoreResult, getBandColor } from "@/hooks/useFormalMeritScore";
+import { MeritScoreDisplay } from "@/components/MeritScoreDisplay";
 import { cn } from "@/lib/utils";
 
 const categories = [
-  { value: "housing", label: "Housing & Tenancy" },
-  { value: "discrimination", label: "Discrimination & Human Rights" },
-  { value: "employment", label: "Employment & Workplace" },
-  { value: "money", label: "Money & Contracts" },
-  { value: "family", label: "Family & Children" },
-  { value: "criminal", label: "Criminal & Police" },
+  { value: "housing", label: "Housing & Tenancy", issueTypes: ["maintenance", "eviction", "harassment", "rent"] },
+  { value: "discrimination", label: "Discrimination & Human Rights", issueTypes: ["discrimination"] },
+  { value: "employment", label: "Employment & Workplace", issueTypes: ["wrongful_dismissal", "unpaid_wages"] },
+  { value: "money", label: "Money & Contracts", issueTypes: ["money_owed"] },
+  { value: "family", label: "Family & Children", issueTypes: ["parenting", "support"] },
+  { value: "criminal", label: "Criminal & Police", issueTypes: ["charges", "bail"] },
+  { value: "consumer", label: "Consumer Disputes", issueTypes: ["contract", "refund"] },
+  { value: "child_protection", label: "Child Protection", issueTypes: ["apprehension", "supervision"] },
+  { value: "administrative", label: "Government Decisions", issueTypes: ["appeal", "review"] },
+  { value: "personal_injury", label: "Personal Injury", issueTypes: ["negligence", "damages"] },
+  { value: "estates", label: "Estates & Wills", issueTypes: ["probate", "guardianship"] },
 ];
 
 const provinces = [
@@ -45,27 +52,66 @@ interface SmartPathwayRouterProps {
 export function SmartPathwayRouter({ onRouted, caseId, initialDescription = "" }: SmartPathwayRouterProps) {
   const navigate = useNavigate();
   const { routeCase, result, isLoading, reset } = usePathwayRouter({ onSuccess: onRouted });
+  const { calculateMeritScore, result: meritResult, loading: meritLoading, reset: resetMerit } = useFormalMeritScore();
 
   const [description, setDescription] = useState(initialDescription);
   const [category, setCategory] = useState<string>("");
   const [province, setProvince] = useState("ON");
   const [amount, setAmount] = useState<string>("");
+  const [showMeritScore, setShowMeritScore] = useState(false);
 
   const handleSubmit = async () => {
     if (description.trim().length < 20) return;
 
-    await routeCase({
+    const routingResult = await routeCase({
       description,
       category: category || undefined,
       province,
       amount: amount ? parseInt(amount, 10) : undefined,
       caseId,
     });
+
+    // Auto-calculate merit score if we have a caseId and routing succeeded
+    if (caseId && routingResult) {
+      const selectedCategory = categories.find(c => c.value === category);
+      const issueType = selectedCategory?.issueTypes?.[0] || 'general';
+      
+      await calculateMeritScore({
+        caseId,
+        province,
+        venue: routingResult.recommended_tribunal,
+        issueType,
+        description,
+      });
+      setShowMeritScore(true);
+    }
+  };
+
+  const handleCalculateMerit = async () => {
+    if (!caseId || !result) return;
+    
+    const selectedCategory = categories.find(c => c.value === category);
+    const issueType = selectedCategory?.issueTypes?.[0] || 'general';
+    
+    await calculateMeritScore({
+      caseId,
+      province,
+      venue: result.recommended_tribunal,
+      issueType,
+      description,
+    });
+    setShowMeritScore(true);
   };
 
   const handleStartJourney = (pathwayId: string) => {
     const url = pathwayUrls[pathwayId] || "/find-my-path";
-    navigate(url, { state: { caseId, routingResult: result } });
+    navigate(url, { state: { caseId, routingResult: result, meritScore: meritResult } });
+  };
+
+  const handleReset = () => {
+    reset();
+    resetMerit();
+    setShowMeritScore(false);
   };
 
   const getConfidenceColor = (score: number) => {
@@ -168,18 +214,42 @@ export function SmartPathwayRouter({ onRouted, caseId, initialDescription = "" }
               </div>
             )}
 
+            {/* Merit Score Section */}
+            {caseId && (
+              <div className="pt-2 border-t">
+                {meritLoading ? (
+                  <div className="flex items-center justify-center gap-2 p-4">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span className="text-sm text-muted-foreground">Calculating merit score...</span>
+                  </div>
+                ) : meritResult && showMeritScore ? (
+                  <MeritScoreDisplay result={meritResult} compact />
+                ) : (
+                  <Button variant="outline" onClick={handleCalculateMerit} className="w-full" size="sm">
+                    <TrendingUp className="w-4 h-4 mr-2" />
+                    Calculate Case Merit Score
+                  </Button>
+                )}
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="flex gap-3">
               <Button onClick={() => handleStartJourney(result.recommended_pathway)} className="flex-1">
                 Start This Journey
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-              <Button variant="outline" onClick={reset}>
+              <Button variant="outline" onClick={handleReset}>
                 Try Different Description
               </Button>
             </div>
           </CardContent>
         </Card>
+
+        {/* Full Merit Score Display */}
+        {meritResult && showMeritScore && (
+          <MeritScoreDisplay result={meritResult} />
+        )}
 
         {/* Alternative Pathways */}
         {result.alternative_pathways.length > 0 && (
