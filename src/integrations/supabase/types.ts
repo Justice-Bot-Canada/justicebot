@@ -1199,6 +1199,48 @@ export type Database = {
         }
         Relationships: []
       }
+      intake_field_definitions: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          field_key: string
+          field_label: string
+          field_type: string
+          help_text: string | null
+          id: string
+          options: Json | null
+          order_index: number | null
+          required: boolean | null
+          validation_rules: Json | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          field_key: string
+          field_label: string
+          field_type: string
+          help_text?: string | null
+          id?: string
+          options?: Json | null
+          order_index?: number | null
+          required?: boolean | null
+          validation_rules?: Json | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          field_key?: string
+          field_label?: string
+          field_type?: string
+          help_text?: string | null
+          id?: string
+          options?: Json | null
+          order_index?: number | null
+          required?: boolean | null
+          validation_rules?: Json | null
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           created_at: string | null
@@ -1305,6 +1347,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      legal_elements: {
+        Row: {
+          element_description: string | null
+          element_key: string
+          element_name: string
+          evidence_hint: string | null
+          id: string
+          issue_type: string
+          order_index: number | null
+          pathway_category: string
+          province: string | null
+          required: boolean | null
+          weight: number | null
+        }
+        Insert: {
+          element_description?: string | null
+          element_key: string
+          element_name: string
+          evidence_hint?: string | null
+          id?: string
+          issue_type: string
+          order_index?: number | null
+          pathway_category: string
+          province?: string | null
+          required?: boolean | null
+          weight?: number | null
+        }
+        Update: {
+          element_description?: string | null
+          element_key?: string
+          element_name?: string
+          evidence_hint?: string | null
+          id?: string
+          issue_type?: string
+          order_index?: number | null
+          pathway_category?: string
+          province?: string | null
+          required?: boolean | null
+          weight?: number | null
+        }
+        Relationships: []
       }
       legal_pathways: {
         Row: {
@@ -1585,6 +1669,39 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      merit_score_config: {
+        Row: {
+          calculation_rules: Json | null
+          component_key: string
+          component_name: string
+          created_at: string | null
+          description: string | null
+          id: string
+          max_points: number
+          weight: number | null
+        }
+        Insert: {
+          calculation_rules?: Json | null
+          component_key: string
+          component_name: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          max_points: number
+          weight?: number | null
+        }
+        Update: {
+          calculation_rules?: Json | null
+          component_key?: string
+          component_name?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          max_points?: number
+          weight?: number | null
         }
         Relationships: []
       }
@@ -1928,6 +2045,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      procedure_templates: {
+        Row: {
+          documents_needed: string[] | null
+          id: string
+          pathway_category: string | null
+          province: string | null
+          step_description: string | null
+          step_key: string
+          step_number: number
+          step_title: string
+          template_type: string
+          tips: string[] | null
+          typical_timeframe: string | null
+        }
+        Insert: {
+          documents_needed?: string[] | null
+          id?: string
+          pathway_category?: string | null
+          province?: string | null
+          step_description?: string | null
+          step_key: string
+          step_number: number
+          step_title: string
+          template_type: string
+          tips?: string[] | null
+          typical_timeframe?: string | null
+        }
+        Update: {
+          documents_needed?: string[] | null
+          id?: string
+          pathway_category?: string | null
+          province?: string | null
+          step_description?: string | null
+          step_key?: string
+          step_number?: number
+          step_title?: string
+          template_type?: string
+          tips?: string[] | null
+          typical_timeframe?: string | null
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
