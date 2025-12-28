@@ -7,7 +7,7 @@ import AuthDialog from "@/components/AuthDialog";
 import { HighContrastToggle, ScreenReaderOnly } from "@/components/AccessibilityFeatures";
 import { PremiumStatusBanner } from "@/components/PremiumStatusBanner";
 import { SkipToContent } from "@/components/SkipToContent";
-// Using optimized WebP logo from public folder for better performance
+import justiceBotLogo from "@/assets/justice-bot-logo.png";
 import NotificationBell from "./NotificationBell";
 
 const Header = () => {
@@ -47,13 +47,13 @@ const Header = () => {
               className="flex items-center gap-3" 
               aria-label="Justice-Bot - Legal clarity, simplified - Go to homepage"
             >
-              <div className="flex items-center justify-center w-10 h-10 bg-white rounded-lg shadow-sm">
+              <div className="flex items-center justify-center w-12 h-12 rounded-lg overflow-hidden">
                 <img 
-                  src="/logo-64.webp" 
-                  alt="Justice-Bot logo - Scale of justice symbol" 
-                  className="w-8 h-8 object-contain"
-                  width="32"
-                  height="32"
+                  src={justiceBotLogo} 
+                  alt="Justice-Bot logo - Lion with scales of justice" 
+                  className="w-12 h-12 object-contain"
+                  width="48"
+                  height="48"
                   loading="eager"
                   decoding="async"
                 />
