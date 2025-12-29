@@ -4,11 +4,11 @@ import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 import ClinicWelcomeBanner from "@/components/ClinicWelcomeBanner";
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 // Lazy load ALL below-the-fold components for better LCP/FCP
-const MeritScoreCalculator = lazy(() => import("@/components/MeritScoreCalculator"));
-const TriageSection = lazy(() => import("@/components/TriageSection"));
 const FeaturesSection = lazy(() => import("@/components/FeaturesSection"));
 const AppDemoVideo = lazy(() => import("@/components/AppDemoVideo").then(m => ({ default: m.AppDemoVideo })));
 const ExplainerVideo = lazy(() => import("@/components/ExplainerVideo").then(m => ({ default: m.ExplainerVideo })));
@@ -35,6 +35,16 @@ const LoadingSection = () => (
 );
 
 const Index = () => {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [user, loading, navigate]);
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
@@ -143,22 +153,27 @@ const Index = () => {
           </div>
         </section>
         
-        <Suspense fallback={<LoadingSection />}>
-          <TriageSection />
-        </Suspense>
-
-        {/* Merit Score Calculator Section */}
+        {/* CTA Section - Encourage sign up */}
         <section className="py-16 px-4 bg-gradient-to-b from-background to-muted/30">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Check Your Case Strength</h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Get an instant AI-powered assessment of your legal case merit score
-              </p>
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Understand Your Legal Options?</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+              Create a free account to access AI-powered case analysis, document review, and step-by-step guidance.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a 
+                href="/welcome" 
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-8 py-3 text-lg font-semibold text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors"
+              >
+                Start Your Case
+              </a>
+              <a 
+                href="/auth" 
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-8 py-3 text-lg font-semibold hover:bg-accent hover:text-accent-foreground transition-colors"
+              >
+                Sign In
+              </a>
             </div>
-            <Suspense fallback={<LoadingSection />}>
-              <MeritScoreCalculator />
-            </Suspense>
           </div>
         </section>
 
