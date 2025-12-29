@@ -301,7 +301,7 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col" onPointerDownOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-primary" />
@@ -315,7 +315,7 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
           )}
         </DialogHeader>
 
-        <ScrollArea className="flex-1 pr-4">
+        <div className="flex-1 overflow-y-auto pr-4">
           {/* Step 1: Case Details */}
           {step === 'case-details' && (
             <div className="space-y-6 py-4">
@@ -917,7 +917,7 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
               </div>
             </div>
           )}
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );
