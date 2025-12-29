@@ -116,6 +116,152 @@ const Index = () => {
       <main id="main-content" tabIndex={-1}>
         <HeroSection />
         
+        {/* How It Works - 3-Step Section */}
+        <section className="py-16 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Three simple steps to understand your legal situation
+              </p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              <div className="text-center p-6 bg-background rounded-xl border shadow-sm">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-primary">1</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Describe Your Issue</h3>
+                <p className="text-muted-foreground">
+                  Tell us about your legal situation in plain language. Our AI understands context and asks clarifying questions.
+                </p>
+              </div>
+              <div className="text-center p-6 bg-background rounded-xl border shadow-sm">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-primary">2</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Get Your Pathway</h3>
+                <p className="text-muted-foreground">
+                  Receive a personalized roadmap showing which tribunals, forms, and steps apply to your situation.
+                </p>
+              </div>
+              <div className="text-center p-6 bg-background rounded-xl border shadow-sm">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-primary">3</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Prepare Your Case</h3>
+                <p className="text-muted-foreground">
+                  Upload evidence, generate documents, and track deadlines — all in one organized workspace.
+                </p>
+              </div>
+            </div>
+            <div className="text-center mt-10">
+              <a 
+                href="/welcome" 
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-8 py-3 text-lg font-semibold text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors"
+              >
+                Start Free Assessment
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* What We Cover / What We Don't Do */}
+        <section className="py-16 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Clear About What We Do</h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Justice-Bot is a legal information tool — not a law firm
+              </p>
+            </div>
+            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+              <div className="p-6 bg-green-50 dark:bg-green-950/30 rounded-xl border border-green-200 dark:border-green-800">
+                <h3 className="text-xl font-semibold mb-4 text-green-700 dark:text-green-400 flex items-center gap-2">
+                  <span className="text-2xl">✓</span> What We Help With
+                </h3>
+                <ul className="space-y-3 text-green-800 dark:text-green-300">
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-600 dark:text-green-400 mt-1">•</span>
+                    <span>Understanding which tribunal or court handles your issue</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-600 dark:text-green-400 mt-1">•</span>
+                    <span>Finding and completing the right forms</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-600 dark:text-green-400 mt-1">•</span>
+                    <span>Organizing your evidence and documents</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-600 dark:text-green-400 mt-1">•</span>
+                    <span>Tracking deadlines and procedural steps</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-600 dark:text-green-400 mt-1">•</span>
+                    <span>Explaining legal processes in plain language</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="p-6 bg-red-50 dark:bg-red-950/30 rounded-xl border border-red-200 dark:border-red-800">
+                <h3 className="text-xl font-semibold mb-4 text-red-700 dark:text-red-400 flex items-center gap-2">
+                  <span className="text-2xl">✗</span> What We Don't Do
+                </h3>
+                <ul className="space-y-3 text-red-800 dark:text-red-300">
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 dark:text-red-400 mt-1">•</span>
+                    <span>Provide legal advice or opinions on your case</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 dark:text-red-400 mt-1">•</span>
+                    <span>Represent you in court or at hearings</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 dark:text-red-400 mt-1">•</span>
+                    <span>Create lawyer-client relationships</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 dark:text-red-400 mt-1">•</span>
+                    <span>Guarantee any legal outcomes</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 dark:text-red-400 mt-1">•</span>
+                    <span>Replace consultation with a qualified lawyer</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Trust & Security Block */}
+        <section className="py-12 bg-muted/50">
+          <div className="container mx-auto px-4">
+            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              <div className="p-5 bg-background rounded-lg border text-center">
+                <div className="text-3xl mb-2">🔒</div>
+                <h4 className="font-semibold mb-1">Your Data is Encrypted</h4>
+                <p className="text-sm text-muted-foreground">
+                  Enterprise-grade encryption protects everything you share. We never sell your data.
+                </p>
+              </div>
+              <div className="p-5 bg-background rounded-lg border text-center">
+                <div className="text-3xl mb-2">🇨🇦</div>
+                <h4 className="font-semibold mb-1">Canadian Data Storage</h4>
+                <p className="text-sm text-muted-foreground">
+                  All data stored on Canadian servers. PIPEDA compliant with strict access controls.
+                </p>
+              </div>
+              <div className="p-5 bg-background rounded-lg border text-center">
+                <div className="text-3xl mb-2">⚖️</div>
+                <h4 className="font-semibold mb-1">Not Legal Advice</h4>
+                <p className="text-sm text-muted-foreground">
+                  Information tool only. Always consult a lawyer for legal advice on your specific situation.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+        
         {/* Lazy load below-hero content */}
         <Suspense fallback={null}>
           <ProvincesBanner />

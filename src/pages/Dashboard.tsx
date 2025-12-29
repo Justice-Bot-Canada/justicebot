@@ -1,20 +1,22 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { 
   Scale, 
   FileText, 
-  CreditCard, 
-  User, 
   ArrowRight,
   CheckCircle,
   Clock,
   AlertCircle,
   Gift,
-  MessageSquare
+  MessageSquare,
+  Upload,
+  BarChart3,
+  BookOpen,
+  Calendar,
+  Loader2
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
@@ -26,395 +28,496 @@ import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
 import CaseProgressTracker from "@/components/CaseProgressTracker";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { PremiumGate } from "@/components/PremiumGate";
 import { LegalChatbot } from "@/components/LegalChatbot";
 import { FormsList } from "@/components/FormsList";
 import { DeadlineWidget } from "@/components/DeadlineWidget";
 import { supabase } from "@/integrations/supabase/client";
+import { Link } from "react-router-dom";
+
+// Progress steps for the guided workflow
+type ProgressStep = 'intake' | 'evidence' | 'processing' | 'merit' | 'forms' | 'generate';
+
+interface CaseData {
+  id: string;
+  title: string;
+  status: string | null;
+  merit_score: number | null;
+  created_at: string;
+  province: string;
+  venue: string | null;
+}
+
+interface EvidenceStats {
+  total: number;
+  processing: number;
+  complete: number;
+}
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { hasAccess, isFreeUser, userNumber } = usePremiumAccess();
-  const [activeTab, setActiveTab] = useState("triage");
-  const [activeCaseId, setActiveCaseId] = useState<string | null>(null);
-  const [hasExistingCases, setHasExistingCases] = useState(false);
+  
+  // Dashboard state
+  const [activeCase, setActiveCase] = useState<CaseData | null>(null);
+  const [cases, setCases] = useState<CaseData[]>([]);
+  const [evidenceStats, setEvidenceStats] = useState<EvidenceStats>({ total: 0, processing: 0, complete: 0 });
   const [loading, setLoading] = useState(true);
   const [showBookWizard, setShowBookWizard] = useState(false);
+  const [activeView, setActiveView] = useState<'overview' | 'triage' | 'evidence' | 'forms' | 'calendar' | 'cases'>('overview');
 
-  // Check if user has existing cases
+  // Load user's cases
   useEffect(() => {
-    const checkExistingCases = async () => {
+    const loadCases = async () => {
       if (!user) return;
       
       try {
         const { data, error } = await supabase
           .from('cases')
-          .select('id')
+          .select('id, title, status, merit_score, created_at, province, venue')
           .eq('user_id', user.id)
-          .limit(1);
+          .order('updated_at', { ascending: false });
 
-        if (!error && data && data.length > 0) {
-          setHasExistingCases(true);
+        if (!error && data) {
+          setCases(data);
+          // Set active case to most recent
+          if (data.length > 0 && !activeCase) {
+            setActiveCase(data[0]);
+          }
         }
       } catch (error) {
-        console.error('Error checking cases:', error);
+        console.error('Error loading cases:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    checkExistingCases();
+    loadCases();
   }, [user]);
 
-  // Auth check is now handled by ProtectedRoute
+  // Load evidence stats when active case changes
+  useEffect(() => {
+    const loadEvidenceStats = async () => {
+      if (!activeCase) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('evidence')
+          .select('id, ocr_text')
+          .eq('case_id', activeCase.id);
+
+        if (!error && data) {
+          const total = data.length;
+          const complete = data.filter(e => e.ocr_text && e.ocr_text.length > 0).length;
+          setEvidenceStats({
+            total,
+            processing: total - complete,
+            complete
+          });
+        }
+      } catch (error) {
+        console.error('Error loading evidence stats:', error);
+      }
+    };
+
+    loadEvidenceStats();
+  }, [activeCase]);
+
+  // Calculate current progress step
+  const getCurrentStep = (): ProgressStep => {
+    if (!activeCase) return 'intake';
+    if (evidenceStats.total === 0) return 'evidence';
+    if (evidenceStats.processing > 0) return 'processing';
+    if (!activeCase.merit_score) return 'merit';
+    return 'forms';
+  };
+
+  const getProgressPercentage = (): number => {
+    const step = getCurrentStep();
+    const steps: ProgressStep[] = ['intake', 'evidence', 'processing', 'merit', 'forms', 'generate'];
+    return ((steps.indexOf(step) + 1) / steps.length) * 100;
+  };
+
+  const getNextAction = () => {
+    const step = getCurrentStep();
+    switch (step) {
+      case 'intake':
+        return { label: 'Start AI Triage', action: () => setActiveView('triage'), icon: MessageSquare };
+      case 'evidence':
+        return { label: 'Upload Evidence', action: () => setActiveView('evidence'), icon: Upload };
+      case 'processing':
+        return { label: 'View Processing Status', action: () => setActiveView('evidence'), icon: Clock };
+      case 'merit':
+        return { label: 'Get Merit Score', action: () => setActiveView('triage'), icon: BarChart3 };
+      case 'forms':
+        return { label: 'View Recommended Forms', action: () => setActiveView('forms'), icon: FileText };
+      default:
+        return { label: 'Build Book of Documents', action: () => setShowBookWizard(true), icon: BookOpen };
+    }
+  };
+
+  const nextAction = getNextAction();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 py-20">
+          <div className="flex items-center justify-center">
+            <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8">
+        {/* Welcome Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Legal Dashboard</h1>
+          <h1 className="text-3xl font-bold mb-2">
+            {cases.length > 0 ? 'Your Legal Workspace' : 'Welcome to Justice-Bot'}
+          </h1>
           <p className="text-muted-foreground">
-            {hasExistingCases 
-              ? "Manage your cases, access forms, and track your progress" 
-              : "Start by using AI Triage to understand your legal situation"}
+            {cases.length > 0 
+              ? 'Continue working on your case or start a new one'
+              : 'Start by telling us about your legal situation'}
           </p>
           
           {isFreeUser && userNumber && (
-            <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-              <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                <Gift className="w-4 h-4" />
-                <Badge variant="outline" className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200">
-                  FREE User #{userNumber}
-                </Badge>
-              </div>
-              <p className="text-sm text-green-600 dark:text-green-400 mt-1">
-                You have lifetime free access to all premium features!
-              </p>
-            </div>
-          )}
-
-          {!hasExistingCases && (
-            <div className="mt-4 p-4 bg-primary/5 rounded-lg border border-primary/20">
-              <h3 className="font-semibold mb-2 flex items-center gap-2">
-                <MessageSquare className="w-5 h-5" />
-                Welcome! Here's how to get started:
-              </h3>
-              <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                <li>Use <strong>AI Triage</strong> to describe your legal issue</li>
-                <li>Create a case from the AI recommendations</li>
-                <li>Upload evidence in the <strong>Documents</strong> tab</li>
-                <li>Track deadlines in the <strong>Calendar</strong> tab</li>
-                <li>Purchase and download forms when ready</li>
-              </ol>
+            <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 inline-flex items-center gap-2">
+              <Gift className="w-4 h-4 text-green-700 dark:text-green-300" />
+              <Badge variant="outline" className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200">
+                FREE User #{userNumber}
+              </Badge>
+              <span className="text-sm text-green-600 dark:text-green-400">Lifetime free access!</span>
             </div>
           )}
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="triage" className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              <span className="hidden sm:inline">AI Triage</span>
-              <span className="sm:hidden">Triage</span>
-            </TabsTrigger>
-            <TabsTrigger value="cases" className="flex items-center gap-2">
-              <Scale className="h-4 w-4" />
-              <span className="hidden sm:inline">Cases</span>
-              <span className="sm:hidden">Cases</span>
-            </TabsTrigger>
-            <TabsTrigger value="calendar" className="flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              <span className="hidden sm:inline">Calendar</span>
-              <span className="sm:hidden">Cal</span>
-            </TabsTrigger>
-            <TabsTrigger value="documents" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              <span className="hidden sm:inline">Documents</span>
-              <span className="sm:hidden">Docs</span>
-            </TabsTrigger>
-            <TabsTrigger value="forms" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              <span className="hidden sm:inline">Forms</span>
-              <span className="sm:hidden">Forms</span>
-            </TabsTrigger>
-            <TabsTrigger value="payments" className="flex items-center gap-2">
-              <CreditCard className="h-4 w-4" />
-              <span className="hidden sm:inline">Payments</span>
-              <span className="sm:hidden">Pay</span>
-            </TabsTrigger>
-            <TabsTrigger value="account" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              <span className="hidden sm:inline">Account</span>
-              <span className="sm:hidden">Acct</span>
-            </TabsTrigger>
-          </TabsList>
+        {/* Navigation Tabs */}
+        <div className="flex flex-wrap gap-2 mb-6 border-b pb-4">
+          {[
+            { key: 'overview', label: 'Overview', icon: Scale },
+            { key: 'triage', label: 'AI Triage', icon: MessageSquare },
+            { key: 'evidence', label: 'Documents', icon: FileText },
+            { key: 'forms', label: 'Forms', icon: FileText },
+            { key: 'calendar', label: 'Calendar', icon: Calendar },
+            { key: 'cases', label: 'My Cases', icon: Scale },
+          ].map(tab => (
+            <Button
+              key={tab.key}
+              variant={activeView === tab.key ? 'default' : 'ghost'}
+              onClick={() => setActiveView(tab.key as typeof activeView)}
+              className="gap-2"
+            >
+              <tab.icon className="h-4 w-4" />
+              <span className="hidden sm:inline">{tab.label}</span>
+            </Button>
+          ))}
+        </div>
 
-          <TabsContent value="triage" className="mt-6">
-            <div className="space-y-6">
+        {/* Overview View - Main Dashboard */}
+        {activeView === 'overview' && (
+          <div className="space-y-6">
+            {/* Case Selector (if multiple cases) */}
+            {cases.length > 1 && (
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5" />
-                    AI Legal Assistant - Start Here
-                  </CardTitle>
-                  <CardDescription>
-                    {hasExistingCases 
-                      ? "Get help with your legal questions and explore new cases" 
-                      : "Tell me about your legal issue and I'll guide you through the right pathway"}
-                  </CardDescription>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">Active Case</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <LegalChatbot />
+                  <select 
+                    className="w-full p-2 border rounded-md bg-background"
+                    value={activeCase?.id || ''}
+                    onChange={(e) => {
+                      const selected = cases.find(c => c.id === e.target.value);
+                      if (selected) setActiveCase(selected);
+                    }}
+                  >
+                    {cases.map(c => (
+                      <option key={c.id} value={c.id}>{c.title}</option>
+                    ))}
+                  </select>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Progress Tracker */}
+            <Card className="border-primary/30">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      {activeCase ? activeCase.title : 'Start Your Case'}
+                    </CardTitle>
+                    <CardDescription>
+                      {activeCase 
+                        ? `${activeCase.venue || 'Legal matter'} • ${activeCase.province}`
+                        : 'No case created yet'}
+                    </CardDescription>
+                  </div>
+                  {activeCase && (
+                    <Badge variant={activeCase.status === 'active' ? 'default' : 'secondary'}>
+                      {activeCase.status || 'In Progress'}
+                    </Badge>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent>
+                {/* Progress Steps */}
+                <div className="mb-6">
+                  <div className="flex justify-between text-sm text-muted-foreground mb-2">
+                    <span>Progress</span>
+                    <span>{Math.round(getProgressPercentage())}%</span>
+                  </div>
+                  <Progress value={getProgressPercentage()} className="h-2" />
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-6 gap-2 mb-6">
+                  {[
+                    { key: 'intake', label: 'Intake', icon: MessageSquare },
+                    { key: 'evidence', label: 'Evidence', icon: Upload },
+                    { key: 'processing', label: 'Processing', icon: Clock },
+                    { key: 'merit', label: 'Merit Score', icon: BarChart3 },
+                    { key: 'forms', label: 'Forms', icon: FileText },
+                    { key: 'generate', label: 'Generate', icon: BookOpen },
+                  ].map((step, idx) => {
+                    const currentIdx = ['intake', 'evidence', 'processing', 'merit', 'forms', 'generate'].indexOf(getCurrentStep());
+                    const isComplete = idx < currentIdx;
+                    const isCurrent = idx === currentIdx;
+                    
+                    return (
+                      <div 
+                        key={step.key}
+                        className={`p-2 rounded-lg text-center text-xs ${
+                          isComplete ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
+                          isCurrent ? 'bg-primary/10 text-primary border border-primary/30' :
+                          'bg-muted text-muted-foreground'
+                        }`}
+                      >
+                        <step.icon className="h-4 w-4 mx-auto mb-1" />
+                        <span>{step.label}</span>
+                        {isComplete && <CheckCircle className="h-3 w-3 mx-auto mt-1" />}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Continue Action Card */}
+                <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-semibold">What's Next?</h4>
+                      <p className="text-sm text-muted-foreground">{nextAction.label}</p>
+                    </div>
+                    <Button onClick={nextAction.action} className="gap-2">
+                      <nextAction.icon className="h-4 w-4" />
+                      Continue
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Stats Grid */}
+            <div className="grid md:grid-cols-3 gap-4">
+              {/* Evidence Status */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Evidence
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {evidenceStats.total > 0 ? (
+                    <div>
+                      <div className="text-2xl font-bold">{evidenceStats.total}</div>
+                      <p className="text-xs text-muted-foreground">
+                        {evidenceStats.complete} processed • {evidenceStats.processing} pending
+                      </p>
+                      {evidenceStats.processing > 0 && (
+                        <div className="mt-2 flex items-center gap-2 text-amber-600 dark:text-amber-400 text-xs">
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          Processing documents...
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-muted-foreground text-sm">
+                      No evidence uploaded yet
+                      <Button variant="link" className="p-0 h-auto text-sm" onClick={() => setActiveView('evidence')}>
+                        Upload now
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 
-              {activeCaseId && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="h-5 w-5" />
-                      Upload Evidence & Documents
-                    </CardTitle>
-                    <CardDescription>
-                      After discussing your case, upload relevant documents, evidence, or correspondence for AI analysis
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <DocumentAnalyzer caseId={activeCaseId} />
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="cases" className="mt-6">
-            {activeCaseId ? (
-              <div className="space-y-6">
-                <CaseProgressTracker caseId={activeCaseId} />
-                <CaseManager onCaseSelect={setActiveCaseId} />
-              </div>
-            ) : (
-              <CaseManager onCaseSelect={setActiveCaseId} />
-            )}
-          </TabsContent>
-
-          <TabsContent value="calendar" className="mt-6">
-            <div className="space-y-6">
-              <DeadlineWidget />
-              {activeCaseId ? (
-                <CaseCalendar caseId={activeCaseId} />
-              ) : (
-                <Card>
-                  <CardContent className="pt-6 text-center text-muted-foreground">
-                    <Clock className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                    <p className="mb-2 font-medium">No case selected</p>
-                    <p className="text-sm">Go to the <strong>Cases</strong> tab to create or select a case first</p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="documents" className="mt-6">
-            {activeCaseId ? (
-              <div className="space-y-6">
-                {/* Case Preparation Guide */}
-                <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-primary" />
-                      📋 Case Preparation Guide
-                    </CardTitle>
-                    <CardDescription>
-                      Follow these steps to prepare your case for the tribunal or court
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid md:grid-cols-3 gap-4">
-                      <div className="p-4 bg-background rounded-lg border">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm flex items-center justify-center font-bold">1</span>
-                          <h4 className="font-semibold">Upload Evidence</h4>
-                        </div>
-                        <p className="text-sm text-muted-foreground">Upload all documents, photos, emails, and evidence related to your case</p>
-                      </div>
-                      <div className="p-4 bg-background rounded-lg border">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm flex items-center justify-center font-bold">2</span>
-                          <h4 className="font-semibold">Organize & Label</h4>
-                        </div>
-                        <p className="text-sm text-muted-foreground">Add descriptions and tags to each document for easy reference</p>
-                      </div>
-                      <div className="p-4 bg-background rounded-lg border">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm flex items-center justify-center font-bold">3</span>
-                          <h4 className="font-semibold">Build Book of Documents</h4>
-                        </div>
-                        <p className="text-sm text-muted-foreground">Generate a professional exhibit book with table of contents</p>
-                      </div>
+              {/* Merit Score */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4" />
+                    Merit Score
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {activeCase?.merit_score ? (
+                    <div>
+                      <div className="text-2xl font-bold">{activeCase.merit_score}/100</div>
+                      <p className="text-xs text-muted-foreground">
+                        {activeCase.merit_score >= 70 ? 'Strong case' : activeCase.merit_score >= 50 ? 'Moderate strength' : 'Needs work'}
+                      </p>
                     </div>
-                  </CardContent>
-                </Card>
+                  ) : (
+                    <div className="text-muted-foreground text-sm">
+                      Not yet calculated
+                      <p className="text-xs">Complete triage to get your score</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
 
-                {/* Evidence Hub - Main document library */}
-                <EvidenceHub caseId={activeCaseId} />
+              {/* Deadlines */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Upcoming Deadlines
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Check the Calendar tab for deadlines
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Book of Documents CTA (if ready) */}
+            {activeCase && evidenceStats.complete >= 3 && (
+              <Card className="border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="font-semibold text-lg flex items-center gap-2">
+                        <BookOpen className="h-5 w-5 text-primary" />
+                        Ready to Build Your Book of Documents
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        You have {evidenceStats.complete} documents ready. Generate a professionally formatted exhibit book.
+                      </p>
+                    </div>
+                    <Button onClick={() => setShowBookWizard(true)} size="lg">
+                      Build Now <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        )}
+
+        {/* Triage View */}
+        {activeView === 'triage' && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5" />
+                AI Legal Assistant
+              </CardTitle>
+              <CardDescription>
+                Describe your legal situation and get personalized guidance
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <LegalChatbot />
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Evidence View */}
+        {activeView === 'evidence' && (
+          <div className="space-y-6">
+            {activeCase ? (
+              <>
+                <EvidenceHub caseId={activeCase.id} />
                 
-                {/* Book of Documents Builder Button */}
-                <Card className="border-2 border-primary/30">
+                <Card className="border-primary/30">
                   <CardContent className="pt-6">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-semibold text-lg flex items-center gap-2">
-                          <FileText className="h-5 w-5 text-primary" />
-                          📚 Book of Documents Wizard
+                        <h3 className="font-semibold flex items-center gap-2">
+                          <BookOpen className="h-5 w-5 text-primary" />
+                          Book of Documents Wizard
                         </h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Generate a professionally formatted book of documents with index, page numbers, and exhibit labels. Required for most tribunal hearings.
+                        <p className="text-sm text-muted-foreground">
+                          Generate a court-ready exhibit book
                         </p>
                       </div>
-                      <Button onClick={() => setShowBookWizard(true)} size="lg" className="shrink-0">
-                        Build Book of Documents
-                        <ArrowRight className="h-4 w-4 ml-2" />
+                      <Button onClick={() => setShowBookWizard(true)}>
+                        Build Book <ArrowRight className="h-4 w-4 ml-2" />
                       </Button>
                     </div>
                   </CardContent>
                 </Card>
                 
-                {/* Book of Documents Wizard Dialog */}
                 <BookOfDocumentsWizard 
-                  caseId={activeCaseId} 
+                  caseId={activeCase.id} 
                   open={showBookWizard}
                   onOpenChange={setShowBookWizard}
                 />
-              </div>
+              </>
             ) : (
               <Card>
                 <CardContent className="pt-6 text-center text-muted-foreground">
                   <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
                   <p className="mb-2 font-medium">No case selected</p>
-                  <p className="text-sm">Go to the <strong>Cases</strong> tab to create or select a case first.</p>
-                  <p className="text-sm mt-2">Documents uploaded during triage will appear here once you select the case.</p>
+                  <p className="text-sm">Start with AI Triage to create a case first.</p>
+                  <Button className="mt-4" onClick={() => setActiveView('triage')}>
+                    Start AI Triage
+                  </Button>
                 </CardContent>
               </Card>
             )}
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="forms" className="mt-6">
-            <FormsList />
-          </TabsContent>
+        {/* Forms View */}
+        {activeView === 'forms' && <FormsList />}
 
-          <TabsContent value="payments" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Calendar View */}
+        {activeView === 'calendar' && (
+          <div className="space-y-6">
+            <DeadlineWidget />
+            {activeCase ? (
+              <CaseCalendar caseId={activeCase.id} />
+            ) : (
               <Card>
-                <CardHeader>
-                  <CardTitle>Payment Methods</CardTitle>
-                  <CardDescription>Choose your preferred payment option</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="p-4 border rounded-lg">
-                    <h4 className="font-semibold mb-2">PayPal</h4>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Secure payment with PayPal or credit card
-                    </p>
-                    <Button>Pay with PayPal</Button>
-                  </div>
-                  
-                  <div className="p-4 border rounded-lg">
-                    <h4 className="font-semibold mb-2">E-Transfer</h4>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Send payment directly to: payments@justice-bot.com
-                    </p>
-                    <Button variant="outline">Copy Email</Button>
-                  </div>
+                <CardContent className="pt-6 text-center text-muted-foreground">
+                  <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>Create a case to track deadlines</p>
                 </CardContent>
               </Card>
+            )}
+          </div>
+        )}
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Purchase History</CardTitle>
-                  <CardDescription>Your recent transactions</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 border rounded-lg">
-                      <div>
-                        <p className="font-medium">LTB Application Form</p>
-                        <p className="text-sm text-muted-foreground">March 15, 2024</p>
-                      </div>
-                      <Badge variant="outline" className="text-success">
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        Paid
-                      </Badge>
-                    </div>
-                    
-                    <div className="text-center py-8 text-muted-foreground">
-                      No previous purchases
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="account" className="mt-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Account Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium">Email</label>
-                    <p className="text-sm text-muted-foreground">{user?.email || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Account Type</label>
-                    <p className="text-sm text-muted-foreground">Standard User</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Member Since</label>
-                    <p className="text-sm text-muted-foreground">
-                      {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Case Progress Overview</CardTitle>
-                  <CardDescription>Your legal journey at a glance</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Cases Created</span>
-                      <span>0</span>
-                    </div>
-                    <Progress value={0} className="h-2" />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Forms Purchased</span>
-                      <span>0</span>
-                    </div>
-                    <Progress value={0} className="h-2" />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Active Cases</span>
-                      <span>0</span>
-                    </div>
-                    <Progress value={0} className="h-2" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
+        {/* Cases View */}
+        {activeView === 'cases' && (
+          <CaseManager onCaseSelect={(id) => {
+            const selected = cases.find(c => c.id === id);
+            if (selected) {
+              setActiveCase(selected);
+              setActiveView('overview');
+            }
+          }} />
+        )}
       </main>
       <Footer />
     </div>
