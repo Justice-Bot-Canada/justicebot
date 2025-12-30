@@ -257,8 +257,125 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
   };
 
   const handleDownload = () => {
-    toast.success('Preparing download... (PDF generation in progress)');
-    // Future: Trigger actual PDF generation
+    if (!generatedBook) {
+      toast.error('No document to download');
+      return;
+    }
+
+    toast.success('Preparing your Book of Documents...');
+
+    // Generate HTML content for the Book of Documents
+    const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Book of Documents - ${generatedBook.coverPage?.case_title || 'Case'}</title>
+  <style>
+    @page { margin: 1in; size: letter; }
+    body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.5; color: #000; }
+    .page { page-break-after: always; min-height: 9in; }
+    .page:last-child { page-break-after: avoid; }
+    .cover { text-align: center; padding-top: 2in; }
+    .cover h1 { font-size: 24pt; font-weight: bold; margin-bottom: 0.5in; }
+    .cover h2 { font-size: 18pt; margin-bottom: 0.3in; }
+    .cover .parties { margin: 1in 0; }
+    .cover .party { margin: 0.5in 0; }
+    .cover .party-label { font-size: 10pt; text-transform: uppercase; }
+    .cover .party-name { font-size: 14pt; font-weight: bold; }
+    .cover .footer { margin-top: 1in; font-size: 10pt; }
+    .toc h2 { text-align: center; margin-bottom: 0.5in; }
+    .toc-item { display: flex; justify-content: space-between; border-bottom: 1px dotted #999; padding: 0.2in 0; }
+    .toc-label { font-weight: bold; }
+    .exhibit-section { margin-bottom: 0.5in; }
+    .exhibit-header { font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 0.1in; margin-bottom: 0.2in; }
+    .exhibit-desc { margin-bottom: 0.3in; font-style: italic; }
+    .certificate { margin-top: 1in; }
+    .certificate h2 { text-align: center; }
+    .signature-line { border-top: 1px solid #000; width: 3in; margin-top: 1in; padding-top: 0.1in; }
+    @media print { .no-print { display: none; } }
+  </style>
+</head>
+<body>
+  <!-- Cover Page -->
+  <div class="page cover">
+    <h1>${generatedBook.coverPage?.title || 'BOOK OF DOCUMENTS'}</h1>
+    <h2>${generatedBook.coverPage?.tribunal_full_name || 'Court/Tribunal'}</h2>
+    <p>Court File No.: ${generatedBook.coverPage?.court_file_number || '[To be assigned]'}</p>
+    
+    <div class="parties">
+      <div class="party">
+        <div class="party-label">Applicant</div>
+        <div class="party-name">${generatedBook.coverPage?.applicant || '[Applicant Name]'}</div>
+      </div>
+      <div>— and —</div>
+      <div class="party">
+        <div class="party-label">Respondent</div>
+        <div class="party-name">${generatedBook.coverPage?.respondent || '[Respondent Name]'}</div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p>${generatedBook.coverPage?.total_exhibits || 0} Exhibits • ${generatedBook.totalPages || 0} Pages</p>
+      <p>Prepared: ${generatedBook.coverPage?.prepared_date || new Date().toLocaleDateString()}</p>
+    </div>
+  </div>
+
+  <!-- Table of Contents -->
+  <div class="page toc">
+    <h2>TABLE OF CONTENTS</h2>
+    ${generatedBook.tableOfContents.map(item => `
+      <div class="toc-item">
+        <span><span class="toc-label">${item.label}</span> — ${item.title}</span>
+        <span>${item.page_reference}</span>
+      </div>
+    `).join('')}
+  </div>
+
+  <!-- Exhibits -->
+  ${generatedBook.exhibits.map(exhibit => `
+    <div class="page exhibit-section">
+      <div class="exhibit-header">${exhibit.label}: ${exhibit.file_name}</div>
+      <div class="exhibit-desc">${exhibit.legal_description || ''}</div>
+      <p><strong>Category:</strong> ${exhibit.category || 'Document'}</p>
+      <p><strong>Date:</strong> ${exhibit.formatted_date || 'Unknown'}</p>
+      <p><strong>Pages:</strong> ${exhibit.page_start}-${exhibit.page_end}</p>
+      <p style="margin-top: 0.5in; color: #666; font-style: italic;">[Exhibit document to be inserted here]</p>
+    </div>
+  `).join('')}
+
+  ${generatedBook.certificateOfService ? `
+  <!-- Certificate of Service -->
+  <div class="page certificate">
+    <h2>CERTIFICATE OF SERVICE</h2>
+    <pre style="white-space: pre-wrap; font-family: 'Times New Roman', serif;">${generatedBook.certificateOfService.content}</pre>
+  </div>
+  ` : ''}
+
+  ${generatedBook.affidavitTemplate ? `
+  <!-- Affidavit of Service -->
+  <div class="page certificate">
+    <h2>AFFIDAVIT OF SERVICE</h2>
+    <pre style="white-space: pre-wrap; font-family: 'Times New Roman', serif;">${generatedBook.affidavitTemplate.content}</pre>
+  </div>
+  ` : ''}
+
+</body>
+</html>`;
+
+    // Create blob and download
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const filename = `Book-of-Documents-${caseTitle?.replace(/[^a-zA-Z0-9]/g, '-') || caseId.slice(0, 8)}.html`;
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast.success('Book of Documents downloaded! Open in browser and use Print → Save as PDF');
   };
 
   const goToStep = (newStep: WizardStep) => {
