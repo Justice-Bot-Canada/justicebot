@@ -446,7 +446,12 @@ const Dashboard = () => {
           <div className="space-y-6">
             {activeCase ? (
               <>
-                <EvidenceHub caseId={activeCase.id} />
+                <EvidenceHub 
+                  caseId={activeCase.id} 
+                  caseDescription={activeCase.title}
+                  caseType={activeCase.venue || undefined}
+                  onBuildBook={() => setShowBookWizard(true)}
+                />
                 
                 <Card className="border-primary/30">
                   <CardContent className="pt-6">
