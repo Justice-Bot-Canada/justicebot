@@ -22,6 +22,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast-stub';
 import { usePremiumAccess } from '@/hooks/usePremiumAccess';
 import { useNavigate } from 'react-router-dom';
+// @ts-ignore
+import html2pdf from 'html2pdf.js';
 
 interface Evidence {
   id: string;
@@ -80,11 +82,13 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
   // Wizard state
   const [step, setStep] = useState<WizardStep>('case-details');
   const [loading, setLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [evidence, setEvidence] = useState<Evidence[]>([]);
   const [exhibitItems, setExhibitItems] = useState<ExhibitItem[]>([]);
   const [generatedBook, setGeneratedBook] = useState<GeneratedBook | null>(null);
 
   const caseDescriptionRef = useRef<HTMLTextAreaElement | null>(null);
+  const pdfRef = useRef<HTMLDivElement | null>(null);
   // Case details
   const [caseDescription, setCaseDescription] = useState('');
   const [caseType, setCaseType] = useState('');
@@ -256,126 +260,48 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!generatedBook) {
       toast.error('No document to download');
       return;
     }
 
-    toast.success('Preparing your Book of Documents...');
+    if (!pdfRef.current) {
+      toast.error('PDF content not ready');
+      return;
+    }
 
-    // Generate HTML content for the Book of Documents
-    const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Book of Documents - ${generatedBook.coverPage?.case_title || 'Case'}</title>
-  <style>
-    @page { margin: 1in; size: letter; }
-    body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.5; color: #000; }
-    .page { page-break-after: always; min-height: 9in; }
-    .page:last-child { page-break-after: avoid; }
-    .cover { text-align: center; padding-top: 2in; }
-    .cover h1 { font-size: 24pt; font-weight: bold; margin-bottom: 0.5in; }
-    .cover h2 { font-size: 18pt; margin-bottom: 0.3in; }
-    .cover .parties { margin: 1in 0; }
-    .cover .party { margin: 0.5in 0; }
-    .cover .party-label { font-size: 10pt; text-transform: uppercase; }
-    .cover .party-name { font-size: 14pt; font-weight: bold; }
-    .cover .footer { margin-top: 1in; font-size: 10pt; }
-    .toc h2 { text-align: center; margin-bottom: 0.5in; }
-    .toc-item { display: flex; justify-content: space-between; border-bottom: 1px dotted #999; padding: 0.2in 0; }
-    .toc-label { font-weight: bold; }
-    .exhibit-section { margin-bottom: 0.5in; }
-    .exhibit-header { font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 0.1in; margin-bottom: 0.2in; }
-    .exhibit-desc { margin-bottom: 0.3in; font-style: italic; }
-    .certificate { margin-top: 1in; }
-    .certificate h2 { text-align: center; }
-    .signature-line { border-top: 1px solid #000; width: 3in; margin-top: 1in; padding-top: 0.1in; }
-    @media print { .no-print { display: none; } }
-  </style>
-</head>
-<body>
-  <!-- Cover Page -->
-  <div class="page cover">
-    <h1>${generatedBook.coverPage?.title || 'BOOK OF DOCUMENTS'}</h1>
-    <h2>${generatedBook.coverPage?.tribunal_full_name || 'Court/Tribunal'}</h2>
-    <p>Court File No.: ${generatedBook.coverPage?.court_file_number || '[To be assigned]'}</p>
-    
-    <div class="parties">
-      <div class="party">
-        <div class="party-label">Applicant</div>
-        <div class="party-name">${generatedBook.coverPage?.applicant || '[Applicant Name]'}</div>
-      </div>
-      <div>— and —</div>
-      <div class="party">
-        <div class="party-label">Respondent</div>
-        <div class="party-name">${generatedBook.coverPage?.respondent || '[Respondent Name]'}</div>
-      </div>
-    </div>
-    
-    <div class="footer">
-      <p>${generatedBook.coverPage?.total_exhibits || 0} Exhibits • ${generatedBook.totalPages || 0} Pages</p>
-      <p>Prepared: ${generatedBook.coverPage?.prepared_date || new Date().toLocaleDateString()}</p>
-    </div>
-  </div>
+    try {
+      setIsDownloading(true);
+      toast.success('Generating PDF...');
 
-  <!-- Table of Contents -->
-  <div class="page toc">
-    <h2>TABLE OF CONTENTS</h2>
-    ${generatedBook.tableOfContents.map(item => `
-      <div class="toc-item">
-        <span><span class="toc-label">${item.label}</span> — ${item.title}</span>
-        <span>${item.page_reference}</span>
-      </div>
-    `).join('')}
-  </div>
+      const fileName = `Book_of_Documents_${caseTitle?.replace(/[^a-zA-Z0-9]/g, '_') || caseId.slice(0, 8)}_${new Date().toISOString().slice(0, 10)}.pdf`;
 
-  <!-- Exhibits -->
-  ${generatedBook.exhibits.map(exhibit => `
-    <div class="page exhibit-section">
-      <div class="exhibit-header">${exhibit.label}: ${exhibit.file_name}</div>
-      <div class="exhibit-desc">${exhibit.legal_description || ''}</div>
-      <p><strong>Category:</strong> ${exhibit.category || 'Document'}</p>
-      <p><strong>Date:</strong> ${exhibit.formatted_date || 'Unknown'}</p>
-      <p><strong>Pages:</strong> ${exhibit.page_start}-${exhibit.page_end}</p>
-      <p style="margin-top: 0.5in; color: #666; font-style: italic;">[Exhibit document to be inserted here]</p>
-    </div>
-  `).join('')}
+      const opt = {
+        margin: [15, 15, 15, 15] as [number, number, number, number],
+        filename: fileName,
+        image: { type: 'jpeg' as const, quality: 0.95 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          allowTaint: false,
+          logging: false,
+          scrollY: 0,
+          windowWidth: pdfRef.current.scrollWidth,
+        },
+        jsPDF: { unit: 'mm' as const, format: 'letter' as const, orientation: 'portrait' as const },
+        pagebreak: { mode: ['css', 'legacy'] as ('css' | 'legacy')[] },
+      };
 
-  ${generatedBook.certificateOfService ? `
-  <!-- Certificate of Service -->
-  <div class="page certificate">
-    <h2>CERTIFICATE OF SERVICE</h2>
-    <pre style="white-space: pre-wrap; font-family: 'Times New Roman', serif;">${generatedBook.certificateOfService.content}</pre>
-  </div>
-  ` : ''}
+      await html2pdf().set(opt).from(pdfRef.current).save();
 
-  ${generatedBook.affidavitTemplate ? `
-  <!-- Affidavit of Service -->
-  <div class="page certificate">
-    <h2>AFFIDAVIT OF SERVICE</h2>
-    <pre style="white-space: pre-wrap; font-family: 'Times New Roman', serif;">${generatedBook.affidavitTemplate.content}</pre>
-  </div>
-  ` : ''}
-
-</body>
-</html>`;
-
-    // Create blob and download
-    const blob = new Blob([htmlContent], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    const filename = `Book-of-Documents-${caseTitle?.replace(/[^a-zA-Z0-9]/g, '-') || caseId.slice(0, 8)}.html`;
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-    toast.success('Book of Documents downloaded! Open in browser and use Print → Save as PDF');
+      toast.success('PDF downloaded successfully!');
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      toast.error('Failed to generate PDF. Please try again.');
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   const goToStep = (newStep: WizardStep) => {
@@ -939,6 +865,84 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
                 </TabsContent>
               </Tabs>
 
+              {/* Hidden PDF Content for Export */}
+              <div 
+                ref={pdfRef} 
+                className="absolute left-[-9999px] top-0 w-[8.5in] bg-white text-black"
+                style={{ fontFamily: 'Times New Roman, serif', fontSize: '12pt', lineHeight: '1.5' }}
+              >
+                {/* Cover Page */}
+                <div className="text-center pt-[2in] pb-8" style={{ pageBreakAfter: 'always' }}>
+                  <h1 className="text-2xl font-bold mb-4">{generatedBook.coverPage?.title || 'BOOK OF DOCUMENTS'}</h1>
+                  <h2 className="text-xl mb-6">{generatedBook.coverPage?.tribunal_full_name || 'Court/Tribunal'}</h2>
+                  <p className="mb-8">Court File No.: {generatedBook.coverPage?.court_file_number || '[To be assigned]'}</p>
+                  
+                  <div className="my-12">
+                    <div className="mb-6">
+                      <p className="text-xs uppercase">Applicant</p>
+                      <p className="font-bold text-lg">{generatedBook.coverPage?.applicant || '[Applicant Name]'}</p>
+                    </div>
+                    <p>— and —</p>
+                    <div className="mt-6">
+                      <p className="text-xs uppercase">Respondent</p>
+                      <p className="font-bold text-lg">{generatedBook.coverPage?.respondent || '[Respondent Name]'}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-12 text-sm">
+                    <p>{generatedBook.coverPage?.total_exhibits || 0} Exhibits • {generatedBook.totalPages || 0} Pages</p>
+                    <p>Prepared: {generatedBook.coverPage?.prepared_date || new Date().toLocaleDateString()}</p>
+                  </div>
+                </div>
+
+                {/* Table of Contents */}
+                <div className="p-8" style={{ pageBreakAfter: 'always' }}>
+                  <h2 className="text-xl font-bold text-center mb-8">TABLE OF CONTENTS</h2>
+                  <div className="space-y-2">
+                    {generatedBook.tableOfContents.map((item, idx) => (
+                      <div key={idx} className="flex justify-between py-2 border-b border-dotted border-gray-400">
+                        <span><strong>{item.label}</strong> — {item.title}</span>
+                        <span>{item.page_reference}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Exhibits */}
+                {generatedBook.exhibits.map((exhibit, idx) => (
+                  <div key={idx} className="p-8" style={{ pageBreakAfter: 'always', pageBreakInside: 'avoid' }}>
+                    <div className="font-bold border-b-2 border-black pb-2 mb-4">
+                      {exhibit.label}: {exhibit.file_name}
+                    </div>
+                    <p className="italic mb-4">{exhibit.legal_description || ''}</p>
+                    <p><strong>Category:</strong> {exhibit.category || 'Document'}</p>
+                    <p><strong>Date:</strong> {exhibit.formatted_date || 'Unknown'}</p>
+                    <p><strong>Pages:</strong> {exhibit.page_start}-{exhibit.page_end}</p>
+                    <p className="mt-8 text-gray-500 italic">[Exhibit document to be inserted here]</p>
+                  </div>
+                ))}
+
+                {/* Certificate of Service */}
+                {generatedBook.certificateOfService && (
+                  <div className="p-8" style={{ pageBreakAfter: 'always' }}>
+                    <h2 className="text-xl font-bold text-center mb-6">CERTIFICATE OF SERVICE</h2>
+                    <pre className="whitespace-pre-wrap" style={{ fontFamily: 'Times New Roman, serif' }}>
+                      {generatedBook.certificateOfService.content}
+                    </pre>
+                  </div>
+                )}
+
+                {/* Affidavit */}
+                {generatedBook.affidavitTemplate && (
+                  <div className="p-8">
+                    <h2 className="text-xl font-bold text-center mb-6">AFFIDAVIT OF SERVICE</h2>
+                    <pre className="whitespace-pre-wrap" style={{ fontFamily: 'Times New Roman, serif' }}>
+                      {generatedBook.affidavitTemplate.content}
+                    </pre>
+                  </div>
+                )}
+              </div>
+
               <div className="flex justify-between">
                 <Button variant="outline" onClick={() => goToStep('options')}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
@@ -949,9 +953,13 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
                     <Edit3 className="h-4 w-4 mr-2" />
                     Edit Details
                   </Button>
-                  <Button onClick={handleDownload}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Download PDF
+                  <Button onClick={handleDownload} disabled={isDownloading}>
+                    {isDownloading ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Download className="h-4 w-4 mr-2" />
+                    )}
+                    {isDownloading ? 'Generating...' : 'Download PDF'}
                   </Button>
                 </div>
               </div>
@@ -1027,9 +1035,13 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Preview
                 </Button>
-                <Button onClick={handleDownload}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Download PDF
+                <Button onClick={handleDownload} disabled={isDownloading}>
+                  {isDownloading ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4 mr-2" />
+                  )}
+                  {isDownloading ? 'Generating...' : 'Download PDF'}
                 </Button>
               </div>
             </div>
