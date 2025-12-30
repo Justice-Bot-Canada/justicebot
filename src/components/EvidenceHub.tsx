@@ -7,9 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-// ❌ REMOVED - Sonner causing runtime errors
-// import { toast } from 'sonner';
 import { toast } from "@/lib/toast-stub";
+import { EvidenceAnalysisPanel } from './EvidenceAnalysisPanel';
 import {
   Upload,
   FileText,
@@ -27,7 +26,8 @@ import {
   Loader2,
   CheckCircle2,
   AlertCircle,
-  RotateCcw
+  RotateCcw,
+  Sparkles
 } from 'lucide-react';
 
 interface Evidence {
@@ -57,11 +57,14 @@ interface Evidence {
 
 interface EvidenceHubProps {
   caseId: string;
+  caseDescription?: string;
+  caseType?: string;
   onEvidenceSelect?: (evidence: Evidence[]) => void;
   selectionMode?: boolean;
+  onBuildBook?: () => void;
 }
 
-export function EvidenceHub({ caseId, onEvidenceSelect, selectionMode = false }: EvidenceHubProps) {
+export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelect, selectionMode = false, onBuildBook }: EvidenceHubProps) {
   const [evidence, setEvidence] = useState<Evidence[]>([]);
   const [selectedEvidence, setSelectedEvidence] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -356,6 +359,15 @@ export function EvidenceHub({ caseId, onEvidenceSelect, selectionMode = false }:
 
   return (
     <div className="space-y-6">
+      {/* AI Evidence Analysis Panel */}
+      <EvidenceAnalysisPanel 
+        caseId={caseId}
+        caseDescription={caseDescription}
+        caseType={caseType}
+        evidenceCount={evidence.length}
+        onBuildBook={onBuildBook}
+      />
+
       {/* Upload Zone */}
       <Card>
         <CardContent className="pt-6">
