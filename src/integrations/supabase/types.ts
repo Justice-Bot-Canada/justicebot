@@ -675,18 +675,39 @@ export type Database = {
       }
       entitlements: {
         Row: {
+          case_id: string | null
+          created_at: string | null
+          ends_at: string | null
+          feature: string | null
           granted_at: string
           product_id: string
+          scope: string | null
+          source: string | null
+          starts_at: string | null
           user_id: string
         }
         Insert: {
+          case_id?: string | null
+          created_at?: string | null
+          ends_at?: string | null
+          feature?: string | null
           granted_at?: string
           product_id: string
+          scope?: string | null
+          source?: string | null
+          starts_at?: string | null
           user_id: string
         }
         Update: {
+          case_id?: string | null
+          created_at?: string | null
+          ends_at?: string | null
+          feature?: string | null
           granted_at?: string
           product_id?: string
+          scope?: string | null
+          source?: string | null
+          starts_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -2271,6 +2292,36 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          current_period_end: string | null
+          plan: string
+          provider: string
+          provider_sub_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          current_period_end?: string | null
+          plan: string
+          provider: string
+          provider_sub_id?: string | null
+          status: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          current_period_end?: string | null
+          plan?: string
+          provider?: string
+          provider_sub_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       support_messages: {
         Row: {
           created_at: string
@@ -3059,6 +3110,10 @@ export type Database = {
         Args: { admin_notes?: string; target_user_id: string }
         Returns: undefined
       }
+      has_entitlement: {
+        Args: { p_case_id?: string; p_feature: string }
+        Returns: boolean
+      }
       has_role:
         | {
             Args: { _role: Database["public"]["Enums"]["app_role"] }
@@ -3110,6 +3165,7 @@ export type Database = {
         Args: { revoke_reason?: string; target_user_id: string }
         Returns: undefined
       }
+      run_sweep_runner: { Args: never; Returns: undefined }
       search_profiles_directory: {
         Args: { p_limit?: number; p_offset?: number; p_query?: string }
         Returns: {
