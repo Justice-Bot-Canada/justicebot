@@ -392,22 +392,72 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Scale className="h-5 w-5 text-amber-500" />
-              Book of Documents
+              Smart Book of Documents
               <Badge className="bg-amber-500">Premium</Badge>
             </DialogTitle>
             <DialogDescription>
-              Generate court-ready exhibit books with AI-powered descriptions
+              The evidence tool that wins cases
             </DialogDescription>
           </DialogHeader>
-          <div className="text-center py-8">
-            <Scale className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <p className="text-muted-foreground mb-6">
-              Upgrade to create Ontario-compliant Books of Documents with automatic organization, 
-              AI descriptions, and court-ready formatting.
-            </p>
-            <Button onClick={() => { onOpenChange(false); navigate('/pricing'); }}>
-              Upgrade to Premium
-            </Button>
+          
+          <div className="space-y-6 py-4">
+            {/* Compelling Value Prop */}
+            <div className="text-center">
+              <BookOpen className="h-16 w-16 text-primary mx-auto mb-4" />
+              <h3 className="text-xl font-bold mb-2">
+                Your Evidence, Court-Ready in Minutes
+              </h3>
+              <p className="text-muted-foreground">
+                Stop struggling with document organization. Our AI analyzes your evidence, 
+                builds a professional exhibit book, and gives you the edge in your hearing.
+              </p>
+            </div>
+
+            {/* What You Get */}
+            <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+              <h4 className="font-semibold text-sm">What's included:</h4>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                  <span><strong>AI Evidence Analysis</strong> — identifies strengths, gaps, and what to add</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                  <span><strong>Key Facts Summary</strong> — auto-generated timeline the adjudicator will love</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                  <span><strong>Smart Organization</strong> — chronological ordering with proper page numbers</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                  <span><strong>Professional Formatting</strong> — cover page, TOC, exhibit labels, certificate of service</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                  <span><strong>Quality Warnings</strong> — flags blurry images and missing dates before you file</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Social Proof */}
+            <div className="text-center text-sm text-muted-foreground italic">
+              "I was dreading organizing 40+ documents. Justice-Bot did it in 3 minutes and caught issues I missed."
+            </div>
+
+            {/* CTA */}
+            <div className="space-y-3">
+              <Button 
+                className="w-full h-12 text-lg font-semibold" 
+                onClick={() => { onOpenChange(false); navigate('/pricing'); }}
+              >
+                <Sparkles className="h-5 w-5 mr-2" />
+                Unlock Smart Book of Documents
+              </Button>
+              <p className="text-xs text-center text-muted-foreground">
+                Starting at $19.99/month • Cancel anytime • 7-day free trial
+              </p>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
