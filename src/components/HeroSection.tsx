@@ -1,19 +1,19 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle, Shield, Clock, AlertTriangle } from "lucide-react";
-import { trackEvent, analytics } from "@/utils/analytics";
+import { ArrowRight, Clock } from "lucide-react";
+import { trackEvent } from "@/utils/analytics";
 import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
   const navigate = useNavigate();
 
-  const handleGetStarted = () => {
-    trackEvent('cta_click', { button: 'hero_assessment', location: 'hero' });
+  const handleCheckSituation = () => {
+    trackEvent('cta_click', { button: 'check_situation', location: 'hero' });
     navigate('/triage');
   };
 
   return (
     <section 
-      className="relative min-h-[85vh] bg-gradient-to-br from-background via-primary/5 to-background overflow-hidden" 
+      className="relative min-h-[70vh] bg-gradient-to-br from-background via-primary/5 to-background overflow-hidden flex items-center" 
       aria-labelledby="hero-heading" 
       role="banner"
     >
@@ -24,106 +24,38 @@ const HeroSection = () => {
       </div>
 
       <div className="container mx-auto px-4 py-12 lg:py-16 relative z-10">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
+        <div className="max-w-3xl mx-auto text-center space-y-8">
           
-          {/* Main headline - speaks to outcome */}
-          <div className="space-y-4 animate-fade-in">
+          {/* Single clear headline */}
+          <div className="space-y-6 animate-fade-in">
             <h1 
               id="hero-heading" 
-              className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight"
+              className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight text-foreground"
             >
-              <span className="text-foreground">Justice-Bot:</span>
-              <br />
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Your Legal Ally in Canada
-              </span>
+              Not sure what form to file — or what happens next?
             </h1>
             
-            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto italic">
-              When people are expected to follow the law, ignorance should not be an option.
-            </p>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mt-2">
-              Justice-Bot helps people understand their legal situation and next steps in plain language.
+            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
+              Answer a few questions about your situation. We'll tell you which tribunal handles it, what form you need, and what to do first.
             </p>
           </div>
 
-          {/* Value bullets - immediate clarity */}
-          <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 text-left animate-fade-in">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-success flex-shrink-0" />
-              <span className="text-foreground">Find your exact tribunal/form (LTB, HRTO, Small Claims)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-success flex-shrink-0" />
-              <span className="text-foreground">Get a score showing your case strength</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-success flex-shrink-0" />
-              <span className="text-foreground">Step-by-step instructions in plain language</span>
-            </div>
-          </div>
-
-          {/* Primary CTA - low friction */}
-          <div className="space-y-4 animate-fade-in">
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <Clock className="w-4 h-4" />
-              <span>Takes less than 90 seconds</span>
-            </div>
-            
+          {/* Single CTA - low friction */}
+          <div className="space-y-4 animate-fade-in pt-4">
             <Button 
               variant="cta" 
               size="lg" 
               className="group text-xl px-12 py-8 shadow-2xl hover:scale-[1.02] transition-all duration-300"
-              onClick={handleGetStarted}
+              onClick={handleCheckSituation}
             >
-              GET STARTED — FREE
+              Check My Situation
               <ArrowRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
             
-            <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-success" />
-                <span>No signup required</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-success" />
-                <span>100% free assessment</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Problem > Solution Section */}
-        <div className="max-w-4xl mx-auto mt-20 animate-fade-in">
-          <div className="bg-card/80 backdrop-blur-md rounded-2xl p-8 md:p-10 border border-border/50 shadow-xl">
-            <div className="flex items-center gap-3 mb-6">
-              <AlertTriangle className="w-8 h-8 text-destructive" />
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground">
-                Terminology is confusing. Deadlines are strict. Mistakes cost you.
-              </h2>
-            </div>
-            
-            <div className="space-y-4 mb-8">
-              <p className="text-lg text-muted-foreground">
-                <strong className="text-foreground">Most people lose or delay cases</strong> because they don't know what forms to file or which tribunal to approach.
-              </p>
-              <p className="text-lg text-muted-foreground">
-                Justice-Bot tells you <strong className="text-foreground">exactly what matters</strong> for your legal situation — step by step.
-              </p>
-              <p className="text-lg text-primary font-semibold">
-                No lawyer fee. No complex legal jargon.
-              </p>
-            </div>
-
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="group border-2 border-primary hover:bg-primary hover:text-primary-foreground"
-              onClick={handleGetStarted}
-            >
-              Start Free Assessment
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
+            <p className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <Clock className="w-4 h-4" />
+              <span>Takes about 2 minutes • No signup required</span>
+            </p>
           </div>
         </div>
       </div>

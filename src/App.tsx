@@ -107,6 +107,7 @@ const LegalChat = lazy(() => import("./pages/LegalChat"));
 const TutorialLibrary = lazy(() => import("./pages/TutorialLibrary"));
 const TemplateLibrary = lazy(() => import("./pages/TemplateLibrary"));
 const Referrals = lazy(() => import("./pages/Referrals"));
+import Referral from "./pages/Referral";
 const SmartDocuments = lazy(() => import("./pages/SmartDocuments"));
 const CaseTimeline = lazy(() => import("./pages/CaseTimeline"));
 const DocumentDrafter = lazy(() => import("./pages/DocumentDrafter"));
@@ -257,6 +258,7 @@ const AppContent = () => {
           <Route path="/partners" element={<Partners />} />
           <Route path="/clinics" element={<Clinics />} />
           <Route path="/referrals" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Referrals /></Suspense></ProtectedRoute>} />
+          <Route path="/referral" element={<Referral />} />
           <Route path="/media-inquiries" element={<MediaInquiries />} />
           <Route path="/press" element={<Press />} />
           <Route path="/government-inquiries" element={<GovernmentInquiries />} />

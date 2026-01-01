@@ -4,38 +4,34 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { 
-  Scale, 
-  FileText, 
-  ArrowRight,
   CheckCircle,
-  Clock,
-  AlertCircle,
+  Circle,
+  ArrowRight,
   Gift,
   MessageSquare,
   Upload,
   BarChart3,
   BookOpen,
-  Calendar,
-  Loader2
+  Loader2,
+  FileText,
+  Calendar as CalendarIcon
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
-import CaseManager from "@/components/CaseManager";
-import CaseCalendar from "@/components/CaseCalendar";
-import { DocumentAnalyzer } from "@/components/DocumentAnalyzer";
 import { EvidenceHub } from "@/components/EvidenceHub";
 import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
-import CaseProgressTracker from "@/components/CaseProgressTracker";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { LegalChatbot } from "@/components/LegalChatbot";
 import { FormsList } from "@/components/FormsList";
 import { DeadlineWidget } from "@/components/DeadlineWidget";
+import CaseCalendar from "@/components/CaseCalendar";
+import CaseManager from "@/components/CaseManager";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // Progress steps for the guided workflow
-type ProgressStep = 'intake' | 'evidence' | 'processing' | 'merit' | 'forms' | 'generate';
+type ProgressStep = 'intake' | 'evidence' | 'summarized' | 'book';
 
 interface CaseData {
   id: string;
@@ -45,6 +41,7 @@ interface CaseData {
   created_at: string;
   province: string;
   venue: string | null;
+  description: string | null;
 }
 
 interface EvidenceStats {
@@ -55,7 +52,8 @@ interface EvidenceStats {
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { hasAccess, isFreeUser, userNumber } = usePremiumAccess();
+  const navigate = useNavigate();
+  const { isFreeUser, userNumber, hasAccess } = usePremiumAccess();
   
   // Dashboard state
   const [activeCase, setActiveCase] = useState<CaseData | null>(null);
@@ -63,7 +61,7 @@ const Dashboard = () => {
   const [evidenceStats, setEvidenceStats] = useState<EvidenceStats>({ total: 0, processing: 0, complete: 0 });
   const [loading, setLoading] = useState(true);
   const [showBookWizard, setShowBookWizard] = useState(false);
-  const [activeView, setActiveView] = useState<'overview' | 'triage' | 'evidence' | 'forms' | 'calendar' | 'cases'>('overview');
+  const [bookGenerated, setBookGenerated] = useState(false);
 
   // Load user's cases
   useEffect(() => {
@@ -73,13 +71,12 @@ const Dashboard = () => {
       try {
         const { data, error } = await supabase
           .from('cases')
-          .select('id, title, status, merit_score, created_at, province, venue')
+          .select('id, title, status, merit_score, created_at, province, venue, description')
           .eq('user_id', user.id)
           .order('updated_at', { ascending: false });
 
         if (!error && data) {
           setCases(data);
-          // Set active case to most recent
           if (data.length > 0 && !activeCase) {
             setActiveCase(data[0]);
           }
@@ -126,36 +123,52 @@ const Dashboard = () => {
   const getCurrentStep = (): ProgressStep => {
     if (!activeCase) return 'intake';
     if (evidenceStats.total === 0) return 'evidence';
-    if (evidenceStats.processing > 0) return 'processing';
-    if (!activeCase.merit_score) return 'merit';
-    return 'forms';
+    if (evidenceStats.processing > 0 || evidenceStats.complete === 0) return 'summarized';
+    if (!bookGenerated) return 'book';
+    return 'book';
+  };
+
+  const currentStep = getCurrentStep();
+  
+  const progressSteps: { key: ProgressStep; label: string; description: string }[] = [
+    { key: 'intake', label: 'Situation Identified', description: 'Complete triage to understand your legal pathway' },
+    { key: 'evidence', label: 'Evidence Uploaded', description: 'Upload your documents and evidence' },
+    { key: 'summarized', label: 'Evidence Summarized', description: 'AI processes and summarizes your documents' },
+    { key: 'book', label: 'Book of Documents Generated', description: 'Generate your court-ready exhibit book' },
+  ];
+
+  const getStepStatus = (stepKey: ProgressStep): 'complete' | 'current' | 'upcoming' => {
+    const stepOrder: ProgressStep[] = ['intake', 'evidence', 'summarized', 'book'];
+    const currentIdx = stepOrder.indexOf(currentStep);
+    const stepIdx = stepOrder.indexOf(stepKey);
+    
+    if (stepIdx < currentIdx) return 'complete';
+    if (stepIdx === currentIdx) return 'current';
+    return 'upcoming';
   };
 
   const getProgressPercentage = (): number => {
-    const step = getCurrentStep();
-    const steps: ProgressStep[] = ['intake', 'evidence', 'processing', 'merit', 'forms', 'generate'];
-    return ((steps.indexOf(step) + 1) / steps.length) * 100;
+    const stepOrder: ProgressStep[] = ['intake', 'evidence', 'summarized', 'book'];
+    const currentIdx = stepOrder.indexOf(currentStep);
+    return ((currentIdx) / (stepOrder.length - 1)) * 100;
   };
 
-  const getNextAction = () => {
-    const step = getCurrentStep();
-    switch (step) {
+  const handleStepClick = (stepKey: ProgressStep) => {
+    switch (stepKey) {
       case 'intake':
-        return { label: 'Start AI Triage', action: () => setActiveView('triage'), icon: MessageSquare };
+        navigate('/triage');
+        break;
       case 'evidence':
-        return { label: 'Upload Evidence', action: () => setActiveView('evidence'), icon: Upload };
-      case 'processing':
-        return { label: 'View Processing Status', action: () => setActiveView('evidence'), icon: Clock };
-      case 'merit':
-        return { label: 'Get Merit Score', action: () => setActiveView('triage'), icon: BarChart3 };
-      case 'forms':
-        return { label: 'View Recommended Forms', action: () => setActiveView('forms'), icon: FileText };
-      default:
-        return { label: 'Build Book of Documents', action: () => setShowBookWizard(true), icon: BookOpen };
+      case 'summarized':
+        // Scroll to evidence section or navigate
+        break;
+      case 'book':
+        if (evidenceStats.complete >= 1) {
+          setShowBookWizard(true);
+        }
+        break;
     }
   };
-
-  const nextAction = getNextAction();
 
   if (loading) {
     return (
@@ -171,20 +184,67 @@ const Dashboard = () => {
     );
   }
 
+  // No case yet - show simplified start view
+  if (cases.length === 0) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 py-12">
+          <div className="max-w-2xl mx-auto text-center">
+            <h1 className="text-3xl font-bold mb-4">Welcome to Justice-Bot</h1>
+            <p className="text-lg text-muted-foreground mb-8">
+              Start by telling us about your legal situation. We'll help you understand the right pathway and what to do next.
+            </p>
+            <Button size="lg" onClick={() => navigate('/triage')} className="gap-2">
+              <MessageSquare className="h-5 w-5" />
+              Start AI Triage
+              <ArrowRight className="h-5 w-5" />
+            </Button>
+            
+            {isFreeUser && userNumber && (
+              <div className="mt-8 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 inline-flex items-center gap-2">
+                <Gift className="w-5 h-5 text-green-700 dark:text-green-300" />
+                <Badge variant="outline" className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200">
+                  FREE User #{userNumber}
+                </Badge>
+                <span className="text-sm text-green-600 dark:text-green-400">Lifetime free access!</span>
+              </div>
+            )}
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8">
         {/* Welcome Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">
-            {cases.length > 0 ? 'Your Legal Workspace' : 'Welcome to Justice-Bot'}
-          </h1>
-          <p className="text-muted-foreground">
-            {cases.length > 0 
-              ? 'Continue working on your case or start a new one'
-              : 'Start by telling us about your legal situation'}
-          </p>
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-2xl md:text-3xl font-bold">Your Case Progress</h1>
+            {cases.length > 1 && (
+              <select 
+                className="p-2 border rounded-md bg-background text-sm"
+                value={activeCase?.id || ''}
+                onChange={(e) => {
+                  const selected = cases.find(c => c.id === e.target.value);
+                  if (selected) setActiveCase(selected);
+                }}
+              >
+                {cases.map(c => (
+                  <option key={c.id} value={c.id}>{c.title}</option>
+                ))}
+              </select>
+            )}
+          </div>
+          {activeCase && (
+            <p className="text-muted-foreground">
+              {activeCase.venue || 'Legal matter'} • {activeCase.province}
+            </p>
+          )}
           
           {isFreeUser && userNumber && (
             <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 inline-flex items-center gap-2">
@@ -192,336 +252,168 @@ const Dashboard = () => {
               <Badge variant="outline" className="bg-green-100 dark:bg-green-800 text-green-800 dark:text-green-200">
                 FREE User #{userNumber}
               </Badge>
-              <span className="text-sm text-green-600 dark:text-green-400">Lifetime free access!</span>
             </div>
           )}
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="flex flex-wrap gap-2 mb-6 border-b pb-4">
-          {[
-            { key: 'overview', label: 'Overview', icon: Scale },
-            { key: 'triage', label: 'AI Triage', icon: MessageSquare },
-            { key: 'evidence', label: 'Documents', icon: FileText },
-            { key: 'forms', label: 'Forms', icon: FileText },
-            { key: 'calendar', label: 'Calendar', icon: Calendar },
-            { key: 'cases', label: 'My Cases', icon: Scale },
-          ].map(tab => (
-            <Button
-              key={tab.key}
-              variant={activeView === tab.key ? 'default' : 'ghost'}
-              onClick={() => setActiveView(tab.key as typeof activeView)}
-              className="gap-2"
-            >
-              <tab.icon className="h-4 w-4" />
-              <span className="hidden sm:inline">{tab.label}</span>
-            </Button>
-          ))}
-        </div>
-
-        {/* Overview View - Main Dashboard */}
-        {activeView === 'overview' && (
-          <div className="space-y-6">
-            {/* Case Selector (if multiple cases) */}
-            {cases.length > 1 && (
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-lg">Active Case</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <select 
-                    className="w-full p-2 border rounded-md bg-background"
-                    value={activeCase?.id || ''}
-                    onChange={(e) => {
-                      const selected = cases.find(c => c.id === e.target.value);
-                      if (selected) setActiveCase(selected);
-                    }}
+        {/* Progress Tracker - Linear Steps */}
+        <Card className="mb-8 border-primary/30">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg">Case Progress</CardTitle>
+              <span className="text-sm text-muted-foreground">{Math.round(getProgressPercentage())}% Complete</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Progress value={getProgressPercentage()} className="h-2 mb-6" />
+            
+            <div className="space-y-3">
+              {progressSteps.map((step, idx) => {
+                const status = getStepStatus(step.key);
+                const isClickable = status === 'current' || status === 'complete';
+                
+                return (
+                  <button
+                    key={step.key}
+                    onClick={() => isClickable && handleStepClick(step.key)}
+                    disabled={!isClickable}
+                    className={`w-full flex items-center gap-4 p-4 rounded-lg border text-left transition-colors ${
+                      status === 'complete' 
+                        ? 'bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800' 
+                        : status === 'current'
+                        ? 'bg-primary/5 border-primary/30 ring-2 ring-primary/20'
+                        : 'bg-muted/30 border-border opacity-60'
+                    } ${isClickable ? 'cursor-pointer hover:border-primary/50' : 'cursor-not-allowed'}`}
                   >
-                    {cases.map(c => (
-                      <option key={c.id} value={c.id}>{c.title}</option>
-                    ))}
-                  </select>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Progress Tracker */}
-            <Card className="border-primary/30">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      {activeCase ? activeCase.title : 'Start Your Case'}
-                    </CardTitle>
-                    <CardDescription>
-                      {activeCase 
-                        ? `${activeCase.venue || 'Legal matter'} • ${activeCase.province}`
-                        : 'No case created yet'}
-                    </CardDescription>
-                  </div>
-                  {activeCase && (
-                    <Badge variant={activeCase.status === 'active' ? 'default' : 'secondary'}>
-                      {activeCase.status || 'In Progress'}
-                    </Badge>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent>
-                {/* Progress Steps */}
-                <div className="mb-6">
-                  <div className="flex justify-between text-sm text-muted-foreground mb-2">
-                    <span>Progress</span>
-                    <span>{Math.round(getProgressPercentage())}%</span>
-                  </div>
-                  <Progress value={getProgressPercentage()} className="h-2" />
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-6 gap-2 mb-6">
-                  {[
-                    { key: 'intake', label: 'Intake', icon: MessageSquare },
-                    { key: 'evidence', label: 'Evidence', icon: Upload },
-                    { key: 'processing', label: 'Processing', icon: Clock },
-                    { key: 'merit', label: 'Merit Score', icon: BarChart3 },
-                    { key: 'forms', label: 'Forms', icon: FileText },
-                    { key: 'generate', label: 'Generate', icon: BookOpen },
-                  ].map((step, idx) => {
-                    const currentIdx = ['intake', 'evidence', 'processing', 'merit', 'forms', 'generate'].indexOf(getCurrentStep());
-                    const isComplete = idx < currentIdx;
-                    const isCurrent = idx === currentIdx;
-                    
-                    return (
-                      <div 
-                        key={step.key}
-                        className={`p-2 rounded-lg text-center text-xs ${
-                          isComplete ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' :
-                          isCurrent ? 'bg-primary/10 text-primary border border-primary/30' :
-                          'bg-muted text-muted-foreground'
-                        }`}
-                      >
-                        <step.icon className="h-4 w-4 mx-auto mb-1" />
-                        <span>{step.label}</span>
-                        {isComplete && <CheckCircle className="h-3 w-3 mx-auto mt-1" />}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Continue Action Card */}
-                <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-semibold">What's Next?</h4>
-                      <p className="text-sm text-muted-foreground">{nextAction.label}</p>
-                    </div>
-                    <Button onClick={nextAction.action} className="gap-2">
-                      <nextAction.icon className="h-4 w-4" />
-                      Continue
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Quick Stats Grid */}
-            <div className="grid md:grid-cols-3 gap-4">
-              {/* Evidence Status */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    Evidence
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {evidenceStats.total > 0 ? (
-                    <div>
-                      <div className="text-2xl font-bold">{evidenceStats.total}</div>
-                      <p className="text-xs text-muted-foreground">
-                        {evidenceStats.complete} processed • {evidenceStats.processing} pending
-                      </p>
-                      {evidenceStats.processing > 0 && (
-                        <div className="mt-2 flex items-center gap-2 text-amber-600 dark:text-amber-400 text-xs">
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                          Processing documents...
-                        </div>
+                    <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                      status === 'complete' 
+                        ? 'bg-green-600 text-white' 
+                        : status === 'current'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted text-muted-foreground'
+                    }`}>
+                      {status === 'complete' ? (
+                        <CheckCircle className="h-5 w-5" />
+                      ) : (
+                        <span className="text-sm font-medium">{idx + 1}</span>
                       )}
                     </div>
-                  ) : (
-                    <div className="text-muted-foreground text-sm">
-                      No evidence uploaded yet
-                      <Button variant="link" className="p-0 h-auto text-sm" onClick={() => setActiveView('evidence')}>
-                        Upload now
-                      </Button>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Merit Score */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4" />
-                    Merit Score
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {activeCase?.merit_score ? (
-                    <div>
-                      <div className="text-2xl font-bold">{activeCase.merit_score}/100</div>
-                      <p className="text-xs text-muted-foreground">
-                        {activeCase.merit_score >= 70 ? 'Strong case' : activeCase.merit_score >= 50 ? 'Moderate strength' : 'Needs work'}
+                    <div className="flex-1">
+                      <p className={`font-medium ${status === 'complete' ? 'text-green-700 dark:text-green-300' : ''}`}>
+                        {step.label}
+                        {status === 'complete' && ' ✓'}
                       </p>
+                      <p className="text-sm text-muted-foreground">{step.description}</p>
                     </div>
-                  ) : (
-                    <div className="text-muted-foreground text-sm">
-                      Not yet calculated
-                      <p className="text-xs">Complete triage to get your score</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Deadlines */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Upcoming Deadlines
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Check the Calendar tab for deadlines
-                  </p>
-                </CardContent>
-              </Card>
+                    {status === 'current' && (
+                      <ArrowRight className="h-5 w-5 text-primary" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
+          </CardContent>
+        </Card>
 
-            {/* Book of Documents CTA (if ready) */}
-            {activeCase && evidenceStats.complete >= 3 && (
-              <Card className="border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-semibold text-lg flex items-center gap-2">
-                        <BookOpen className="h-5 w-5 text-primary" />
-                        Ready to Build Your Book of Documents
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        You have {evidenceStats.complete} documents ready. Generate a professionally formatted exhibit book.
-                      </p>
-                    </div>
-                    <Button onClick={() => setShowBookWizard(true)} size="lg">
-                      Build Now <ArrowRight className="h-4 w-4 ml-2" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        )}
-
-        {/* Triage View */}
-        {activeView === 'triage' && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5" />
-                AI Legal Assistant
-              </CardTitle>
-              <CardDescription>
-                Describe your legal situation and get personalized guidance
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <LegalChatbot />
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Evidence View */}
-        {activeView === 'evidence' && (
-          <div className="space-y-6">
-            {activeCase ? (
-              <>
+        {/* Evidence Section */}
+        {activeCase && (
+          <div className="space-y-6 mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Upload className="h-5 w-5" />
+                  Evidence & Documents
+                </CardTitle>
+                <CardDescription>
+                  {evidenceStats.total > 0 
+                    ? `${evidenceStats.complete} of ${evidenceStats.total} documents processed`
+                    : 'Upload your evidence to build your case'
+                  }
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
                 <EvidenceHub 
                   caseId={activeCase.id} 
-                  caseDescription={activeCase.title}
+                  caseDescription={activeCase.description || activeCase.title}
                   caseType={activeCase.venue || undefined}
                   onBuildBook={() => setShowBookWizard(true)}
                 />
-                
-                <Card className="border-primary/30">
-                  <CardContent className="pt-6">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold flex items-center gap-2">
-                          <BookOpen className="h-5 w-5 text-primary" />
-                          Book of Documents Wizard
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          Generate a court-ready exhibit book
-                        </p>
-                      </div>
-                      <Button onClick={() => setShowBookWizard(true)}>
-                        Build Book <ArrowRight className="h-4 w-4 ml-2" />
-                      </Button>
+              </CardContent>
+            </Card>
+            
+            {/* Book of Documents CTA */}
+            {evidenceStats.complete >= 1 && (
+              <Card className="border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-primary/10">
+                <CardContent className="pt-6">
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-bold text-lg flex items-center gap-2 mb-2">
+                        <BookOpen className="h-5 w-5 text-primary" />
+                        Generate Court-Ready Book (PDF)
+                      </h3>
+                      <p className="text-sm text-muted-foreground max-w-lg">
+                        Your Book of Documents includes a cover page, table of contents, properly labeled exhibits, and sequential page numbering — the format tribunals expect.
+                      </p>
                     </div>
-                  </CardContent>
-                </Card>
-                
-                <BookOfDocumentsWizard 
-                  caseId={activeCase.id} 
-                  open={showBookWizard}
-                  onOpenChange={setShowBookWizard}
-                />
-              </>
-            ) : (
-              <Card>
-                <CardContent className="pt-6 text-center text-muted-foreground">
-                  <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p className="mb-2 font-medium">No case selected</p>
-                  <p className="text-sm">Start with AI Triage to create a case first.</p>
-                  <Button className="mt-4" onClick={() => setActiveView('triage')}>
-                    Start AI Triage
-                  </Button>
+                    <Button onClick={() => setShowBookWizard(true)} size="lg" className="gap-2 whitespace-nowrap">
+                      Generate Book
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             )}
+
+            <BookOfDocumentsWizard 
+              caseId={activeCase.id} 
+              open={showBookWizard}
+              onOpenChange={setShowBookWizard}
+            />
           </div>
         )}
 
-        {/* Forms View */}
-        {activeView === 'forms' && <FormsList />}
+        {/* Quick Actions Row */}
+        <div className="grid md:grid-cols-3 gap-4 mb-8">
+          <Card className="cursor-pointer hover:border-primary/50 transition-colors" onClick={() => navigate('/triage')}>
+            <CardContent className="pt-6">
+              <MessageSquare className="h-8 w-8 text-primary mb-3" />
+              <h4 className="font-semibold mb-1">AI Legal Chat</h4>
+              <p className="text-sm text-muted-foreground">Get guidance on your situation</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="cursor-pointer hover:border-primary/50 transition-colors">
+            <CardContent className="pt-6">
+              <FileText className="h-8 w-8 text-primary mb-3" />
+              <h4 className="font-semibold mb-1">Forms Library</h4>
+              <p className="text-sm text-muted-foreground">Find the right forms for your case</p>
+              <Link to="/forms" className="text-primary text-sm hover:underline mt-2 inline-block">
+                Browse forms →
+              </Link>
+            </CardContent>
+          </Card>
+          
+          <Card className="cursor-pointer hover:border-primary/50 transition-colors">
+            <CardContent className="pt-6">
+              <CalendarIcon className="h-8 w-8 text-primary mb-3" />
+              <h4 className="font-semibold mb-1">Deadlines</h4>
+              <p className="text-sm text-muted-foreground">Track important dates</p>
+              {activeCase && (
+                <div className="mt-3">
+                  <DeadlineWidget />
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
-        {/* Calendar View */}
-        {activeView === 'calendar' && (
-          <div className="space-y-6">
-            <DeadlineWidget />
-            {activeCase ? (
-              <CaseCalendar caseId={activeCase.id} />
-            ) : (
-              <Card>
-                <CardContent className="pt-6 text-center text-muted-foreground">
-                  <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                  <p>Create a case to track deadlines</p>
-                </CardContent>
-              </Card>
-            )}
+        {/* Case Management Link */}
+        {cases.length > 0 && (
+          <div className="text-center">
+            <Link to="/cases" className="text-primary hover:underline text-sm">
+              Manage all cases →
+            </Link>
           </div>
-        )}
-
-        {/* Cases View */}
-        {activeView === 'cases' && (
-          <CaseManager onCaseSelect={(id) => {
-            const selected = cases.find(c => c.id === id);
-            if (selected) {
-              setActiveCase(selected);
-              setActiveView('overview');
-            }
-          }} />
         )}
       </main>
       <Footer />
