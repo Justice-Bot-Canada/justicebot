@@ -2184,6 +2184,42 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_outreach_log: {
+        Row: {
+          contact_name: string | null
+          created_at: string
+          email_hash: string
+          id: string
+          message_id: string | null
+          notes: string | null
+          organization_name: string
+          organization_type: string | null
+          sent_at: string
+        }
+        Insert: {
+          contact_name?: string | null
+          created_at?: string
+          email_hash: string
+          id?: string
+          message_id?: string | null
+          notes?: string | null
+          organization_name: string
+          organization_type?: string | null
+          sent_at?: string
+        }
+        Update: {
+          contact_name?: string | null
+          created_at?: string
+          email_hash?: string
+          id?: string
+          message_id?: string | null
+          notes?: string | null
+          organization_name?: string
+          organization_type?: string | null
+          sent_at?: string
+        }
+        Relationships: []
+      }
       referrals: {
         Row: {
           created_at: string

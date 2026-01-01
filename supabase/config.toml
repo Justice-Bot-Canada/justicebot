@@ -154,3 +154,6 @@ verify_jwt = true
 
 [functions.pathway-router]
 verify_jwt = false
+
+[functions.send-referral-outreach]
+verify_jwt = true
