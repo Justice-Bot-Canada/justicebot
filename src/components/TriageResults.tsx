@@ -9,7 +9,6 @@ import {
   CheckCircle,
   AlertTriangle,
   FileText,
-  MapPin,
   ExternalLink,
   Building2,
   Users,
@@ -19,7 +18,6 @@ import {
   Briefcase,
   Shield,
   Gavel,
-  Info,
   Loader2
 } from "lucide-react";
 
@@ -68,15 +66,15 @@ const venueIcons: Record<string, React.ElementType> = {
 };
 
 const venueColors: Record<string, string> = {
-  ltb: "bg-blue-50 text-blue-700 border-blue-200",
-  hrto: "bg-purple-50 text-purple-700 border-purple-200",
-  "small-claims": "bg-green-50 text-green-700 border-green-200",
-  family: "bg-rose-50 text-rose-700 border-rose-200",
-  criminal: "bg-red-50 text-red-700 border-red-200",
-  labour: "bg-amber-50 text-amber-700 border-amber-200",
-  wsib: "bg-orange-50 text-orange-700 border-orange-200",
-  "superior-court": "bg-indigo-50 text-indigo-700 border-indigo-200",
-  divisional: "bg-slate-50 text-slate-700 border-slate-200",
+  ltb: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800",
+  hrto: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-800",
+  "small-claims": "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-300 dark:border-green-800",
+  family: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-800",
+  criminal: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/30 dark:text-red-300 dark:border-red-800",
+  labour: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800",
+  wsib: "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/30 dark:text-orange-300 dark:border-orange-800",
+  "superior-court": "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/30 dark:text-indigo-300 dark:border-indigo-800",
+  divisional: "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-950/30 dark:text-slate-300 dark:border-slate-800",
 };
 
 const venuePortals: Record<string, string> = {
@@ -104,259 +102,171 @@ const TriageResults: React.FC<TriageResultsProps> = ({
   const venueColor = venueColors[result.venue] || "bg-gray-50 text-gray-700 border-gray-200";
   const portalUrl = venuePortals[result.venue] || "https://www.ontario.ca/";
 
-  const hasUrgentFlags = result.flags.some(f => 
-    ['urgent', 'deadline', 'safety', 'eviction'].includes(f.toLowerCase())
-  );
-
   const primaryForms = result.recommendedForms.filter(f => f.priority === 'primary');
-  const secondaryForms = result.recommendedForms.filter(f => f.priority === 'secondary');
-  const optionalForms = result.recommendedForms.filter(f => f.priority === 'optional');
 
   return (
     <div className="space-y-6">
-      {/* Main Result Card */}
-      <Card className="overflow-hidden">
-        <div className={`h-2 ${result.confidence >= 80 ? 'bg-green-500' : result.confidence >= 60 ? 'bg-amber-500' : 'bg-red-500'}`} />
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      {/* Main Result Card - Venue */}
+      <Card className="overflow-hidden border-2 border-primary/30">
+        <CardHeader className="bg-primary/5">
+          <CardTitle className="flex items-center gap-2 text-lg">
             <CheckCircle className="h-5 w-5 text-green-600" />
-            Recommended Legal Pathway
+            Your Situation
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="pt-6 space-y-4">
           {/* Venue Header */}
-          <div className={`flex items-center justify-between p-4 rounded-lg border ${venueColor}`}>
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-background">
-                <VenueIcon className="h-8 w-8" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg">{result.venueTitle}</h3>
-                <p className="text-sm opacity-80">{province}</p>
-              </div>
+          <div className={`flex items-center gap-4 p-4 rounded-lg border ${venueColor}`}>
+            <div className="p-3 rounded-lg bg-background">
+              <VenueIcon className="h-8 w-8" />
             </div>
-            <div className="text-right">
-              <Badge className={result.confidence >= 80 ? 'bg-green-600' : result.confidence >= 60 ? 'bg-amber-600' : 'bg-red-600'}>
-                {result.confidence}% Match
-              </Badge>
+            <div>
+              <p className="text-sm font-medium opacity-80">Correct Venue</p>
+              <h3 className="font-bold text-xl">{result.venueTitle}</h3>
+              <p className="text-sm opacity-80">{province}</p>
             </div>
           </div>
 
-          {/* Reasoning */}
-          <div>
-            <h4 className="font-semibold mb-2 flex items-center gap-2">
-              <Info className="h-4 w-4" />
-              Why This Venue?
-            </h4>
-            <p className="text-muted-foreground">{result.reasoning}</p>
+          {/* Primary Form */}
+          {primaryForms.length > 0 && (
+            <div className="p-4 rounded-lg border bg-muted/30">
+              <p className="text-sm font-medium text-muted-foreground mb-1">Correct Form</p>
+              <h4 className="font-bold text-lg">{primaryForms[0].formCode} – {primaryForms[0].formTitle}</h4>
+            </div>
+          )}
+
+          {/* Risk Warning */}
+          <div className="p-4 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="font-semibold text-amber-700 dark:text-amber-300">
+                  Most people lose here because evidence is rejected or misfiled.
+                </p>
+                <p className="text-sm text-amber-600 dark:text-amber-400 mt-1">
+                  Proper preparation makes the difference between winning and losing.
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Urgent Deadlines */}
           {result.urgentDeadlines.length > 0 && (
-            <div className={`p-4 rounded-lg border ${hasUrgentFlags ? 'border-red-200 bg-red-50' : 'border-amber-200 bg-amber-50'}`}>
+            <div className="p-4 rounded-lg border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/30">
               <div className="flex items-start gap-2">
-                <Clock className={`h-5 w-5 mt-0.5 ${hasUrgentFlags ? 'text-red-600' : 'text-amber-600'}`} />
+                <Clock className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5" />
                 <div>
-                  <h4 className={`font-semibold mb-2 ${hasUrgentFlags ? 'text-red-700' : 'text-amber-700'}`}>
-                    {hasUrgentFlags ? '⚠️ Urgent Deadlines' : 'Important Deadlines'}
+                  <h4 className="font-semibold text-red-700 dark:text-red-300 mb-2">
+                    Important Deadlines
                   </h4>
                   <ul className="space-y-1">
                     {result.urgentDeadlines.map((deadline, index) => (
-                      <li key={index} className="text-sm">{deadline}</li>
+                      <li key={index} className="text-sm text-red-600 dark:text-red-400">{deadline}</li>
                     ))}
                   </ul>
                 </div>
               </div>
             </div>
           )}
-
-          {/* Flags */}
-          {result.flags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {result.flags.map((flag, index) => (
-                <Badge key={index} variant="outline" className="capitalize">
-                  {flag}
-                </Badge>
-              ))}
-            </div>
-          )}
         </CardContent>
       </Card>
 
-      {/* Recommended Forms Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Recommended Forms
-          </CardTitle>
-          <CardDescription>
-            Based on your situation, these forms are most appropriate
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Primary Forms */}
-          {primaryForms.length > 0 && (
-            <div>
-              <h4 className="text-sm font-semibold text-green-700 mb-3 flex items-center gap-2">
-                <CheckCircle className="h-4 w-4" />
-                Start With These (Primary)
-              </h4>
-              <div className="space-y-3">
-                {primaryForms.map((form, index) => (
-                  <div
-                    key={index}
-                    className="p-4 border rounded-lg hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-colors"
-                    onClick={() => onSelectForm(form)}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold">{form.formCode}</span>
-                          <Badge variant="outline" className="text-xs">
-                            {form.confidence}% match
-                          </Badge>
-                        </div>
-                        <p className="text-sm font-medium">{form.formTitle}</p>
-                        <p className="text-sm text-muted-foreground mt-1">{form.reason}</p>
-                      </div>
-                      <ArrowRight className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Secondary Forms */}
-          {secondaryForms.length > 0 && (
-            <div>
-              <h4 className="text-sm font-semibold text-amber-700 mb-3 flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                You May Also Need (Secondary)
-              </h4>
-              <div className="space-y-2">
-                {secondaryForms.map((form, index) => (
-                  <div
-                    key={index}
-                    className="p-3 border rounded-lg hover:border-primary/50 cursor-pointer transition-colors"
-                    onClick={() => onSelectForm(form)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="font-medium text-sm">{form.formCode}: {form.formTitle}</span>
-                        <p className="text-xs text-muted-foreground">{form.reason}</p>
-                      </div>
-                      <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Optional Forms */}
-          {optionalForms.length > 0 && (
-            <div>
-              <h4 className="text-sm font-semibold text-muted-foreground mb-3">
-                Optional / Situational
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {optionalForms.map((form, index) => (
-                  <Badge
-                    key={index}
-                    variant="outline"
-                    className="cursor-pointer hover:bg-primary/10"
-                    onClick={() => onSelectForm(form)}
-                  >
-                    {form.formCode}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
+      {/* Primary CTA */}
+      <Card className="border-2 border-primary bg-gradient-to-r from-primary/5 to-primary/10">
+        <CardContent className="pt-6 pb-6">
+          <div className="text-center space-y-4">
+            <h3 className="text-xl font-bold">Save this & build your case</h3>
+            <p className="text-muted-foreground">
+              Create a free account to save your triage results, upload evidence, and track your legal journey.
+            </p>
+            <Button onClick={onProceed} size="lg" className="gap-2" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Creating Case...
+                </>
+              ) : (
+                <>
+                  Save this & build your case
+                  <ArrowRight className="h-5 w-5" />
+                </>
+              )}
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              Free account. No obligation.
+            </p>
+          </div>
         </CardContent>
       </Card>
 
       {/* Next Steps Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Next Steps</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ol className="space-y-3">
-            {result.nextSteps.map((step, index) => (
-              <li key={index} className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm flex items-center justify-center font-medium">
-                  {index + 1}
-                </span>
-                <span className="text-sm pt-0.5">{step}</span>
-              </li>
-            ))}
-          </ol>
-        </CardContent>
-      </Card>
+      {result.nextSteps.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Next Steps</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ol className="space-y-3">
+              {result.nextSteps.map((step, index) => (
+                <li key={index} className="flex gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm flex items-center justify-center font-medium">
+                    {index + 1}
+                  </span>
+                  <span className="text-sm pt-0.5">{step}</span>
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+        </Card>
+      )}
 
-      {/* Alternative Venues */}
-      {result.alternativeVenues && result.alternativeVenues.length > 0 && (
+      {/* Additional Forms (collapsed) */}
+      {result.recommendedForms.length > 1 && (
         <Card className="border-dashed">
           <CardHeader>
-            <CardTitle className="text-base">Other Options to Consider</CardTitle>
+            <CardTitle className="text-base flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              Other Forms You May Need
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {result.alternativeVenues.map((alt, index) => {
-                const AltIcon = venueIcons[alt.venue] || Scale;
-                return (
-                  <div key={index} className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50">
-                    <AltIcon className="h-4 w-4 text-muted-foreground" />
+              {result.recommendedForms.slice(1).map((form, index) => (
+                <div
+                  key={index}
+                  className="p-3 border rounded-lg hover:border-primary/50 cursor-pointer transition-colors"
+                  onClick={() => onSelectForm(form)}
+                >
+                  <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-sm font-medium capitalize">{alt.venue.replace('-', ' ')}</span>
-                      <p className="text-xs text-muted-foreground">{alt.reason}</p>
+                      <span className="font-medium text-sm">{form.formCode}: {form.formTitle}</span>
+                      <p className="text-xs text-muted-foreground">{form.reason}</p>
                     </div>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Action Buttons */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <Button variant="outline" onClick={onBack} className="flex-1" disabled={isLoading}>
+      {/* Back Button */}
+      <div className="flex justify-between">
+        <Button variant="ghost" onClick={onBack} disabled={isLoading}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Revise My Description
+          Start Over
         </Button>
-        <Button onClick={onProceed} className="flex-1" disabled={isLoading}>
-          {isLoading ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Creating Case & Uploading...
-            </>
-          ) : (
-            <>
-              Proceed to Forms
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </>
-          )}
-        </Button>
-      </div>
-
-      {/* Official Portal Link */}
-      <div className="text-center text-sm text-muted-foreground">
-        <p>
-          Official portal:{" "}
-          <a
-            href={portalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline inline-flex items-center gap-1"
-          >
-            {portalUrl}
-            <ExternalLink className="h-3 w-3" />
-          </a>
-        </p>
+        
+        <a
+          href={portalUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm text-muted-foreground hover:text-primary inline-flex items-center gap-1"
+        >
+          Official tribunal portal
+          <ExternalLink className="h-3 w-3" />
+        </a>
       </div>
     </div>
   );
