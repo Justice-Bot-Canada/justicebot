@@ -422,11 +422,13 @@ export type Database = {
           is_paid: boolean | null
           law_section: string | null
           merit_score: number | null
+          merit_score_status: string | null
           municipality: string | null
           owner: string | null
           plan: string | null
           province: string
           status: string | null
+          timeline_viewed: boolean | null
           title: string
           triage: Json | null
           updated_at: string
@@ -441,11 +443,13 @@ export type Database = {
           is_paid?: boolean | null
           law_section?: string | null
           merit_score?: number | null
+          merit_score_status?: string | null
           municipality?: string | null
           owner?: string | null
           plan?: string | null
           province: string
           status?: string | null
+          timeline_viewed?: boolean | null
           title: string
           triage?: Json | null
           updated_at?: string
@@ -460,11 +464,13 @@ export type Database = {
           is_paid?: boolean | null
           law_section?: string | null
           merit_score?: number | null
+          merit_score_status?: string | null
           municipality?: string | null
           owner?: string | null
           plan?: string | null
           province?: string
           status?: string | null
+          timeline_viewed?: boolean | null
           title?: string
           triage?: Json | null
           updated_at?: string
