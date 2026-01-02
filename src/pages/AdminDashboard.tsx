@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from "react-helmet-async";
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
 import { supabase } from '@/integrations/supabase/client';
@@ -136,7 +137,11 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="mb-8">
@@ -282,5 +287,6 @@ export default function AdminDashboard() {
       </main>
       <Footer />
     </div>
+    </>
   );
 }

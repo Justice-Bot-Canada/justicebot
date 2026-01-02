@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { useRole } from "@/hooks/useRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -78,7 +79,11 @@ export default function AdminTestimonials() {
   }
 
   return (
-    <div className="container mx-auto p-8">
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="container mx-auto p-8">
       <h1 className="text-3xl font-bold mb-8">Manage Testimonials</h1>
 
       <div className="space-y-4">
@@ -174,5 +179,6 @@ export default function AdminTestimonials() {
         )}
       </div>
     </div>
+    </>
   );
 }
