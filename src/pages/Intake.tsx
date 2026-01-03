@@ -3,42 +3,42 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ArrowRight, ArrowLeft, Home, Briefcase, Users, Heart, Scale, HelpCircle, Check } from "lucide-react";
+import { ArrowRight, ArrowLeft, Home, Users, Heart, Scale, HelpCircle, Check, ShieldCheck, MapPin } from "lucide-react";
 import { trackEvent } from "@/utils/analytics";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { cn } from "@/lib/utils";
 
-// Issue types with icons and mapping to tribunals
+// Issue types — max 5, emotionally clear labels
 const ISSUE_TYPES = [
   { 
     id: 'housing', 
-    label: 'Housing / Eviction', 
+    label: 'Housing or Eviction', 
     icon: Home,
-    description: 'Rent disputes, evictions, repairs, landlord issues'
+    shortDesc: 'My landlord is causing problems'
   },
   { 
     id: 'family', 
-    label: 'Family / Custody', 
+    label: 'Family or Custody', 
     icon: Users,
-    description: 'Divorce, child custody, support payments'
+    shortDesc: 'I need help with my kids or separation'
   },
   { 
     id: 'child-protection', 
-    label: 'Child Protection (CAS)', 
+    label: 'Child Protection', 
     icon: Heart,
-    description: 'CAS involvement, child welfare matters'
+    shortDesc: 'CAS / Children\'s Aid is involved'
   },
   { 
     id: 'human-rights', 
-    label: 'Human Rights / Discrimination', 
+    label: 'Discrimination', 
     icon: Scale,
-    description: 'Workplace, housing, or service discrimination'
+    shortDesc: 'I\'m being treated unfairly'
   },
   { 
     id: 'other', 
-    label: 'Other Legal Issue', 
+    label: 'Something Else', 
     icon: HelpCircle,
-    description: 'Small claims, employment, other disputes'
+    shortDesc: 'Money owed, employment, other'
   }
 ];
 
@@ -214,12 +214,12 @@ export default function Intake() {
       </div>
 
       <main className="container mx-auto px-4 py-8 max-w-2xl">
-        {/* Step 1: Issue Type */}
+        {/* Step 1: What's going on? */}
         {step === 1 && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="text-center space-y-2">
-              <h1 className="text-3xl font-bold">What's your legal issue about?</h1>
-              <p className="text-muted-foreground">Select the category that best describes your situation</p>
+          <div className="space-y-8 animate-fade-in">
+            <div className="text-center space-y-3">
+              <h1 className="text-3xl md:text-4xl font-bold">What's going on?</h1>
+              <p className="text-muted-foreground text-lg">You don't need to explain everything — just pick the closest match.</p>
             </div>
 
             <div className="space-y-3">
@@ -229,24 +229,24 @@ export default function Intake() {
                   <Card 
                     key={issue.id}
                     className={cn(
-                      "cursor-pointer transition-all hover:border-primary",
-                      issueType === issue.id && "border-primary bg-primary/5 ring-2 ring-primary"
+                      "cursor-pointer transition-all hover:border-primary hover:shadow-md",
+                      issueType === issue.id && "border-primary bg-primary/5 ring-2 ring-primary shadow-md"
                     )}
                     onClick={() => setIssueType(issue.id)}
                   >
-                    <CardContent className="p-4 flex items-center gap-4">
+                    <CardContent className="p-5 flex items-center gap-4">
                       <div className={cn(
-                        "p-3 rounded-full",
+                        "p-3 rounded-full shrink-0",
                         issueType === issue.id ? "bg-primary text-primary-foreground" : "bg-muted"
                       )}>
                         <Icon className="h-6 w-6" />
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold">{issue.label}</h3>
-                        <p className="text-sm text-muted-foreground">{issue.description}</p>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-lg">{issue.label}</h3>
+                        <p className="text-sm text-muted-foreground">{issue.shortDesc}</p>
                       </div>
                       {issueType === issue.id && (
-                        <Check className="h-5 w-5 text-primary" />
+                        <Check className="h-5 w-5 text-primary shrink-0" />
                       )}
                     </CardContent>
                   </Card>
@@ -256,12 +256,16 @@ export default function Intake() {
           </div>
         )}
 
-        {/* Step 2: Province */}
+        {/* Step 2: Where are you? */}
         {step === 2 && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="text-center space-y-2">
-              <h1 className="text-3xl font-bold">Where are you located?</h1>
-              <p className="text-muted-foreground">This determines which tribunal handles your case</p>
+          <div className="space-y-8 animate-fade-in">
+            <div className="text-center space-y-3">
+              <div className="inline-flex items-center gap-2 text-primary mb-2">
+                <MapPin className="h-5 w-5" />
+                <span className="text-sm font-medium">This is important</span>
+              </div>
+              <h1 className="text-3xl md:text-4xl font-bold">Where are you located?</h1>
+              <p className="text-muted-foreground text-lg">Legal rules are different in each province. We'll make sure you get the right info.</p>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -269,8 +273,8 @@ export default function Intake() {
                 <Card 
                   key={prov.code}
                   className={cn(
-                    "cursor-pointer transition-all hover:border-primary text-center",
-                    province === prov.code && "border-primary bg-primary/5 ring-2 ring-primary"
+                    "cursor-pointer transition-all hover:border-primary hover:shadow-md text-center",
+                    province === prov.code && "border-primary bg-primary/5 ring-2 ring-primary shadow-md"
                   )}
                   onClick={() => setProvince(prov.code)}
                 >
@@ -284,24 +288,24 @@ export default function Intake() {
           </div>
         )}
 
-        {/* Step 3: Context Question */}
+        {/* Step 3: One smart question */}
         {step === 3 && issueType && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="text-center space-y-2">
-              <h1 className="text-3xl font-bold">One quick question</h1>
-              <p className="text-muted-foreground">This helps us give you the right information</p>
+          <div className="space-y-8 animate-fade-in">
+            <div className="text-center space-y-3">
+              <h1 className="text-3xl md:text-4xl font-bold">One more thing</h1>
+              <p className="text-muted-foreground text-lg">This helps us understand how urgent your situation is.</p>
             </div>
 
-            <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">
+            <Card className="p-6 md:p-8">
+              <h2 className="text-xl font-semibold mb-6 text-center">
                 {CONTEXT_QUESTIONS[issueType]?.question}
               </h2>
-              <div className="space-y-3">
+              <div className="space-y-3 max-w-md mx-auto">
                 {CONTEXT_QUESTIONS[issueType]?.options.map((option) => (
                   <Button
                     key={option.value}
                     variant={contextAnswer === option.value ? "default" : "outline"}
-                    className="w-full justify-start text-left h-auto py-4 px-4"
+                    className="w-full justify-center text-center h-auto py-4 px-6 text-base"
                     onClick={() => setContextAnswer(option.value)}
                   >
                     {contextAnswer === option.value && <Check className="h-4 w-4 mr-2 shrink-0" />}
@@ -313,41 +317,53 @@ export default function Intake() {
           </div>
         )}
 
-        {/* Step 4: Summary Preview */}
+        {/* Step 4: Summary — this is where trust forms */}
         {step === 4 && issueType && province && (
-          <div className="space-y-6 animate-fade-in">
-            <div className="text-center space-y-2">
-              <h1 className="text-3xl font-bold">Here's what we found</h1>
-              <p className="text-muted-foreground">Based on your answers, here's your legal pathway</p>
-            </div>
-
+          <div className="space-y-8 animate-fade-in">
             {(() => {
               const tribunal = getTribunalInfo(issueType, province, contextAnswer || '');
               const selectedIssue = ISSUE_TYPES.find(i => i.id === issueType);
               const selectedProvince = PROVINCES.find(p => p.code === province);
               
               return (
-                <div className="space-y-4">
+                <>
+                  {/* Emotional header */}
+                  <div className="text-center space-y-3">
+                    <div className="inline-flex items-center gap-2 text-primary mb-2">
+                      <ShieldCheck className="h-5 w-5" />
+                      <span className="text-sm font-medium">We've got you</span>
+                    </div>
+                    <h1 className="text-3xl md:text-4xl font-bold">Here's what applies to you</h1>
+                    <p className="text-muted-foreground text-lg max-w-lg mx-auto">
+                      Based on your answers, here's what you're dealing with — and how we can help.
+                    </p>
+                  </div>
+
+                  {/* What applies to you */}
                   <Card className="p-6 border-primary bg-primary/5">
                     <div className="space-y-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Your issue type</p>
-                        <p className="font-semibold">{selectedIssue?.label}</p>
+                      <div className="flex items-center gap-3 pb-4 border-b">
+                        <Scale className="h-6 w-6 text-primary shrink-0" />
+                        <div>
+                          <p className="text-sm text-muted-foreground">Your legal venue</p>
+                          <p className="text-xl font-bold text-primary">{tribunal.name}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Your location</p>
-                        <p className="font-semibold">{selectedProvince?.name}</p>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Issue</p>
+                          <p className="font-medium">{selectedIssue?.label}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Province</p>
+                          <p className="font-medium">{selectedProvince?.name}</p>
+                        </div>
                       </div>
-                      <div className="border-t pt-4">
-                        <p className="text-sm text-muted-foreground">Likely venue</p>
-                        <p className="text-xl font-bold text-primary">{tribunal.name}</p>
-                        <p className="text-sm text-muted-foreground mt-1">{tribunal.description}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-2">Common forms you may need</p>
+                      <div className="pt-4 border-t">
+                        <p className="text-sm text-muted-foreground mb-2">Forms you'll likely need</p>
                         <div className="flex flex-wrap gap-2">
                           {tribunal.forms.map((form) => (
-                            <span key={form} className="px-3 py-1 bg-background rounded-full text-sm border">
+                            <span key={form} className="px-3 py-1 bg-background rounded-full text-sm border font-medium">
                               {form}
                             </span>
                           ))}
@@ -356,12 +372,56 @@ export default function Intake() {
                     </div>
                   </Card>
 
-                  <Card className="p-4 bg-warning/10 border-warning">
-                    <p className="text-sm font-medium text-warning-foreground">
-                      ⚠️ Important: Most tribunals have strict deadlines. Missing a deadline can mean losing your case.
-                    </p>
+                  {/* What usually goes wrong */}
+                  <Card className="p-6 bg-destructive/5 border-destructive/20">
+                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                      <span className="text-destructive">⚠️</span> What usually goes wrong
+                    </h3>
+                    <ul className="space-y-2 text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <span className="text-destructive shrink-0">•</span>
+                        <span>Missing filing deadlines (most people don't know the rules)</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-destructive shrink-0">•</span>
+                        <span>Using the wrong forms or filling them out incorrectly</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-destructive shrink-0">•</span>
+                        <span>Not knowing what evidence to bring</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-destructive shrink-0">•</span>
+                        <span>Showing up unprepared and losing by default</span>
+                      </li>
+                    </ul>
                   </Card>
-                </div>
+
+                  {/* What we can help with */}
+                  <Card className="p-6 bg-success/5 border-success/20">
+                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                      <span className="text-success">✓</span> What we can help with
+                    </h3>
+                    <ul className="space-y-2 text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-success shrink-0 mt-0.5" />
+                        <span>The right forms for your exact situation</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-success shrink-0 mt-0.5" />
+                        <span>Step-by-step guidance from start to hearing</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-success shrink-0 mt-0.5" />
+                        <span>A clear evidence checklist so you know what to gather</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="h-4 w-4 text-success shrink-0 mt-0.5" />
+                        <span>Deadline tracking so you never miss a date</span>
+                      </li>
+                    </ul>
+                  </Card>
+                </>
               );
             })()}
           </div>
@@ -392,20 +452,21 @@ export default function Intake() {
             <Button
               onClick={handleComplete}
               variant="cta"
-              className="min-w-[180px]"
+              size="lg"
+              className="min-w-[220px]"
             >
-              Unlock My Legal Package
-              <ArrowRight className="h-4 w-4 ml-2" />
+              Unlock My Legal Help
+              <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
           )}
         </div>
 
-        {/* Reassurance */}
+        {/* Reassurance — emotional copy */}
         <p className="text-center text-sm text-muted-foreground mt-6">
-          {step === 1 && "Takes about 2 minutes. No signup required."}
-          {step === 2 && "We support all Canadian provinces and territories."}
-          {step === 3 && "Your answers are private and secure."}
-          {step === 4 && "See what's included before you pay."}
+          {step === 1 && "You're not alone. Thousands of Canadians face this every year."}
+          {step === 2 && "We cover all provinces and territories across Canada."}
+          {step === 3 && "Your answers are private. We never share your information."}
+          {step === 4 && "You'll see exactly what's included before paying anything."}
         </p>
       </main>
     </div>

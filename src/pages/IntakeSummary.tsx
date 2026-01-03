@@ -160,12 +160,13 @@ export default function IntakeSummary() {
       </header>
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-8 items-start">
           {/* Left: Summary of their situation */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Your Legal Pathway</h1>
-              <p className="text-muted-foreground">Based on your answers, here's what you're dealing with</p>
+              <p className="text-sm text-primary font-medium mb-2">Your personalized pathway</p>
+              <h1 className="text-3xl font-bold mb-2">You're not starting from scratch.</h1>
+              <p className="text-muted-foreground">Here's what we know about your situation.</p>
             </div>
 
             <Card className="border-primary">
@@ -223,35 +224,45 @@ export default function IntakeSummary() {
 
           {/* Right: What's included + Payment */}
           <div className="space-y-6">
-            <Card className="border-2 border-primary">
-              <CardHeader className="bg-primary/5 border-b">
+            <Card className="border-2 border-primary overflow-hidden">
+              <CardHeader className="bg-primary text-primary-foreground">
                 <CardTitle className="flex items-center justify-between">
-                  <span>Unlock Your Legal Package</span>
-                  <span className="text-2xl font-bold text-primary">$5.99</span>
+                  <span>Unlock Your Legal Help</span>
+                  <span className="text-2xl font-bold">$5.99</span>
                 </CardTitle>
-                <p className="text-sm text-muted-foreground">One-time payment • Lifetime access</p>
+                <p className="text-sm opacity-90">One-time • No subscription • Instant access</p>
               </CardHeader>
               <CardContent className="p-6">
+                <p className="text-muted-foreground mb-6 text-center">
+                  Everything you need to handle this yourself — with confidence.
+                </p>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-success shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-medium">Correct Official Forms</p>
-                      <p className="text-sm text-muted-foreground">Pre-filled with guidance for your specific situation</p>
+                      <p className="font-medium">The Right Forms</p>
+                      <p className="text-sm text-muted-foreground">Official tribunal forms for your exact situation</p>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-success shrink-0 mt-0.5" />
                     <div>
                       <p className="font-medium">Step-by-Step Guidance</p>
-                      <p className="text-sm text-muted-foreground">Clear instructions from filing to hearing</p>
+                      <p className="text-sm text-muted-foreground">Plain-language instructions from filing to hearing</p>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-success shrink-0 mt-0.5" />
                     <div>
                       <p className="font-medium">Evidence Checklist</p>
-                      <p className="text-sm text-muted-foreground">Know exactly what documents to gather</p>
+                      <p className="text-sm text-muted-foreground">Know exactly what documents you need</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-success shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Deadline Tracker</p>
+                      <p className="text-sm text-muted-foreground">Never miss a filing date</p>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
@@ -261,19 +272,12 @@ export default function IntakeSummary() {
                       <p className="text-sm text-muted-foreground">Save and print everything you need</p>
                     </div>
                   </li>
-                  <li className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-success shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-medium">Deadline Tracker</p>
-                      <p className="text-sm text-muted-foreground">Never miss an important date</p>
-                    </div>
-                  </li>
                 </ul>
 
                 <Button 
                   variant="cta" 
                   size="lg" 
-                  className="w-full mt-6"
+                  className="w-full mt-8 py-6 text-lg"
                   onClick={handleUnlock}
                   disabled={isLoading}
                 >
@@ -281,14 +285,14 @@ export default function IntakeSummary() {
                     <>Processing...</>
                   ) : (
                     <>
-                      Unlock My Legal Package
+                      Unlock My Legal Help
                       <ArrowRight className="h-5 w-5 ml-2" />
                     </>
                   )}
                 </Button>
 
                 <p className="text-center text-sm text-muted-foreground mt-4">
-                  Secure payment via Stripe • 30-day money-back guarantee
+                  Secure payment • 30-day money-back guarantee
                 </p>
               </CardContent>
             </Card>
