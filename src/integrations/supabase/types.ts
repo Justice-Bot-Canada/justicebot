@@ -3227,8 +3227,6 @@ export type Database = {
           id: string
         }[]
       }
-      show_limit: { Args: never; Returns: number }
-      show_trgm: { Args: { "": string }; Returns: string[] }
       user_has_role: { Args: { target_role: string }; Returns: boolean }
     }
     Enums: {
