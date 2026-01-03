@@ -8,7 +8,7 @@ const HeroSection = () => {
 
   const handleCheckSituation = () => {
     trackEvent('cta_click', { button: 'check_situation', location: 'hero' });
-    navigate('/triage');
+    navigate('/intake');
   };
 
   return (

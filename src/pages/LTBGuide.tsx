@@ -382,17 +382,15 @@ export default function LTBGuide() {
                   for LTB, HRTO, and other Ontario tribunals.
                 </p>
                 <div className="flex flex-wrap justify-center gap-4 pt-4">
-                  <Button size="lg" asChild>
-                    <a href="/journey">
-                      Start Case Assessment <ArrowRight className="ml-2 h-4 w-4" />
-                    </a>
-                  </Button>
-                  <Button size="lg" variant="outline" asChild>
-                    <a href="/legal-chat">
-                      Ask AI Assistant
+                  <Button size="lg" variant="cta" asChild>
+                    <a href="/intake">
+                      Check My Situation <ArrowRight className="ml-2 h-4 w-4" />
                     </a>
                   </Button>
                 </div>
+                <p className="text-sm text-muted-foreground pt-2">
+                  Takes about 2 minutes • No signup required
+                </p>
                 <p className="text-sm text-muted-foreground">
                   Questions? Email <a href="mailto:admin@justice-bot.com" className="text-primary hover:underline">admin@justice-bot.com</a>
                 </p>
