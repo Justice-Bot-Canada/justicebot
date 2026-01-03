@@ -3,268 +3,355 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Loader2, Mail, ArrowRight } from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { OnboardingFlow } from "@/components/OnboardingFlow";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { Loader2, Mail, ArrowRight, MapPin, Shield } from "lucide-react";
+import { FlowHeader } from "@/components/FlowHeader";
+import { FlowProgressIndicator } from "@/components/FlowProgressIndicator";
 import { supabase } from "@/integrations/supabase/client";
 import AuthDialog from "@/components/AuthDialog";
+import { PROVINCE_NAMES } from "@/config/provinceConfig";
 
 const Welcome = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [verified, setVerified] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  const [checkingOnboarding, setCheckingOnboarding] = useState(true);
+  
+  // State
+  const [selectedProvince, setSelectedProvince] = useState<string>("");
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [justSignedUp, setJustSignedUp] = useState(false);
   const [processingVerification, setProcessingVerification] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [existingCase, setExistingCase] = useState<string | null>(null);
 
-  // Handle email verification callback - Supabase sends hash fragments
+  // Handle email verification callback
   useEffect(() => {
     const handleAuthCallback = async () => {
-      // Check if URL has hash with access_token (email verification click)
       const hashParams = new URLSearchParams(location.hash.substring(1));
       const accessToken = hashParams.get('access_token');
       const type = hashParams.get('type');
       
       if (accessToken && type === 'signup') {
         setProcessingVerification(true);
-        // Supabase client will automatically pick up the tokens from the URL
-        // Just wait for the auth state to update
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         if (session) {
-          setVerified(true);
-          setProcessingVerification(false);
-          // Clear the hash from URL for cleaner look
           window.history.replaceState(null, '', '/welcome');
-        } else if (error) {
-          console.error('Auth callback error:', error);
-          setProcessingVerification(false);
         }
+        setProcessingVerification(false);
       }
     };
 
     handleAuthCallback();
   }, [location.hash]);
 
-  // Check if user just signed up (stored in sessionStorage)
+  // Check if user just signed up
   useEffect(() => {
     const signupPending = sessionStorage.getItem('justSignedUp') === 'true';
     if (signupPending && !user && !loading) {
       setJustSignedUp(true);
-      // Clear the flag so it doesn't persist across sessions
       sessionStorage.removeItem('justSignedUp');
     }
   }, [user, loading]);
 
+  // Check for existing case and load user's province preference
   useEffect(() => {
-    const checkOnboarding = async () => {
-      if (!loading && user) {
-        setVerified(true);
-        setJustSignedUp(false);
-        
-        // Check if user has completed onboarding
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('onboarding_completed')
-          .eq('user_id', user.id)
-          .maybeSingle();
+    const loadUserState = async () => {
+      if (!user) return;
+      setJustSignedUp(false);
 
-        if (profile && !profile.onboarding_completed) {
-          setShowOnboarding(true);
-        } else {
-          // Auto-redirect to dashboard after 2 seconds if onboarding is complete
-          setTimeout(() => navigate("/dashboard"), 2000);
+      // Check for existing case
+      const { data: cases } = await supabase
+        .from('cases')
+        .select('id, flow_step, province')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false })
+        .limit(1);
+
+      if (cases && cases.length > 0) {
+        const activeCase = cases[0];
+        setExistingCase(activeCase.id);
+        
+        // If case is beyond welcome step, redirect to appropriate page
+        if (activeCase.flow_step && activeCase.flow_step !== 'welcome') {
+          const routes: Record<string, string> = {
+            'triage': '/triage',
+            'evidence': `/evidence?caseId=${activeCase.id}`,
+            'timeline': `/case-timeline?caseId=${activeCase.id}`,
+            'documents': '/dashboard',
+            'complete': '/dashboard',
+          };
+          navigate(routes[activeCase.flow_step] || '/dashboard');
+          return;
         }
-        setCheckingOnboarding(false);
+        
+        // Pre-fill province if set on case
+        if (activeCase.province) {
+          setSelectedProvince(activeCase.province);
+        }
+      }
+
+      // Load profile province preference
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('selected_province')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (profile?.selected_province && !selectedProvince) {
+        setSelectedProvince(profile.selected_province);
       }
     };
 
-    checkOnboarding();
-  }, [user, loading, navigate]);
+    loadUserState();
+  }, [user, navigate]);
 
-  const handleGetStarted = () => {
-    navigate("/dashboard");
+  // Handle continue to triage
+  const handleContinue = async () => {
+    if (!user || !selectedProvince) return;
+
+    setIsSaving(true);
+
+    try {
+      // Save province to profile
+      await supabase
+        .from('profiles')
+        .update({ selected_province: selectedProvince })
+        .eq('user_id', user.id);
+
+      // Create or update case
+      if (existingCase) {
+        await supabase
+          .from('cases')
+          .update({ 
+            province: selectedProvince, 
+            flow_step: 'triage',
+            updated_at: new Date().toISOString() 
+          })
+          .eq('id', existingCase);
+        
+        navigate('/triage');
+      } else {
+        // Create new case stub
+        const { data: newCase, error } = await supabase
+          .from('cases')
+          .insert({
+            user_id: user.id,
+            title: 'New Case',
+            province: selectedProvince,
+            flow_step: 'triage',
+            status: 'pending',
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        navigate('/triage');
+      }
+    } catch (error) {
+      console.error('Error saving:', error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleOnboardingComplete = () => {
-    setShowOnboarding(false);
-  };
-
+  // Loading state
   if (loading || processingVerification) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-20">
-          <Card className="max-w-2xl mx-auto text-center py-12">
+      <div className="min-h-screen bg-background flex flex-col">
+        <FlowHeader currentStep="welcome" showProgress={false} />
+        <main className="flex-1 flex items-center justify-center p-4">
+          <Card className="max-w-md w-full text-center py-12">
             <CardContent>
               <Loader2 className="mx-auto h-12 w-12 text-primary mb-4 animate-spin" />
               <h3 className="text-lg font-semibold mb-2">
-                {processingVerification ? "Completing your verification..." : "Verifying your account..."}
+                {processingVerification ? "Completing verification..." : "Loading..."}
               </h3>
-              <p className="text-muted-foreground">
-                {processingVerification ? "Just a moment while we set up your account" : "Please wait a moment"}
-              </p>
             </CardContent>
           </Card>
         </main>
-        <Footer />
       </div>
     );
   }
 
-  // Show email verification instructions if user just signed up
+  // Email verification instructions (just signed up)
   if (justSignedUp) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-20">
-          <Card className="max-w-2xl mx-auto text-center py-12">
-            <CardHeader>
-              <div className="flex justify-center mb-4">
-                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Mail className="h-10 w-10 text-primary" />
-                </div>
+      <div className="min-h-screen bg-background flex flex-col">
+        <FlowHeader currentStep="welcome" showProgress={false} />
+        <main className="flex-1 flex items-center justify-center p-4">
+          <Card className="max-w-lg w-full">
+            <CardHeader className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                <Mail className="h-8 w-8 text-primary" />
               </div>
-              <CardTitle className="text-3xl mb-2">Check Your Email!</CardTitle>
-              <CardDescription className="text-lg">
-                We've sent you a verification link to complete your registration
+              <CardTitle className="text-2xl">Check Your Email</CardTitle>
+              <CardDescription>
+                We've sent you a verification link to complete registration
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="bg-muted/50 rounded-lg p-6 text-left max-w-lg mx-auto">
-                <h4 className="font-semibold mb-3 text-foreground">Next Steps:</h4>
-                <ol className="space-y-3 text-muted-foreground">
-                  <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">1</span>
-                    <span>Open your email inbox (check spam/junk folder too)</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">2</span>
-                    <span>Click the verification link in the email from Justice-Bot</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">3</span>
-                    <span>You'll be automatically signed in and ready to go!</span>
-                  </li>
-                </ol>
-              </div>
-
-              <div className="pt-4 border-t space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  Already verified your email?
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button onClick={() => setShowAuthDialog(true)} variant="default">
-                    Sign In Now
-                  </Button>
-                  <Button onClick={() => navigate("/")} variant="outline">
-                    Return to Home
-                  </Button>
-                </div>
+              <ol className="space-y-3 text-sm text-muted-foreground">
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">1</span>
+                  <span>Open your email inbox (check spam folder too)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">2</span>
+                  <span>Click the verification link from Justice-Bot</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">3</span>
+                  <span>You'll be signed in and ready to go</span>
+                </li>
+              </ol>
+              <div className="pt-4 border-t">
+                <Button 
+                  onClick={() => setShowAuthDialog(true)} 
+                  variant="outline" 
+                  className="w-full"
+                >
+                  Already verified? Sign In
+                </Button>
               </div>
             </CardContent>
           </Card>
         </main>
-        <Footer />
         <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
       </div>
     );
   }
 
-  // If not logged in and not just signed up, show sign in prompt
+  // Not logged in - prompt to sign in
   if (!user) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-20">
-          <Card className="max-w-2xl mx-auto text-center py-12">
-            <CardHeader>
-              <CardTitle className="text-3xl mb-2">Welcome to Justice-Bot</CardTitle>
-              <CardDescription className="text-lg">
-                Sign in to access your account
+      <div className="min-h-screen bg-background flex flex-col">
+        <FlowHeader currentStep="welcome" showProgress={false} />
+        <main className="flex-1 flex items-center justify-center p-4">
+          <Card className="max-w-md w-full">
+            <CardHeader className="text-center">
+              <CardTitle className="text-2xl">Welcome to Justice-Bot</CardTitle>
+              <CardDescription>
+                Your AI-powered legal preparation assistant
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button onClick={() => setShowAuthDialog(true)} variant="default">
-                  Sign In
-                </Button>
-                <Button onClick={() => navigate("/")} variant="outline">
-                  Return to Home
-                </Button>
-              </div>
+            <CardContent className="space-y-4">
+              <Button 
+                onClick={() => setShowAuthDialog(true)} 
+                size="lg"
+                className="w-full"
+              >
+                Sign In to Get Started
+              </Button>
+              <p className="text-xs text-center text-muted-foreground">
+                Free to start. No credit card required.
+              </p>
             </CardContent>
           </Card>
         </main>
-        <Footer />
         <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
       </div>
     );
   }
 
-  // User is verified and logged in - show success
+  // ============================================
+  // STEP 1: GATED ENTRY - Province Selection
+  // ============================================
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container mx-auto px-4 py-20">
-        <Card className="max-w-2xl mx-auto text-center py-12">
-          <CardHeader>
-            <div className="flex justify-center mb-4">
-              <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center">
-                <CheckCircle className="h-10 w-10 text-green-500" />
-              </div>
+    <div className="min-h-screen bg-background flex flex-col">
+      <FlowHeader currentStep="welcome" />
+      
+      <main className="flex-1 container mx-auto px-4 py-8 max-w-2xl">
+        {/* Progress indicator */}
+        <div className="mb-8">
+          <FlowProgressIndicator currentStep="welcome" />
+        </div>
+
+        {/* Main card */}
+        <Card className="border-2 border-primary/20">
+          <CardHeader className="text-center pb-4">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+              <MapPin className="h-8 w-8 text-primary" />
             </div>
-            <CardTitle className="text-3xl mb-2">Welcome to Justice-Bot!</CardTitle>
-            <CardDescription className="text-lg">
-              Your account is verified and ready to use
+            <CardTitle className="text-2xl">Let's Begin Your Case</CardTitle>
+            <CardDescription className="text-base">
+              First, tell us which province you're in. This helps us find the right tribunals and forms for your situation.
             </CardDescription>
           </CardHeader>
+          
           <CardContent className="space-y-6">
-            <div className="text-left space-y-4 max-w-lg mx-auto">
-              <p className="text-muted-foreground">
-                You now have access to all features:
-              </p>
-              <ul className="space-y-2 text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span>AI-powered case assessment and merit scoring</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span>Access to legal forms and document templates</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span>Case management and deadline tracking</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span>Step-by-step guidance for your legal pathway</span>
-                </li>
-              </ul>
+            {/* Province selector */}
+            <div className="space-y-2">
+              <Label htmlFor="province" className="text-sm font-medium">
+                Your Province or Territory
+              </Label>
+              <Select value={selectedProvince} onValueChange={setSelectedProvince}>
+                <SelectTrigger id="province" className="w-full h-12">
+                  <SelectValue placeholder="Select your province..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(PROVINCE_NAMES).map(([code, name]) => (
+                    <SelectItem key={code} value={code}>
+                      {name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            
-            <div className="pt-4">
-              <Button onClick={handleGetStarted} size="lg" className="w-full sm:w-auto gap-2">
-                Go to Dashboard
-                <ArrowRight className="w-4 h-4" />
-              </Button>
+
+            {/* Primary CTA */}
+            <Button
+              onClick={handleContinue}
+              size="lg"
+              className="w-full text-lg py-6 gap-2"
+              disabled={!selectedProvince || isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  Start AI Triage
+                  <ArrowRight className="h-5 w-5" />
+                </>
+              )}
+            </Button>
+
+            {/* Reassurance copy */}
+            <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg">
+              <Shield className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-muted-foreground">
+                No commitment required. We'll help you understand your options. Takes about 2 minutes.
+              </p>
             </div>
           </CardContent>
         </Card>
-      </main>
-      <Footer />
 
-      {/* Onboarding Flow */}
-      {!checkingOnboarding && (
-        <OnboardingFlow 
-          open={showOnboarding} 
-          onComplete={handleOnboardingComplete}
-        />
-      )}
+        {/* What to expect */}
+        <div className="mt-8 text-center">
+          <p className="text-sm text-muted-foreground mb-4">What happens next:</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4 text-sm">
+            <div className="flex items-center gap-2 justify-center">
+              <span className="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-medium flex items-center justify-center">2</span>
+              <span className="text-muted-foreground">AI Triage</span>
+            </div>
+            <div className="flex items-center gap-2 justify-center">
+              <span className="w-6 h-6 rounded-full bg-muted text-muted-foreground text-xs font-medium flex items-center justify-center">3</span>
+              <span className="text-muted-foreground">Upload Evidence</span>
+            </div>
+            <div className="flex items-center gap-2 justify-center">
+              <span className="w-6 h-6 rounded-full bg-muted text-muted-foreground text-xs font-medium flex items-center justify-center">4</span>
+              <span className="text-muted-foreground">Review Timeline</span>
+            </div>
+            <div className="flex items-center gap-2 justify-center">
+              <span className="w-6 h-6 rounded-full bg-muted text-muted-foreground text-xs font-medium flex items-center justify-center">5</span>
+              <span className="text-muted-foreground">Generate Documents</span>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 };

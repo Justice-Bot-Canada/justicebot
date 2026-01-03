@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/lib/toast-stub";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { FlowHeader } from "@/components/FlowHeader";
+import { FlowProgressIndicator } from "@/components/FlowProgressIndicator";
 import { RelatedPages } from "@/components/RelatedPages";
 import CanonicalURL from "@/components/CanonicalURL";
 import EnhancedSEO from "@/components/EnhancedSEO";
@@ -17,7 +17,8 @@ import AuthDialog from "@/components/AuthDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Loader2, BookOpen, FileCheck, ArrowRight, UserPlus, Shield, Sparkles, CheckCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, BookOpen, FileCheck, ArrowRight, ArrowLeft, UserPlus, Shield, Sparkles, CheckCircle, Info } from "lucide-react";
 import { analytics, trackEvent } from "@/utils/analytics";
 
 interface FormRecommendation {
@@ -286,31 +287,36 @@ const Triage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       <CanonicalURL />
       <EnhancedSEO
         title="Free AI Legal Triage Tool - Find Your Legal Pathway | Justice-Bot"
         description="Use our smart AI-powered legal triage to instantly determine if you need Small Claims Court, LTB, HRTO, Family Court, or other tribunals. Get personalized form recommendations and next steps."
-        keywords="legal triage, legal pathway finder, Ontario legal help, legal assessment tool, smart legal triage, AI legal help, form recommendation"
+        keywords="legal triage, legal pathway finder, Canada legal help, legal assessment tool, smart legal triage, AI legal help, form recommendation"
         structuredData={structuredData}
       />
-      <Header />
-      <main className="container mx-auto px-4 py-8">
+      <FlowHeader currentStep="triage" />
+      <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
+          {/* Progress indicator */}
+          <div className="mb-6">
+            <FlowProgressIndicator currentStep="triage" />
+          </div>
+
+          {/* Step header */}
           <div className="mb-8">
-            <Button 
-              variant="outline" 
-              onClick={() => step === 0 ? navigate("/") : setStep(0)}
-              className="mb-4"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {step === 0 ? "Back to Home" : "New Analysis"}
-            </Button>
-            
-            <h1 className="text-3xl font-bold mb-2">Smart Legal Triage</h1>
+            <h1 className="text-3xl font-bold mb-2">AI Legal Triage</h1>
             <p className="text-muted-foreground">
-              Get AI-powered guidance on the right legal pathway and forms for your situation.
+              Answer a few questions and we'll identify the right legal pathway and forms for your situation.
             </p>
+            {step === 0 && (
+              <Alert className="mt-4 bg-primary/5 border-primary/20">
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  Takes about 2 minutes. You can update answers anytime.
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
 
           {step === 0 && (
@@ -491,7 +497,6 @@ const Triage = () => {
           )}
         </div>
       </main>
-      <Footer />
       
       <TriageDiscountModal 
         isOpen={showDiscountModal} 
