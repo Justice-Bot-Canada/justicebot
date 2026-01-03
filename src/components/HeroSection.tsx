@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Clock } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { trackEvent } from "@/utils/analytics";
 import { useNavigate } from "react-router-dom";
 
@@ -32,15 +32,19 @@ const HeroSection = () => {
               id="hero-heading" 
               className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight text-foreground"
             >
-              Not sure what form to file — or what happens next?
+              Free Legal Help for Canadians (2025)
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-              Answer a few questions about your situation. We'll tell you which tribunal handles it, what form you need, and what to do first.
+              Understand your rights. Find the right legal path. Get the correct forms — without a lawyer.
+            </p>
+
+            <p className="text-base text-muted-foreground">
+              Used by Canadians dealing with housing, family court, child protection, and human rights issues.
             </p>
           </div>
 
-          {/* Single CTA - low friction */}
+          {/* Single CTA - no pricing, no dashboard, no clutter */}
           <div className="space-y-4 animate-fade-in pt-4">
             <Button 
               variant="cta" 
@@ -48,14 +52,9 @@ const HeroSection = () => {
               className="group text-xl px-12 py-8 shadow-2xl hover:scale-[1.02] transition-all duration-300"
               onClick={handleCheckSituation}
             >
-              Check My Situation
+              🔴 Check My Situation (2 minutes)
               <ArrowRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
-            
-            <p className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <Clock className="w-4 h-4" />
-              <span>Takes about 2 minutes • No signup required</span>
-            </p>
           </div>
         </div>
       </div>
