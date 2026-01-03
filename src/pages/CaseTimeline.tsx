@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Plus, Calendar, Clock, AlertCircle, FileText, Users, Mail, Shield } from "lucide-react";
+import { Plus, Calendar, Clock, AlertCircle, FileText, Users, Mail, Shield, ArrowRight, CheckCircle } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { AddTimelineEventDialog } from "@/components/AddTimelineEventDialog";
 import { format } from "date-fns";
 import SEOHead from "@/components/SEOHead";
+import { FlowHeader } from "@/components/FlowHeader";
+import { FlowProgressIndicator } from "@/components/FlowProgressIndicator";
 import { useCaseProfile } from "@/hooks/useCaseProfile";
 
 interface TimelineEvent {
@@ -36,14 +38,17 @@ export default function CaseTimeline() {
   const [loading, setLoading] = useState(true);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [seedsAdded, setSeedsAdded] = useState(false);
+  const [hasConfirmed, setHasConfirmed] = useState(false);
+  const [caseData, setCaseData] = useState<any>(null);
 
   useEffect(() => {
     if (!user) {
-      navigate("/");
+      navigate("/welcome");
       return;
     }
     loadEvents();
-  }, [user, navigate]);
+    loadCaseData();
+  }, [user, navigate, caseId]);
 
   // Auto-generate timeline from case profile
   useEffect(() => {
@@ -51,6 +56,19 @@ export default function CaseTimeline() {
       autoGenerateTimeline();
     }
   }, [caseProfile, seedsAdded]);
+
+  const loadCaseData = async () => {
+    if (!caseId) return;
+    const { data } = await supabase
+      .from('cases')
+      .select('*')
+      .eq('id', caseId)
+      .single();
+    if (data) {
+      setCaseData(data);
+      setHasConfirmed(data.timeline_viewed || false);
+    }
+  };
 
   const loadEvents = async () => {
     try {
@@ -132,6 +150,24 @@ export default function CaseTimeline() {
     }
   };
 
+  // Handle confirmation and continue
+  const handleConfirmAndContinue = async () => {
+    if (!caseId) return;
+
+    // Mark timeline as viewed and update flow step
+    await supabase
+      .from('cases')
+      .update({ 
+        timeline_viewed: true, 
+        flow_step: 'documents',
+        updated_at: new Date().toISOString() 
+      })
+      .eq('id', caseId);
+
+    setHasConfirmed(true);
+    navigate('/dashboard');
+  };
+
   const getCategoryIcon = (category: string | null) => {
     switch (category) {
       case "incident":
@@ -166,33 +202,44 @@ export default function CaseTimeline() {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-muted rounded w-1/3"></div>
-          <div className="h-64 bg-muted rounded"></div>
+      <div className="min-h-screen bg-background flex flex-col">
+        <FlowHeader currentStep="timeline" />
+        <div className="container mx-auto px-4 py-8">
+          <div className="animate-pulse space-y-4">
+            <div className="h-8 bg-muted rounded w-1/3"></div>
+            <div className="h-64 bg-muted rounded"></div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-background flex flex-col">
       <SEOHead 
-        title="Case Timeline Builder - Justice Bot"
+        title="Case Timeline - Review Your Timeline | Justice Bot"
         description="Build a chronological timeline of events for your legal case. Organize incidents, filings, correspondence, and evidence."
       />
-      <div className="container mx-auto px-4 py-8">
+      <FlowHeader currentStep="timeline" caseTitle={caseData?.title} />
+      <main className="flex-1 container mx-auto px-4 py-8">
+        {/* Progress indicator */}
+        <div className="mb-6">
+          <FlowProgressIndicator currentStep="timeline" />
+        </div>
+
+        {/* Step header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Case Timeline Builder</h1>
+          <h1 className="text-3xl font-bold mb-2">Review Your Timeline</h1>
           <p className="text-muted-foreground">
-            Build a chronological record of all events related to your case
+            A chronological record of events helps establish the sequence and strengthens your case.
           </p>
         </div>
 
-        <Alert className="mb-6">
-          <AlertCircle className="h-4 w-4" />
+        {/* Reassurance message */}
+        <Alert className="mb-6 bg-primary/5 border-primary/20">
+          <Calendar className="h-4 w-4" />
           <AlertDescription>
-            A well-organized timeline helps establish the sequence of events and strengthens your case presentation.
+            Nothing is filed yet. This is just to help you understand what happens next and prepare your documentation.
           </AlertDescription>
         </Alert>
 
@@ -276,12 +323,37 @@ export default function CaseTimeline() {
           </div>
         )}
 
+        {/* Continue CTA */}
+        <Card className="mt-8 border-primary/20 bg-gradient-to-r from-primary/5 to-background">
+          <div className="p-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium">Ready to generate your documents?</p>
+                  <p className="text-sm text-muted-foreground">
+                    By continuing, you confirm you've reviewed your timeline and are ready for the next step.
+                  </p>
+                </div>
+              </div>
+              <Button 
+                onClick={handleConfirmAndContinue}
+                size="lg"
+                className="gap-2 w-full sm:w-auto"
+              >
+                I Understand, Continue
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </Card>
+
         <AddTimelineEventDialog
           open={showAddDialog}
           onOpenChange={setShowAddDialog}
           onEventAdded={handleEventAdded}
         />
-      </div>
-    </>
+      </main>
+    </div>
   );
 }

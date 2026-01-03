@@ -418,6 +418,7 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          flow_step: string | null
           id: string
           is_paid: boolean | null
           law_section: string | null
@@ -431,6 +432,7 @@ export type Database = {
           timeline_viewed: boolean | null
           title: string
           triage: Json | null
+          triage_complete: boolean | null
           updated_at: string
           user_id: string
           user_number: number | null
@@ -439,6 +441,7 @@ export type Database = {
         Insert: {
           created_at?: string
           description?: string | null
+          flow_step?: string | null
           id?: string
           is_paid?: boolean | null
           law_section?: string | null
@@ -452,6 +455,7 @@ export type Database = {
           timeline_viewed?: boolean | null
           title: string
           triage?: Json | null
+          triage_complete?: boolean | null
           updated_at?: string
           user_id: string
           user_number?: number | null
@@ -460,6 +464,7 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string | null
+          flow_step?: string | null
           id?: string
           is_paid?: boolean | null
           law_section?: string | null
@@ -473,6 +478,7 @@ export type Database = {
           timeline_viewed?: boolean | null
           title?: string
           triage?: Json | null
+          triage_complete?: boolean | null
           updated_at?: string
           user_id?: string
           user_number?: number | null
@@ -2127,6 +2133,7 @@ export type Database = {
           last_name: string | null
           onboarding_completed: boolean | null
           phone: string | null
+          selected_province: string | null
           signup_number: number | null
           updated_at: string
           user_id: string
@@ -2142,6 +2149,7 @@ export type Database = {
           last_name?: string | null
           onboarding_completed?: boolean | null
           phone?: string | null
+          selected_province?: string | null
           signup_number?: number | null
           updated_at?: string
           user_id: string
@@ -2157,6 +2165,7 @@ export type Database = {
           last_name?: string | null
           onboarding_completed?: boolean | null
           phone?: string | null
+          selected_province?: string | null
           signup_number?: number | null
           updated_at?: string
           user_id?: string
@@ -3003,6 +3012,7 @@ export type Database = {
           last_name: string | null
           onboarding_completed: boolean | null
           phone: string | null
+          selected_province: string | null
           signup_number: number | null
           updated_at: string
           user_id: string
