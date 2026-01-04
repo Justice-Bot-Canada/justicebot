@@ -105,7 +105,7 @@ export default function SEOPage() {
                 <Card className="p-8 mt-8">
                   <h2 className="text-2xl font-bold mb-6">Frequently Asked Questions</h2>
                   <Accordion type="single" collapsible className="w-full">
-                    {page.faq.map((item: any, idx: number) => (
+                    {page.faq.map((item: { question: string; answer: string }, idx: number) => (
                       <AccordionItem key={idx} value={`item-${idx}`}>
                         <AccordionTrigger>{item.question}</AccordionTrigger>
                         <AccordionContent>{item.answer}</AccordionContent>

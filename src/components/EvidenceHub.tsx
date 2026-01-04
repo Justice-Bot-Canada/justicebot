@@ -42,8 +42,8 @@ interface Evidence {
   metadata?: {
     doc_type?: string;
     category?: string;
-    parties?: any;
-    dates?: any;
+    parties?: Record<string, unknown>;
+    dates?: Record<string, unknown>;
     extracted_summary?: string;
     evidence_value?: string;
     confidence?: number;
@@ -105,18 +105,57 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
       if (error) throw error;
 
       // Transform the data to include metadata properly
-      const transformedData = data?.map((item: any) => ({
-        ...item,
-        metadata: item.evidence_metadata?.[0] ? {
-          doc_type: item.evidence_metadata[0].doc_type,
-          category: item.evidence_metadata[0].category,
-          parties: item.evidence_metadata[0].parties,
-          dates: item.evidence_metadata[0].dates,
-          extracted_summary: item.evidence_metadata[0].extracted_text,
-          confidence: item.evidence_metadata[0].confidence_score
-        } : undefined,
-        links: item.evidence_links || []
-      })) || [];
+      interface EvidenceMetadataItem {
+        doc_type?: string;
+        category?: string;
+        parties?: Record<string, unknown>;
+        dates?: Record<string, unknown>;
+        extracted_text?: string;
+        confidence_score?: number;
+      }
+      
+      interface RawEvidenceItem {
+        id: string;
+        file_name: string;
+        file_path: string;
+        file_type: string;
+        description?: string;
+        tags?: string[];
+        upload_date: string;
+        case_id: string;
+        evidence_metadata?: EvidenceMetadataItem | EvidenceMetadataItem[];
+        evidence_links?: Array<{
+          form_id: string;
+          section_key: string;
+          note?: string;
+        }>;
+      }
+      
+      const transformedData = (data as unknown as RawEvidenceItem[] | null)?.map((item) => {
+        const metadataItem = Array.isArray(item.evidence_metadata) 
+          ? item.evidence_metadata[0] 
+          : item.evidence_metadata;
+        
+        return {
+          id: item.id,
+          file_name: item.file_name,
+          file_path: item.file_path,
+          file_type: item.file_type,
+          description: item.description,
+          tags: item.tags,
+          upload_date: item.upload_date,
+          case_id: item.case_id,
+          metadata: metadataItem ? {
+            doc_type: metadataItem.doc_type,
+            category: metadataItem.category,
+            parties: metadataItem.parties,
+            dates: metadataItem.dates,
+            extracted_summary: metadataItem.extracted_text,
+            confidence: metadataItem.confidence_score
+          } : undefined,
+          links: item.evidence_links || []
+        };
+      }) || [];
 
       setEvidence(transformedData);
     } catch (error) {
@@ -276,9 +315,9 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
       
       toast.success(`Re-extracted ${ocrText.length} characters of text`);
       fetchEvidence();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('OCR reprocess error:', error);
-      toast.error(error.message || 'Failed to re-process OCR');
+      toast.error(error instanceof Error ? error.message : 'Failed to re-process OCR');
     } finally {
       setProcessing(prev => {
         const next = new Set(prev);

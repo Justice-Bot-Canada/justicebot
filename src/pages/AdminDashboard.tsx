@@ -112,11 +112,11 @@ export default function AdminDashboard() {
       setTopic('');
       setFormType('');
       loadStats();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error generating SEO page:', error);
       toast({
         title: "Generation Failed",
-        description: error.message,
+        description: error instanceof Error ? error.message : "Failed to generate page",
         variant: "destructive"
       });
     } finally {

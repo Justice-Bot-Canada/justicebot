@@ -158,7 +158,7 @@ export function DocumentAnalyzer({ caseId }: { caseId?: string }) {
         return updated;
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Analysis error:', error);
       setFiles(prev => {
         const updated = [...prev];
@@ -166,7 +166,7 @@ export function DocumentAnalyzer({ caseId }: { caseId?: string }) {
           ...updated[index], 
           status: 'error', 
           progress: 0,
-          error: error.message || 'Analysis failed'
+          error: error instanceof Error ? error.message : 'Analysis failed'
         };
         return updated;
       });

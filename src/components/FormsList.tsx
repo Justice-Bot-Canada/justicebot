@@ -56,7 +56,7 @@ export function FormsList() {
 
       if (error) throw error;
       setForms(data || []);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error loading forms:', error);
       toast.error('Failed to load forms');
     } finally {
@@ -151,9 +151,9 @@ export function FormsList() {
       } else {
         throw new Error('No payment URL received');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error processing payment:', error);
-      toast.error(error.message || 'Failed to process payment');
+      toast.error(error instanceof Error ? error.message : 'Failed to process payment');
       setProcessingPayment(null);
     }
   };

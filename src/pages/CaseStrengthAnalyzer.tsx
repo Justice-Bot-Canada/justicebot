@@ -73,11 +73,11 @@ export default function CaseStrengthAnalyzer() {
         title: "Analysis Complete",
         description: `Your ${getCaseTypeLabel(caseType)} case has been analyzed`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error analyzing case:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to analyze case",
+        description: error instanceof Error ? error.message : "Failed to analyze case",
         variant: "destructive",
       });
     } finally {

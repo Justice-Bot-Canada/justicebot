@@ -50,12 +50,12 @@ export function useLegalResearch() {
       }
 
       return data.results;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error searching cases:', error);
       
       toast({
         title: "Search Error",
-        description: error.message || 'Failed to search legal cases',
+        description: error instanceof Error ? error.message : 'Failed to search legal cases',
         variant: "destructive",
       });
       

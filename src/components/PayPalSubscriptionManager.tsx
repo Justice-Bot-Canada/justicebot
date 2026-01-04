@@ -82,9 +82,9 @@ export default function PayPalSubscriptionManager() {
       toast.success("Subscription cancelled successfully");
       setSubscription({ hasSubscription: false, subscriptionType: null, grantedAt: null });
       setShowCancelDialog(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error cancelling subscription:", error);
-      toast.error(error.message || "Failed to cancel subscription. Please contact support.");
+      toast.error(error instanceof Error ? error.message : "Failed to cancel subscription. Please contact support.");
     } finally {
       setCancelling(false);
     }

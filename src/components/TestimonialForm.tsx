@@ -52,7 +52,7 @@ export function TestimonialForm({ caseId, caseType }: { caseId?: string; caseTyp
       // Reset form
       setFormData({ name: "", location: "", story: "", outcome: "" });
       setRating(5);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error submitting testimonial:", error);
       toast({
         title: "Error",

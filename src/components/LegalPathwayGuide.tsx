@@ -16,14 +16,15 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from '@/integrations/supabase/types';
 
 interface LegalPathway {
   id: string;
   pathway_type: string;
   recommendation: string;
   confidence_score: number;
-  relevant_laws: any; // JSON field from database
-  next_steps: any; // JSON field from database
+  relevant_laws: Json;
+  next_steps: Json;
 }
 
 interface AnalysisData {
@@ -337,13 +338,13 @@ const LegalPathwayGuide: React.FC<LegalPathwayGuideProps> = ({ caseId, onBack })
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {pathway.next_steps.map((step, index) => (
+                {(Array.isArray(pathway.next_steps) ? pathway.next_steps : []).map((step, index) => (
                   <div key={index} className="flex items-start gap-3 p-3 border rounded-lg">
                     <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm flex items-center justify-center flex-shrink-0">
                       {index + 1}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">{step}</p>
+                      <p className="text-sm font-medium">{String(step)}</p>
                     </div>
                   </div>
                 ))}
@@ -357,10 +358,10 @@ const LegalPathwayGuide: React.FC<LegalPathwayGuideProps> = ({ caseId, onBack })
             </CardHeader>
             <CardContent>
               <ul className="space-y-2">
-                {pathway.relevant_laws.map((law, index) => (
+                {(Array.isArray(pathway.relevant_laws) ? pathway.relevant_laws : []).map((law, index) => (
                   <li key={index} className="flex items-center gap-2 text-sm">
                     <Scale className="h-4 w-4 text-muted-foreground" />
-                    {law}
+                    {String(law)}
                   </li>
                 ))}
               </ul>

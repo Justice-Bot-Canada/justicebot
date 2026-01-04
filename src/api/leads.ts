@@ -6,7 +6,7 @@ export interface LeadInput {
   phone?: string;
   source?: string;
   journey?: string;
-  payload?: any;
+  payload?: Record<string, unknown>;
   turnstileToken?: string;
 }
 
@@ -21,7 +21,7 @@ export async function submitLead(input: LeadInput) {
 
 export async function getMyLeads() {
   const { data, error } = await supabase
-    .from('leads' as any)
+    .from('leads')
     .select('*')
     .order('created_at', { ascending: false });
   

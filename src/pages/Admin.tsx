@@ -360,9 +360,9 @@ const Admin = () => {
       setSelectedUser(null);
       setAdminNotes("");
       loadAdminData();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error granting admin:', error);
-      toast.error(error.message || 'Failed to grant admin access');
+      toast.error(error instanceof Error ? error.message : 'Failed to grant admin access');
     }
   };
 
@@ -382,9 +382,9 @@ const Admin = () => {
       setSelectedUser(null);
       setRevokeReason("");
       loadAdminData();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error revoking admin:', error);
-      toast.error(error.message || 'Failed to revoke admin access');
+      toast.error(error instanceof Error ? error.message : 'Failed to revoke admin access');
     }
   };
 
@@ -402,9 +402,9 @@ const Admin = () => {
       
       toast.success(data?.message || 'Ontario forms synced successfully');
       console.log('Sync results:', data);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error syncing forms:', error);
-      toast.error(error.message || 'Failed to sync Ontario forms');
+      toast.error(error instanceof Error ? error.message : 'Failed to sync Ontario forms');
     } finally {
       setSyncingForms(false);
     }
