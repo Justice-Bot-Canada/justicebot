@@ -74,8 +74,8 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold mb-4">Coverage</h3>
             <ul className="space-y-2 text-sm text-background/80">
-              <li>Ontario (Available Now)</li>
-              <li>More Provinces Coming</li>
+              <li>All Canadian Provinces & Territories</li>
+              <li>Updated Daily at 5am</li>
               <li>Mobile Optimized</li>
               <li>Free Beta Access</li>
             </ul>
