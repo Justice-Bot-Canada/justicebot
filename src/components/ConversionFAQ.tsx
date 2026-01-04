@@ -31,7 +31,7 @@ const ConversionFAQ = () => {
     {
       id: "accuracy",
       question: "How accurate is the legal guidance?",
-      answer: "Our AI is trained on Ontario tribunal procedures and regularly updated. We cite specific forms and deadlines from official sources. However, laws change — always double-check critical deadlines with the tribunal directly."
+      answer: "Our AI is trained on Canadian tribunal and court procedures across all provinces and territories, and regularly updated. We cite specific forms and deadlines from official sources. However, laws change — always double-check critical deadlines with the tribunal or court directly."
     },
     {
       id: "time",
