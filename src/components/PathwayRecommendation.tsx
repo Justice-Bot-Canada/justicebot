@@ -26,7 +26,13 @@ interface PathwayProps {
     nextSteps: string[];
   };
   caseId: string;
-  caseData: any;
+  caseData: {
+    title?: string;
+    description?: string;
+    province?: string;
+    venue?: string;
+    [key: string]: unknown;
+  };
 }
 
 export function PathwayRecommendation({ pathway, caseId, caseData }: PathwayProps) {

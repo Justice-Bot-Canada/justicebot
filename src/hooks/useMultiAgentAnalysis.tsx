@@ -4,9 +4,97 @@ import { toast } from 'sonner';
 
 export type AgentRole = 'researcher' | 'analyst' | 'strategist' | 'drafter';
 
+export interface LawReference {
+  name: string;
+  section?: string;
+  sections?: string[];
+  description?: string;
+  application?: string;
+}
+
+export interface Precedent {
+  citation: string;
+  court?: string;
+  summary?: string;
+  relevance?: string;
+  outcome?: string;
+}
+
+export interface StrengthWeakness {
+  factor: string;
+  impact?: string;
+  description?: string;
+  evidence?: string;
+  mitigation?: string;
+}
+
+export interface RiskFactor {
+  risk: string;
+  severity?: string;
+  mitigation?: string;
+  likelihood?: string;
+  impact?: string;
+}
+
+export interface ActionItem {
+  action: string;
+  step?: number;
+  priority?: string;
+  deadline?: string;
+  resources?: string;
+}
+
+export interface DocumentRequirement {
+  name: string;
+  form?: string;
+  required?: boolean;
+  description?: string;
+  deadline?: string;
+  priority?: string;
+}
+
+export interface KeyArgument {
+  argument: string;
+  support?: string;
+  strength?: string;
+  evidence?: string;
+  anticipatedResponse?: string;
+}
+
+export interface FilingInstruction {
+  step?: string;
+  details?: string;
+  deadline?: string;
+  where?: string;
+  how?: string;
+  fees?: string;
+  copies?: string;
+}
+
+export interface NextStep {
+  step: string | number;
+  action?: string;
+  priority?: string;
+  notes?: string;
+  deadline?: string;
+}
+
+export interface PrimaryStrategy {
+  approach?: string;
+  rationale?: string;
+  timeline?: string;
+  estimatedCost?: string;
+}
+
+export interface NegotiationStrategy {
+  leverage?: string[];
+  targets?: string;
+  walkAwayPoint?: string;
+}
+
 export interface AgentResult {
   agent: AgentRole;
-  output: any;
+  output: Record<string, unknown>;
   duration: number;
 }
 
@@ -18,23 +106,32 @@ export interface MultiAgentAnalysis {
     meritScore: number;
     successProbability: string;
     confidence: string;
-    relevantLaws: any[];
-    precedents: any[];
+    relevantLaws: LawReference[];
+    precedents: Precedent[];
     keyIssues: string[];
-    strengths: any[];
-    weaknesses: any[];
+    strengths: StrengthWeakness[];
+    weaknesses: StrengthWeakness[];
     evidenceGaps: string[];
-    riskFactors: any[];
-    primaryStrategy: any;
-    actionPlan: any[];
-    negotiationStrategy: any;
-    requiredDocuments: any[];
-    keyArguments: any[];
-    filingInstructions: any;
+    riskFactors: RiskFactor[];
+    primaryStrategy: PrimaryStrategy;
+    actionPlan: ActionItem[];
+    negotiationStrategy: NegotiationStrategy;
+    requiredDocuments: DocumentRequirement[];
+    keyArguments: KeyArgument[];
+    filingInstructions: FilingInstruction;
     summary: string;
-    nextSteps: any[];
+    nextSteps: NextStep[];
   };
   totalDuration: number;
+}
+
+export interface CaseDetails {
+  title?: string;
+  description?: string;
+  province?: string;
+  venue?: string;
+  status?: string;
+  [key: string]: unknown;
 }
 
 export function useMultiAgentAnalysis() {
@@ -45,7 +142,7 @@ export function useMultiAgentAnalysis() {
 
   const runAnalysis = async (
     caseId: string | null,
-    caseDetails: any,
+    caseDetails: CaseDetails,
     caseType: string,
     province: string = 'ON',
     agents?: AgentRole[]

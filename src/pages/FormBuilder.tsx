@@ -30,6 +30,8 @@ import Footer from "@/components/Footer";
 import { PremiumStatus } from "@/components/PremiumStatus";
 import { useCaseProfile } from "@/hooks/useCaseProfile";
 
+import type { Json } from '@/integrations/supabase/types';
+
 interface FormInfo {
   id: string;
   form_code: string;
@@ -37,8 +39,8 @@ interface FormInfo {
   description: string;
   tribunal_type: string;
   price_cents: number;
-  form_fields: any;
-  filing_requirements: any;
+  form_fields: Json;
+  filing_requirements: Json;
 }
 
 interface FormField {
@@ -63,7 +65,7 @@ const FormBuilder = () => {
 
   const [form, setForm] = useState<FormInfo | null>(null);
   const [fields, setFields] = useState<FormField[]>([]);
-  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [formData, setFormData] = useState<Record<string, string | number | boolean | readonly string[]>>({});
   const [currentSection, setCurrentSection] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -248,7 +250,7 @@ const FormBuilder = () => {
         const updatedData = { ...formData };
         Object.entries(data.prefilled_data).forEach(([fieldId, value]) => {
           const field = fields.find(f => f.id === fieldId || f.name === fieldId);
-          if (field) {
+          if (field && (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean')) {
             updatedData[field.name] = value;
           }
         });
@@ -258,9 +260,9 @@ const FormBuilder = () => {
       } else {
         throw new Error("Failed to pre-fill form");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Auto-fill error:', error);
-      toast.error(error.message || "Failed to pre-fill form. You can fill it manually.");
+      toast.error(error instanceof Error ? error.message : "Failed to pre-fill form. You can fill it manually.");
     } finally {
       setAutoFilling(false);
     }
@@ -277,12 +279,12 @@ const FormBuilder = () => {
     try {
       const { error } = await supabase
         .from('form_usage')
-        .upsert({
+        .upsert([{
           form_id: formId,
           user_id: user.id,
-          field_data: formData,
+          field_data: formData as unknown as Json,
           completion_status: 'in_progress'
-        });
+        }]);
 
       if (error) throw error;
       toast.success("Progress saved!");
@@ -416,13 +418,14 @@ const FormBuilder = () => {
   };
 
   const renderField = (field: FormField) => {
-    const value = formData[field.name] || '';
+    const rawValue = formData[field.name];
+    const value = typeof rawValue === 'string' || typeof rawValue === 'number' ? rawValue : '';
 
     switch (field.type) {
       case 'textarea':
         return (
           <Textarea
-            value={value}
+            value={String(value)}
             onChange={(e) => handleFieldChange(field.name, e.target.value)}
             placeholder={field.placeholder}
             className="min-h-24"
@@ -431,7 +434,7 @@ const FormBuilder = () => {
       case 'select':
         return (
           <select
-            value={value}
+            value={String(value)}
             onChange={(e) => handleFieldChange(field.name, e.target.value)}
             className="w-full p-2 border border-input rounded-md bg-background"
           >
@@ -445,7 +448,7 @@ const FormBuilder = () => {
         return (
           <Input
             type={field.type}
-            value={value}
+            value={String(value)}
             onChange={(e) => handleFieldChange(field.name, e.target.value)}
             placeholder={field.placeholder}
           />

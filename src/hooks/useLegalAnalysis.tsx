@@ -39,7 +39,7 @@ export function useLegalAnalysis() {
   const [error, setError] = useState<string | null>(null);
 
   const analyzeCase = async (
-    caseDetails: any,
+    caseDetails: Record<string, unknown>,
     caseType: string,
     province: string = 'ON'
   ) => {
@@ -77,8 +77,8 @@ export function useLegalAnalysis() {
       });
 
       return result.analysis;
-    } catch (err: any) {
-      const errorMessage = err.message || 'Failed to analyze case';
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to analyze case';
       console.error('Analysis error:', err);
       setError(errorMessage);
       

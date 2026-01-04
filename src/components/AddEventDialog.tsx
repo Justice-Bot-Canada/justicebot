@@ -79,7 +79,7 @@ export function AddEventDialog({ caseId, open, onOpenChange, onEventAdded }: Add
       
       onEventAdded();
       onOpenChange(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error adding event:', error);
       // toast.error(error.message || "Failed to add event");
     } finally {

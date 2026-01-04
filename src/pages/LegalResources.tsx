@@ -217,7 +217,7 @@ const LegalResources: React.FC = () => {
                 <CardContent>
                   <div className="space-y-4">
                     {data.results?.length > 0 ? (
-                      data.results.map((item: any, index: number) => (
+                      data.results.map((item: { name?: string; title?: string; citation?: string; dataset?: string; year?: string; snippet?: string; url?: string }, index: number) => (
                         <div key={index} className="border-b pb-4 last:border-0">
                           <h3 className="font-semibold text-lg mb-1">
                             {item.name || item.title || item.citation}

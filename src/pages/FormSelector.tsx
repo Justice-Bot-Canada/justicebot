@@ -25,6 +25,8 @@ import Footer from "@/components/Footer";
 import { useCaseProfile } from "@/hooks/useCaseProfile";
 import { useSearchParams } from "react-router-dom";
 
+import type { Json } from '@/integrations/supabase/types';
+
 interface FormInfo {
   id: string;
   form_code: string;
@@ -32,8 +34,8 @@ interface FormInfo {
   description: string;
   tribunal_type: string;
   price_cents: number;
-  filing_requirements: any;
-  form_fields: any;
+  filing_requirements: Json;
+  form_fields: Json;
   pdf_url?: string | null;
 }
 
@@ -263,12 +265,12 @@ const FormSelector = () => {
                         </div>
                       </div>
                     </CardHeader>
-                    {form.filing_requirements && (
+                    {form.filing_requirements && typeof form.filing_requirements === 'object' && form.filing_requirements !== null && !Array.isArray(form.filing_requirements) && (
                       <CardContent>
                         <div className="flex items-start gap-2">
                           <Clock className="h-4 w-4 text-warning mt-0.5" />
                           <p className="text-sm text-muted-foreground">
-                            {form.filing_requirements.deadline || "Check official guidelines for deadlines"}
+                            {(form.filing_requirements as Record<string, unknown>).deadline as string || "Check official guidelines for deadlines"}
                           </p>
                         </div>
                       </CardContent>

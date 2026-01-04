@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 interface PremiumStatusProps {
   caseId?: string;
   formCode?: string;
-  formData?: any;
+  formData?: Record<string, unknown>;
 }
 
 export const PremiumStatus = ({ caseId, formCode, formData }: PremiumStatusProps) => {

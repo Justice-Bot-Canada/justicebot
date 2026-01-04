@@ -109,7 +109,7 @@ export const AccessibilityPanel: React.FC = () => {
     announceChange(key, value);
   };
 
-  const announceChange = (setting: keyof AccessibilitySettings, value: any) => {
+  const announceChange = (setting: keyof AccessibilitySettings, value: boolean | number) => {
     if (!settings.voiceAnnouncements) return;
     
     const messages = {

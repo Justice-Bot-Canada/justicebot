@@ -49,12 +49,12 @@ export function useEvidenceAnalysis() {
       });
 
       return data.analysis;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error analyzing evidence:', error);
       
       toast({
         title: "Analysis Error",
-        description: error.message || 'Failed to analyze evidence',
+        description: error instanceof Error ? error.message : 'Failed to analyze evidence',
         variant: "destructive",
       });
       

@@ -53,7 +53,7 @@ export default function AdminTestimonials() {
     }
   };
 
-  const updateTestimonial = async (id: string, updates: any) => {
+  const updateTestimonial = async (id: string, updates: Record<string, unknown>) => {
     try {
       const { error } = await supabase
         .from("testimonials")

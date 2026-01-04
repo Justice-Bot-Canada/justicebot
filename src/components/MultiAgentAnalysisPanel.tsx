@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useMultiAgentAnalysis, AgentRole, MultiAgentAnalysis } from '@/hooks/useMultiAgentAnalysis';
+import { useMultiAgentAnalysis, AgentRole, MultiAgentAnalysis, CaseDetails, ActionItem, LawReference, Precedent, StrengthWeakness, RiskFactor, DocumentRequirement, KeyArgument, NextStep } from '@/hooks/useMultiAgentAnalysis';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,17 +17,18 @@ import {
   AlertTriangle,
   Target,
   Scale,
-  Loader2
+  Loader2,
+  LucideIcon
 } from 'lucide-react';
 
 interface MultiAgentAnalysisPanelProps {
   caseId?: string;
-  caseDetails: any;
+  caseDetails: CaseDetails;
   caseType: string;
   province?: string;
 }
 
-const AGENT_INFO: Record<AgentRole, { icon: any; label: string; description: string }> = {
+const AGENT_INFO: Record<AgentRole, { icon: LucideIcon; label: string; description: string }> = {
   researcher: { 
     icon: Search, 
     label: 'Research Agent', 
@@ -255,7 +256,7 @@ export function MultiAgentAnalysisPanel({
               <div>
                 <h4 className="font-semibold mb-3">Immediate Next Steps</h4>
                 <div className="space-y-2">
-                  {fa.nextSteps.slice(0, 5).map((step: any, i: number) => (
+                  {fa.nextSteps.slice(0, 5).map((step: NextStep, i: number) => (
                     <div key={i} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-medium">
                         {step.step || i + 1}
@@ -293,7 +294,7 @@ export function MultiAgentAnalysisPanel({
                 </h4>
                 <ScrollArea className="h-64">
                   <div className="space-y-3">
-                    {fa.relevantLaws.map((law: any, i: number) => (
+                    {fa.relevantLaws.map((law: LawReference, i: number) => (
                       <Card key={i} className="p-4">
                         <h5 className="font-medium">{law.name}</h5>
                         {law.sections?.length > 0 && (
@@ -315,7 +316,7 @@ export function MultiAgentAnalysisPanel({
                 <h4 className="font-semibold mb-3">Key Precedents</h4>
                 <ScrollArea className="h-64">
                   <div className="space-y-3">
-                    {fa.precedents.map((p: any, i: number) => (
+                    {fa.precedents.map((p: Precedent, i: number) => (
                       <Card key={i} className="p-4">
                         <h5 className="font-medium">{p.citation}</h5>
                         {p.court && <p className="text-sm text-muted-foreground">{p.court}</p>}
@@ -338,7 +339,7 @@ export function MultiAgentAnalysisPanel({
                   Strengths
                 </h4>
                 <div className="space-y-2">
-                  {fa?.strengths?.map((s: any, i: number) => (
+                  {fa?.strengths?.map((s: StrengthWeakness, i: number) => (
                     <div key={i} className="p-3 bg-green-50 rounded-lg border border-green-200">
                       <p className="font-medium text-green-800">{s.factor}</p>
                       {s.evidence && <p className="text-sm text-green-600 mt-1">{s.evidence}</p>}
@@ -359,7 +360,7 @@ export function MultiAgentAnalysisPanel({
                   Weaknesses
                 </h4>
                 <div className="space-y-2">
-                  {fa?.weaknesses?.map((w: any, i: number) => (
+                  {fa?.weaknesses?.map((w: StrengthWeakness, i: number) => (
                     <div key={i} className="p-3 bg-red-50 rounded-lg border border-red-200">
                       <p className="font-medium text-red-800">{w.factor}</p>
                       {w.mitigation && (
@@ -400,7 +401,7 @@ export function MultiAgentAnalysisPanel({
               <div>
                 <h4 className="font-semibold mb-3">Risk Factors</h4>
                 <div className="space-y-2">
-                  {fa.riskFactors.map((r: any, i: number) => (
+                  {fa.riskFactors.map((r: RiskFactor, i: number) => (
                     <div key={i} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
                       <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5" />
                       <div>
@@ -446,7 +447,7 @@ export function MultiAgentAnalysisPanel({
               <div>
                 <h4 className="font-semibold mb-3">Detailed Action Plan</h4>
                 <div className="space-y-3">
-                  {fa.actionPlan.map((step: any, i: number) => (
+                  {fa.actionPlan.map((step: ActionItem, i: number) => (
                     <div key={i} className="flex gap-4 p-4 bg-muted/50 rounded-lg">
                       <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-medium">
                         {step.step || i + 1}
@@ -512,7 +513,7 @@ export function MultiAgentAnalysisPanel({
                   Required Documents
                 </h4>
                 <div className="space-y-3">
-                  {fa.requiredDocuments.map((doc: any, i: number) => (
+                  {fa.requiredDocuments.map((doc: DocumentRequirement, i: number) => (
                     <Card key={i} className="p-4">
                       <div className="flex items-start justify-between">
                         <div>
@@ -545,7 +546,7 @@ export function MultiAgentAnalysisPanel({
               <div>
                 <h4 className="font-semibold mb-3">Key Arguments to Include</h4>
                 <div className="space-y-3">
-                  {fa.keyArguments.map((arg: any, i: number) => (
+                  {fa.keyArguments.map((arg: KeyArgument, i: number) => (
                     <Card key={i} className="p-4">
                       <h5 className="font-medium">{arg.argument}</h5>
                       <p className="text-sm text-muted-foreground mt-1">

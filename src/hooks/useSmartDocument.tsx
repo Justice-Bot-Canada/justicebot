@@ -55,12 +55,12 @@ export function useSmartDocument() {
       });
 
       return data.document;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error generating document:', error);
       
       toast({
         title: "Generation Error",
-        description: error.message || 'Failed to generate document',
+        description: error instanceof Error ? error.message : 'Failed to generate document',
         variant: "destructive",
       });
       

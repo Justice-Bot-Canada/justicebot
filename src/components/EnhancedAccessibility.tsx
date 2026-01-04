@@ -39,7 +39,15 @@ export const AccessibilityPanel = () => {
     applyAccessibilitySettings(savedPrefs);
   }, []);
 
-  const applyAccessibilitySettings = (prefs: any) => {
+  interface AccessibilityPreferences {
+    fontSize?: number;
+    lineHeight?: number;
+    soundEnabled?: boolean;
+    reducedMotion?: boolean;
+    highContrast?: boolean;
+  }
+
+  const applyAccessibilitySettings = (prefs: AccessibilityPreferences) => {
     const root = document.documentElement;
     
     // Font size
@@ -63,8 +71,8 @@ export const AccessibilityPanel = () => {
     }
   };
 
-  const savePreferences = (newPrefs: any) => {
-    const preferences = {
+  const savePreferences = (newPrefs: Partial<AccessibilityPreferences>) => {
+    const preferences: AccessibilityPreferences = {
       fontSize,
       lineHeight,
       soundEnabled,
@@ -129,7 +137,7 @@ export const AccessibilityPanel = () => {
     if (!soundEnabled) return;
     
     // Create audio feedback for actions
-    const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const context = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
     const oscillator = context.createOscillator();
     const gainNode = context.createGain();
     
