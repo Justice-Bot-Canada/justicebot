@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useLocation } from 'react-router-dom';
@@ -13,57 +13,88 @@ declare global {
   }
 }
 
+// Session start detection for GA4 attribution
+const SESSION_KEY = 'jb_session_start';
+
+function isNewSession(): boolean {
+  const lastSession = sessionStorage.getItem(SESSION_KEY);
+  const now = Date.now();
+  // New session if no previous session OR session older than 30 min
+  if (!lastSession || (now - parseInt(lastSession, 10)) > 30 * 60 * 1000) {
+    sessionStorage.setItem(SESSION_KEY, now.toString());
+    return true;
+  }
+  return false;
+}
+
 export function useAnalytics() {
   const { user } = useAuth();
   const location = useLocation();
-  const { hasConsent, consent } = useConsent();
+  const { hasConsent } = useConsent();
+  const initialPageViewSent = useRef(false);
 
-  const trackPageView = useCallback(async () => {
-    // Capture and store UTM params on every page view
+  const sendGA4PageView = useCallback(() => {
+    if (typeof window === 'undefined' || !window.gtag) return;
+
+    // Capture and store UTM params
     const urlParams = parseUTMParams();
     const hasUrlParams = Object.values(urlParams).some(v => v !== null);
     if (hasUrlParams) {
       storeUTMParams(urlParams);
     }
     
-    // Get current UTM params (from URL or storage) to include in page_view
     const utm = getCurrentUTMParams();
+    const isSessionStart = isNewSession();
     
-    // ALWAYS send page_view to GA4 for proper landing page attribution
-    // This fixes "(not set)" landing page issue - GA4 needs page_view at session start
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'page_view', {
-        page_path: location.pathname + location.search,
-        page_title: document.title,
-        page_location: window.location.href,
-        // Include UTM params in page_view for attribution
-        ...(utm.utm_source && { utm_source: utm.utm_source }),
-        ...(utm.utm_medium && { utm_medium: utm.utm_medium }),
-        ...(utm.utm_campaign && { utm_campaign: utm.utm_campaign }),
-        ...(utm.utm_term && { utm_term: utm.utm_term }),
-        ...(utm.utm_content && { utm_content: utm.utm_content }),
-      });
-    }
+    // Send page_view with session_start flag for proper landing page attribution
+    window.gtag('event', 'page_view', {
+      page_path: location.pathname + location.search,
+      page_title: document.title,
+      page_location: window.location.href,
+      // Session start flag helps GA4 identify landing pages
+      ...(isSessionStart && { session_start: true }),
+      // Include UTM params for attribution
+      ...(utm.utm_source && { utm_source: utm.utm_source }),
+      ...(utm.utm_medium && { utm_medium: utm.utm_medium }),
+      ...(utm.utm_campaign && { utm_campaign: utm.utm_campaign }),
+      ...(utm.utm_term && { utm_term: utm.utm_term }),
+      ...(utm.utm_content && { utm_content: utm.utm_content }),
+    });
+  }, [location.pathname, location.search]);
 
-    // Only track to Supabase if user has given consent
-    if (hasConsent) {
-      try {
-        await supabase.from('analytics_events').insert([{
-          user_id: user?.id || null,
-          event_type: 'page_view',
-          page_url: location.pathname,
-          user_agent: navigator.userAgent,
-        }]);
-      } catch (error) {
-        console.error('Analytics tracking error:', error);
-      }
+  const trackPageViewToSupabase = useCallback(async () => {
+    if (!hasConsent) return;
+    
+    try {
+      await supabase.from('analytics_events').insert([{
+        user_id: user?.id || null,
+        event_type: 'page_view',
+        page_url: location.pathname,
+        user_agent: navigator.userAgent,
+      }]);
+    } catch (error) {
+      console.error('Analytics tracking error:', error);
     }
-  }, [location.pathname, location.search, user?.id, hasConsent]);
+  }, [location.pathname, user?.id, hasConsent]);
 
-  // Track page views on route changes - don't wait for consent for GA4
+  // CRITICAL: Fire page_view immediately on mount for GA4 landing page attribution
   useEffect(() => {
-    trackPageView();
-  }, [trackPageView]);
+    if (!initialPageViewSent.current) {
+      initialPageViewSent.current = true;
+      // Send synchronously on first load - don't wait for anything
+      sendGA4PageView();
+      trackPageViewToSupabase();
+    }
+  }, []); // Empty deps - only on mount
+
+  // Track subsequent page views on route changes
+  useEffect(() => {
+    // Skip the initial page view (already handled above)
+    if (initialPageViewSent.current) {
+      sendGA4PageView();
+      trackPageViewToSupabase();
+    }
+  }, [location.pathname, location.search, sendGA4PageView, trackPageViewToSupabase]);
 
   const trackEvent = async (eventType: string, eventData?: Record<string, unknown>) => {
     // Only track if user has given consent

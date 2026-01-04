@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,11 +9,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { analytics } from "@/utils/analytics";
+import { CheckCircle, XCircle } from "lucide-react";
 
 interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
+
+// Password validation rules
+const PASSWORD_MIN_LENGTH = 6;
 
 export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +28,12 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const [agreedToDisclaimer, setAgreedToDisclaimer] = useState(false);
   const [agreedToLiability, setAgreedToLiability] = useState(false);
   const { toast } = useToast();
+
+  // Real-time password validation feedback
+  const passwordValidation = useMemo(() => ({
+    minLength: password.length >= PASSWORD_MIN_LENGTH,
+    hasContent: password.length > 0,
+  }), [password]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,11 +78,29 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate all legal agreements
-    if (!agreedToTerms || !agreedToPrivacy || !agreedToDisclaimer || !agreedToLiability) {
+    // Track which specific agreements are missing for analytics
+    const missingAgreements = [];
+    if (!agreedToTerms) missingAgreements.push('terms');
+    if (!agreedToPrivacy) missingAgreements.push('privacy');
+    if (!agreedToDisclaimer) missingAgreements.push('disclaimer');
+    if (!agreedToLiability) missingAgreements.push('liability');
+
+    if (missingAgreements.length > 0) {
+      analytics.signupFailed(`missing_agreements:${missingAgreements.join(',')}`);
       toast({
         title: "Agreement Required",
-        description: "You must agree to all Terms, Privacy Policy, Disclaimer, and Liability agreements to create an account.",
+        description: "Please check all the required agreement boxes to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate password before attempting signup
+    if (!passwordValidation.minLength) {
+      analytics.signupFailed('password_too_short');
+      toast({
+        title: "Password Too Short",
+        description: `Password must be at least ${PASSWORD_MIN_LENGTH} characters.`,
         variant: "destructive",
       });
       return;
@@ -84,7 +112,7 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     try {
       const redirectUrl = `${window.location.origin}/welcome`;
       
-      const { error } = await supabase.auth.signUp({
+      const { error, data } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -100,23 +128,44 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       });
 
       if (error) {
-        analytics.signupFailed(error.message);
+        // Log specific error types for debugging
+        const errorType = error.message.toLowerCase().includes('already registered') 
+          ? 'user_exists' 
+          : error.message.toLowerCase().includes('invalid') 
+            ? 'invalid_email' 
+            : `auth_error:${error.message}`;
+        analytics.signupFailed(errorType);
+        
+        // User-friendly error messages
+        let userMessage = error.message;
+        if (error.message.toLowerCase().includes('already registered')) {
+          userMessage = "This email is already registered. Try signing in instead.";
+        }
+        
         toast({
-          title: "Error",
-          description: error.message,
+          title: "Signup Error",
+          description: userMessage,
           variant: "destructive",
         });
+      } else if (data.user && !data.session) {
+        // Email confirmation required
+        analytics.signupComplete(email, 'email_pending_confirmation');
+        toast({
+          title: "Check Your Email",
+          description: "We sent you a confirmation link. Click it to complete signup.",
+        });
+        onOpenChange(false);
       } else {
         analytics.signupComplete(email, 'email');
-        // Store signup flag in sessionStorage and redirect to welcome page
         sessionStorage.setItem('justSignedUp', 'true');
         onOpenChange(false);
         window.location.href = '/welcome';
       }
     } catch (error) {
+      analytics.signupFailed('unexpected_error');
       toast({
         title: "Error",
-        description: "An unexpected error occurred",
+        description: "Something went wrong. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -195,10 +244,24 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Create a password"
+                  placeholder="Create a password (min 6 characters)"
                   required
-                  minLength={6}
+                  minLength={PASSWORD_MIN_LENGTH}
+                  className={password.length > 0 && !passwordValidation.minLength ? "border-destructive" : ""}
                 />
+                {/* Password requirements hint */}
+                {password.length > 0 && (
+                  <div className="flex items-center gap-1.5 text-xs">
+                    {passwordValidation.minLength ? (
+                      <CheckCircle className="h-3 w-3 text-green-500" />
+                    ) : (
+                      <XCircle className="h-3 w-3 text-destructive" />
+                    )}
+                    <span className={passwordValidation.minLength ? "text-green-600" : "text-muted-foreground"}>
+                      At least {PASSWORD_MIN_LENGTH} characters
+                    </span>
+                  </div>
+                )}
               </div>
               
               <div className="space-y-3 pt-2 border-t">
