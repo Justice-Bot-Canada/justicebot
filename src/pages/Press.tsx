@@ -53,7 +53,7 @@ const Press = () => {
               Press & Media
             </h1>
             <blockquote className="text-xl md:text-2xl text-foreground font-medium max-w-3xl mx-auto leading-relaxed border-l-4 border-primary pl-6 text-left italic mb-6">
-              "Justice-Bot is built on a simple principle: when people are expected to follow the law, ignorance should not be an option."
+              "Justice-Bot is built on a simple principle: when people are expected to follow the law, ignorance is not an option."
             </blockquote>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               Justice-Bot is a Canadian civic-technology initiative focused on early legal literacy 
