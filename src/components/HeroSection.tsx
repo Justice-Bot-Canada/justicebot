@@ -1,19 +1,28 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import { trackEvent } from "@/utils/analytics";
 import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
   const navigate = useNavigate();
 
-  const handleCheckSituation = () => {
-    trackEvent('cta_click', { button: 'check_situation', location: 'hero' });
-    navigate('/intake');
+  const handleStart = () => {
+    trackEvent('funnel_start', { location: 'hero' });
+    navigate('/funnel');
+  };
+
+  const handleHowItWorks = () => {
+    trackEvent('cta_click', { button: 'how_it_works', location: 'hero' });
+    // Scroll to trust section or open modal
+    const trustSection = document.getElementById('what-we-do');
+    if (trustSection) {
+      trustSection.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
     <section 
-      className="relative min-h-[70vh] bg-gradient-to-br from-background via-primary/5 to-background overflow-hidden flex items-center" 
+      className="relative min-h-[85vh] bg-gradient-to-br from-background via-primary/5 to-background overflow-hidden flex items-center" 
       aria-labelledby="hero-heading" 
       role="banner"
     >
@@ -26,35 +35,44 @@ const HeroSection = () => {
       <div className="container mx-auto px-4 py-12 lg:py-16 relative z-10">
         <div className="max-w-3xl mx-auto text-center space-y-8">
           
-          {/* Single clear headline */}
+          {/* Clear headline */}
           <div className="space-y-6 animate-fade-in">
             <h1 
               id="hero-heading" 
               className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight text-foreground"
             >
-              Free Legal Help for Canadians (2025)
+              Get the right legal help for your situation — step by step
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-              Understand your rights. Find the right legal path. Get the correct forms — without a lawyer.
-            </p>
-
-            <p className="text-base text-muted-foreground">
-              Used by Canadians dealing with housing, family court, child protection, and human rights issues.
+              We guide you to the correct forms, courts, and next steps. No guesswork.
             </p>
           </div>
 
-          {/* Single CTA - no pricing, no dashboard, no clutter */}
-          <div className="space-y-4 animate-fade-in pt-4">
+          {/* Primary CTA - big and dominant */}
+          <div className="space-y-4 animate-fade-in pt-6">
             <Button 
               variant="cta" 
               size="lg" 
-              className="group text-xl px-12 py-8 shadow-2xl hover:scale-[1.02] transition-all duration-300"
-              onClick={handleCheckSituation}
+              className="group text-xl md:text-2xl px-12 py-8 md:py-10 shadow-2xl hover:scale-[1.02] transition-all duration-300 w-full sm:w-auto"
+              onClick={handleStart}
             >
-              🔴 Check My Situation (2 minutes)
-              <ArrowRight className="w-6 h-6 ml-2 group-hover:translate-x-1 transition-transform" />
+              Start — it takes 2 minutes
+              <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
             </Button>
+            
+            {/* Secondary CTA */}
+            <div>
+              <Button 
+                variant="ghost" 
+                size="lg"
+                className="text-muted-foreground hover:text-foreground"
+                onClick={handleHowItWorks}
+              >
+                <Play className="w-4 h-4 mr-2" />
+                See how it works
+              </Button>
+            </div>
           </div>
         </div>
       </div>

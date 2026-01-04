@@ -79,6 +79,7 @@ import UploadFirst from "./pages/UploadFirst";
 import ExplainMyOptions from "./pages/ExplainMyOptions";
 import Intake from "./pages/Intake";
 import IntakeSummary from "./pages/IntakeSummary";
+import Funnel from "./pages/Funnel";
 import CaseDemo from "./pages/CaseDemo";
 import TenantRightsGuide from "./pages/TenantRightsGuide";
 import FamilyLawGuide from "./pages/FamilyLawGuide";
@@ -157,6 +158,7 @@ const AppContent = () => {
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/intake" element={<Intake />} />
           <Route path="/intake/summary" element={<IntakeSummary />} />
+          <Route path="/funnel" element={<Funnel />} />
           <Route path="/triage" element={<Triage />} />
           <Route path="/urgent-triage" element={<UrgentTriage />} />
           <Route path="/find-my-path" element={<FindMyPath />} />

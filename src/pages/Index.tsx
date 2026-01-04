@@ -86,7 +86,7 @@ const Index = () => {
         <HeroSection />
         
         {/* What We Do / Don't Do - Clear trust building */}
-        <section className="py-16 bg-background">
+        <section id="what-we-do" className="py-16 bg-background">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Clear About What We Do</h2>
