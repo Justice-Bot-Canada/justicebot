@@ -378,17 +378,30 @@ export function LegalChatbot() {
 
       {/* Input */}
       <form onSubmit={handleSubmit} className="p-4 border-t bg-background">
-        <div className="flex gap-2 max-w-3xl mx-auto">
-          <Textarea
-            ref={textareaRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={user ? "Ask about legal procedures, forms, deadlines..." : "Sign in to start chatting"}
-            disabled={isLoading || !user}
-            className="min-h-[44px] max-h-[120px] resize-none flex-1"
-            rows={1}
-          />
+        <div className="flex gap-2 max-w-3xl mx-auto items-end">
+          <div className="flex-1 relative">
+            <Textarea
+              ref={textareaRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder={user ? "Ask about legal procedures, forms, deadlines..." : "Sign in to start chatting"}
+              disabled={isLoading || !user}
+              className="min-h-[44px] max-h-[120px] resize-none w-full pr-2 text-base"
+              rows={1}
+              autoComplete="off"
+              autoCorrect="on"
+              autoCapitalize="sentences"
+              spellCheck="true"
+              inputMode="text"
+              enterKeyHint="send"
+              style={{ 
+                fontSize: '16px',
+                WebkitAppearance: 'none',
+                touchAction: 'manipulation'
+              }}
+            />
+          </div>
           <Button 
             type="submit" 
             disabled={isLoading || !input.trim() || !user}
