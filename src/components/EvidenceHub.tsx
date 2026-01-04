@@ -216,49 +216,64 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
         if (evidenceError) throw evidenceError;
         setUploadProgress(prev => ({ ...prev, [fileId]: 75 }));
 
-        // Analyze document with AI
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          try {
-            const content = e.target?.result as string;
-            const { data: analysisData, error: analysisError } = await supabase.functions.invoke('analyze-document', {
-              body: {
-                fileContent: content.substring(0, 50000),
-                fileName: file.name,
-                caseId
+        // Analyze document with AI - use storage path for binary files
+        try {
+          const isTextFile = file.type.startsWith('text/') || file.type.includes('json');
+          
+          let analysisBody: { fileName: string; caseId: string; filePath?: string; fileContent?: string; fileType?: string };
+          
+          if (isTextFile) {
+            // Read text content directly
+            const textContent = await file.text();
+            analysisBody = {
+              fileContent: textContent.substring(0, 50000),
+              fileName: file.name,
+              caseId
+            };
+          } else {
+            // For binary files (PDF, images), pass the storage path
+            analysisBody = {
+              filePath,
+              fileName: file.name,
+              fileType: file.type,
+              caseId
+            };
+          }
+
+          const { data: analysisData, error: analysisError } = await supabase.functions.invoke('analyze-document', {
+            body: analysisBody
+          });
+
+          if (analysisError) {
+            console.error('Analysis error:', analysisError);
+            toast.warning(`${file.name} uploaded but analysis failed`);
+          } else if (analysisData?.metadata) {
+            // Save metadata
+            await supabase.from('evidence_metadata').insert({
+              evidence_id: evidenceData.id,
+              doc_type: analysisData.metadata.doc_type,
+              category: analysisData.metadata.category,
+              parties: analysisData.metadata.parties,
+              dates: analysisData.metadata.dates,
+              extracted_text: analysisData.metadata.extracted_summary,
+              confidence_score: analysisData.metadata.confidence,
+              flags: {
+                evidence_value: analysisData.metadata.evidence_value,
+                legal_issues: analysisData.metadata.legal_issues
               }
             });
-
-            if (!analysisError && analysisData?.metadata) {
-              // Save metadata
-              await supabase.from('evidence_metadata').insert({
-                evidence_id: evidenceData.id,
-                doc_type: analysisData.metadata.doc_type,
-                category: analysisData.metadata.category,
-                parties: analysisData.metadata.parties,
-                dates: analysisData.metadata.dates,
-                extracted_text: analysisData.metadata.extracted_summary,
-                confidence_score: analysisData.metadata.confidence,
-                flags: {
-                  evidence_value: analysisData.metadata.evidence_value,
-                  legal_issues: analysisData.metadata.legal_issues
-                }
-              });
-            }
-
-            setUploadProgress(prev => ({ ...prev, [fileId]: 100 }));
             toast.success(`${file.name} uploaded and analyzed`);
-            fetchEvidence();
-          } catch (error) {
-            console.error('Analysis error:', error);
-            toast.warning(`${file.name} uploaded but analysis failed`);
+          } else {
+            toast.success(`${file.name} uploaded`);
           }
-        };
 
-        if (file.type.startsWith('text/') || file.type.includes('json')) {
-          reader.readAsText(file);
-        } else {
-          reader.readAsDataURL(file);
+          setUploadProgress(prev => ({ ...prev, [fileId]: 100 }));
+          fetchEvidence();
+        } catch (analysisErr) {
+          console.error('Analysis error:', analysisErr);
+          toast.warning(`${file.name} uploaded but analysis failed`);
+          setUploadProgress(prev => ({ ...prev, [fileId]: 100 }));
+          fetchEvidence();
         }
 
       } catch (error) {
