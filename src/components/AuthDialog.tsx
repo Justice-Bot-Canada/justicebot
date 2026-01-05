@@ -25,7 +25,10 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const [password, setPassword] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [termsError, setTermsError] = useState("");
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -96,31 +99,46 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent double-submit
+    if (isLoading) return;
+    
+    setSubmitAttempted(true);
     setEmailError("");
+    setPasswordError("");
+    setTermsError("");
+    
+    let hasError = false;
     
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!email.trim()) {
+      setEmailError("Email is required");
+      hasError = true;
+    } else if (!emailRegex.test(email)) {
       setEmailError("Please enter a valid email address");
-      analytics.signupFailed('invalid_email_format');
-      return;
+      hasError = true;
     }
 
-    // Simplified: single agreement checkbox
+    // Validate password with visible error
+    if (!password) {
+      setPasswordError("Password is required");
+      hasError = true;
+    } else if (!passwordValidation.minLength) {
+      setPasswordError(`Password must be at least ${PASSWORD_MIN_LENGTH} characters`);
+      hasError = true;
+    }
+
+    // Validate terms with visible error
     if (!agreedToTerms) {
-      analytics.signupFailed('terms_not_accepted');
-      toast({
-        title: "Agreement Required",
-        description: "Please agree to our terms to continue.",
-        variant: "destructive",
-      });
-      return;
+      setTermsError("You must agree to continue");
+      hasError = true;
     }
-
-    // Validate password before attempting signup
-    if (!passwordValidation.minLength) {
-      analytics.signupFailed('password_too_short');
-      return; // Inline validation already shows error
+    
+    // Stop if any validation failed
+    if (hasError) {
+      analytics.signupFailed('validation_error');
+      return;
     }
 
     analytics.signupAttempt(email);
@@ -318,16 +336,25 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   id="signup-password"
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    setPasswordError("");
+                  }}
                   placeholder="Min 6 characters"
                   required
                   minLength={PASSWORD_MIN_LENGTH}
                   aria-describedby="password-hint"
-                  className={password.length > 0 && !passwordValidation.minLength ? "border-destructive" : ""}
+                  aria-invalid={!!passwordError}
+                  className={passwordError || (submitAttempted && !passwordValidation.minLength) ? "border-destructive" : ""}
                 />
-                {/* Always visible password hint */}
+                {/* Always visible password hint OR error */}
                 <div id="password-hint" className="flex items-center gap-1.5 text-xs">
-                  {password.length === 0 ? (
+                  {passwordError ? (
+                    <>
+                      <XCircle className="h-3 w-3 text-destructive" />
+                      <span className="text-destructive">{passwordError}</span>
+                    </>
+                  ) : password.length === 0 ? (
                     <span className="text-muted-foreground">Must be at least {PASSWORD_MIN_LENGTH} characters</span>
                   ) : passwordValidation.minLength ? (
                     <>
@@ -343,21 +370,33 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                 </div>
               </div>
               
-              {/* Simplified single agreement */}
-              <div className="flex items-start space-x-2 pt-2">
-                <Checkbox 
-                  id="terms" 
-                  checked={agreedToTerms}
-                  onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)}
-                  required
-                  className="mt-0.5"
-                />
-                <label htmlFor="terms" className="text-xs leading-tight cursor-pointer text-muted-foreground">
-                  I agree to the{" "}
-                  <Link to="/terms" className="text-primary underline hover:text-primary/80" target="_blank">Terms</Link>,{" "}
-                  <Link to="/privacy" className="text-primary underline hover:text-primary/80" target="_blank">Privacy Policy</Link>, and{" "}
-                  <Link to="/disclaimer" className="text-primary underline hover:text-primary/80" target="_blank">Disclaimer</Link>
-                </label>
+              {/* Simplified single agreement with visible error */}
+              <div className="space-y-1.5 pt-2">
+                <div className="flex items-start space-x-2">
+                  <Checkbox 
+                    id="terms" 
+                    checked={agreedToTerms}
+                    onCheckedChange={(checked) => {
+                      setAgreedToTerms(checked as boolean);
+                      setTermsError("");
+                    }}
+                    required
+                    className={`mt-0.5 ${termsError ? "border-destructive" : ""}`}
+                    aria-invalid={!!termsError}
+                  />
+                  <label htmlFor="terms" className="text-xs leading-tight cursor-pointer text-muted-foreground">
+                    I agree to the{" "}
+                    <Link to="/terms" className="text-primary underline hover:text-primary/80" target="_blank">Terms</Link>,{" "}
+                    <Link to="/privacy" className="text-primary underline hover:text-primary/80" target="_blank">Privacy Policy</Link>, and{" "}
+                    <Link to="/disclaimer" className="text-primary underline hover:text-primary/80" target="_blank">Disclaimer</Link>
+                  </label>
+                </div>
+                {termsError && (
+                  <p className="text-xs text-destructive flex items-center gap-1 ml-6">
+                    <XCircle className="h-3 w-3" />
+                    {termsError}
+                  </p>
+                )}
               </div>
               
               <Button 
