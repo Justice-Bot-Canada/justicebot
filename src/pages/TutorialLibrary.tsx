@@ -1,12 +1,12 @@
-import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import TutorialVideos from "@/components/TutorialVideos";
+import VideoShowcase from "@/components/VideoShowcase";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { CanonicalURL } from "@/components/CanonicalURL";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlayCircle } from "lucide-react";
+import { PlayCircle, Video } from "lucide-react";
 
 export default function TutorialLibrary() {
   const structuredData = {
@@ -21,24 +21,24 @@ export default function TutorialLibrary() {
         "name": "How to File an LTB Application",
         "description": "Step-by-step guide to filing Landlord and Tenant Board applications in Ontario",
         "thumbnailUrl": "https://justice-bot.com/how-it-works-thumbnail.jpg",
-        "uploadDate": "2025-01-15",
-        "duration": "PT10M"
+        "uploadDate": "2026-01-05",
+        "duration": "PT5M"
       },
       {
         "@type": "VideoObject", 
-        "name": "HRTO Application Complete Guide",
+        "name": "Filing an HRTO Complaint",
         "description": "Complete walkthrough of filing Human Rights Tribunal Ontario complaints",
         "thumbnailUrl": "https://justice-bot.com/how-it-works-thumbnail.jpg",
-        "uploadDate": "2025-01-15",
-        "duration": "PT15M"
+        "uploadDate": "2026-01-05",
+        "duration": "PT5M"
       },
       {
         "@type": "VideoObject",
-        "name": "Small Claims Court Filing Tutorial",
+        "name": "Small Claims Court Filing Guide",
         "description": "Learn how to file claims under $35,000 in Ontario Small Claims Court",
         "thumbnailUrl": "https://justice-bot.com/how-it-works-thumbnail.jpg",
-        "uploadDate": "2025-01-15",
-        "duration": "PT12M"
+        "uploadDate": "2026-01-05",
+        "duration": "PT5M"
       }
     ]
   };
@@ -99,31 +99,47 @@ export default function TutorialLibrary() {
             </p>
           </div>
 
-          <Tabs defaultValue="all" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 mb-8">
-              <TabsTrigger value="all">All Videos</TabsTrigger>
-              <TabsTrigger value="ltb">LTB</TabsTrigger>
-              <TabsTrigger value="hrto">HRTO</TabsTrigger>
-              <TabsTrigger value="small-claims">Small Claims</TabsTrigger>
-              <TabsTrigger value="general">General</TabsTrigger>
-            </TabsList>
+          {/* Featured AI-Generated Tutorial Videos */}
+          <section className="mb-16">
+            <div className="flex items-center gap-2 mb-6">
+              <Video className="w-6 h-6 text-primary" />
+              <h2 className="text-2xl font-bold">Platform Walkthrough Videos</h2>
+            </div>
+            <p className="text-muted-foreground mb-8">
+              See how Justice-Bot helps you through each step of your legal journey with these visual guides.
+            </p>
+            <VideoShowcase />
+          </section>
 
-            <TabsContent value="all">
-              <TutorialVideos />
-            </TabsContent>
-            <TabsContent value="ltb">
-              <TutorialVideos pathwayType="ltb" />
-            </TabsContent>
-            <TabsContent value="hrto">
-              <TutorialVideos pathwayType="hrto" />
-            </TabsContent>
-            <TabsContent value="small-claims">
-              <TutorialVideos pathwayType="small-claims" />
-            </TabsContent>
-            <TabsContent value="general">
-              <TutorialVideos category="general" />
-            </TabsContent>
-          </Tabs>
+          {/* Database-Driven Tutorial Videos */}
+          <section>
+            <h2 className="text-2xl font-bold mb-6">Additional Resources</h2>
+            <Tabs defaultValue="all" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 mb-8">
+                <TabsTrigger value="all">All Videos</TabsTrigger>
+                <TabsTrigger value="ltb">LTB</TabsTrigger>
+                <TabsTrigger value="hrto">HRTO</TabsTrigger>
+                <TabsTrigger value="small-claims">Small Claims</TabsTrigger>
+                <TabsTrigger value="general">General</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="all">
+                <TutorialVideos />
+              </TabsContent>
+              <TabsContent value="ltb">
+                <TutorialVideos pathwayType="ltb" />
+              </TabsContent>
+              <TabsContent value="hrto">
+                <TutorialVideos pathwayType="hrto" />
+              </TabsContent>
+              <TabsContent value="small-claims">
+                <TutorialVideos pathwayType="small-claims" />
+              </TabsContent>
+              <TabsContent value="general">
+                <TutorialVideos category="general" />
+              </TabsContent>
+            </Tabs>
+          </section>
         </div>
       </main>
       <Footer />

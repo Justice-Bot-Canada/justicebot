@@ -348,9 +348,36 @@
 
   <url>
     <loc>https://www.justice-bot.com/tutorials</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-05</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.85</priority>
+    <video:video>
+      <video:thumbnail_loc>https://justice-bot.com/how-it-works-thumbnail.jpg</video:thumbnail_loc>
+      <video:title>How to File an LTB Application</video:title>
+      <video:description>Step-by-step walkthrough of filing a Landlord and Tenant Board application in Ontario</video:description>
+      <video:content_loc>https://justice-bot.com/tutorials/ltb-filing-tutorial.mp4</video:content_loc>
+      <video:duration>300</video:duration>
+      <video:publication_date>2026-01-05</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://justice-bot.com/how-it-works-thumbnail.jpg</video:thumbnail_loc>
+      <video:title>Filing an HRTO Complaint</video:title>
+      <video:description>Complete guide to filing a Human Rights Tribunal of Ontario complaint</video:description>
+      <video:content_loc>https://justice-bot.com/tutorials/hrto-complaint-tutorial.mp4</video:content_loc>
+      <video:duration>300</video:duration>
+      <video:publication_date>2026-01-05</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://justice-bot.com/how-it-works-thumbnail.jpg</video:thumbnail_loc>
+      <video:title>Small Claims Court Filing Guide</video:title>
+      <video:description>Learn how to file a Small Claims Court case for claims under $35,000</video:description>
+      <video:content_loc>https://justice-bot.com/tutorials/small-claims-tutorial.mp4</video:content_loc>
+      <video:duration>300</video:duration>
+      <video:publication_date>2026-01-05</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+    </video:video>
   </url>
 
   <url>
