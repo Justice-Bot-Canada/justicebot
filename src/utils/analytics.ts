@@ -68,6 +68,72 @@ const createItem = (planKey: string, planName: string, price: number) => ({
 
 // Predefined tracking functions
 export const analytics = {
+  // ==========================================
+  // GA4 FUNNEL EVENTS (Required for Purchase Funnels)
+  // ==========================================
+
+  // Funnel entry - when user clicks "Check eligibility" from SEO pages
+  funnelStart: (entryPage?: string) => {
+    sendGA4Event('funnel_start', {
+      country: 'CA',
+      entry_page: entryPage || window.location.pathname,
+    });
+  },
+
+  // Triage start - when first triage question loads
+  funnelTriageStart: (province?: string) => {
+    sendGA4Event('triage_start', {
+      country: 'CA',
+      province: province || 'ON',
+    });
+  },
+
+  // Triage complete - CRITICAL: when last triage question is answered
+  funnelTriageComplete: (data: { province?: string; caseType?: string; meritRange?: string }) => {
+    sendGA4Event('triage_complete', {
+      country: 'CA',
+      province: data.province || 'ON',
+      case_type: data.caseType || 'unknown',
+      merit_range: data.meritRange || 'unknown',
+    });
+  },
+
+  // Paywall shown - when unlock/paywall screen appears
+  paywallView: (product?: string) => {
+    sendGA4Event('paywall_view', {
+      country: 'CA',
+      product: product || 'case_assessment',
+    });
+  },
+
+  // Checkout started - when user clicks payment button
+  funnelBeginCheckout: (data: { value: number; itemName: string }) => {
+    sendGA4Event('begin_checkout', {
+      country: 'CA',
+      currency: 'CAD',
+      value: data.value,
+      item_name: data.itemName,
+    });
+  },
+
+  // Purchase completed - NON-NEGOTIABLE: fires after confirmed payment
+  funnelPurchase: (data: { transactionId?: string; value: number; itemName: string }) => {
+    sendGA4Event('purchase', {
+      transaction_id: data.transactionId || crypto.randomUUID(),
+      currency: 'CAD',
+      value: data.value,
+      items: [{
+        item_name: data.itemName,
+        category: 'Legal',
+        country: 'CA',
+      }],
+    });
+  },
+
+  // ==========================================
+  // GA4 ECOMMERCE EVENTS (for general use)
+  // ==========================================
+
   // GA4 Ecommerce: view_item (required for Purchase Journey)
   viewItem: (planKey: string, planName: string, price: number) => {
     sendGA4Event('view_item', {
@@ -95,7 +161,7 @@ export const analytics = {
     });
   },
 
-  // Triage tracking
+  // Triage tracking (legacy)
   triageStart: () => trackEvent('triage_start'),
   triageComplete: (venue: string) => trackEvent('triage_complete', { venue }),
   

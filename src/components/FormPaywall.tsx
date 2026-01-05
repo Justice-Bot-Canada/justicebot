@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import PayPalTrialButton from "@/components/PayPalTrialButton";
+import { analytics } from "@/utils/analytics";
 
 interface FormPaywallProps {
   formId: string;
@@ -28,6 +29,7 @@ export default function FormPaywall({
   const [hasPurchased, setHasPurchased] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
   const { hasAccess, isPremium } = usePremiumAccess();
+  const paywallViewFired = useRef(false);
 
   // Check if user has purchased this specific form
   useEffect(() => {
@@ -60,9 +62,19 @@ export default function FormPaywall({
     checkFormPurchase();
   }, [formId]);
 
+  // Fire GA4 paywall_view event when paywall is shown
+  useEffect(() => {
+    if (!checkingAccess && !isPremium && !hasAccess && !hasPurchased && !paywallViewFired.current) {
+      paywallViewFired.current = true;
+      analytics.paywallView(formTitle || 'form_access');
+    }
+  }, [checkingAccess, isPremium, hasAccess, hasPurchased, formTitle]);
+
   // Handle one-time form purchase via edge function
   const handleFormPurchase = async () => {
     setLoading("form");
+    // Fire GA4 begin_checkout event
+    analytics.funnelBeginCheckout({ value: 5.99, itemName: formTitle || 'Legal Form' });
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {

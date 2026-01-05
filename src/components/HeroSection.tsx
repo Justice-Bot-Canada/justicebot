@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play } from "lucide-react";
-import { trackEvent } from "@/utils/analytics";
+import { trackEvent, analytics } from "@/utils/analytics";
 import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
@@ -8,6 +8,8 @@ const HeroSection = () => {
 
   const handleStart = () => {
     trackEvent('funnel_start', { location: 'hero' });
+    // Fire GA4 funnel_start event for purchase funnel
+    analytics.funnelStart(window.location.pathname);
     navigate('/funnel');
   };
 
