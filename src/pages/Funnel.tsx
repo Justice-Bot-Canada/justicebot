@@ -1,13 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ArrowRight, ArrowLeft, Home, Users, Heart, Scale, FileText, Check, AlertTriangle, MapPin, Shield, Clock, FileCheck } from "lucide-react";
-import { trackEvent } from "@/utils/analytics";
+import { trackEvent, analytics } from "@/utils/analytics";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { cn } from "@/lib/utils";
-
 // All Canadian provinces/territories
 const PROVINCES = [
   { code: 'ON', name: 'Ontario' },
@@ -111,9 +110,15 @@ export default function Funnel() {
   const totalSteps = 7;
   const progress = (step / totalSteps) * 100;
 
-  // Track funnel start on mount
+  // Track if triage_start and triage_complete have been fired to prevent duplicates
+  const triageStartFired = useRef(false);
+  const triageCompleteFired = useRef(false);
+
+  // Track funnel start on mount (GA4 funnel_start event)
   useEffect(() => {
     trackEvent('funnel_view', { step: 1 });
+    // Fire GA4 funnel_start event
+    analytics.funnelStart(window.location.pathname);
   }, []);
 
   // Persist selections
@@ -154,6 +159,11 @@ export default function Funnel() {
       trackEvent('funnel_confidence_view', { province, legalArea });
     } else if (step === 3) {
       setStep(4);
+      // Fire GA4 triage_start when entering the triage questions step
+      if (!triageStartFired.current) {
+        triageStartFired.current = true;
+        analytics.funnelTriageStart(province || 'ON');
+      }
     } else if (step === 4) {
       // Check if all triage questions answered
       const questions = TRIAGE_QUESTIONS[legalArea!] || [];
@@ -161,10 +171,23 @@ export default function Funnel() {
       if (allAnswered) {
         setStep(5);
         trackEvent('form_recommended', { province, legalArea, triageAnswers });
+        // Fire GA4 triage_complete - CRITICAL for funnel tracking
+        if (!triageCompleteFired.current) {
+          triageCompleteFired.current = true;
+          const yesCount = Object.values(triageAnswers).filter(Boolean).length;
+          const meritRange = yesCount === 3 ? 'high' : yesCount >= 2 ? 'medium' : 'low';
+          analytics.funnelTriageComplete({
+            province: province || 'ON',
+            caseType: legalArea || 'unknown',
+            meritRange,
+          });
+        }
       }
     } else if (step === 5) {
       setStep(6);
       trackEvent('paywall_view', { province, legalArea });
+      // Fire GA4 paywall_view event
+      analytics.paywallView('case_assessment');
     }
   };
 
@@ -174,6 +197,10 @@ export default function Funnel() {
 
   const handlePayment = async (type: 'one-time' | 'monthly') => {
     trackEvent('payment_initiated', { type, province, legalArea });
+    // Fire GA4 begin_checkout event
+    const value = type === 'one-time' ? 29 : 19;
+    const itemName = type === 'one-time' ? 'Case Assessment (One-Time)' : 'Case Assessment (Monthly)';
+    analytics.funnelBeginCheckout({ value, itemName });
     // Navigate to payment or trigger Stripe
     navigate('/pricing');
   };

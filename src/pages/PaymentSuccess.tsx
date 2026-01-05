@@ -2,7 +2,7 @@ import { CheckCircle, ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { analytics } from "@/utils/analytics";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -13,6 +13,7 @@ const PaymentSuccess = () => {
   const [verifying, setVerifying] = useState(true);
   const [verified, setVerified] = useState(false);
   const [formId, setFormId] = useState<string | null>(null);
+  const purchaseEventFired = useRef(false);
   
   useEffect(() => {
     const verifyPayment = async () => {
@@ -44,10 +45,22 @@ const PaymentSuccess = () => {
         if (data?.success) {
           setVerified(true);
           
-          // Track payment completion
+          // Track payment completion with legacy analytics
           const plan = searchParams.get('plan') || 'form_purchase';
-          const amount = '29.99';
+          const amount = searchParams.get('amount') || '29.99';
           analytics.paymentCompleted(plan, amount, token);
+          
+          // Fire GA4 purchase event - NON-NEGOTIABLE for funnel tracking
+          // Only fire once to prevent duplicates on refresh
+          if (!purchaseEventFired.current) {
+            purchaseEventFired.current = true;
+            const value = parseFloat(amount) || 5.99;
+            analytics.funnelPurchase({
+              transactionId: token || crypto.randomUUID(),
+              value,
+              itemName: plan === 'form_purchase' ? 'Legal Form' : 'Case Assessment',
+            });
+          }
           
           toast({
             title: "Payment Successful!",
