@@ -2,9 +2,16 @@ import { ArrowRight, Check, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
+import { useShouldHidePricing } from '@/components/ProgramBanner';
 
 export const PricingTeaser = () => {
   const navigate = useNavigate();
+  const shouldHidePricing = useShouldHidePricing();
+
+  // Don't render for program users with pricing disabled
+  if (shouldHidePricing) {
+    return null;
+  }
 
   return (
     <section className="py-12 bg-gradient-to-b from-background to-muted/20" id="pricing">

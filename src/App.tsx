@@ -11,6 +11,7 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { CanonicalURL } from "@/components/CanonicalURL";
 import { ConsentProvider } from "@/hooks/useConsent";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
+import { ProgramProvider } from "@/contexts/ProgramContext";
 import Index from "./pages/Index";
 import PathwayDecision from "./pages/PathwayDecision";
 import Pricing from "./pages/Pricing";
@@ -119,6 +120,8 @@ const CaseStrengthAnalyzer = lazy(() => import("./pages/CaseStrengthAnalyzer"));
 const SettlementCalculator = lazy(() => import("./pages/SettlementCalculator"));
 const SubscriptionSuccess = lazy(() => import("./pages/SubscriptionSuccess"));
 const FeatureGuide = lazy(() => import("./pages/FeatureGuide"));
+const ProgramLanding = lazy(() => import("./pages/ProgramLanding"));
+const AdminProgramDashboard = lazy(() => import("./pages/AdminProgramDashboard"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -284,6 +287,10 @@ const AppContent = () => {
           <Route path="/admin" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Admin /></Suspense></ProtectedRoute>} />
           <Route path="/admin/forms-sync" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><AdminFormsSync /></Suspense></ProtectedRoute>} />
           <Route path="/admin/testimonials" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><AdminTestimonials /></Suspense></ProtectedRoute>} />
+          <Route path="/admin/programs" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><AdminProgramDashboard /></Suspense></ProtectedRoute>} />
+
+          {/* Program Pilot Routes */}
+          <Route path="/program/:slug" element={<Suspense fallback={<LoadingFallback />}><ProgramLanding /></Suspense>} />
 
           {/* Payment & Subscription */}
           <Route path="/low-income" element={<ProtectedRoute><LowIncomeApproval /></ProtectedRoute>} />
@@ -315,8 +322,10 @@ const App = () => (
         <Toaster />
         <BrowserRouter>
           <ConsentProvider>
-            <AppContent />
-            <CookieConsentBanner />
+            <ProgramProvider>
+              <AppContent />
+              <CookieConsentBanner />
+            </ProgramProvider>
           </ConsentProvider>
         </BrowserRouter>
       </TooltipProvider>
