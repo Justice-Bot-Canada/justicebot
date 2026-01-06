@@ -107,12 +107,14 @@ export default function IntakeSummary() {
     try {
       const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
         body: {
-          priceId: 'price_intake_unlock', // Replace with actual Stripe price ID
+          priceId: 'price_1SYLdJL0pLShFbLttpxYfuas', // $5.99 Legal Form - One-Time Purchase
+          mode: 'payment',
           successUrl: `${window.location.origin}/payment-success?type=intake`,
           cancelUrl: `${window.location.origin}/intake/summary`,
           metadata: {
             issueType: intakeData.issueType,
-            province: intakeData.province
+            province: intakeData.province,
+            product: 'intake_unlock'
           }
         }
       });
