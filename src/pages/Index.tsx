@@ -40,10 +40,11 @@ const Index = () => {
       const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
         body: {
           priceId: 'price_1SYLdJL0pLShFbLttpxYfuas',
+          planKey: 'form_unlock',
           mode: 'payment',
           successUrl: `${window.location.origin}/unlock-success?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${window.location.origin}/`,
-          metadata: { product: 'emergency_form_unlock', source: 'homepage_banner' }
+          metadata: { product: 'form_unlock', source: 'homepage_banner' }
         }
       });
       if (error) throw error;

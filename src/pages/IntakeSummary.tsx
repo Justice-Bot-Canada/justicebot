@@ -108,13 +108,15 @@ export default function IntakeSummary() {
       const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
         body: {
           priceId: 'price_1SYLdJL0pLShFbLttpxYfuas', // $5.99 Legal Form - One-Time Purchase
+          planKey: 'form_unlock',
           mode: 'payment',
           successUrl: `${window.location.origin}/unlock-success?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${window.location.origin}/intake/summary`,
           metadata: {
             issueType: intakeData.issueType,
             province: intakeData.province,
-            product: 'intake_unlock'
+            product: 'form_unlock',
+            source: 'intake_summary'
           }
         }
       });

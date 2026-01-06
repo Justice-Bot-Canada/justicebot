@@ -72,6 +72,9 @@ serve(async (req) => {
     const finalSuccessUrl = successUrl || `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
     const finalCancelUrl = cancelUrl || `${origin}/pricing`;
 
+    const effectivePlanKey = planKey || metadata?.plan_key || metadata?.product || (mode === 'payment' ? 'form_unlock' : 'unknown');
+    const effectiveProduct = metadata?.product || effectivePlanKey;
+
     // Build session params based on mode
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       line_items: [
@@ -86,8 +89,8 @@ serve(async (req) => {
       client_reference_id: user?.id || undefined, // Critical for mapping payment to user
       metadata: {
         user_id: user?.id || "guest",
-        plan_key: planKey || "unknown",
-        product: metadata?.product || planKey || "unknown",
+        plan_key: effectivePlanKey,
+        product: effectiveProduct,
         source: metadata?.source || "unknown",
         ...metadata
       },
