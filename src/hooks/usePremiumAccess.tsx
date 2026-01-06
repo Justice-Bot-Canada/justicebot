@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRole } from '@/hooks/useRole';
+import { useProgram } from '@/contexts/ProgramContext';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface PremiumAccess {
   hasAccess: boolean;
   isPremium: boolean;
   isFreeUser: boolean;
+  isProgramUser: boolean;
   loading: boolean;
   userNumber?: number;
-  tier: 'free' | 'low-income' | 'monthly' | 'yearly' | null;
+  tier: 'free' | 'low-income' | 'monthly' | 'yearly' | 'program' | null;
   hasSettlementCalculator: boolean;
   refetch: () => Promise<void>;
 }
@@ -17,10 +19,11 @@ export interface PremiumAccess {
 export function usePremiumAccess(): PremiumAccess {
   const { user } = useAuth();
   const { isAdmin, loading: roleLoading } = useRole();
+  const { program, isProgramMode } = useProgram();
   const [isPremium, setIsPremium] = useState(false);
   const [isFreeUser, setIsFreeUser] = useState(false);
   const [userNumber, setUserNumber] = useState<number>();
-  const [tier, setTier] = useState<'free' | 'low-income' | 'monthly' | 'yearly' | null>(null);
+  const [tier, setTier] = useState<'free' | 'low-income' | 'monthly' | 'yearly' | 'program' | null>(null);
   const [loading, setLoading] = useState(true);
 
   const checkAccess = async () => {
@@ -90,19 +93,23 @@ export function usePremiumAccess(): PremiumAccess {
     }
   }, [user?.id, roleLoading]); // Wait for role to load before checking access
 
-  // Grant full access to admins automatically
-  const hasAccess = isAdmin || isPremium || isFreeUser;
+  // Program users get full access when disable_pricing is true
+  const isProgramUser = isProgramMode && (program?.disable_pricing ?? false);
+
+  // Grant full access to admins, premium users, free tier users, or program users
+  const hasAccess = isAdmin || isPremium || isFreeUser || isProgramUser;
   
-  // Settlement Calculator is only available for Monthly and Yearly tiers
+  // Settlement Calculator is only available for Monthly and Yearly tiers (not program users)
   const hasSettlementCalculator = isAdmin || tier === 'monthly' || tier === 'yearly';
 
   return {
     hasAccess,
     isPremium: isAdmin || isPremium, // Admins treated as premium
     isFreeUser,
+    isProgramUser,
     loading: loading || roleLoading,
     userNumber,
-    tier: isAdmin ? 'yearly' : tier, // Admins get highest tier
+    tier: isAdmin ? 'yearly' : isProgramUser ? 'program' : tier, // Admins get highest tier
     hasSettlementCalculator,
     refetch: checkAccess,
   };

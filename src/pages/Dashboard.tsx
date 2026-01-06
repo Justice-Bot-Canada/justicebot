@@ -28,6 +28,7 @@ import { useNextAction, NextActionType } from "@/hooks/useNextAction";
 import { EvidenceHub } from "@/components/EvidenceHub";
 import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
 import DashboardHeader from "@/components/DashboardHeader";
+import { ProgramBanner } from "@/components/ProgramBanner";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import {
@@ -191,6 +192,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <DashboardHeader />
+      <ProgramBanner />
       
       <main className="flex-1 container mx-auto px-4 py-6 max-w-3xl">
         {/* Free user badge */}

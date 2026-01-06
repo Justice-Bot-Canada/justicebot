@@ -14,12 +14,14 @@ import { TriageDiscountModal } from "@/components/TriageDiscountModal";
 import { TriageDocumentUpload, PendingDocument } from "@/components/TriageDocumentUpload";
 import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
 import AuthDialog from "@/components/AuthDialog";
+import { ProgramBanner } from "@/components/ProgramBanner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, BookOpen, FileCheck, ArrowRight, ArrowLeft, UserPlus, Shield, Sparkles, CheckCircle, Info } from "lucide-react";
 import { analytics, trackEvent } from "@/utils/analytics";
+import { useProgramCaseFields } from "@/hooks/useProgramCaseFields";
 
 interface FormRecommendation {
   formCode: string;
@@ -46,6 +48,7 @@ interface TriageResult {
 const Triage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const programCaseFields = useProgramCaseFields();
   const [step, setStep] = useState(0);
   const [triageResult, setTriageResult] = useState<TriageResult | null>(null);
   const [userDescription, setUserDescription] = useState("");
@@ -131,6 +134,7 @@ const Triage = () => {
             recommendedForms: triageResult.recommendedForms,
             flags: triageResult.flags,
           } as any,
+          ...programCaseFields,
         })
         .select()
         .single();
@@ -296,6 +300,7 @@ const Triage = () => {
         structuredData={structuredData}
       />
       <FlowHeader currentStep="triage" />
+      <ProgramBanner />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Progress indicator */}

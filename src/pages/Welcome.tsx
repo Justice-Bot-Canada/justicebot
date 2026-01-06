@@ -11,11 +11,13 @@ import { FlowProgressIndicator } from "@/components/FlowProgressIndicator";
 import { supabase } from "@/integrations/supabase/client";
 import AuthDialog from "@/components/AuthDialog";
 import { PROVINCE_NAMES } from "@/config/provinceConfig";
+import { useProgramCaseFields } from "@/hooks/useProgramCaseFields";
 
 const Welcome = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const programCaseFields = useProgramCaseFields();
   
   // State
   const [selectedProvince, setSelectedProvince] = useState<string>("");
@@ -141,6 +143,7 @@ const Welcome = () => {
             province: selectedProvince,
             flow_step: 'triage',
             status: 'pending',
+            ...programCaseFields,
           })
           .select()
           .single();

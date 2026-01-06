@@ -15,6 +15,7 @@ import { toast } from "@/lib/toast-stub";
 import { useNavigate } from "react-router-dom";
 import LegalPathwayGuide from "./LegalPathwayGuide";
 import { CaseWorkspace } from "./CaseWorkspace";
+import { useProgramCaseFields } from "@/hooks/useProgramCaseFields";
 
 interface Case {
   id: string;
@@ -54,6 +55,7 @@ interface CaseWithMetrics extends Case {
 const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) => void }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const programCaseFields = useProgramCaseFields();
   const [cases, setCases] = useState<CaseWithMetrics[]>([]);
   const [selectedCase, setSelectedCase] = useState<Case | null>(null);
   const [evidence, setEvidence] = useState<Evidence[]>([]);
@@ -197,6 +199,7 @@ const CaseManager = ({ onCaseSelect }: { onCaseSelect?: (caseId: string | null) 
         .from('cases')
         .insert({
           ...newCase,
+          ...programCaseFields,
           user_id: user.id,
           status: 'analyzing'
         })

@@ -2192,6 +2192,38 @@ export type Database = {
         }
         Relationships: []
       }
+      program_members: {
+        Row: {
+          created_at: string
+          id: string
+          program_id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          program_id: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          program_id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_members_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       programs: {
         Row: {
           cohort_batch: string | null
@@ -3297,6 +3329,10 @@ export type Database = {
         | { Args: never; Returns: boolean }
         | { Args: { p_user_id: string }; Returns: boolean }
       is_owner: { Args: never; Returns: boolean }
+      is_program_member: {
+        Args: { p_program_id: string; p_user_id?: string }
+        Returns: boolean
+      }
       lia_log: {
         Args: { action: string; application_id: string; details: Json }
         Returns: undefined
