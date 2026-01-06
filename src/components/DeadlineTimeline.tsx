@@ -25,7 +25,7 @@ const generateTimeline = (venue: string, incidentDate: Date = new Date()): Timel
   const today = new Date();
   
   switch (venue) {
-    case 'hrto':
+    case 'hrto': {
       const oneYearDeadline = addDays(incidentDate, 365);
       const isNearDeadline = differenceInDays(oneYearDeadline, today) <= 90;
       
@@ -68,8 +68,9 @@ const generateTimeline = (venue: string, incidentDate: Date = new Date()): Timel
           estimatedDuration: '1 day'
         }
       ];
+    }
       
-    case 'ltb':
+    case 'ltb': {
       return [
         {
           id: 'gather-evidence',
@@ -107,8 +108,9 @@ const generateTimeline = (venue: string, incidentDate: Date = new Date()): Timel
           estimatedDuration: '2-4 hours'
         }
       ];
+    }
       
-    case 'small-claims':
+    case 'small-claims': {
       return [
         {
           id: 'calculate-damages',
@@ -146,6 +148,7 @@ const generateTimeline = (venue: string, incidentDate: Date = new Date()): Timel
           estimatedDuration: '1-2 hours'
         }
       ];
+    }
       
     default:
       return [];
