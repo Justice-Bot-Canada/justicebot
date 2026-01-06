@@ -94,40 +94,50 @@ serve(async (req) => {
       }
     }
 
-    // Determine product from metadata
+    // Determine product and case from metadata
     const product = session.metadata?.product || 'form_unlock';
     const rawPlanKey = session.metadata?.plan_key;
     const planKey = (!rawPlanKey || rawPlanKey === 'unknown') ? product : rawPlanKey;
+    const caseId = session.metadata?.case_id || null;
     
-    // Check if entitlement already exists (idempotency)
+    // Check if entitlement already exists (idempotency) - scoped by case_id if present
     if (userId && userId !== 'guest') {
-      const { data: existing } = await supabaseAdmin
+      let existingQuery = supabaseAdmin
         .from('entitlements')
         .select('*')
         .eq('user_id', userId)
-        .eq('product_id', planKey)
-        .maybeSingle();
+        .eq('product_id', planKey);
+      
+      // If case_id present, scope check to that case
+      if (caseId) {
+        existingQuery = existingQuery.eq('case_id', caseId);
+      }
+
+      const { data: existing } = await existingQuery.maybeSingle();
 
       if (existing) {
-        logStep("Entitlement already exists", { userId, product: planKey });
+        logStep("Entitlement already exists", { userId, product: planKey, caseId });
         return new Response(JSON.stringify({ 
           success: true, 
           alreadyUnlocked: true,
-          product: planKey 
+          product: planKey,
+          caseId
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
           status: 200,
         });
       }
 
-      // Create entitlement record
+      // Create entitlement record - scoped to case_id
       const { error: entitlementError } = await supabaseAdmin
         .from('entitlements')
         .insert({
           user_id: userId,
           product_id: planKey,
+          case_id: caseId,
           source: 'stripe',
           feature: product,
+          scope: caseId ? 'case' : 'global',
           granted_at: new Date().toISOString(),
         });
 
@@ -135,7 +145,26 @@ serve(async (req) => {
         logStep("Failed to create entitlement", { error: entitlementError.message });
         // Don't fail the request - payment succeeded
       } else {
-        logStep("Entitlement created", { userId, product: planKey });
+        logStep("Entitlement created", { userId, product: planKey, caseId, scope: caseId ? 'case' : 'global' });
+      }
+
+      // Also update the case record to mark it as paid
+      if (caseId) {
+        const { error: caseError } = await supabaseAdmin
+          .from('cases')
+          .update({ 
+            is_paid: true,
+            plan: planKey,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', caseId)
+          .eq('user_id', userId);
+
+        if (caseError) {
+          logStep("Failed to update case", { error: caseError.message });
+        } else {
+          logStep("Case marked as paid", { caseId });
+        }
       }
     }
 
@@ -146,8 +175,9 @@ serve(async (req) => {
       .upsert({
         payment_id: sessionId,
         user_id: userId || 'guest',
-        amount: (session.amount_total || 599) / 100,
-        amount_cents: session.amount_total || 599,
+        case_id: caseId,
+        amount: (session.amount_total || 3900) / 100,
+        amount_cents: session.amount_total || 3900,
         currency: session.currency || 'cad',
         status: 'completed',
         payment_provider: 'stripe',
@@ -161,12 +191,13 @@ serve(async (req) => {
     if (paymentError) {
       logStep("Failed to record payment", { error: paymentError.message });
     } else {
-      logStep("Payment recorded");
+      logStep("Payment recorded", { caseId });
     }
 
     return new Response(JSON.stringify({ 
       success: true, 
       product: planKey,
+      caseId,
       userId: userId !== 'guest' ? userId : null
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

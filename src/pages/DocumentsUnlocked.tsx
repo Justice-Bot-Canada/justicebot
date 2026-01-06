@@ -5,8 +5,7 @@ import { analytics, trackEvent } from '@/utils/analytics';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   CheckCircle,
   Circle,
@@ -16,6 +15,8 @@ import {
   Download,
   ArrowRight,
   AlertCircle,
+  Unlock,
+  RefreshCw,
 } from 'lucide-react';
 
 export default function DocumentsUnlocked() {
@@ -25,6 +26,7 @@ export default function DocumentsUnlocked() {
 
   const [verifying, setVerifying] = useState(!!sessionId);
   const [verified, setVerified] = useState(false);
+  const [caseId, setCaseId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const hasVerified = useRef(false);
 
@@ -46,12 +48,15 @@ export default function DocumentsUnlocked() {
 
         if (data?.success) {
           setVerified(true);
+          setCaseId(data.caseId || null);
           trackEvent('payment_completed', {
             product: 'court_ready_pack',
             sessionId,
+            caseId: data.caseId,
           });
           trackEvent('documents_unlocked', {
             product: 'court_ready_pack',
+            caseId: data.caseId,
           });
           analytics.funnelPurchase({ value: 39, itemName: 'Court-Ready Document Pack' });
         } else {
@@ -68,35 +73,13 @@ export default function DocumentsUnlocked() {
     verifyPayment();
   }, [sessionId]);
 
-  const steps = [
-    {
-      id: 'triage',
-      label: 'Triage complete',
-      status: 'complete' as const,
-      icon: CheckCircle,
-    },
-    {
-      id: 'upload',
-      label: 'Upload evidence',
-      status: 'current' as const,
-      icon: Upload,
-      description: 'Add your supporting documents',
-    },
-    {
-      id: 'generate',
-      label: 'Documents generating',
-      status: 'upcoming' as const,
-      icon: FileCheck,
-      description: 'AI organizes your case materials',
-    },
-    {
-      id: 'download',
-      label: 'Download & file',
-      status: 'upcoming' as const,
-      icon: Download,
-      description: 'Get your court-ready package',
-    },
-  ];
+  const handleContinue = () => {
+    if (caseId) {
+      navigate(`/evidence?case=${caseId}`);
+    } else {
+      navigate('/evidence');
+    }
+  };
 
   if (verifying) {
     return (
@@ -137,41 +120,62 @@ export default function DocumentsUnlocked() {
     );
   }
 
+  const steps = [
+    {
+      id: 'intake',
+      label: 'Intake completed',
+      status: 'complete' as const,
+      icon: CheckCircle,
+    },
+    {
+      id: 'unlocked',
+      label: 'Document preparation unlocked',
+      status: 'complete' as const,
+      icon: Unlock,
+    },
+    {
+      id: 'upload',
+      label: 'Upload evidence',
+      status: 'current' as const,
+      icon: Upload,
+    },
+    {
+      id: 'generate',
+      label: 'Documents generated',
+      status: 'upcoming' as const,
+      icon: RefreshCw,
+    },
+    {
+      id: 'download',
+      label: 'Download & file',
+      status: 'upcoming' as const,
+      icon: Download,
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
       <main className="flex-1 container mx-auto px-4 py-12">
-        <div className="max-w-2xl mx-auto space-y-8">
+        <div className="max-w-xl mx-auto space-y-8">
           {/* Success Header */}
           <div className="text-center space-y-4">
             <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto">
               <CheckCircle className="h-10 w-10 text-green-600" />
             </div>
-            <div>
-              <Badge className="mb-2 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
-                Payment Complete
-              </Badge>
-              <h1 className="text-3xl font-bold">You're all set — let's prepare your documents</h1>
-              <p className="text-muted-foreground mt-2">
-                Your Court-Ready Document Pack is now unlocked
-              </p>
-            </div>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+              You're all set. Let's prepare your documents.
+            </h1>
           </div>
 
           {/* Progress Checklist */}
           <Card>
-            <CardHeader>
-              <CardTitle>Your Progress</CardTitle>
-              <CardDescription>
-                Follow these steps to complete your filing-ready package
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {steps.map((step, index) => (
+            <CardContent className="pt-6">
+              <div className="space-y-3">
+                {steps.map((step) => (
                   <div
                     key={step.id}
-                    className={`flex items-start gap-4 p-4 rounded-lg transition-colors ${
+                    className={`flex items-center gap-4 p-3 rounded-lg ${
                       step.status === 'current'
                         ? 'bg-primary/5 border border-primary/20'
                         : step.status === 'complete'
@@ -181,56 +185,42 @@ export default function DocumentsUnlocked() {
                   >
                     <div className="flex-shrink-0">
                       {step.status === 'complete' ? (
-                        <CheckCircle className="h-6 w-6 text-green-600" />
+                        <CheckCircle className="h-5 w-5 text-green-600" />
                       ) : step.status === 'current' ? (
-                        <div className="h-6 w-6 rounded-full border-2 border-primary flex items-center justify-center">
+                        <div className="h-5 w-5 rounded-full border-2 border-primary flex items-center justify-center">
                           <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
                         </div>
                       ) : (
-                        <Circle className="h-6 w-6 text-muted-foreground/40" />
+                        <Circle className="h-5 w-5 text-muted-foreground/40" />
                       )}
                     </div>
-                    <div className="flex-1">
-                      <h4
-                        className={`font-medium ${
-                          step.status === 'upcoming' ? 'text-muted-foreground' : ''
-                        }`}
-                      >
-                        {step.label}
-                      </h4>
-                      {step.description && (
-                        <p className="text-sm text-muted-foreground">{step.description}</p>
-                      )}
-                    </div>
-                    {step.status === 'current' && (
-                      <Badge variant="outline" className="bg-primary/10 text-primary">
-                        Next
-                      </Badge>
-                    )}
+                    <span
+                      className={`font-medium ${
+                        step.status === 'upcoming' ? 'text-muted-foreground' : 'text-foreground'
+                      }`}
+                    >
+                      {step.label}
+                    </span>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          {/* CTA */}
+          {/* Primary CTA */}
           <div className="text-center space-y-4">
             <Button
               size="lg"
-              className="text-lg px-8 py-6"
-              onClick={() => navigate('/evidence')}
+              className="text-lg px-8 py-6 bg-slate-800 hover:bg-slate-900 text-white"
+              onClick={handleContinue}
             >
-              Upload Your Evidence
+              Upload My Evidence
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
+            
             <p className="text-sm text-muted-foreground">
-              Or{' '}
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="text-primary hover:underline"
-              >
-                go to your dashboard
-              </button>
+              You can upload documents now or come back anytime.<br />
+              Progress is saved.
             </p>
           </div>
         </div>

@@ -37,9 +37,10 @@ serve(async (req) => {
       mode = 'subscription', // 'subscription' or 'payment'
       successUrl,
       cancelUrl,
+      caseId,
       metadata = {}
     } = await req.json();
-    logStep("Request body", { priceId, planKey, trialDays, mode });
+    logStep("Request body", { priceId, planKey, trialDays, mode, caseId });
 
     // Get user from auth header (optional - support guest checkout)
     const authHeader = req.headers.get("Authorization");
@@ -89,6 +90,7 @@ serve(async (req) => {
       client_reference_id: user?.id || undefined, // Critical for mapping payment to user
       metadata: {
         user_id: user?.id || "guest",
+        case_id: caseId || metadata?.case_id || null,
         plan_key: effectivePlanKey,
         product: effectiveProduct,
         source: metadata?.source || "unknown",
