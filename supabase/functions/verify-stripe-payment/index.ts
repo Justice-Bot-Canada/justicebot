@@ -58,10 +58,11 @@ serve(async (req) => {
       });
     }
 
-    // Validate the correct price for the $5.99 unlock
+    // Validate the correct price for unlocks
     const lineItems = await stripe.checkout.sessions.listLineItems(sessionId, { limit: 10 });
     const allowedPriceIds = new Set([
-      'price_1SYLdJL0pLShFbLttpxYfuas', // $5.99 unlock
+      'price_1SYLdJL0pLShFbLttpxYfuas', // $5.99 unlock (legacy)
+      'price_1SmUwAL0pLShFbLtIK429fdX', // $39 Court-Ready Document Pack
     ]);
     const matchedPrice = lineItems.data.some((li) => {
       const price = (li.price as Stripe.Price | null);

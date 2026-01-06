@@ -19,39 +19,39 @@ export const PricingTeaser = () => {
         <div className="max-w-3xl mx-auto text-center">
           <Badge variant="secondary" className="mb-4">
             <Zap className="w-3 h-3 mr-1" />
-            5-Day Free Trial
+            One-Time Purchase
           </Badge>
           
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Plans Starting at{' '}
-            <span className="text-primary">$19.99/month</span>
+            Court-Ready Document Pack{' '}
+            <span className="text-primary">$39</span>
           </h2>
           
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            Choose from Basic, Professional, or Premium plans. All include full access during your free trial.
+            Everything you need to file correctly — triage, evidence organization, tribunal forms, and filing instructions.
           </p>
 
           <div className="flex flex-wrap justify-center gap-4 mb-8 text-sm text-muted-foreground">
             <div className="flex items-center gap-1.5">
               <Check className="w-4 h-4 text-green-500" />
-              <span>No hidden fees</span>
+              <span>No subscription</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Check className="w-4 h-4 text-green-500" />
-              <span>Cancel anytime</span>
+              <span>No ongoing charges</span>
             </div>
             <div className="flex items-center gap-1.5">
               <Check className="w-4 h-4 text-green-500" />
-              <span>Card required for trial</span>
+              <span>Instant access</span>
             </div>
           </div>
 
           <Button 
             size="lg" 
-            onClick={() => navigate('/pricing')}
+            onClick={() => navigate('/triage')}
             className="gap-2"
           >
-            View All Plans
+            Get Started
             <ArrowRight className="w-4 h-4" />
           </Button>
         </div>

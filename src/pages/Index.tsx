@@ -4,13 +4,11 @@ import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 import ClinicWelcomeBanner from "@/components/ClinicWelcomeBanner";
-import { Suspense, lazy, useEffect, useState } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 
 // Lazy load below-the-fold components
 const TrustSignals = lazy(() => import("@/components/TrustSignals"));
@@ -25,7 +23,6 @@ const LoadingSection = () => (
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
 
   // Redirect authenticated users to dashboard
   useEffect(() => {
@@ -34,29 +31,8 @@ const Index = () => {
     }
   }, [user, loading, navigate]);
 
-  const handleEmergencyCheckout = async () => {
-    setIsCheckoutLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
-        body: {
-          priceId: 'price_1SYLdJL0pLShFbLttpxYfuas',
-          planKey: 'form_unlock',
-          mode: 'payment',
-          successUrl: `${window.location.origin}/unlock-success?session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${window.location.origin}/`,
-          metadata: { product: 'form_unlock', source: 'homepage_banner' }
-        }
-      });
-      if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url; // Same tab - no context loss
-      }
-    } catch (err) {
-      console.error('Checkout error:', err);
-      toast.error('Unable to start checkout. Please try again.');
-    } finally {
-      setIsCheckoutLoading(false);
-    }
+  const handleGetCourtReadyDocs = () => {
+    navigate('/triage');
   };
 
   const structuredData = {
@@ -112,7 +88,7 @@ const Index = () => {
       <ClinicWelcomeBanner />
       <Header />
       
-      {/* Emergency $5.99 Offer Banner - Above the fold */}
+      {/* Court-Ready Document Pack Banner - Above the fold */}
       <section className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-b-2 border-primary/30 py-6">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
@@ -120,17 +96,16 @@ const Index = () => {
               Need help filing or organizing documents TODAY?
             </h2>
             <p className="text-muted-foreground mb-4">
-              Unlock step-by-step guidance and document preparation help for a one-time <span className="font-semibold text-foreground">$5.99</span>.
+              Get your Court-Ready Document Pack for a one-time <span className="font-semibold text-foreground">$39</span>.
               <br />
-              <span className="text-sm">No legal advice. Immediate access.</span>
+              <span className="text-sm">One-time payment. No subscription. No ongoing charges.</span>
             </p>
             <Button
               size="lg"
-              onClick={handleEmergencyCheckout}
-              disabled={isCheckoutLoading}
+              onClick={handleGetCourtReadyDocs}
               className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-3 text-lg"
             >
-              {isCheckoutLoading ? 'Loading...' : 'Get Help Now – $5.99'}
+              Get Started — Free Triage First
             </Button>
             <p className="text-xs text-muted-foreground mt-3">
               This is legal information and document preparation support — not legal advice or representation.

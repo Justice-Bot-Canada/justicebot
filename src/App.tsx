@@ -122,6 +122,7 @@ const SubscriptionSuccess = lazy(() => import("./pages/SubscriptionSuccess"));
 const FeatureGuide = lazy(() => import("./pages/FeatureGuide"));
 const ProgramLanding = lazy(() => import("./pages/ProgramLanding"));
 const AdminProgramDashboard = lazy(() => import("./pages/AdminProgramDashboard"));
+const DocumentsUnlocked = lazy(() => import("./pages/DocumentsUnlocked"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -298,6 +299,7 @@ const AppContent = () => {
           <Route path="/court-information" element={<Navigate to="/court" replace />} />
           <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
           <Route path="/unlock-success" element={<UnlockSuccess />} />
+          <Route path="/documents-unlocked" element={<Suspense fallback={<LoadingFallback />}><DocumentsUnlocked /></Suspense>} />
           <Route path="/subscription-success" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SubscriptionSuccess /></Suspense></ProtectedRoute>} />
           <Route path="/payment-cancel" element={<ProtectedRoute><PaymentCancel /></ProtectedRoute>} />
           <Route path="/thank-you" element={<ThankYou />} />
