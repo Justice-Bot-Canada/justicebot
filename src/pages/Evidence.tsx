@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { BookOpen, ArrowRight, Upload } from "lucide-react";
+import { BookOpen, ArrowRight, Upload, FileText, Plus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { FlowHeader } from "@/components/FlowHeader";
 import { FlowProgressIndicator } from "@/components/FlowProgressIndicator";
@@ -16,6 +16,7 @@ import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
 import { EvidenceBundlePaywall } from "@/components/paywalls";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import { supabase } from "@/integrations/supabase/client";
+import { trackEvent } from "@/utils/analytics";
 
 const Evidence = () => {
   const navigate = useNavigate();
@@ -76,18 +77,31 @@ const Evidence = () => {
     setEvidenceCount(count || 0);
   };
 
-  // Handle continue to timeline
-  const handleContinueToTimeline = async () => {
+  // Handle generate documents
+  const handleGenerateDocuments = async () => {
     if (!caseId) return;
+    
+    trackEvent('generate_documents_clicked', { caseId, evidenceCount });
     
     // Update case flow step
     await supabase
       .from('cases')
-      .update({ flow_step: 'timeline', updated_at: new Date().toISOString() })
+      .update({ 
+        flow_step: 'generating_documents', 
+        updated_at: new Date().toISOString() 
+      })
       .eq('id', caseId);
 
-    navigate(`/case-timeline?caseId=${caseId}`);
+    // Navigate to smart documents for generation
+    navigate(`/smart-documents?case=${caseId}&generate=true`);
   };
+
+  // Track page view
+  useEffect(() => {
+    if (caseId) {
+      trackEvent('evidence_upload_started', { caseId });
+    }
+  }, [caseId]);
 
   if (!user) {
     navigate("/welcome");
@@ -191,11 +205,12 @@ const Evidence = () => {
                   </p>
                 </div>
                 <Button 
-                  onClick={handleContinueToTimeline}
+                  onClick={handleGenerateDocuments}
                   disabled={evidenceCount === 0}
                   size="lg"
                   className="gap-2 w-full sm:w-auto bg-slate-800 hover:bg-slate-900 text-white"
                 >
+                  <FileText className="h-4 w-4" />
                   Generate My Documents
                   <ArrowRight className="h-4 w-4" />
                 </Button>
