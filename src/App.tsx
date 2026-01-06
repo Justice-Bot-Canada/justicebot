@@ -19,6 +19,7 @@ import Privacy from "./pages/Privacy";
 import Liability from "./pages/Liability";
 import Terms from "./pages/Terms";
 import PaymentSuccess from "./pages/PaymentSuccess";
+import UnlockSuccess from "./pages/UnlockSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
 import ThankYou from "./pages/ThankYou";
 import NotFound from "./pages/NotFound";
@@ -289,6 +290,7 @@ const AppContent = () => {
           <Route path="/low-income-approval" element={<Navigate to="/low-income" replace />} />
           <Route path="/court-information" element={<Navigate to="/court" replace />} />
           <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
+          <Route path="/unlock-success" element={<UnlockSuccess />} />
           <Route path="/subscription-success" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SubscriptionSuccess /></Suspense></ProtectedRoute>} />
           <Route path="/payment-cancel" element={<ProtectedRoute><PaymentCancel /></ProtectedRoute>} />
           <Route path="/thank-you" element={<ThankYou />} />
