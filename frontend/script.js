@@ -187,7 +187,7 @@
 
   function renderPayPalButtons() {
     // global paypal from SDK
-    // eslint-disable-next-line no-undef
+     
     paypal.Buttons({
       async createOrder() {
         const r = await callApi('/payments/create-order', {
