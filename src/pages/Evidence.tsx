@@ -5,6 +5,7 @@ import { BookOpen, ArrowRight, Upload, FileText, Plus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { FlowHeader } from "@/components/FlowHeader";
 import { FlowProgressIndicator } from "@/components/FlowProgressIndicator";
+import { ProgramBanner, useShouldHidePricing } from "@/components/ProgramBanner";
 import SEOHead from "@/components/SEOHead";
 import { EvidenceHub } from "@/components/EvidenceHub";
 import { EvidenceAnalyzer } from "@/components/EvidenceAnalyzer";
@@ -24,6 +25,7 @@ const Evidence = () => {
   const { user } = useAuth();
   const { hasAccess, isFreeUser, tier } = usePremiumAccess();
   const { program, isProgramMode } = useProgram();
+  const shouldHidePricing = useShouldHidePricing();
   const [searchParams] = useSearchParams();
   const caseId = searchParams.get('case') || searchParams.get('caseId'); // Support both params
   const [caseData, setCaseData] = useState<any>(null);
@@ -33,8 +35,9 @@ const Evidence = () => {
 
   const isPremium = hasAccess && (tier === 'monthly' || tier === 'yearly');
 
+  // Program users bypass paywall
   const handleBookClick = () => {
-    if (!isPremium && !isFreeUser) {
+    if (!isPremium && !isFreeUser && !shouldHidePricing) {
       setShowBundlePaywall(true);
       return;
     }
@@ -134,6 +137,7 @@ const Evidence = () => {
         canonicalUrl="https://justice-bot.com/evidence"
       />
       <FlowHeader currentStep="evidence" caseTitle={caseData?.title} />
+      <ProgramBanner />
       <main className="flex-1 container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Progress indicator */}

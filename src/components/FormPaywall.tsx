@@ -6,6 +6,7 @@ import { Check, Lock, Zap, Clock, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
+import { useShouldHidePricing } from "@/components/ProgramBanner";
 import PayPalTrialButton from "@/components/PayPalTrialButton";
 import { analytics } from "@/utils/analytics";
 
@@ -29,6 +30,7 @@ export default function FormPaywall({
   const [hasPurchased, setHasPurchased] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
   const { hasAccess, isPremium } = usePremiumAccess();
+  const shouldHidePricing = useShouldHidePricing();
   const paywallViewFired = useRef(false);
 
   // Check if user has purchased this specific form
@@ -123,7 +125,8 @@ export default function FormPaywall({
     );
   }
 
-  if (isPremium || hasAccess || hasPurchased) {
+  // Program users, premium users, or users who purchased this form get access
+  if (isPremium || hasAccess || hasPurchased || shouldHidePricing) {
     return <>{children}</>;
   }
   // PayPal plan IDs
