@@ -7,13 +7,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Stripe Price IDs - these must be created in Stripe Dashboard
-const STRIPE_PRICES = {
-  basic: "price_basic_monthly", // Replace with actual Stripe price ID
-  professional: "price_professional_monthly", // Replace with actual Stripe price ID  
-  premium: "price_premium_monthly", // Replace with actual Stripe price ID
-};
-
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CREATE-STRIPE-CHECKOUT] ${step}${detailsStr}`);
@@ -36,9 +29,17 @@ serve(async (req) => {
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
     logStep("Stripe key verified");
 
-    // Get request body
-    const { priceId, planKey, trialDays = 5 } = await req.json();
-    logStep("Request body", { priceId, planKey, trialDays });
+    // Get request body - support both subscriptions and one-time payments
+    const { 
+      priceId, 
+      planKey, 
+      trialDays = 5,
+      mode = 'subscription', // 'subscription' or 'payment'
+      successUrl,
+      cancelUrl,
+      metadata = {}
+    } = await req.json();
+    logStep("Request body", { priceId, planKey, trialDays, mode });
 
     // Get user from auth header (optional - support guest checkout)
     const authHeader = req.headers.get("Authorization");
@@ -68,8 +69,10 @@ serve(async (req) => {
     }
 
     const origin = req.headers.get("origin") || "https://justice-bot.com";
+    const finalSuccessUrl = successUrl || `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
+    const finalCancelUrl = cancelUrl || `${origin}/pricing`;
 
-    // Create checkout session with trial
+    // Build session params based on mode
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       line_items: [
         {
@@ -77,21 +80,26 @@ serve(async (req) => {
           quantity: 1,
         },
       ],
-      mode: "subscription",
-      success_url: `${origin}/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/pricing`,
-      subscription_data: {
+      mode: mode as 'subscription' | 'payment',
+      success_url: finalSuccessUrl,
+      cancel_url: finalCancelUrl,
+      metadata: {
+        user_id: user?.id || "guest",
+        plan_key: planKey || "unknown",
+        ...metadata
+      },
+    };
+
+    // Add subscription-specific options
+    if (mode === 'subscription') {
+      sessionParams.subscription_data = {
         trial_period_days: trialDays,
         metadata: {
           plan_key: planKey || "unknown",
           user_id: user?.id || "guest",
         },
-      },
-      metadata: {
-        user_id: user?.id || "guest",
-        plan_key: planKey || "unknown",
-      },
-    };
+      };
+    }
 
     // Add customer info
     if (customerId) {
@@ -101,7 +109,7 @@ serve(async (req) => {
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
-    logStep("Checkout session created", { sessionId: session.id, url: session.url });
+    logStep("Checkout session created", { sessionId: session.id, url: session.url, mode });
 
     return new Response(JSON.stringify({ url: session.url, sessionId: session.id }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
