@@ -41,14 +41,14 @@ const Index = () => {
         body: {
           priceId: 'price_1SYLdJL0pLShFbLttpxYfuas',
           mode: 'payment',
-          successUrl: `${window.location.origin}/payment-success?type=form_unlock`,
+          successUrl: `${window.location.origin}/unlock-success`,
           cancelUrl: `${window.location.origin}/`,
           metadata: { product: 'emergency_form_unlock', source: 'homepage_banner' }
         }
       });
       if (error) throw error;
       if (data?.url) {
-        window.open(data.url, '_blank');
+        window.location.href = data.url; // Same tab - no context loss
       }
     } catch (err) {
       console.error('Checkout error:', err);
