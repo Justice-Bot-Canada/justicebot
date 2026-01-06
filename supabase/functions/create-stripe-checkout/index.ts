@@ -83,9 +83,12 @@ serve(async (req) => {
       mode: mode as 'subscription' | 'payment',
       success_url: finalSuccessUrl,
       cancel_url: finalCancelUrl,
+      client_reference_id: user?.id || undefined, // Critical for mapping payment to user
       metadata: {
         user_id: user?.id || "guest",
         plan_key: planKey || "unknown",
+        product: metadata?.product || planKey || "unknown",
+        source: metadata?.source || "unknown",
         ...metadata
       },
     };
