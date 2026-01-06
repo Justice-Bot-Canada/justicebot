@@ -60,7 +60,6 @@ export function CourtReadyPaywall({ triageData, onAccessGranted }: CourtReadyPay
     }
   }, [accessLoading, hasAccess, isProgramUser, shouldHidePricing, onAccessGranted]);
 
-  // If user has access (paid or program), skip paywall
   if (accessLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -117,123 +116,122 @@ export function CourtReadyPaywall({ triageData, onAccessGranted }: CourtReadyPay
   };
 
   const benefits = [
-    {
-      icon: ClipboardList,
-      title: 'Guided Legal Triage',
-      description: 'AI identifies your legal pathway and required forms',
-    },
-    {
-      icon: Upload,
-      title: 'Evidence Upload & Organization',
-      description: 'Securely store and organize all your documents',
-    },
-    {
-      icon: BookOpen,
-      title: 'Auto-Organized Book of Documents',
-      description: 'Tribunal-ready document bundle with proper formatting',
-    },
-    {
-      icon: FileCheck,
-      title: 'Form Generation',
-      description: 'Pre-filled court and tribunal forms ready for filing',
-    },
-    {
-      icon: MapPin,
-      title: 'Step-by-Step Filing Instructions',
-      description: 'Exactly where, when, and how to file your documents',
-    },
+    'Guided legal triage based on your situation',
+    'Secure evidence upload and organization',
+    'Automatically formatted Book of Documents',
+    'Correct tribunal or court forms selected for you',
+    'Step-by-step filing instructions',
   ];
 
   return (
     <>
-      <Card className="max-w-2xl mx-auto border-primary/30 shadow-lg">
-        <CardHeader className="text-center pb-4">
-          <Badge className="w-fit mx-auto mb-3 bg-primary/10 text-primary border-primary/20">
-            One-Time Purchase
-          </Badge>
-          <CardTitle className="text-2xl md:text-3xl">
-            Court-Ready Document Pack
-          </CardTitle>
-          <CardDescription className="text-base">
-            Everything you need to file correctly — prepared and organized for submission
-          </CardDescription>
-        </CardHeader>
+      <div className="max-w-xl mx-auto px-4 py-8">
+        {/* Page Title */}
+        <h1 className="text-2xl md:text-3xl font-bold text-center text-foreground mb-3">
+          Prepare Your Court-Ready Documents
+        </h1>
+        
+        {/* Subheading */}
+        <p className="text-center text-muted-foreground mb-8">
+          You're almost finished. To generate your filing-ready documents, complete the one-time payment below.
+        </p>
 
-        <CardContent className="space-y-6">
-          {/* Benefits list */}
-          <div className="space-y-4">
-            {benefits.map((benefit, index) => (
-              <div key={index} className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <benefit.icon className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <h4 className="font-medium">{benefit.title}</h4>
-                  <p className="text-sm text-muted-foreground">{benefit.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <Separator />
-
-          {/* Pricing */}
-          <div className="text-center space-y-2">
-            <div className="flex items-baseline justify-center gap-2">
-              <span className="text-4xl font-bold">$39</span>
-              <span className="text-muted-foreground">CAD</span>
+        <Card className="border-border shadow-sm">
+          <CardContent className="pt-6 space-y-6">
+            {/* What You Get */}
+            <div className="space-y-3">
+              <h3 className="font-semibold text-foreground">What You Get</h3>
+              <ul className="space-y-2">
+                {benefits.map((benefit, index) => (
+                  <li key={index} className="flex items-start gap-2">
+                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-foreground">{benefit}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <p className="text-sm text-muted-foreground font-medium">
-              One-time payment. No subscription. No ongoing charges.
+
+            <Separator />
+
+            {/* Divider Text */}
+            <p className="text-sm text-muted-foreground text-center">
+              This prepares your documents for submission.<br />
+              It does not provide legal advice or representation.
             </p>
-          </div>
 
-          {/* CTA Button */}
-          <Button
-            onClick={handlePurchase}
-            disabled={isProcessing}
-            size="lg"
-            className="w-full text-lg py-6"
-          >
-            {isProcessing ? (
-              <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              <>
-                <FileCheck className="mr-2 h-5 w-5" />
-                Generate My Court-Ready Documents
-              </>
-            )}
-          </Button>
+            <Separator />
 
-          {/* Trust signals */}
-          <div className="flex flex-wrap justify-center gap-4 text-xs text-muted-foreground pt-2">
-            <div className="flex items-center gap-1.5">
-              <Shield className="h-4 w-4 text-green-600" />
-              <span>Secure payment</span>
+            {/* Price Block */}
+            <div className="text-center space-y-1">
+              <p className="text-sm text-muted-foreground font-medium">One-Time Payment</p>
+              <p className="text-4xl font-bold text-foreground">$39</p>
+              <p className="text-sm text-muted-foreground">
+                No subscriptions. No recurring charges.
+              </p>
             </div>
-            <div className="flex items-center gap-1.5">
-              <CreditCard className="h-4 w-4 text-green-600" />
-              <span>Stripe protected</span>
+
+            {/* CTA Button */}
+            <Button
+              onClick={handlePurchase}
+              disabled={isProcessing}
+              size="lg"
+              className="w-full text-base py-6 bg-slate-800 hover:bg-slate-900 text-white"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                'Generate My Court-Ready Documents'
+              )}
+            </Button>
+
+            {/* Under-Button Assurance */}
+            <p className="text-xs text-muted-foreground text-center">
+              Your payment unlocks document generation for this case only.
+            </p>
+
+            {/* Optional Micro-Copy */}
+            <p className="text-xs text-muted-foreground text-center">
+              Most users complete their documents in under 30 minutes.
+            </p>
+
+            <Separator />
+
+            {/* Trust & Reassurance */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Shield className="h-4 w-4 text-green-600" />
+                <span>Your information is private and secure</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <FileCheck className="h-4 w-4 text-green-600" />
+                <span>Documents are generated specifically for your case</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <ClipboardList className="h-4 w-4 text-green-600" />
+                <span>You keep full control over what you file and when</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <span>Instant access</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+
+            <Separator />
+
+            {/* Legal Clarity Footer */}
+            <p className="text-xs text-muted-foreground text-center">
+              Justice-Bot helps you prepare documents and understand procedure.<br />
+              It does not provide legal advice or replace a lawyer.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
       <AuthDialog
         open={showAuthDialog}
         onOpenChange={(open) => {
           setShowAuthDialog(open);
-          // After dialog closes and user is now authenticated, try purchase
           if (!open) {
             setTimeout(() => {
-              // Re-check auth state after dialog closes
               handlePurchase();
             }, 500);
           }
