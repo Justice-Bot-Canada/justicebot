@@ -25,19 +25,20 @@ const StripeTrialButton = ({ priceId, planKey, trialDays = 5 }: StripeTrialButto
       trackEvent('stripe_trial_started', { plan_key: planKey, trial_days: trialDays });
 
       const { data, error } = await supabase.functions.invoke("create-stripe-checkout", {
-        body: { priceId, planKey, trialDays },
+        body: { 
+          priceId, 
+          planKey, 
+          trialDays,
+          successUrl: `${window.location.origin}/subscription-success`,
+          cancelUrl: window.location.href
+        },
       });
 
       if (error) throw error;
 
       if (data?.url) {
-        // Open Stripe checkout in new tab
-        window.open(data.url, "_blank");
-        
-        toast({
-          title: "Checkout opened",
-          description: "Complete your free trial signup in the new window.",
-        });
+        // Same tab for continuity
+        window.location.href = data.url;
       } else {
         throw new Error("No checkout URL returned");
       }

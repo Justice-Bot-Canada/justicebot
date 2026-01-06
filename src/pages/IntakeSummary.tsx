@@ -109,7 +109,7 @@ export default function IntakeSummary() {
         body: {
           priceId: 'price_1SYLdJL0pLShFbLttpxYfuas', // $5.99 Legal Form - One-Time Purchase
           mode: 'payment',
-          successUrl: `${window.location.origin}/payment-success?type=intake`,
+          successUrl: `${window.location.origin}/unlock-success`,
           cancelUrl: `${window.location.origin}/intake/summary`,
           metadata: {
             issueType: intakeData.issueType,
