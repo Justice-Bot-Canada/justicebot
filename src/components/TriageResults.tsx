@@ -135,19 +135,11 @@ const TriageResults: React.FC<TriageResultsProps> = ({
             </div>
           )}
 
-          {/* Risk Warning */}
-          <div className="p-4 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="font-semibold text-amber-700 dark:text-amber-300">
-                  Most people lose here because evidence is rejected or misfiled.
-                </p>
-                <p className="text-sm text-amber-600 dark:text-amber-400 mt-1">
-                  Proper preparation makes the difference between winning and losing.
-                </p>
-              </div>
-            </div>
+          {/* Informational Note */}
+          <div className="p-4 rounded-lg border border-muted bg-muted/30">
+            <p className="text-sm text-muted-foreground">
+              This is informational, not legal advice. We help you understand the process.
+            </p>
           </div>
 
           {/* Urgent Deadlines */}
@@ -171,13 +163,13 @@ const TriageResults: React.FC<TriageResultsProps> = ({
         </CardContent>
       </Card>
 
-      {/* Primary CTA */}
+      {/* Primary CTA - Save & Continue */}
       <Card className="border-2 border-primary bg-gradient-to-r from-primary/5 to-primary/10">
         <CardContent className="pt-6 pb-6">
           <div className="text-center space-y-4">
-            <h3 className="text-xl font-bold">Get Your Court-Ready Documents</h3>
+            <h3 className="text-xl font-bold">Save my case & continue</h3>
             <p className="text-muted-foreground">
-              Upload your evidence, organize your case, and get filing-ready tribunal forms.
+              You can come back anytime. Nothing is filed without you.
             </p>
             <Button onClick={onProceed} size="lg" className="gap-2" disabled={isLoading}>
               {isLoading ? (
@@ -187,13 +179,13 @@ const TriageResults: React.FC<TriageResultsProps> = ({
                 </>
               ) : (
                 <>
-                  Generate My Court-Ready Documents
+                  Save & continue
                   <ArrowRight className="h-5 w-5" />
                 </>
               )}
             </Button>
             <p className="text-xs text-muted-foreground">
-              One-time payment. No subscription.
+              ✓ Come back anytime • ✓ No payment yet • ✓ Nothing shared
             </p>
           </div>
         </CardContent>

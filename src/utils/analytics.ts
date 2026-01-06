@@ -92,6 +92,96 @@ const createItem = (planKey: string, planName: string, price: number) => ({
 // Predefined tracking functions
 export const analytics = {
   // ==========================================
+  // MINIMUM VIABLE CONVERSION FUNNEL EVENTS
+  // These 10 events are NON-NEGOTIABLE for scaling
+  // ==========================================
+
+  // Step 0: landing_view - anonymous visitor arrives
+  landingView: () => {
+    sendGA4Event('landing_view', {
+      landing_page: window.location.pathname,
+    });
+  },
+
+  // Step 1: triage_started - user begins answering questions
+  triageStarted: (province?: string) => {
+    sendGA4Event('triage_started', {
+      province: province || 'unknown',
+    });
+  },
+
+  // Step 1: triage_completed - user finishes all questions
+  triageCompletedEvent: (venue: string, province: string) => {
+    sendGA4Event('triage_completed', {
+      venue,
+      province,
+    });
+  },
+
+  // Step 2: case_snapshot_shown - user sees their situation summary
+  caseSnapshotShown: (venue: string, confidence: number) => {
+    sendGA4Event('case_snapshot_shown', {
+      venue,
+      confidence,
+    });
+  },
+
+  // Step 3: signup_completed - user creates account
+  signupCompletedEvent: (method: string) => {
+    sendGA4Event('signup_completed', {
+      method,
+    });
+  },
+
+  // Step 4: dashboard_view - logged in user sees their dashboard
+  dashboardView: (caseId?: string, progressPercent?: number) => {
+    sendGA4Event('dashboard_view', {
+      case_id: caseId || 'none',
+      progress_percent: progressPercent || 0,
+    });
+  },
+
+  // Step 5: evidence_uploaded - user uploads at least one file
+  evidenceUploaded: (fileCount: number, caseId?: string) => {
+    sendGA4Event('evidence_uploaded', {
+      file_count: fileCount,
+      case_id: caseId || 'unknown',
+    });
+  },
+
+  // Step 6: paywall_viewed - user sees the paywall
+  paywallViewed: (venue?: string, progressPercent?: number) => {
+    sendGA4Event('paywall_viewed', {
+      venue: venue || 'unknown',
+      progress_percent: progressPercent || 0,
+    });
+  },
+
+  // Step 6: payment_completed - user successfully pays
+  paymentCompletedEvent: (transactionId: string, value: number) => {
+    sendGA4Event('payment_completed', {
+      transaction_id: transactionId,
+      value,
+      currency: 'CAD',
+    });
+  },
+
+  // Step 7: features_unlocked - user gets access after payment
+  featuresUnlocked: (caseId?: string) => {
+    sendGA4Event('features_unlocked', {
+      case_id: caseId || 'unknown',
+    });
+  },
+
+  // Step 8: case_resumed - returning user continues their case
+  caseResumed: (caseId: string, lastActivity?: string) => {
+    sendGA4Event('case_resumed', {
+      case_id: caseId,
+      last_activity: lastActivity || 'unknown',
+    });
+  },
+
+  // ==========================================
   // GA4 FUNNEL EVENTS (Required for Purchase Funnels)
   // ==========================================
 

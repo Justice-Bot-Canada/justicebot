@@ -55,6 +55,12 @@ const PaymentSuccess = () => {
           if (!purchaseEventFired.current) {
             purchaseEventFired.current = true;
             const value = parseFloat(amount) || 5.99;
+            
+            // New funnel events
+            analytics.paymentCompletedEvent(token || crypto.randomUUID(), value);
+            analytics.featuresUnlocked(formIdParam || undefined);
+            
+            // Legacy GA4 purchase event
             analytics.funnelPurchase({
               transactionId: token || crypto.randomUUID(),
               value,

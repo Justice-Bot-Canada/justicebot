@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { 
   CheckCircle,
   Circle,
@@ -20,7 +21,8 @@ import {
   User,
   Settings,
   HelpCircle,
-  History
+  History,
+  Lock
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
@@ -32,6 +34,7 @@ import { ProgramBanner } from "@/components/ProgramBanner";
 import { ResumeCaseCard } from "@/components/ResumeCaseCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { analytics } from "@/utils/analytics";
 import {
   Collapsible,
   CollapsibleContent,
@@ -87,6 +90,45 @@ const Dashboard = () => {
     timelineViewed: activeCase?.timeline_viewed ?? false,
     meritScoreStatus: activeCase?.merit_score_status ?? null,
   });
+
+  // Calculate progress percentage for funnel tracking
+  const progressPercent = useMemo(() => {
+    if (!activeCase) return 0;
+    
+    let progress = 20; // Case created = 20%
+    
+    if (evidenceStats.total > 0) {
+      progress += 20; // Evidence uploaded = +20% (40% total)
+    }
+    
+    if (activeCase.timeline_viewed) {
+      progress += 15; // Timeline viewed = +15% (55% total)
+    }
+    
+    if (activeCase.merit_score) {
+      progress += 10; // Merit score = +10% (65% total)
+    }
+    
+    if (hasAccess) {
+      progress += 20; // Paid = +20% (85% total)
+    }
+    
+    // Documents generated would be 100% but we don't track that here
+    return Math.min(progress, 100);
+  }, [activeCase, evidenceStats.total, hasAccess]);
+
+  // Track dashboard view
+  useEffect(() => {
+    if (!loading && user) {
+      analytics.dashboardView(activeCase?.id, progressPercent);
+      
+      // Track case resumed if returning user with existing case
+      if (activeCase && cases.length > 0) {
+        const lastActivity = activeCase.flow_step || 'case_created';
+        analytics.caseResumed(activeCase.id, lastActivity);
+      }
+    }
+  }, [loading, user, activeCase?.id, progressPercent]);
 
   // Load user's cases and entitlements
   useEffect(() => {
@@ -216,6 +258,88 @@ const Dashboard = () => {
       <ProgramBanner />
       
       <main className="flex-1 container mx-auto px-4 py-6 max-w-3xl">
+        {/* Your case is saved header */}
+        {activeCase && (
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold mb-2">Your case is saved</h1>
+            <p className="text-muted-foreground text-sm">
+              {activeCase.venue || activeCase.province} • Last updated {new Date(activeCase.created_at).toLocaleDateString()}
+            </p>
+          </div>
+        )}
+
+        {/* Progress indicator with percentage */}
+        {activeCase && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium">You're {progressPercent}% prepared</span>
+              <span className="text-xs text-muted-foreground">{progressPercent < 100 ? 'Keep going!' : 'Ready to file'}</span>
+            </div>
+            <Progress value={progressPercent} className="h-2" />
+          </div>
+        )}
+
+        {/* Checklist */}
+        {activeCase && (
+          <Card className="mb-6">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Preparation Checklist</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {/* Upload evidence */}
+              <div className="flex items-center gap-3">
+                {evidenceStats.total > 0 ? (
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                ) : (
+                  <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                )}
+                <span className={evidenceStats.total > 0 ? 'text-foreground' : 'text-muted-foreground'}>
+                  Upload evidence
+                </span>
+                {evidenceStats.total > 0 && (
+                  <Badge variant="outline" className="ml-auto">{evidenceStats.total} files</Badge>
+                )}
+              </div>
+              
+              {/* Review timeline */}
+              <div className="flex items-center gap-3">
+                {activeCase.timeline_viewed ? (
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                ) : (
+                  <Circle className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                )}
+                <span className={activeCase.timeline_viewed ? 'text-foreground' : 'text-muted-foreground'}>
+                  Review timeline
+                </span>
+              </div>
+              
+              {/* Generate forms (locked) */}
+              <div className="flex items-center gap-3">
+                {hasAccess ? (
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                ) : (
+                  <Lock className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                )}
+                <span className={hasAccess ? 'text-foreground' : 'text-muted-foreground'}>
+                  Generate forms {!hasAccess && <span className="text-xs">(locked)</span>}
+                </span>
+              </div>
+              
+              {/* Prepare for filing (locked) */}
+              <div className="flex items-center gap-3">
+                {hasAccess ? (
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                ) : (
+                  <Lock className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                )}
+                <span className={hasAccess ? 'text-foreground' : 'text-muted-foreground'}>
+                  Export Book of Documents {!hasAccess && <span className="text-xs">(locked)</span>}
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Free user badge */}
         {isFreeUser && userNumber && (
           <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 inline-flex items-center gap-2">

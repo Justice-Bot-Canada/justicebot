@@ -185,7 +185,8 @@ const SmartTriageForm: React.FC<SmartTriageFormProps> = ({
       return;
     }
 
-    // Track triage form submission
+    // Track triage started
+    analytics.triageStarted(province);
     analytics.triageStart();
     trackEvent("triage_submit", { province, description_length: description.length });
 
