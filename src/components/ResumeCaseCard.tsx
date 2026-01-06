@@ -19,7 +19,6 @@ const getStatusInfo = (flowStep: string | null, evidenceCount: number): {
   ctaRoute: string;
   icon: React.ReactNode;
 } => {
-  // Map flow_step to our simplified states
   const step = flowStep?.toLowerCase() || '';
   
   if (step === 'documents_ready' || step === 'complete') {
@@ -27,7 +26,7 @@ const getStatusInfo = (flowStep: string | null, evidenceCount: number): {
       statusLine: 'Documents ready to download',
       ctaText: 'Download My Documents',
       ctaRoute: 'documents-ready',
-      icon: <FileText className="h-5 w-5" />
+      icon: <FileText className="h-5 w-5 text-green-600" />
     };
   }
   
@@ -49,7 +48,6 @@ const getStatusInfo = (flowStep: string | null, evidenceCount: number): {
     };
   }
   
-  // Default: just unlocked, needs evidence
   return {
     statusLine: 'Evidence upload in progress',
     ctaText: 'Continue Uploading Evidence',
