@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Scale, FileText, CheckCircle, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Loader2, Scale, FileText, CheckCircle, AlertTriangle, ShieldCheck, Upload } from 'lucide-react';
 import AuthDialog from '@/components/AuthDialog';
 import { toast } from 'sonner';
+import { trackEvent } from '@/utils/analytics';
 
 export default function ProgramLanding() {
   const { slug } = useParams<{ slug: string }>();
@@ -24,12 +25,17 @@ export default function ProgramLanding() {
   const referralSource = searchParams.get('ref') || searchParams.get('source') || slug;
   const cohortBatch = searchParams.get('cohort') || program?.cohort_batch;
 
-  // Once program is loaded, set it in context
+  // Once program is loaded, set it in context and track view
   useEffect(() => {
     if (program) {
       setProgram(program);
+      trackEvent('program_landing_viewed', {
+        program_id: program.id,
+        program_slug: slug,
+        organization: program.organization,
+      });
     }
-  }, [program, setProgram]);
+  }, [program, setProgram, slug]);
 
   const handleStartCase = async () => {
     if (!user) {
@@ -40,6 +46,12 @@ export default function ProgramLanding() {
     if (!program) return;
 
     setIsProcessing(true);
+    
+    trackEvent('program_intake_started', {
+      program_id: program.id,
+      program_slug: slug,
+    });
+
     try {
       // Increment referral count
       await supabase.rpc('increment_program_referral', { p_program_id: program.id });
@@ -124,11 +136,11 @@ export default function ProgramLanding() {
             {program.organization || 'Partner Program'}
           </Badge>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            {program.name}
+            You've been referred by {program.organization || program.name}
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            {program.description || 
-              'A practical tool for people navigating legal processes alone — without replacing legal advice.'}
+            This tool helps you organize evidence and prepare court-ready documents.<br />
+            <strong>No payment is required.</strong>
           </p>
         </div>
 
@@ -137,10 +149,10 @@ export default function ProgramLanding() {
           <CardHeader className="text-center">
             <CardTitle className="flex items-center justify-center gap-2">
               <Scale className="h-5 w-5 text-primary" />
-              Get Started with Your Case
+              Get Started
             </CardTitle>
             <CardDescription>
-              No account is required to start. You'll answer a short triage to understand your options.
+              Answer a short triage to understand your legal options and get started.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -148,22 +160,22 @@ export default function ProgramLanding() {
               <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
                 <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-sm">Answer a short triage</p>
-                  <p className="text-xs text-muted-foreground">Understand your legal situation</p>
+                  <p className="font-medium text-sm">Complete a short triage</p>
+                  <p className="text-xs text-muted-foreground">5–10 minutes</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
+                <Upload className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium text-sm">Upload your evidence</p>
+                  <p className="text-xs text-muted-foreground">Documents, photos, messages</p>
                 </div>
               </div>
               <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
                 <FileText className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-sm">Get process orientation</p>
-                  <p className="text-xs text-muted-foreground">Know the correct forms & steps</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
-                <Scale className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-sm">Prepare documents</p>
-                  <p className="text-xs text-muted-foreground">Organize evidence & filings</p>
+                  <p className="font-medium text-sm">Get court-ready documents</p>
+                  <p className="text-xs text-muted-foreground">Forms + filing instructions</p>
                 </div>
               </div>
             </div>
@@ -180,10 +192,8 @@ export default function ProgramLanding() {
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Creating your case...
                   </>
-                ) : user ? (
-                  'Start Your Case'
                 ) : (
-                  'Sign Up to Start'
+                  'Start My Case'
                 )}
               </Button>
             </div>

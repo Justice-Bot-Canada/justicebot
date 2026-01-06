@@ -24,6 +24,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, BookOpen, FileCheck, ArrowRight, ArrowLeft, UserPlus, Shield, Sparkles, CheckCircle, Info } from "lucide-react";
 import { analytics, trackEvent } from "@/utils/analytics";
 import { useProgramCaseFields } from "@/hooks/useProgramCaseFields";
+import { useProgram } from "@/contexts/ProgramContext";
 
 interface FormRecommendation {
   formCode: string;
@@ -51,6 +52,7 @@ const Triage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const programCaseFields = useProgramCaseFields();
+  const { program, isProgramMode } = useProgram();
   const { hasAccess, isProgramUser, loading: accessLoading } = usePremiumAccess();
   const shouldHidePricing = useShouldHidePricing();
   const [step, setStep] = useState(0);
@@ -92,6 +94,11 @@ const Triage = () => {
       province: prov,
       evidenceCount: evidenceCount || 0
     });
+    
+    // Track program-specific intake completion
+    if (isProgramMode && program) {
+      analytics.programIntakeCompleted(program.id, result.venue);
+    }
     
     // Show discount modal after triage (only once per session) - but not if they have evidence ready
     const hasEvidenceReady = result.flags?.includes('evidence-ready') || result.flags?.includes('book-of-documents-recommended');
