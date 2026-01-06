@@ -34,7 +34,7 @@ serve(async (req) => {
 async function handleA2AJRequest(queryType: string, params: any) {
   try {
     let endpoint = '';
-    let queryParams = new URLSearchParams();
+    const queryParams = new URLSearchParams();
 
     switch (queryType) {
       case 'search_cases':
@@ -122,7 +122,7 @@ async function handleCanLIIRequest(queryType: string, params: any) {
     }
 
     let endpoint = '';
-    let queryParams = new URLSearchParams();
+    const queryParams = new URLSearchParams();
 
     switch (queryType) {
       case 'search_cases':
