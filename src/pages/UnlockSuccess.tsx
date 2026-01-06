@@ -26,9 +26,8 @@ const UnlockSuccess = () => {
       verificationAttempted.current = true;
 
       if (!sessionId) {
-        // No session ID - might be a direct visit or browser back
         setVerifying(false);
-        setVerified(true); // Assume success if no session to verify
+        setError('Missing session ID. Please use the link from your Stripe receipt or contact support.');
         return;
       }
 
@@ -41,7 +40,6 @@ const UnlockSuccess = () => {
 
         if (data?.success) {
           setVerified(true);
-          // Fire purchase analytics
           analytics.funnelPurchase({
             transactionId: sessionId,
             value: 5.99,
@@ -52,8 +50,7 @@ const UnlockSuccess = () => {
         }
       } catch (err) {
         console.error('Verification error:', err);
-        // Still show success - payment likely went through
-        setVerified(true);
+        setError('We could not confirm your payment yet. If you were charged, email support@justice-bot.com with your receipt.');
       } finally {
         setVerifying(false);
       }

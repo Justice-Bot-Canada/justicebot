@@ -28,7 +28,8 @@ serve(async (req) => {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
 
-    const { sessionId } = await req.json();
+    const body = await req.json().catch(() => ({}));
+    const sessionId = body?.sessionId || body?.session_id;
     if (!sessionId) throw new Error("Missing sessionId");
     logStep("Verifying session", { sessionId });
 
@@ -38,6 +39,8 @@ serve(async (req) => {
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ['payment_intent', 'customer']
     });
+
+    // Validate the paid status early
     logStep("Session retrieved", { 
       status: session.payment_status, 
       mode: session.mode,
@@ -55,10 +58,31 @@ serve(async (req) => {
       });
     }
 
+    // Validate the correct price for the $5.99 unlock
+    const lineItems = await stripe.checkout.sessions.listLineItems(sessionId, { limit: 10 });
+    const allowedPriceIds = new Set([
+      'price_1SYLdJL0pLShFbLttpxYfuas', // $5.99 unlock
+    ]);
+    const matchedPrice = lineItems.data.some((li) => {
+      const price = (li.price as Stripe.Price | null);
+      return !!price?.id && allowedPriceIds.has(price.id);
+    });
+
+    if (!matchedPrice) {
+      logStep('Price mismatch', { lineItems: lineItems.data.map(li => ({ price: (li.price as any)?.id, description: li.description })) });
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Incorrect product purchased'
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
     // Get user_id from session metadata or find by email
     let userId = session.metadata?.user_id;
     const customerEmail = session.customer_details?.email;
-    
+
     if (userId === 'guest' && customerEmail) {
       // Try to find user by email
       const { data: authUser } = await supabaseAdmin.auth.admin.listUsers();
@@ -71,7 +95,8 @@ serve(async (req) => {
 
     // Determine product from metadata
     const product = session.metadata?.product || 'form_unlock';
-    const planKey = session.metadata?.plan_key || product;
+    const rawPlanKey = session.metadata?.plan_key;
+    const planKey = (!rawPlanKey || rawPlanKey === 'unknown') ? product : rawPlanKey;
     
     // Check if entitlement already exists (idempotency)
     if (userId && userId !== 'guest') {
