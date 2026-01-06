@@ -15,19 +15,19 @@ export const KlaviyoTracking = () => {
   useEffect(() => {
     // Initialize Klaviyo object on page load (official script)
     if (!window.klaviyo) {
-      window._klOnsite = window._klOnsite || [];
+      window._klOnsite = window._klOnsite ?? [];
       try {
         window.klaviyo = new Proxy({}, {
-          get: function(_target: any, prop: string | symbol) {
+          get: function(_target: unknown, prop: string | symbol) {
             return "push" === prop 
-              ? function(...args: any[]) {
-                  window._klOnsite.push.apply(window._klOnsite, args);
+              ? function(...args: unknown[]) {
+                  window._klOnsite.push(...args);
                 }
-              : function(...args: any[]) {
-                  const callback = "function" == typeof args[args.length - 1] ? args.pop() : undefined;
+              : function(...args: unknown[]) {
+                  const callback = "function" == typeof args[args.length - 1] ? args.pop() as ((result: unknown) => void) : undefined;
                   const promise = new Promise((resolve) => {
-                    window._klOnsite.push([prop, ...args, function(result: any) {
-                      callback && callback(result);
+                    window._klOnsite.push([prop, ...args, function(result: unknown) {
+                      if (callback) { callback(result); }
                       resolve(result);
                     }]);
                   });
@@ -36,15 +36,15 @@ export const KlaviyoTracking = () => {
           }
         });
       } catch (_e) {
-        window.klaviyo = window.klaviyo || [];
-        window.klaviyo.push = function(...args: any[]) {
-          window._klOnsite.push.apply(window._klOnsite, args);
+        window.klaviyo = window.klaviyo ?? [];
+        window.klaviyo.push = function(...args: unknown[]) {
+          window._klOnsite.push(...args);
         };
       }
     }
 
     // Initialize legacy _learnq for backwards compatibility
-    window._learnq = window._learnq || [];
+    window._learnq = window._learnq ?? [];
 
     // Load Klaviyo script
     const script = document.createElement('script');
