@@ -1,16 +1,45 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight, Play, Zap } from "lucide-react";
 import { trackEvent, analytics } from "@/utils/analytics";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
 
   const handleStart = () => {
     trackEvent('funnel_start', { location: 'hero' });
     // Fire GA4 funnel_start event for purchase funnel
     analytics.funnelStart(window.location.pathname);
     navigate('/funnel');
+  };
+
+  const handlePaidHelp = async () => {
+    setIsCheckoutLoading(true);
+    trackEvent('cta_click', { button: 'paid_help_599', location: 'hero' });
+    try {
+      const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
+        body: {
+          priceId: 'price_1SYLdJL0pLShFbLttpxYfuas',
+          mode: 'payment',
+          successUrl: `${window.location.origin}/payment-success?type=form_unlock`,
+          cancelUrl: `${window.location.origin}/`,
+          metadata: { product: 'emergency_form_unlock', source: 'hero_cta' }
+        }
+      });
+      if (error) throw error;
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (err) {
+      console.error('Checkout error:', err);
+      toast.error('Unable to start checkout. Please try again.');
+    } finally {
+      setIsCheckoutLoading(false);
+    }
   };
 
   const handleHowItWorks = () => {
@@ -62,6 +91,20 @@ const HeroSection = () => {
               Start — it takes 2 minutes
               <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
             </Button>
+            
+            {/* Paid Help CTA */}
+            <div className="pt-2">
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground font-semibold"
+                onClick={handlePaidHelp}
+                disabled={isCheckoutLoading}
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                {isCheckoutLoading ? 'Loading...' : 'Get Help Now ($5.99)'}
+              </Button>
+            </div>
             
             {/* Secondary CTA */}
             <div>
