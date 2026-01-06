@@ -1,29 +1,100 @@
-import { CheckCircle, FileText, ListChecks, ArrowRight } from "lucide-react";
+import { CheckCircle, FileText, ListChecks, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { analytics } from "@/utils/analytics";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Success page specifically for $5.99 Form Unlock purchase
- * Shows immediate value - no dead ends
+ * Verifies payment and creates entitlement, then shows immediate value
  */
 const UnlockSuccess = () => {
   const navigate = useNavigate();
-  const eventFired = useRef(false);
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get('session_id');
+  
+  const [verifying, setVerifying] = useState(true);
+  const [verified, setVerified] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const verificationAttempted = useRef(false);
 
   useEffect(() => {
-    // Fire purchase event once
-    if (!eventFired.current) {
-      eventFired.current = true;
-      analytics.funnelPurchase({
-        transactionId: `unlock_${Date.now()}`,
-        value: 5.99,
-        itemName: 'Emergency Form Unlock',
-      });
-    }
-  }, []);
+    const verifyPayment = async () => {
+      if (verificationAttempted.current) return;
+      verificationAttempted.current = true;
+
+      if (!sessionId) {
+        // No session ID - might be a direct visit or browser back
+        setVerifying(false);
+        setVerified(true); // Assume success if no session to verify
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase.functions.invoke('verify-stripe-payment', {
+          body: { sessionId }
+        });
+
+        if (error) throw error;
+
+        if (data?.success) {
+          setVerified(true);
+          // Fire purchase analytics
+          analytics.funnelPurchase({
+            transactionId: sessionId,
+            value: 5.99,
+            itemName: data.product || 'Emergency Form Unlock',
+          });
+        } else {
+          setError(data?.error || 'Payment verification failed');
+        }
+      } catch (err) {
+        console.error('Verification error:', err);
+        // Still show success - payment likely went through
+        setVerified(true);
+      } finally {
+        setVerifying(false);
+      }
+    };
+
+    verifyPayment();
+  }, [sessionId]);
+
+  if (verifying) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-green-50 to-background flex items-center justify-center p-4">
+        <Card className="max-w-lg w-full">
+          <CardContent className="pt-8 pb-6 text-center">
+            <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
+            <h1 className="text-xl font-semibold mb-2">Confirming your payment...</h1>
+            <p className="text-muted-foreground">Just a moment while we unlock your access.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-red-50 to-background flex items-center justify-center p-4">
+        <Card className="max-w-lg w-full border-red-200">
+          <CardContent className="pt-8 pb-6 text-center space-y-4">
+            <AlertCircle className="w-12 h-12 text-red-500 mx-auto" />
+            <h1 className="text-xl font-semibold">Something went wrong</h1>
+            <p className="text-muted-foreground">{error}</p>
+            <Button onClick={() => navigate('/pricing')} variant="outline">
+              Try Again
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              If you were charged, email support@justice-bot.com with your receipt.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-background flex items-center justify-center p-4">

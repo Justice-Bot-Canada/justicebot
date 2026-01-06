@@ -41,7 +41,7 @@ const Index = () => {
         body: {
           priceId: 'price_1SYLdJL0pLShFbLttpxYfuas',
           mode: 'payment',
-          successUrl: `${window.location.origin}/unlock-success`,
+          successUrl: `${window.location.origin}/unlock-success?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${window.location.origin}/`,
           metadata: { product: 'emergency_form_unlock', source: 'homepage_banner' }
         }
