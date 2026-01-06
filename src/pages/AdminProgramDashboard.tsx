@@ -185,7 +185,13 @@ export default function AdminProgramDashboard() {
     }
 
     const summary = (data as ProgramSummary[])[0];
+    const exportDate = new Date().toLocaleDateString('en-CA');
+    
     const csv = [
+      ['Program Summary Report'],
+      [`Program: ${programName}`],
+      [`Export Date: ${exportDate}`],
+      [''],
       ['Metric', 'Value'],
       ['Total Referrals', summary.total_referrals],
       ['Intake Started', summary.intake_started],
@@ -193,13 +199,18 @@ export default function AdminProgramDashboard() {
       ['Completed', summary.completed],
       ['Completion Rate (%)', summary.completion_rate],
       ['Doc Readiness Rate (%)', summary.doc_readiness_rate],
-    ].map(row => row.join(',')).join('\n');
+      [''],
+      ['Note: This report contains aggregate statistics only.'],
+      ['No personally identifiable information (PII) is included.'],
+      [''],
+      ['Justice-Bot provides procedural assistance only - not legal advice.'],
+    ].map(row => Array.isArray(row) && row.length > 1 ? row.join(',') : row).join('\n');
 
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${programName.toLowerCase().replace(/\s+/g, '-')}-summary.csv`;
+    a.download = `${programName.toLowerCase().replace(/\s+/g, '-')}-summary-${exportDate}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success('Summary exported');

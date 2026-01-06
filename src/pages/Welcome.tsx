@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Mail, ArrowRight, MapPin, Shield } from "lucide-react";
 import { FlowHeader } from "@/components/FlowHeader";
 import { FlowProgressIndicator } from "@/components/FlowProgressIndicator";
+import { ProgramBanner } from "@/components/ProgramBanner";
 import { supabase } from "@/integrations/supabase/client";
 import AuthDialog from "@/components/AuthDialog";
 import { PROVINCE_NAMES } from "@/config/provinceConfig";
@@ -263,6 +264,7 @@ const Welcome = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <FlowHeader currentStep="welcome" />
+      <ProgramBanner />
       
       <main className="flex-1 container mx-auto px-4 py-8 max-w-2xl">
         {/* Progress indicator */}

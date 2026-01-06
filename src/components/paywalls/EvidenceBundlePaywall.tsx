@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 import { Check, FolderArchive, ArrowRight, ArrowLeft } from "lucide-react";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
+import { useShouldHidePricing } from "@/components/ProgramBanner";
 import PayPalTrialButton from "@/components/PayPalTrialButton";
 
 const PAYPAL_PLAN_ID = "P-0FR50831D4940483BNFBBB7Y";
@@ -20,9 +21,10 @@ export function EvidenceBundlePaywall({
   evidenceCount,
 }: EvidenceBundlePaywallProps) {
   const { hasAccess, isFreeUser, loading } = usePremiumAccess();
+  const shouldHidePricing = useShouldHidePricing();
 
-  // If user has access, just confirm immediately
-  if (hasAccess && open) {
+  // Program users and users with access bypass paywall
+  if ((hasAccess || shouldHidePricing) && open) {
     onConfirm();
     onOpenChange(false);
     return null;

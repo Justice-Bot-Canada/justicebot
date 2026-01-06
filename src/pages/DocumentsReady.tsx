@@ -5,6 +5,7 @@ import { trackEvent, analytics } from '@/utils/analytics';
 import { useProgram } from '@/contexts/ProgramContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { ProgramBanner } from '@/components/ProgramBanner';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -62,6 +63,7 @@ export default function DocumentsReady() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
+      <ProgramBanner />
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-2xl mx-auto space-y-8">
           {/* Success Header */}
