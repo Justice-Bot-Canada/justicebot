@@ -29,6 +29,7 @@ import { EvidenceHub } from "@/components/EvidenceHub";
 import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
 import DashboardHeader from "@/components/DashboardHeader";
 import { ProgramBanner } from "@/components/ProgramBanner";
+import { ResumeCaseCard } from "@/components/ResumeCaseCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import {
@@ -48,12 +49,19 @@ interface CaseData {
   description: string | null;
   timeline_viewed?: boolean;
   merit_score_status?: 'pending' | 'calculating' | 'complete' | 'failed';
+  flow_step?: string | null;
+  is_paid?: boolean;
 }
 
 interface EvidenceStats {
   total: number;
   processing: number;
   complete: number;
+}
+
+interface CaseEntitlement {
+  case_id: string;
+  product_id: string;
 }
 
 const Dashboard = () => {
@@ -64,6 +72,7 @@ const Dashboard = () => {
   // Dashboard state
   const [activeCase, setActiveCase] = useState<CaseData | null>(null);
   const [cases, setCases] = useState<CaseData[]>([]);
+  const [paidCases, setPaidCases] = useState<CaseEntitlement[]>([]);
   const [evidenceStats, setEvidenceStats] = useState<EvidenceStats>({ total: 0, processing: 0, complete: 0 });
   const [loading, setLoading] = useState(true);
   const [showBookWizard, setShowBookWizard] = useState(false);
@@ -79,23 +88,35 @@ const Dashboard = () => {
     meritScoreStatus: activeCase?.merit_score_status ?? null,
   });
 
-  // Load user's cases
+  // Load user's cases and entitlements
   useEffect(() => {
-    const loadCases = async () => {
+    const loadCasesAndEntitlements = async () => {
       if (!user) return;
       
       try {
-        const { data, error } = await supabase
+        // Load cases with flow_step and is_paid
+        const { data: casesData, error: casesError } = await supabase
           .from('cases')
-          .select('id, title, status, merit_score, created_at, province, venue, description')
+          .select('id, title, status, merit_score, created_at, province, venue, description, flow_step, is_paid')
           .eq('user_id', user.id)
           .order('updated_at', { ascending: false });
 
-        if (!error && data) {
-          setCases(data);
-          if (data.length > 0 && !activeCase) {
-            setActiveCase(data[0]);
+        if (!casesError && casesData) {
+          setCases(casesData);
+          if (casesData.length > 0 && !activeCase) {
+            setActiveCase(casesData[0]);
           }
+        }
+
+        // Load case-scoped entitlements
+        const { data: entitlementData, error: entitlementError } = await supabase
+          .from('entitlements')
+          .select('case_id, product_id')
+          .eq('user_id', user.id)
+          .not('case_id', 'is', null);
+
+        if (!entitlementError && entitlementData) {
+          setPaidCases(entitlementData.filter(e => e.case_id) as CaseEntitlement[]);
         }
       } catch (error) {
         console.error('Error loading cases:', error);
@@ -104,7 +125,7 @@ const Dashboard = () => {
       }
     };
 
-    loadCases();
+    loadCasesAndEntitlements();
   }, [user]);
 
   // Load evidence stats when active case changes
@@ -225,57 +246,79 @@ const Dashboard = () => {
         )}
 
         {/* ============================================ */}
-        {/* ABOVE THE FOLD: Next Required Action Card   */}
-        {/* This is the DOMINANT element - ONE CTA only */}
+        {/* ABOVE THE FOLD: Show Resume Card OR Next Action */}
         {/* ============================================ */}
-        <Card className="mb-6 border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-background to-primary/10 shadow-lg">
-          <CardContent className="pt-6 pb-8">
-            {/* Status indicator */}
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="text-sm font-medium text-muted-foreground">
-                {activeCase ? 'Case in progress' : 'Ready to start'}
-              </span>
-              {activeCase && (
-                <span className="text-sm text-muted-foreground">
-                  • {activeCase.venue || activeCase.province}
-                </span>
-              )}
-            </div>
-
-            {/* Next step title */}
-            <div className="flex items-start gap-4 mb-6">
-              <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                {getActionIcon()}
+        {(() => {
+          // Check if active case has a paid entitlement
+          const activeCasePaid = activeCase && paidCases.some(e => e.case_id === activeCase.id);
+          
+          if (activeCasePaid && activeCase) {
+            // Show Resume Case card for paid cases - NO pricing, NO upsells
+            return (
+              <div className="mb-6">
+                <ResumeCaseCard
+                  caseId={activeCase.id}
+                  caseTitle={activeCase.title}
+                  flowStep={activeCase.flow_step || null}
+                  evidenceCount={evidenceStats.total}
+                  province={activeCase.province}
+                />
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-muted-foreground mb-1">Your next step:</p>
-                <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">
-                  {nextAction.title}
-                </h2>
-                <p className="text-muted-foreground">
-                  {nextAction.description}
+            );
+          }
+          
+          // Default: Show regular next action card for unpaid cases
+          return (
+            <Card className="mb-6 border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-background to-primary/10 shadow-lg">
+              <CardContent className="pt-6 pb-8">
+                {/* Status indicator */}
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {activeCase ? 'Case in progress' : 'Ready to start'}
+                  </span>
+                  {activeCase && (
+                    <span className="text-sm text-muted-foreground">
+                      • {activeCase.venue || activeCase.province}
+                    </span>
+                  )}
+                </div>
+
+                {/* Next step title */}
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    {getActionIcon()}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-muted-foreground mb-1">Your next step:</p>
+                    <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">
+                      {nextAction.title}
+                    </h2>
+                    <p className="text-muted-foreground">
+                      {nextAction.description}
+                    </p>
+                  </div>
+                </div>
+
+                {/* PRIMARY CTA - Full width, high contrast */}
+                <Button 
+                  onClick={handleNextAction}
+                  size="lg" 
+                  className="w-full text-lg py-6 gap-3"
+                  disabled={nextAction.action === 'wait_merit'}
+                >
+                  {nextAction.ctaText}
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+
+                {/* Reassurance text */}
+                <p className="text-center text-sm text-muted-foreground mt-4">
+                  {nextAction.reassurance}
                 </p>
-              </div>
-            </div>
-
-            {/* PRIMARY CTA - Full width, high contrast */}
-            <Button 
-              onClick={handleNextAction}
-              size="lg" 
-              className="w-full text-lg py-6 gap-3"
-              disabled={nextAction.action === 'wait_merit'}
-            >
-              {nextAction.ctaText}
-              <ArrowRight className="h-5 w-5" />
-            </Button>
-
-            {/* Reassurance text */}
-            <p className="text-center text-sm text-muted-foreground mt-4">
-              {nextAction.reassurance}
-            </p>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          );
+        })()}
 
         {/* ============================================ */}
         {/* SECONDARY: Case Progress (Collapsed)        */}
