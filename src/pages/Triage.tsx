@@ -14,7 +14,9 @@ import { TriageDiscountModal } from "@/components/TriageDiscountModal";
 import { TriageDocumentUpload, PendingDocument } from "@/components/TriageDocumentUpload";
 import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
 import AuthDialog from "@/components/AuthDialog";
-import { ProgramBanner } from "@/components/ProgramBanner";
+import { ProgramBanner, useShouldHidePricing } from "@/components/ProgramBanner";
+import { CourtReadyPaywall } from "@/components/CourtReadyPaywall";
+import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -49,6 +51,8 @@ const Triage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const programCaseFields = useProgramCaseFields();
+  const { hasAccess, isProgramUser, loading: accessLoading } = usePremiumAccess();
+  const shouldHidePricing = useShouldHidePricing();
   const [step, setStep] = useState(0);
   const [triageResult, setTriageResult] = useState<TriageResult | null>(null);
   const [userDescription, setUserDescription] = useState("");
@@ -60,6 +64,10 @@ const Triage = () => {
   const [showBookWizard, setShowBookWizard] = useState(false);
   const [uploadedEvidenceCount, setUploadedEvidenceCount] = useState(0);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+  
+  // Check if user should see paywall (after triage, before evidence)
+  const userHasAccess = hasAccess || isProgramUser || shouldHidePricing;
 
   const handleTriageComplete = (result: TriageResult, description: string, prov: string, evidenceCount?: number) => {
     setTriageResult(result);
@@ -382,14 +390,40 @@ const Triage = () => {
                 result={triageResult}
                 description={userDescription}
                 province={province}
-                onProceed={() => user ? setStep(2) : setShowAuthDialog(true)}
+                onProceed={() => {
+                  if (!user) {
+                    setShowAuthDialog(true);
+                  } else if (userHasAccess) {
+                    setStep(2);
+                  } else {
+                    setShowPaywall(true);
+                  }
+                }}
                 onBack={() => setStep(0)}
                 onSelectForm={handleSelectForm}
                 isLoading={isSavingDocuments}
               />
 
-              {/* Document Upload Section - only for logged in users */}
-              {user && (
+              {/* Paywall - shown after triage for non-paying users */}
+              {showPaywall && !userHasAccess && user && (
+                <div className="mt-8">
+                  <CourtReadyPaywall
+                    triageData={{
+                      venue: triageResult.venue,
+                      venueTitle: triageResult.venueTitle,
+                      province: province,
+                      description: userDescription,
+                    }}
+                    onAccessGranted={() => {
+                      setShowPaywall(false);
+                      setStep(2);
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Document Upload Section - only for logged in users with access */}
+              {user && userHasAccess && !showPaywall && (
                 <div className="mt-6">
                   <TriageDocumentUpload
                     documents={pendingDocuments}

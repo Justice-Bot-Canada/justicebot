@@ -56,6 +56,8 @@ export function usePremiumAccess(): PremiumAccess {
           setTier('monthly');
         } else if (productId.includes('low-income') || productId.includes('lowincome')) {
           setTier('low-income');
+        } else if (productId.includes('court_ready') || productId.includes('form_unlock')) {
+          setTier('monthly'); // One-time purchases get monthly-level access
         } else {
           setTier('monthly'); // Default to monthly for unrecognized premium tiers
         }

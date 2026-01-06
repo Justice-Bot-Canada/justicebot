@@ -248,7 +248,7 @@ const Pricing = () => {
       <CanonicalURL />
       <EnhancedSEO
         title="Pricing | Justice-Bot Legal Tools"
-        description="Canadian legal document plans: Basic $19, Professional $29, Premium $49/month. 5-day free trial. No hidden fees. Cancel anytime."
+        description="Court-Ready Document Pack $39 one-time. Everything you need to file correctly. No subscription required."
         keywords="legal services pricing Canada, affordable legal help Ontario, legal document pricing"
         structuredData={productStructuredData}
         breadcrumbs={breadcrumbs}
@@ -260,14 +260,69 @@ const Pricing = () => {
         <div className="text-center mb-10">
           <h1 className="text-3xl md:text-4xl font-bold mb-3">Simple, Transparent Pricing</h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Choose the plan that fits your legal needs. All plans include a 5-day free trial.
+            One-time payment for your Court-Ready Document Pack. No subscription required.
           </p>
         </div>
 
+        {/* Featured: One-Time Purchase */}
+        <Card className="max-w-2xl mx-auto mb-12 border-2 border-primary bg-gradient-to-br from-primary/5 to-primary/10">
+          <CardHeader className="text-center pb-4">
+            <Badge className="w-fit mx-auto mb-3 bg-primary text-primary-foreground">
+              Most Popular
+            </Badge>
+            <CardTitle className="text-2xl md:text-3xl">Court-Ready Document Pack</CardTitle>
+            <CardDescription className="text-base">
+              Everything you need to file correctly — prepared for submission
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="text-center">
+              <div className="flex items-baseline justify-center gap-2">
+                <span className="text-5xl font-bold">$39</span>
+                <span className="text-muted-foreground">CAD</span>
+              </div>
+              <p className="text-sm text-muted-foreground mt-2 font-medium">
+                One-time payment. No subscription. No ongoing charges.
+              </p>
+            </div>
+            
+            <div className="grid sm:grid-cols-2 gap-3">
+              {[
+                "AI-powered legal triage",
+                "Evidence upload & organization",
+                "Auto-organized Book of Documents",
+                "Tribunal form generation",
+                "Step-by-step filing instructions",
+                "Deadline tracking"
+              ].map((feature, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-600 flex-shrink-0" />
+                  <span className="text-sm">{feature}</span>
+                </div>
+              ))}
+            </div>
+
+            <Button
+              size="lg"
+              className="w-full text-lg py-6"
+              onClick={() => window.location.href = '/triage'}
+            >
+              <FileText className="mr-2 h-5 w-5" />
+              Get Started — Free Triage First
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Subscription Plans - Secondary */}
+        <div className="text-center mb-6">
+          <h2 className="text-xl font-semibold text-muted-foreground">Or choose a subscription plan</h2>
+          <p className="text-sm text-muted-foreground">For ongoing legal needs with additional features</p>
+        </div>
+
         {/* Free Trial Banner */}
-        <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 mb-10 max-w-2xl mx-auto flex items-center justify-between flex-wrap gap-4">
+        <div className="bg-muted/50 border border-border rounded-xl p-4 mb-10 max-w-2xl mx-auto flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-3">
-            <div className="bg-primary text-primary-foreground rounded-full p-2">
+            <div className="bg-muted-foreground/20 text-muted-foreground rounded-full p-2">
               <Zap className="w-5 h-5" />
             </div>
             <div>

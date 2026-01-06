@@ -175,25 +175,25 @@ const TriageResults: React.FC<TriageResultsProps> = ({
       <Card className="border-2 border-primary bg-gradient-to-r from-primary/5 to-primary/10">
         <CardContent className="pt-6 pb-6">
           <div className="text-center space-y-4">
-            <h3 className="text-xl font-bold">Save this & build your case</h3>
+            <h3 className="text-xl font-bold">Get Your Court-Ready Documents</h3>
             <p className="text-muted-foreground">
-              Create a free account to save your triage results, upload evidence, and track your legal journey.
+              Upload your evidence, organize your case, and get filing-ready tribunal forms.
             </p>
             <Button onClick={onProceed} size="lg" className="gap-2" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Creating Case...
+                  Processing...
                 </>
               ) : (
                 <>
-                  Save this & build your case
+                  Generate My Court-Ready Documents
                   <ArrowRight className="h-5 w-5" />
                 </>
               )}
             </Button>
             <p className="text-xs text-muted-foreground">
-              Free account. No obligation.
+              One-time payment. No subscription.
             </p>
           </div>
         </CardContent>
