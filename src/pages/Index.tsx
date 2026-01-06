@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { analytics } from "@/utils/analytics";
 
 // Lazy load below-the-fold components
 const TrustSignals = lazy(() => import("@/components/TrustSignals"));
@@ -30,6 +31,13 @@ const Index = () => {
       navigate('/dashboard', { replace: true });
     }
   }, [user, loading, navigate]);
+
+  // Track landing view for funnel analytics
+  useEffect(() => {
+    if (!loading && !user) {
+      analytics.landingView();
+    }
+  }, [loading, user]);
 
   const handleGetCourtReadyDocs = () => {
     navigate('/triage');
@@ -88,27 +96,25 @@ const Index = () => {
       <ClinicWelcomeBanner />
       <Header />
       
-      {/* Court-Ready Document Pack Banner - Above the fold */}
+      {/* Trust Banner - Above the fold - NO pricing */}
       <section className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-b-2 border-primary/30 py-6">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">
-              Need help filing or organizing documents TODAY?
+              Get organized for your legal issue in minutes.
             </h2>
             <p className="text-muted-foreground mb-4">
-              Get your Court-Ready Document Pack for a one-time <span className="font-semibold text-foreground">$39</span>.
-              <br />
-              <span className="text-sm">One-time payment. No subscription. No ongoing charges.</span>
+              No legal advice. No commitment required.
             </p>
             <Button
               size="lg"
               onClick={handleGetCourtReadyDocs}
               className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-3 text-lg"
             >
-              Get Started — Free Triage First
+              Start — no signup required
             </Button>
             <p className="text-xs text-muted-foreground mt-3">
-              This is legal information and document preparation support — not legal advice or representation.
+              Takes about 2 minutes. Free to start.
             </p>
           </div>
         </div>

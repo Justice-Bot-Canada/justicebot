@@ -5,7 +5,7 @@ import { useShouldHidePricing } from '@/components/ProgramBanner';
 import { usePremiumAccess } from '@/hooks/usePremiumAccess';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast-stub';
-import { trackEvent } from '@/utils/analytics';
+import { trackEvent, analytics } from '@/utils/analytics';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -48,6 +48,10 @@ export function CourtReadyPaywall({ triageData, caseId, onAccessGranted, onCaseC
   // Track paywall view
   useEffect(() => {
     if (!accessLoading && !hasAccess && !isProgramUser && !shouldHidePricing) {
+      // Track with new funnel event
+      analytics.paywallViewed(triageData?.venue, 0);
+      
+      // Legacy event for backwards compatibility
       trackEvent('paywall_viewed', {
         location: 'post_triage',
         venue: triageData?.venue,

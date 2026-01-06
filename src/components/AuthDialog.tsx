@@ -182,6 +182,8 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       } else if (data.user && !data.session) {
         // Email confirmation required
         analytics.signupComplete(email, 'email_pending_confirmation');
+        // New funnel event
+        analytics.signupCompletedEvent('email');
         // Fire GA4 sign_up event for Canada funnel
         if (typeof window !== 'undefined' && window.gtag) {
           window.gtag('event', 'sign_up', {

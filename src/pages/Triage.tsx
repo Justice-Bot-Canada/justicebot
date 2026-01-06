@@ -78,8 +78,13 @@ const Triage = () => {
     setUploadedEvidenceCount(evidenceCount || 0);
     setStep(1);
     
-    // Track triage completion
+    // Track triage completion events
     analytics.triageComplete(result.venue);
+    analytics.triageCompletedEvent(result.venue, prov);
+    
+    // Track case snapshot shown (Step 2 of funnel)
+    analytics.caseSnapshotShown(result.venue, result.confidence);
+    
     // Pipeline event with rich payload
     analytics.triageCompleted({
       recommendedJourney: result.venue,

@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { toast } from "@/lib/toast-stub";
+import { analytics } from "@/utils/analytics";
 import { EvidenceAnalysisPanel } from './EvidenceAnalysisPanel';
 import {
   Upload,
@@ -263,8 +264,12 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
               }
             });
             toast.success(`${file.name} uploaded and analyzed`);
+            // Track evidence uploaded
+            analytics.evidenceUploaded(evidence.length + 1, caseId);
           } else {
             toast.success(`${file.name} uploaded`);
+            // Track evidence uploaded
+            analytics.evidenceUploaded(evidence.length + 1, caseId);
           }
 
           setUploadProgress(prev => ({ ...prev, [fileId]: 100 }));

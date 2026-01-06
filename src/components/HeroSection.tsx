@@ -81,7 +81,7 @@ const HeroSection = () => {
             </p>
           </div>
 
-          {/* Primary CTA - big and dominant */}
+          {/* Single Primary CTA - no pricing */}
           <div className="space-y-4 animate-fade-in pt-6">
             <Button 
               variant="cta" 
@@ -89,23 +89,9 @@ const HeroSection = () => {
               className="group text-xl md:text-2xl px-12 py-8 md:py-10 shadow-2xl hover:scale-[1.02] transition-all duration-300 w-full sm:w-auto"
               onClick={handleStart}
             >
-              Start — it takes 2 minutes
+              Start — no signup required
               <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
             </Button>
-            
-            {/* Paid Help CTA */}
-            <div className="pt-2">
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground font-semibold"
-                onClick={handlePaidHelp}
-                disabled={isCheckoutLoading}
-              >
-                <Zap className="w-4 h-4 mr-2" />
-                {isCheckoutLoading ? 'Loading...' : 'Get Help Now ($5.99)'}
-              </Button>
-            </div>
             
             {/* Secondary CTA */}
             <div>
