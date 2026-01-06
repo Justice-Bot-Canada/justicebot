@@ -157,3 +157,9 @@ verify_jwt = false
 
 [functions.send-referral-outreach]
 verify_jwt = true
+
+[functions.verify-stripe-payment]
+verify_jwt = false
+
+[functions.create-stripe-checkout]
+verify_jwt = false

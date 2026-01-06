@@ -29,7 +29,7 @@ const StripeTrialButton = ({ priceId, planKey, trialDays = 5 }: StripeTrialButto
           priceId, 
           planKey, 
           trialDays,
-          successUrl: `${window.location.origin}/subscription-success`,
+          successUrl: `${window.location.origin}/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: window.location.href
         },
       });
