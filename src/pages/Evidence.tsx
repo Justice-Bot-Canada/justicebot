@@ -16,12 +16,14 @@ import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
 import { EvidenceBundlePaywall } from "@/components/paywalls";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import { supabase } from "@/integrations/supabase/client";
-import { trackEvent } from "@/utils/analytics";
+import { trackEvent, analytics } from "@/utils/analytics";
+import { useProgram } from "@/contexts/ProgramContext";
 
 const Evidence = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { hasAccess, isFreeUser, tier } = usePremiumAccess();
+  const { program, isProgramMode } = useProgram();
   const [searchParams] = useSearchParams();
   const caseId = searchParams.get('case') || searchParams.get('caseId'); // Support both params
   const [caseData, setCaseData] = useState<any>(null);
@@ -83,6 +85,11 @@ const Evidence = () => {
     
     trackEvent('generate_documents_clicked', { caseId, evidenceCount });
     
+    // Track program-specific document generation
+    if (isProgramMode && program) {
+      analytics.programDocumentsGenerated(program.id, ['book_of_documents', 'filing_forms']);
+    }
+    
     // Update case flow step
     await supabase
       .from('cases')
@@ -100,8 +107,13 @@ const Evidence = () => {
   useEffect(() => {
     if (caseId) {
       trackEvent('evidence_upload_started', { caseId });
+      
+      // Track program-specific evidence upload
+      if (isProgramMode && program) {
+        analytics.programEvidenceUploaded(program.id, evidenceCount);
+      }
     }
-  }, [caseId]);
+  }, [caseId, isProgramMode, program, evidenceCount]);
 
   if (!user) {
     navigate("/welcome");

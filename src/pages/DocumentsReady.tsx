@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { trackEvent } from '@/utils/analytics';
+import { trackEvent, analytics } from '@/utils/analytics';
+import { useProgram } from '@/contexts/ProgramContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ export default function DocumentsReady() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const caseId = searchParams.get('case') || searchParams.get('caseId');
+  const { program, isProgramMode } = useProgram();
   const [regenerationsUsed, setRegenerationsUsed] = useState(0);
   const maxRegenerations = 2;
 
@@ -40,6 +42,12 @@ export default function DocumentsReady() {
 
   const handleDownload = () => {
     trackEvent('documents_downloaded', { caseId });
+    
+    // Track program-specific download
+    if (isProgramMode && program) {
+      analytics.programDocumentsDownloaded(program.id);
+    }
+    
     // Navigate to the actual download/export functionality
     navigate(`/smart-documents?case=${caseId}`);
   };

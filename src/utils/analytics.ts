@@ -10,18 +10,41 @@ declare global {
   }
 }
 
-// Helper to attach UTM params to all events
+// Session storage key for program_id
+const PROGRAM_STORAGE_KEY = 'justice_bot_program';
+
+// Helper to get current program_id from session
+const getCurrentProgramId = (): string | null => {
+  try {
+    const stored = sessionStorage.getItem(PROGRAM_STORAGE_KEY);
+    if (stored) {
+      const program = JSON.parse(stored);
+      return program?.id || null;
+    }
+  } catch {
+    // Ignore parsing errors
+  }
+  return null;
+};
+
+// Helper to attach UTM params and program_id to all events
 const attachUTMParams = (properties?: Record<string, any>): Record<string, any> => {
   const utm = getCurrentUTMParams();
-  const utmParams: Record<string, any> = {};
+  const enrichedParams: Record<string, any> = {};
   
-  if (utm.utm_source) utmParams.utm_source = utm.utm_source;
-  if (utm.utm_medium) utmParams.utm_medium = utm.utm_medium;
-  if (utm.utm_campaign) utmParams.utm_campaign = utm.utm_campaign;
-  if (utm.utm_term) utmParams.utm_term = utm.utm_term;
-  if (utm.utm_content) utmParams.utm_content = utm.utm_content;
+  if (utm.utm_source) enrichedParams.utm_source = utm.utm_source;
+  if (utm.utm_medium) enrichedParams.utm_medium = utm.utm_medium;
+  if (utm.utm_campaign) enrichedParams.utm_campaign = utm.utm_campaign;
+  if (utm.utm_term) enrichedParams.utm_term = utm.utm_term;
+  if (utm.utm_content) enrichedParams.utm_content = utm.utm_content;
   
-  return { ...properties, ...utmParams };
+  // Always attach program_id if present (CRITICAL for agency analytics)
+  const programId = getCurrentProgramId();
+  if (programId) {
+    enrichedParams.program_id = programId;
+  }
+  
+  return { ...properties, ...enrichedParams };
 };
 
 export const trackEvent = (eventName: string, properties?: Record<string, any>) => {
@@ -486,5 +509,71 @@ export const analytics = {
     };
     trackEvent('clinic_dropoff', payload);
     sendGA4Event('clinic_dropoff', payload);
+  },
+
+  // ==========================================
+  // PROGRAM / AGENCY CONVERSION EVENTS
+  // These track agency/government referral flows
+  // All events auto-include program_id via attachUTMParams
+  // ==========================================
+
+  // Program landing page viewed
+  programLandingViewed: (programId: string, programSlug: string, organization?: string) => {
+    const payload = {
+      program_id: programId,
+      program_slug: programSlug,
+      organization: organization || 'unknown',
+    };
+    trackEvent('program_landing_viewed', payload);
+    sendGA4Event('program_landing_viewed', payload);
+  },
+
+  // Program intake started (user clicks "Start My Case")
+  programIntakeStarted: (programId: string, programSlug: string) => {
+    const payload = {
+      program_id: programId,
+      program_slug: programSlug,
+    };
+    trackEvent('program_intake_started', payload);
+    sendGA4Event('program_intake_started', payload);
+  },
+
+  // Program intake completed (triage done)
+  programIntakeCompleted: (programId: string, venue?: string) => {
+    const payload = {
+      program_id: programId,
+      venue: venue || 'unknown',
+    };
+    trackEvent('program_intake_completed', payload);
+    sendGA4Event('program_intake_completed', payload);
+  },
+
+  // Program evidence uploaded
+  programEvidenceUploaded: (programId: string, fileCount: number) => {
+    const payload = {
+      program_id: programId,
+      file_count: fileCount,
+    };
+    trackEvent('program_evidence_uploaded', payload);
+    sendGA4Event('program_evidence_uploaded', payload);
+  },
+
+  // Program documents generated
+  programDocumentsGenerated: (programId: string, documentTypes: string[]) => {
+    const payload = {
+      program_id: programId,
+      document_types: documentTypes,
+    };
+    trackEvent('program_documents_generated', payload);
+    sendGA4Event('program_documents_generated', payload);
+  },
+
+  // Program documents downloaded
+  programDocumentsDownloaded: (programId: string) => {
+    const payload = {
+      program_id: programId,
+    };
+    trackEvent('program_documents_downloaded', payload);
+    sendGA4Event('program_documents_downloaded', payload);
   },
 };
