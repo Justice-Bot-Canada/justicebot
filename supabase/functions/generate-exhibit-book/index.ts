@@ -221,7 +221,7 @@ serve(async (req) => {
 
   // Track status for response
   let buildStatus: 'building' | 'ready' | 'failed' = 'building';
-  let failedDocument: string | null = null;
+  const failedDocument: string | null = null;
 
   try {
     console.log('[GENERATE-BOOK] Starting book generation...');
@@ -437,7 +437,7 @@ serve(async (req) => {
     // SORT CHRONOLOGICALLY (oldest first - Ontario requirement)
     // ========================================================================
     const sortBy = organizationAnswers?.sortBy || 'chronological';
-    let sortedEvidence = [...processedEvidence];
+    const sortedEvidence = [...processedEvidence];
 
     sortedEvidence.sort((a, b) => {
       if (a.order_override !== undefined && b.order_override !== undefined) {
