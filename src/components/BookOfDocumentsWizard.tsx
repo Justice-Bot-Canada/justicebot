@@ -1,4 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+
+// Escape HTML to prevent XSS attacks when using innerHTML
+const escapeHtml = (unsafe: string | undefined | null): string => {
+  if (!unsafe) return '';
+  return String(unsafe)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -277,28 +288,29 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
       pdfContainer.style.cssText = 'position: fixed; left: 0; top: 0; width: 8.5in; background: white; color: black; font-family: "Times New Roman", serif; font-size: 12pt; line-height: 1.5; z-index: -9999; visibility: hidden;';
       
       // Build PDF HTML content
+      // Escape all user-controlled content to prevent XSS
       pdfContainer.innerHTML = `
         <!-- Cover Page -->
         <div style="text-align: center; padding-top: 2in; padding-bottom: 2rem; page-break-after: always;">
-          <h1 style="font-size: 24pt; font-weight: bold; margin-bottom: 1rem;">${generatedBook.coverPage?.title || 'BOOK OF DOCUMENTS'}</h1>
-          <h2 style="font-size: 18pt; margin-bottom: 1.5rem;">${generatedBook.coverPage?.tribunal_full_name || 'Court/Tribunal'}</h2>
-          <p style="margin-bottom: 2rem;">Court File No.: ${generatedBook.coverPage?.court_file_number || '[To be assigned]'}</p>
+          <h1 style="font-size: 24pt; font-weight: bold; margin-bottom: 1rem;">${escapeHtml(generatedBook.coverPage?.title) || 'BOOK OF DOCUMENTS'}</h1>
+          <h2 style="font-size: 18pt; margin-bottom: 1.5rem;">${escapeHtml(generatedBook.coverPage?.tribunal_full_name) || 'Court/Tribunal'}</h2>
+          <p style="margin-bottom: 2rem;">Court File No.: ${escapeHtml(generatedBook.coverPage?.court_file_number) || '[To be assigned]'}</p>
           
           <div style="margin: 3rem 0;">
             <div style="margin-bottom: 1.5rem;">
               <p style="font-size: 10pt; text-transform: uppercase;">Applicant</p>
-              <p style="font-weight: bold; font-size: 14pt;">${generatedBook.coverPage?.applicant || applicantName || '[Applicant Name]'}</p>
+              <p style="font-weight: bold; font-size: 14pt;">${escapeHtml(generatedBook.coverPage?.applicant) || escapeHtml(applicantName) || '[Applicant Name]'}</p>
             </div>
             <p>— and —</p>
             <div style="margin-top: 1.5rem;">
               <p style="font-size: 10pt; text-transform: uppercase;">Respondent</p>
-              <p style="font-weight: bold; font-size: 14pt;">${generatedBook.coverPage?.respondent || respondentName || '[Respondent Name]'}</p>
+              <p style="font-weight: bold; font-size: 14pt;">${escapeHtml(generatedBook.coverPage?.respondent) || escapeHtml(respondentName) || '[Respondent Name]'}</p>
             </div>
           </div>
           
           <div style="margin-top: 3rem; font-size: 11pt;">
             <p>${generatedBook.coverPage?.total_exhibits || exhibitItems.filter(i => i.include).length} Exhibits • ${generatedBook.totalPages || 0} Pages</p>
-            <p>Prepared: ${generatedBook.coverPage?.prepared_date || new Date().toLocaleDateString()}</p>
+            <p>Prepared: ${escapeHtml(generatedBook.coverPage?.prepared_date) || new Date().toLocaleDateString()}</p>
           </div>
         </div>
 
@@ -307,8 +319,8 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
           <h2 style="font-size: 18pt; font-weight: bold; text-align: center; margin-bottom: 2rem;">TABLE OF CONTENTS</h2>
           ${generatedBook.tableOfContents.map((item) => `
             <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px dotted #999;">
-              <span><strong>${item.label}</strong> — ${item.title}</span>
-              <span>${item.page_reference}</span>
+              <span><strong>${escapeHtml(item.label)}</strong> — ${escapeHtml(item.title)}</span>
+              <span>${escapeHtml(item.page_reference)}</span>
             </div>
           `).join('')}
         </div>
@@ -317,11 +329,11 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
         ${generatedBook.exhibits.map((exhibit) => `
           <div style="padding: 2rem; page-break-after: always; page-break-inside: avoid;">
             <div style="font-weight: bold; border-bottom: 2px solid black; padding-bottom: 0.5rem; margin-bottom: 1rem;">
-              ${exhibit.label}: ${exhibit.file_name}
+              ${escapeHtml(exhibit.label)}: ${escapeHtml(exhibit.file_name)}
             </div>
-            <p style="font-style: italic; margin-bottom: 1rem;">${exhibit.legal_description || ''}</p>
-            <p><strong>Category:</strong> ${exhibit.category || 'Document'}</p>
-            <p><strong>Date:</strong> ${exhibit.formatted_date || 'Unknown'}</p>
+            <p style="font-style: italic; margin-bottom: 1rem;">${escapeHtml(exhibit.legal_description)}</p>
+            <p><strong>Category:</strong> ${escapeHtml(exhibit.category) || 'Document'}</p>
+            <p><strong>Date:</strong> ${escapeHtml(exhibit.formatted_date) || 'Unknown'}</p>
             <p><strong>Pages:</strong> ${exhibit.page_start}-${exhibit.page_end}</p>
             <p style="margin-top: 2rem; color: #666; font-style: italic;">[Exhibit document to be inserted here]</p>
           </div>
@@ -331,7 +343,7 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
           <!-- Certificate of Service -->
           <div style="padding: 2rem; page-break-after: always;">
             <h2 style="font-size: 18pt; font-weight: bold; text-align: center; margin-bottom: 1.5rem;">CERTIFICATE OF SERVICE</h2>
-            <pre style="white-space: pre-wrap; font-family: 'Times New Roman', serif;">${generatedBook.certificateOfService.content}</pre>
+            <pre style="white-space: pre-wrap; font-family: 'Times New Roman', serif;">${escapeHtml(generatedBook.certificateOfService.content)}</pre>
           </div>
         ` : ''}
 
@@ -339,7 +351,7 @@ export function BookOfDocumentsWizard({ caseId, caseTitle, open, onOpenChange }:
           <!-- Affidavit of Service -->
           <div style="padding: 2rem;">
             <h2 style="font-size: 18pt; font-weight: bold; text-align: center; margin-bottom: 1.5rem;">AFFIDAVIT OF SERVICE</h2>
-            <pre style="white-space: pre-wrap; font-family: 'Times New Roman', serif;">${generatedBook.affidavitTemplate.content}</pre>
+            <pre style="white-space: pre-wrap; font-family: 'Times New Roman', serif;">${escapeHtml(generatedBook.affidavitTemplate.content)}</pre>
           </div>
         ` : ''}
       `;
