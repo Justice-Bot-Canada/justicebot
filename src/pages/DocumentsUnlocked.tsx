@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { analytics, trackEvent } from '@/utils/analytics';
+import { trackEvent } from '@/utils/analytics';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -19,16 +19,33 @@ import {
   RefreshCw,
 } from 'lucide-react';
 
+type StepStatus = 'complete' | 'current' | 'upcoming';
+
+interface Step {
+  id: string;
+  label: string;
+  status: StepStatus;
+  icon: 'check' | 'unlock' | 'upload' | 'generate' | 'download';
+}
+
 export default function DocumentsUnlocked() {
   const navigate = useNavigate();
+  const { caseId: paramCaseId } = useParams();
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
 
+  // Support both route param and query param for caseId
+  const caseId = paramCaseId || searchParams.get('caseId') || searchParams.get('case');
+
   const [verifying, setVerifying] = useState(!!sessionId);
   const [verified, setVerified] = useState(false);
-  const [caseId, setCaseId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const hasVerified = useRef(false);
+
+  useEffect(() => {
+    // Track page view
+    trackEvent('next_steps_viewed', { caseId });
+  }, [caseId]);
 
   useEffect(() => {
     if (!sessionId || hasVerified.current) {
@@ -48,17 +65,11 @@ export default function DocumentsUnlocked() {
 
         if (data?.success) {
           setVerified(true);
-          setCaseId(data.caseId || null);
           trackEvent('payment_completed', {
-            product: 'court_ready_pack',
+            product: 'court_ready_documents',
             sessionId,
-            caseId: data.caseId,
+            caseId: data.caseId || caseId,
           });
-          trackEvent('documents_unlocked', {
-            product: 'court_ready_pack',
-            caseId: data.caseId,
-          });
-          analytics.funnelPurchase({ value: 39, itemName: 'Court-Ready Document Pack' });
         } else {
           setError(data?.error || 'Payment verification failed');
         }
@@ -71,9 +82,10 @@ export default function DocumentsUnlocked() {
     };
 
     verifyPayment();
-  }, [sessionId]);
+  }, [sessionId, caseId]);
 
-  const handleContinue = () => {
+  const handleUploadEvidence = () => {
+    trackEvent('evidence_upload_started', { caseId, source: 'next_steps' });
     if (caseId) {
       navigate(`/evidence?case=${caseId}`);
     } else {
@@ -120,38 +132,27 @@ export default function DocumentsUnlocked() {
     );
   }
 
-  const steps = [
-    {
-      id: 'intake',
-      label: 'Intake completed',
-      status: 'complete' as const,
-      icon: CheckCircle,
-    },
-    {
-      id: 'unlocked',
-      label: 'Document preparation unlocked',
-      status: 'complete' as const,
-      icon: Unlock,
-    },
-    {
-      id: 'upload',
-      label: 'Upload evidence',
-      status: 'current' as const,
-      icon: Upload,
-    },
-    {
-      id: 'generate',
-      label: 'Documents generated',
-      status: 'upcoming' as const,
-      icon: RefreshCw,
-    },
-    {
-      id: 'download',
-      label: 'Download & file',
-      status: 'upcoming' as const,
-      icon: Download,
-    },
+  const steps: Step[] = [
+    { id: 'intake', label: 'Intake completed', status: 'complete', icon: 'check' },
+    { id: 'unlocked', label: 'Document preparation unlocked', status: 'complete', icon: 'unlock' },
+    { id: 'upload', label: 'Upload evidence', status: 'current', icon: 'upload' },
+    { id: 'generate', label: 'Generate documents', status: 'upcoming', icon: 'generate' },
+    { id: 'download', label: 'Download & file', status: 'upcoming', icon: 'download' },
   ];
+
+  const getStepIcon = (step: Step) => {
+    if (step.status === 'complete') {
+      return <CheckCircle className="h-5 w-5 text-green-600" />;
+    }
+    if (step.status === 'current') {
+      return (
+        <div className="h-5 w-5 rounded-full border-2 border-primary flex items-center justify-center">
+          <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+        </div>
+      );
+    }
+    return <Circle className="h-5 w-5 text-muted-foreground/40" />;
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -166,6 +167,9 @@ export default function DocumentsUnlocked() {
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">
               You're all set. Let's prepare your documents.
             </h1>
+            <p className="text-muted-foreground">
+              Your one-time payment unlocked document preparation for this case.
+            </p>
           </div>
 
           {/* Progress Checklist */}
@@ -183,22 +187,17 @@ export default function DocumentsUnlocked() {
                         : 'bg-muted/30'
                     }`}
                   >
-                    <div className="flex-shrink-0">
-                      {step.status === 'complete' ? (
-                        <CheckCircle className="h-5 w-5 text-green-600" />
-                      ) : step.status === 'current' ? (
-                        <div className="h-5 w-5 rounded-full border-2 border-primary flex items-center justify-center">
-                          <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                        </div>
-                      ) : (
-                        <Circle className="h-5 w-5 text-muted-foreground/40" />
-                      )}
-                    </div>
+                    <div className="flex-shrink-0">{getStepIcon(step)}</div>
                     <span
                       className={`font-medium ${
                         step.status === 'upcoming' ? 'text-muted-foreground' : 'text-foreground'
                       }`}
                     >
+                      {step.status === 'complete' && step.icon === 'check' && '✅ '}
+                      {step.status === 'complete' && step.icon === 'unlock' && '🔓 '}
+                      {step.status === 'current' && '🔄 '}
+                      {step.status === 'upcoming' && step.icon === 'generate' && '⏳ '}
+                      {step.status === 'upcoming' && step.icon === 'download' && '📄 '}
                       {step.label}
                     </span>
                   </div>
@@ -211,16 +210,24 @@ export default function DocumentsUnlocked() {
           <div className="text-center space-y-4">
             <Button
               size="lg"
-              className="text-lg px-8 py-6 bg-slate-800 hover:bg-slate-900 text-white"
-              onClick={handleContinue}
+              className="text-lg px-8 py-6 w-full sm:w-auto bg-slate-800 hover:bg-slate-900 text-white"
+              onClick={handleUploadEvidence}
             >
               Upload My Evidence
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            
+
             <p className="text-sm text-muted-foreground">
-              You can upload documents now or come back anytime.<br />
-              Progress is saved.
+              You can upload documents now or come back later.<br />
+              Your progress is saved automatically.
+            </p>
+          </div>
+
+          {/* Legal Clarity Footer */}
+          <div className="text-center pt-4 border-t border-border">
+            <p className="text-xs text-muted-foreground">
+              Justice-Bot helps you prepare documents and understand procedure.<br />
+              It does not provide legal advice or representation.
             </p>
           </div>
         </div>

@@ -116,6 +116,7 @@ import Referral from "./pages/Referral";
 const SmartDocuments = lazy(() => import("./pages/SmartDocuments"));
 const CaseTimeline = lazy(() => import("./pages/CaseTimeline"));
 const DocumentDrafter = lazy(() => import("./pages/DocumentDrafter"));
+const DocumentsReady = lazy(() => import("./pages/DocumentsReady"));
 const CaseStrengthAnalyzer = lazy(() => import("./pages/CaseStrengthAnalyzer"));
 const SettlementCalculator = lazy(() => import("./pages/SettlementCalculator"));
 const SubscriptionSuccess = lazy(() => import("./pages/SubscriptionSuccess"));
@@ -299,7 +300,9 @@ const AppContent = () => {
           <Route path="/court-information" element={<Navigate to="/court" replace />} />
           <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
           <Route path="/unlock-success" element={<UnlockSuccess />} />
-          <Route path="/documents-unlocked" element={<Suspense fallback={<LoadingFallback />}><DocumentsUnlocked /></Suspense>} />
+          <Route path="/case/:caseId/next-steps" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><DocumentsUnlocked /></Suspense></ProtectedRoute>} />
+          <Route path="/documents-unlocked" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/case/:caseId/documents-ready" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><DocumentsReady /></Suspense></ProtectedRoute>} />
           <Route path="/subscription-success" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SubscriptionSuccess /></Suspense></ProtectedRoute>} />
           <Route path="/payment-cancel" element={<ProtectedRoute><PaymentCancel /></ProtectedRoute>} />
           <Route path="/thank-you" element={<ThankYou />} />

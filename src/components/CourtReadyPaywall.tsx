@@ -120,7 +120,7 @@ export function CourtReadyPaywall({ triageData, caseId, onAccessGranted, onCaseC
           priceId: STRIPE_PRICE_ID,
           mode: 'payment',
           caseId: finalCaseId,
-          successUrl: `${window.location.origin}/documents-unlocked?session_id={CHECKOUT_SESSION_ID}`,
+          successUrl: `${window.location.origin}/case/${finalCaseId}/next-steps?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${window.location.origin}/triage`,
           metadata: {
             product: 'court_ready_pack',
