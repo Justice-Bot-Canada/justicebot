@@ -117,144 +117,146 @@ export default function ProgramLanding() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* No Legal Advice Banner - Always prominent for program users */}
-      {program.show_no_legal_advice_banner && (
-        <Alert className="rounded-none border-x-0 border-t-0 bg-amber-50 dark:bg-amber-950/20 border-amber-200">
-          <ShieldCheck className="h-4 w-4 text-amber-600" />
-          <AlertTitle className="text-amber-800 dark:text-amber-200">Important Disclaimer</AlertTitle>
-          <AlertDescription className="text-amber-700 dark:text-amber-300">
-            Justice-Bot provides procedural guidance and document preparation tools only. 
-            This is not legal advice. For legal advice, please consult a licensed lawyer or legal aid.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      <div className="container max-w-4xl mx-auto px-4 py-12">
-        {/* Program Header */}
-        <div className="text-center mb-12">
-          <Badge variant="secondary" className="mb-4">
-            {program.organization || 'Partner Program'}
-          </Badge>
+      <div className="container max-w-3xl mx-auto px-4 py-12 md:py-16">
+        {/* Header */}
+        <div className="text-center mb-10">
           <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            You've been referred by {program.organization || program.name}
+            You've Been Referred by {program.organization || program.name}
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            This tool helps you organize evidence and prepare court-ready documents.<br />
-            <strong>No payment is required.</strong>
+            This tool helps you organize evidence and prepare court-ready documents for your legal matter.
+          </p>
+          <p className="text-lg font-semibold text-foreground mt-2">
+            No payment is required.
           </p>
         </div>
 
-        {/* Main CTA Card */}
-        <Card className="mb-8 border-primary/20">
-          <CardHeader className="text-center">
-            <CardTitle className="flex items-center justify-center gap-2">
-              <Scale className="h-5 w-5 text-primary" />
-              Get Started
+        {/* What This Tool Does */}
+        <Card className="mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-primary" />
+              What This Tool Does
             </CardTitle>
-            <CardDescription>
-              Answer a short triage to understand your legal options and get started.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
-                <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-sm">Complete a short triage</p>
-                  <p className="text-xs text-muted-foreground">5–10 minutes</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
-                <Upload className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-sm">Upload your evidence</p>
-                  <p className="text-xs text-muted-foreground">Documents, photos, messages</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50">
-                <FileText className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-sm">Get court-ready documents</p>
-                  <p className="text-xs text-muted-foreground">Forms + filing instructions</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex justify-center pt-4">
-              <Button
-                size="lg"
-                onClick={handleStartCase}
-                disabled={isProcessing}
-                className="px-8"
-              >
-                {isProcessing ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating your case...
-                  </>
-                ) : (
-                  'Start My Case'
-                )}
-              </Button>
-            </div>
-
-            {!user && (
-              <p className="text-center text-sm text-muted-foreground">
-                Already have an account?{' '}
-                <button 
-                  onClick={() => setShowAuth(true)}
-                  className="text-primary hover:underline"
-                >
-                  Sign in
-                </button>
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* What to Expect */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">What happens next?</CardTitle>
           </CardHeader>
           <CardContent>
-            <ol className="space-y-3 text-sm text-muted-foreground">
-              <li className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">1</span>
-                <span>Answer a short questionnaire about your situation (5–10 minutes)</span>
+            <ul className="space-y-2 text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-1">•</span>
+                <span>Guides you through questions about your situation</span>
               </li>
-              <li className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">2</span>
-                <span>Receive guidance on which tribunal or court handles your issue</span>
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-1">•</span>
+                <span>Helps you upload and organize evidence</span>
               </li>
-              <li className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">3</span>
-                <span>Get the correct forms and filing instructions</span>
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-1">•</span>
+                <span>Prepares filing-ready documents for court or tribunal</span>
               </li>
-              <li className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">4</span>
-                <span>Organize your evidence into a court-ready Book of Documents</span>
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-1">•</span>
+                <span>Explains next steps in plain language</span>
               </li>
-            </ol>
+            </ul>
           </CardContent>
         </Card>
 
-        {/* Footer */}
-        <div className="mt-12 text-center text-sm text-muted-foreground">
-          <p>
-            This program is provided in partnership with {program.organization || 'community organizations'}.
-          </p>
-          <p className="mt-2">
-            Questions? Contact{' '}
-            {program.contact_email ? (
-              <a href={`mailto:${program.contact_email}`} className="text-primary hover:underline">
-                {program.contact_email}
-              </a>
+        {/* What This Tool Does NOT Do */}
+        <Card className="mb-6 border-amber-200 dark:border-amber-800">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2 text-amber-700 dark:text-amber-300">
+              <AlertTriangle className="h-5 w-5" />
+              What This Tool Does NOT Do
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2 text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <span className="text-amber-600 mt-1">•</span>
+                <span>Does not provide legal advice</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber-600 mt-1">•</span>
+                <span>Does not replace a lawyer</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber-600 mt-1">•</span>
+                <span>Does not submit documents on your behalf</span>
+              </li>
+            </ul>
+            <p className="mt-4 text-sm font-medium text-foreground">
+              You remain responsible for reviewing and filing your documents.
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Privacy & Safety */}
+        <Card className="mb-10">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-primary" />
+              Privacy & Safety
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2 text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-1">•</span>
+                <span>Your information is private and secure</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-1">•</span>
+                <span>Your agency will not see your personal documents</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-primary mt-1">•</span>
+                <span>Your case is not shared without your consent</span>
+              </li>
+            </ul>
+          </CardContent>
+        </Card>
+
+        {/* Primary CTA */}
+        <div className="mb-6">
+          <Button
+            size="lg"
+            onClick={handleStartCase}
+            disabled={isProcessing}
+            className="w-full py-6 text-lg"
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Creating your case...
+              </>
             ) : (
-              <a href="/contact" className="text-primary hover:underline">
-                our support team
-              </a>
+              'Start My Case'
             )}
+          </Button>
+        </div>
+
+        {/* Secondary reassurance */}
+        <p className="text-center text-sm text-muted-foreground mb-8">
+          You can stop and come back at any time. Progress is saved automatically.
+        </p>
+
+        {!user && (
+          <p className="text-center text-sm text-muted-foreground mb-8">
+            Already have an account?{' '}
+            <button 
+              onClick={() => setShowAuth(true)}
+              className="text-primary hover:underline"
+            >
+              Sign in
+            </button>
+          </p>
+        )}
+
+        {/* Footer Legal Notice */}
+        <div className="border-t pt-8 text-center">
+          <p className="text-sm text-muted-foreground">
+            Justice-Bot provides procedural assistance only.<br />
+            No lawyer-client relationship is created.
           </p>
         </div>
       </div>
