@@ -416,6 +416,7 @@ export type Database = {
       }
       cases: {
         Row: {
+          cohort_batch: string | null
           created_at: string
           description: string | null
           flow_step: string | null
@@ -427,7 +428,10 @@ export type Database = {
           municipality: string | null
           owner: string | null
           plan: string | null
+          program_id: string | null
+          program_referral_code: string | null
           province: string
+          referral_source: string | null
           status: string | null
           timeline_viewed: boolean | null
           title: string
@@ -439,6 +443,7 @@ export type Database = {
           venue: string | null
         }
         Insert: {
+          cohort_batch?: string | null
           created_at?: string
           description?: string | null
           flow_step?: string | null
@@ -450,7 +455,10 @@ export type Database = {
           municipality?: string | null
           owner?: string | null
           plan?: string | null
+          program_id?: string | null
+          program_referral_code?: string | null
           province: string
+          referral_source?: string | null
           status?: string | null
           timeline_viewed?: boolean | null
           title: string
@@ -462,6 +470,7 @@ export type Database = {
           venue?: string | null
         }
         Update: {
+          cohort_batch?: string | null
           created_at?: string
           description?: string | null
           flow_step?: string | null
@@ -473,7 +482,10 @@ export type Database = {
           municipality?: string | null
           owner?: string | null
           plan?: string | null
+          program_id?: string | null
+          program_referral_code?: string | null
           province?: string
+          referral_source?: string | null
           status?: string | null
           timeline_viewed?: boolean | null
           title?: string
@@ -484,7 +496,15 @@ export type Database = {
           user_number?: number | null
           venue?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "cases_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       court_form_fields: {
         Row: {
@@ -2172,6 +2192,63 @@ export type Database = {
         }
         Relationships: []
       }
+      programs: {
+        Row: {
+          cohort_batch: string | null
+          contact_email: string | null
+          created_at: string
+          description: string | null
+          disable_ai_beyond_procedural: boolean
+          disable_pricing: boolean
+          id: string
+          is_active: boolean
+          max_referrals: number | null
+          name: string
+          organization: string | null
+          referral_count: number
+          settings: Json | null
+          show_no_legal_advice_banner: boolean
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          cohort_batch?: string | null
+          contact_email?: string | null
+          created_at?: string
+          description?: string | null
+          disable_ai_beyond_procedural?: boolean
+          disable_pricing?: boolean
+          id?: string
+          is_active?: boolean
+          max_referrals?: number | null
+          name: string
+          organization?: string | null
+          referral_count?: number
+          settings?: Json | null
+          show_no_legal_advice_banner?: boolean
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          cohort_batch?: string | null
+          contact_email?: string | null
+          created_at?: string
+          description?: string | null
+          disable_ai_beyond_procedural?: boolean
+          disable_pricing?: boolean
+          id?: string
+          is_active?: boolean
+          max_referrals?: number | null
+          name?: string
+          organization?: string | null
+          referral_count?: number
+          settings?: Json | null
+          show_no_legal_advice_banner?: boolean
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       referral_codes: {
         Row: {
           code: string
@@ -3075,6 +3152,17 @@ export type Database = {
         Args: { target_schemas?: string[] }
         Returns: undefined
       }
+      export_program_summary: {
+        Args: { p_program_id: string }
+        Returns: {
+          completed: number
+          completion_rate: number
+          doc_readiness_rate: number
+          docs_ready: number
+          intake_started: number
+          total_referrals: number
+        }[]
+      }
       get_admins_meta_secure: {
         Args: never
         Returns: {
@@ -3143,6 +3231,7 @@ export type Database = {
         Args: { end_date?: string; start_date?: string }
         Returns: Json
       }
+      get_program_stats: { Args: { p_program_id: string }; Returns: Json }
       get_recent_usage_counts: {
         Args: {
           p_ip_address: string
@@ -3198,6 +3287,10 @@ export type Database = {
           }
       increment_form_usage: {
         Args: { form_id_input: string }
+        Returns: undefined
+      }
+      increment_program_referral: {
+        Args: { p_program_id: string }
         Returns: undefined
       }
       is_admin:

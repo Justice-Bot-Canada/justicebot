@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { usePremiumAccess } from '@/hooks/usePremiumAccess';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { useShouldHidePricing } from '@/components/ProgramBanner';
 
 interface UpsellModalProps {
   trigger: 'feature_limit' | 'success_milestone' | 'time_saved';
@@ -16,11 +17,13 @@ export function UpsellModal({ trigger, context }: UpsellModalProps) {
   const { user } = useAuth();
   const { hasAccess } = usePremiumAccess();
   const navigate = useNavigate();
+  const shouldHidePricing = useShouldHidePricing();
   const [open, setOpen] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    if (!user || hasAccess || dismissed) return;
+    // Don't show upsells for program users
+    if (!user || hasAccess || dismissed || shouldHidePricing) return;
 
     // Check if we've shown this prompt recently
     checkAndShowPrompt();
@@ -127,7 +130,8 @@ export function UpsellModal({ trigger, context }: UpsellModalProps) {
 
   const content = getContent();
 
-  if (!user || hasAccess) return null;
+  // Don't render for program users or users with access
+  if (!user || hasAccess || shouldHidePricing) return null;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

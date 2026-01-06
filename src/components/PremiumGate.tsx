@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Lock, Crown, Sparkles, Check } from 'lucide-react';
 import PayPalTrialButton from '@/components/PayPalTrialButton';
+import { useProgram } from '@/contexts/ProgramContext';
+
 // PayPal plan IDs
 const PAYPAL_PLAN_IDS = {
   basic: "P-913106187H1268013NFBA72I",
@@ -23,6 +25,10 @@ interface PremiumGateProps {
 export const PremiumGate = ({ children, feature, fallback, showUpgrade = true }: PremiumGateProps) => {
   const { user } = useAuth();
   const { hasAccess, isFreeUser, userNumber, loading } = usePremiumAccess();
+  const { isProgramMode, program } = useProgram();
+
+  // Program users with disabled pricing get full access
+  const hasProgramAccess = isProgramMode && program?.disable_pricing;
 
   if (loading) {
     return (
@@ -56,7 +62,8 @@ export const PremiumGate = ({ children, feature, fallback, showUpgrade = true }:
     );
   }
 
-  if (hasAccess) {
+  // Grant access if user has premium OR is in a program with pricing disabled
+  if (hasAccess || hasProgramAccess) {
     return <>{children}</>;
   }
 
