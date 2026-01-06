@@ -414,6 +414,8 @@ const Triage = () => {
                       province: province,
                       description: userDescription,
                     }}
+                    caseId={createdCaseId}
+                    onCaseCreated={(newCaseId) => setCreatedCaseId(newCaseId)}
                     onAccessGranted={() => {
                       setShowPaywall(false);
                       setStep(2);

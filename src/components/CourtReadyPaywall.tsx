@@ -30,12 +30,14 @@ interface CourtReadyPaywallProps {
     province: string;
     description: string;
   };
+  caseId?: string | null;
   onAccessGranted?: () => void;
+  onCaseCreated?: (caseId: string) => void;
 }
 
 const STRIPE_PRICE_ID = 'price_1SmUwAL0pLShFbLtIK429fdX'; // $39 CAD one-time
 
-export function CourtReadyPaywall({ triageData, onAccessGranted }: CourtReadyPaywallProps) {
+export function CourtReadyPaywall({ triageData, caseId, onAccessGranted, onCaseCreated }: CourtReadyPaywallProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { hasAccess, isProgramUser, loading: accessLoading } = usePremiumAccess();
@@ -86,15 +88,44 @@ export function CourtReadyPaywall({ triageData, onAccessGranted }: CourtReadyPay
     });
 
     try {
+      // Create case if we don't have one yet
+      let finalCaseId = caseId;
+      if (!finalCaseId && triageData) {
+        const { data: newCase, error: caseError } = await supabase
+          .from('cases')
+          .insert({
+            user_id: user.id,
+            title: `${triageData.venueTitle || triageData.venue} Case`,
+            description: triageData.description,
+            venue: triageData.venue,
+            province: triageData.province,
+            status: 'pending',
+            flow_step: 'payment',
+            triage: {
+              venue: triageData.venue,
+              venueTitle: triageData.venueTitle,
+              province: triageData.province,
+            } as any,
+          })
+          .select()
+          .single();
+
+        if (caseError) throw caseError;
+        finalCaseId = newCase.id;
+        onCaseCreated?.(newCase.id);
+      }
+
       const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
         body: {
           priceId: STRIPE_PRICE_ID,
           mode: 'payment',
+          caseId: finalCaseId,
           successUrl: `${window.location.origin}/documents-unlocked?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: `${window.location.origin}/triage`,
           metadata: {
             product: 'court_ready_pack',
             plan_key: 'court_ready_pack',
+            case_id: finalCaseId,
             venue: triageData?.venue || 'unknown',
             province: triageData?.province || 'unknown',
           },

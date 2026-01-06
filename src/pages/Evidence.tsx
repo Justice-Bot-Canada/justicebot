@@ -22,7 +22,7 @@ const Evidence = () => {
   const { user } = useAuth();
   const { hasAccess, isFreeUser, tier } = usePremiumAccess();
   const [searchParams] = useSearchParams();
-  const caseId = searchParams.get('caseId');
+  const caseId = searchParams.get('case') || searchParams.get('caseId'); // Support both params
   const [caseData, setCaseData] = useState<any>(null);
   const [bookWizardOpen, setBookWizardOpen] = useState(false);
   const [showBundlePaywall, setShowBundlePaywall] = useState(false);
@@ -121,7 +121,7 @@ const Evidence = () => {
               <div>
                 <h1 className="text-3xl font-bold mb-2">Upload Your Evidence</h1>
                 <p className="text-muted-foreground">
-                  Upload documents that support your case. They'll be automatically organized and ready to use.
+                  Add documents that support your case. You can upload now or come back later — progress is saved automatically.
                 </p>
               </div>
               <Button 
@@ -149,10 +149,10 @@ const Evidence = () => {
           </div>
 
           {/* Reassurance message */}
-          <Alert className="mb-6 bg-primary/5 border-primary/20">
-            <Upload className="h-4 w-4" />
-            <AlertDescription>
-              Upload what you have. You can add more documents later. All uploads are encrypted and secure.
+          <Alert className="mb-6 bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800">
+            <Upload className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-800 dark:text-green-200">
+              <strong>Progress saves automatically.</strong> You can add, remove, or replace evidence anytime before generating documents.
             </AlertDescription>
           </Alert>
 
@@ -186,7 +186,7 @@ const Evidence = () => {
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {evidenceCount > 0 
-                      ? 'Ready to continue to the next step'
+                      ? 'Ready to generate your documents'
                       : 'Upload at least one document to continue'}
                   </p>
                 </div>
@@ -194,9 +194,9 @@ const Evidence = () => {
                   onClick={handleContinueToTimeline}
                   disabled={evidenceCount === 0}
                   size="lg"
-                  className="gap-2 w-full sm:w-auto"
+                  className="gap-2 w-full sm:w-auto bg-slate-800 hover:bg-slate-900 text-white"
                 >
-                  Continue to Timeline
+                  Generate My Documents
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
