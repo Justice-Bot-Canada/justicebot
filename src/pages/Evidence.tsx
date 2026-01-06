@@ -215,6 +215,12 @@ const Evidence = () => {
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
+              {/* Refund-prevention micro-copy */}
+              {evidenceCount > 0 && (
+                <p className="text-xs text-muted-foreground text-center mt-4 pt-4 border-t border-border">
+                  Make sure all evidence is uploaded before generating documents.
+                </p>
+              )}
             </CardContent>
           </Card>
         </div>
