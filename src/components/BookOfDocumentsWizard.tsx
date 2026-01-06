@@ -33,7 +33,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast-stub';
 import { usePremiumAccess } from '@/hooks/usePremiumAccess';
 import { useNavigate } from 'react-router-dom';
-// @ts-ignore
+
 import html2pdf from 'html2pdf.js';
 
 interface Evidence {
