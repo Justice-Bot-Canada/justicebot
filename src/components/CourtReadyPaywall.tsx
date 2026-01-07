@@ -85,11 +85,16 @@ export function CourtReadyPaywall({ triageData, caseId, onAccessGranted, onCaseC
     }
 
     setIsProcessing(true);
-    trackEvent('payment_initiated', {
+    
+    // ONLY track checkout initiation (NOT purchase - that fires after webhook confirms)
+    trackEvent('checkout_initiated', {
       product: 'court_ready_pack',
       price: 39,
       currency: 'CAD',
     });
+    
+    // Track begin_checkout for funnel (NOT purchase)
+    analytics.beginCheckout('court_ready_pack', 'Court-Ready Document Pack', 39);
 
     try {
       // Create case if we don't have one yet

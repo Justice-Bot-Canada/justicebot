@@ -42,20 +42,45 @@ serve(async (req) => {
     } = await req.json();
     logStep("Request body", { priceId, planKey, trialDays, mode, caseId });
 
-    // Get user from auth header (optional - support guest checkout)
+    // CRITICAL: Authentication is REQUIRED - no guest checkout allowed
     const authHeader = req.headers.get("Authorization");
-    let user = null;
-    let userEmail = null;
-
-    if (authHeader) {
-      const token = authHeader.replace("Bearer ", "");
-      const { data } = await supabaseClient.auth.getUser(token);
-      user = data.user;
-      userEmail = user?.email;
-      logStep("User authenticated", { userId: user?.id, email: userEmail });
-    } else {
-      logStep("Guest checkout - no auth header");
+    if (!authHeader) {
+      logStep("ERROR: No auth header - authentication required");
+      return new Response(JSON.stringify({ 
+        error: "Authentication required before checkout" 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401,
+      });
     }
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data, error: authError } = await supabaseClient.auth.getUser(token);
+    
+    if (authError || !data.user) {
+      logStep("ERROR: Invalid auth token", { error: authError?.message });
+      return new Response(JSON.stringify({ 
+        error: "Invalid authentication. Please log in again." 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401,
+      });
+    }
+
+    const user = data.user;
+    const userEmail = user.email;
+    
+    if (!userEmail) {
+      logStep("ERROR: User has no email");
+      return new Response(JSON.stringify({ 
+        error: "User email required for checkout" 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    logStep("User authenticated", { userId: user.id, email: userEmail });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
