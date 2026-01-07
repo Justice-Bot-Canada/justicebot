@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { trackEvent } from '@/utils/analytics';
+import { trackEvent, analytics } from '@/utils/analytics';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -41,6 +41,7 @@ export default function DocumentsUnlocked() {
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const hasVerified = useRef(false);
+  const purchaseEventFired = useRef(false);
 
   useEffect(() => {
     // Track page view
@@ -65,11 +66,35 @@ export default function DocumentsUnlocked() {
 
         if (data?.success) {
           setVerified(true);
-          trackEvent('payment_completed', {
-            product: 'court_ready_documents',
-            sessionId,
-            caseId: data.caseId || caseId,
-          });
+          
+          // CRITICAL: Only fire purchase event AFTER server-side verification confirms payment
+          // This ensures GA = Stripe = Supabase (same truth)
+          if (!purchaseEventFired.current) {
+            purchaseEventFired.current = true;
+            
+            // Fire new funnel purchase events (only after verification)
+            analytics.paymentCompletedEvent(sessionId, 39);
+            analytics.featuresUnlocked(data.caseId || caseId);
+            
+            // Fire GA4 purchase event for funnel tracking
+            analytics.funnelPurchase({
+              transactionId: sessionId,
+              value: 39,
+              itemName: 'Court-Ready Document Pack',
+            });
+            
+            // Legacy event for backwards compatibility
+            trackEvent('payment_completed', {
+              product: 'court_ready_documents',
+              sessionId,
+              caseId: data.caseId || caseId,
+              verifiedByServer: true,
+            });
+          }
+        } else if (data?.alreadyUnlocked) {
+          // Already processed by webhook - just mark as verified
+          setVerified(true);
+          trackEvent('payment_already_verified', { caseId, sessionId });
         } else {
           setError(data?.error || 'Payment verification failed');
         }
