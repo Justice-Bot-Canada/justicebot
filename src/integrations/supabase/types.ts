@@ -56,6 +56,44 @@ export type Database = {
         }
         Relationships: []
       }
+      entitlements: {
+        Row: {
+          access_level: string
+          ends_at: string | null
+          product_id: string
+          source: string
+          starts_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_level?: string
+          ends_at?: string | null
+          product_id: string
+          source?: string
+          starts_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_level?: string
+          ends_at?: string | null
+          product_id?: string
+          source?: string
+          starts_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entitlements_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       evidence: {
         Row: {
           case_id: string
@@ -108,6 +146,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      features: {
+        Row: {
+          created_at: string
+          description: string | null
+          key: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          key: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          key?: string
+          name?: string
+        }
+        Relationships: []
       }
       form_usage: {
         Row: {
@@ -300,6 +359,157 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          amount_total: number | null
+          created_at: string
+          currency: string | null
+          id: number
+          paid_at: string | null
+          price_id: string | null
+          status: string
+          stripe_checkout_session_id: string | null
+          stripe_payment_intent_id: string | null
+          stripe_subscription_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount_total?: number | null
+          created_at?: string
+          currency?: string | null
+          id?: number
+          paid_at?: string | null
+          price_id?: string | null
+          status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_subscription_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount_total?: number | null
+          created_at?: string
+          currency?: string | null
+          id?: number
+          paid_at?: string | null
+          price_id?: string | null
+          status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_subscription_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_price_id_fkey"
+            columns: ["price_id"]
+            isOneToOne: false
+            referencedRelation: "prices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plan_features: {
+        Row: {
+          feature_key: string
+          product_id: string
+          value: Json
+        }
+        Insert: {
+          feature_key: string
+          product_id: string
+          value?: Json
+        }
+        Update: {
+          feature_key?: string
+          product_id?: string
+          value?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_features_feature_key_fkey"
+            columns: ["feature_key"]
+            isOneToOne: false
+            referencedRelation: "features"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "plan_features_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prices: {
+        Row: {
+          active: boolean
+          created_at: string
+          currency: string
+          id: string
+          interval: string | null
+          metadata: Json
+          product_id: string
+          stripe_price_id: string
+          unit_amount: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          currency?: string
+          id: string
+          interval?: string | null
+          metadata?: Json
+          product_id: string
+          stripe_price_id: string
+          unit_amount: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          currency?: string
+          id?: string
+          interval?: string | null
+          metadata?: Json
+          product_id?: string
+          stripe_price_id?: string
+          unit_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prices_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          metadata: Json
+          name: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id: string
+          metadata?: Json
+          name: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          metadata?: Json
+          name?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -339,6 +549,57 @@ export type Database = {
         }
         Relationships: []
       }
+      stripe_customers: {
+        Row: {
+          created_at: string
+          stripe_customer_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          stripe_customer_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          stripe_customer_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      stripe_webhook_events: {
+        Row: {
+          id: number
+          livemode: boolean
+          payload: Json
+          processed_at: string | null
+          processing_error: string | null
+          received_at: string
+          stripe_event_id: string
+          type: string
+        }
+        Insert: {
+          id?: number
+          livemode: boolean
+          payload: Json
+          processed_at?: string | null
+          processing_error?: string | null
+          received_at?: string
+          stripe_event_id: string
+          type: string
+        }
+        Update: {
+          id?: number
+          livemode?: boolean
+          payload?: Json
+          processed_at?: string | null
+          processing_error?: string | null
+          received_at?: string
+          stripe_event_id?: string
+          type?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -362,9 +623,82 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      active_entitlements: {
+        Row: {
+          access_level: string | null
+          ends_at: string | null
+          is_active: boolean | null
+          product_id: string | null
+          source: string | null
+          starts_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          access_level?: string | null
+          ends_at?: string | null
+          is_active?: never
+          product_id?: string | null
+          source?: string | null
+          starts_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          access_level?: string | null
+          ends_at?: string | null
+          is_active?: never
+          product_id?: string | null
+          source?: string | null
+          starts_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entitlements_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      my_active_entitlements: {
+        Row: {
+          access_level: string | null
+          ends_at: string | null
+          product_id: string | null
+          source: string | null
+          starts_at: string | null
+        }
+        Insert: {
+          access_level?: string | null
+          ends_at?: string | null
+          product_id?: string | null
+          source?: string | null
+          starts_at?: string | null
+        }
+        Update: {
+          access_level?: string | null
+          ends_at?: string | null
+          product_id?: string | null
+          source?: string | null
+          starts_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "entitlements_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
+      has_active_entitlement: {
+        Args: { p_product_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -374,6 +708,16 @@ export type Database = {
       }
       increment_form_usage: { Args: { form_id: string }; Returns: undefined }
       make_user_admin: { Args: { _email: string }; Returns: undefined }
+      user_feature_number: {
+        Args: { p_feature_key: string; p_path: string[] }
+        Returns: number
+      }
+      user_feature_unlimited: {
+        Args: { p_feature_key: string }
+        Returns: boolean
+      }
+      user_feature_value: { Args: { p_feature_key: string }; Returns: Json }
+      user_has_feature: { Args: { p_feature_key: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
