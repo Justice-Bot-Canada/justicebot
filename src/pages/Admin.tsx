@@ -214,15 +214,15 @@ const Admin = () => {
         return;
       }
 
-      const allUsers = usersData || [];
+      const allUsers = Array.isArray(usersData) ? usersData : [];
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
       const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-      const newUsersToday = allUsers.filter(u => new Date(u.created_at) >= today).length;
-      const newUsersThisWeek = allUsers.filter(u => new Date(u.created_at) >= weekAgo).length;
-      const newUsersThisMonth = allUsers.filter(u => new Date(u.created_at) >= monthAgo).length;
+      const newUsersToday = allUsers.filter((u: any) => new Date(u.created_at) >= today).length;
+      const newUsersThisWeek = allUsers.filter((u: any) => new Date(u.created_at) >= weekAgo).length;
+      const newUsersThisMonth = allUsers.filter((u: any) => new Date(u.created_at) >= monthAgo).length;
 
       setUserStats({
         totalUsers: allUsers.length,
@@ -232,7 +232,7 @@ const Admin = () => {
       });
 
       // Format users data with real emails and display names
-      const formattedUsers = allUsers.map(u => ({
+      const formattedUsers = allUsers.map((u: any) => ({
         id: u.id,
         email: u.email,
         created_at: u.created_at,
@@ -248,7 +248,7 @@ const Admin = () => {
         .rpc('get_all_admins');
 
       if (!adminsError && adminsData) {
-        setAdmins(adminsData);
+        setAdmins((Array.isArray(adminsData) ? adminsData : []) as unknown as AdminUser[]);
       }
 
       // Load case statistics
@@ -320,7 +320,7 @@ const Admin = () => {
           .reduce((sum, f) => sum + (f.completion_time_minutes || 0), 0) / formUsageData.length || 0;
 
         // Calculate retention (users who signed in within last 30 days)
-        const retainedUsers = allUsers.filter(u => {
+        const retainedUsers = allUsers.filter((u: any) => {
           if (!u.last_sign_in_at) return false;
           const signInDate = new Date(u.last_sign_in_at);
           return signInDate >= monthAgo;
@@ -349,8 +349,7 @@ const Admin = () => {
 
     try {
       const { error } = await supabase.rpc('grant_admin_role', {
-        target_user_id: selectedUser.id,
-        admin_notes: adminNotes || null
+        p_user_id: selectedUser.id
       });
 
       if (error) throw error;
@@ -371,8 +370,7 @@ const Admin = () => {
 
     try {
       const { error } = await supabase.rpc('revoke_admin_role', {
-        target_user_id: selectedUser.id,
-        revoke_reason: revokeReason || null
+        p_user_id: selectedUser.id
       });
 
       if (error) throw error;

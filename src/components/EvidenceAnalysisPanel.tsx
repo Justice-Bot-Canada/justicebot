@@ -46,7 +46,7 @@ export function EvidenceAnalysisPanel({
         const { data, error } = await supabase
           .from('evidence_analysis')
           .select('analysis_data, created_at')
-          .eq('case_id', caseId)
+          .eq('evidence_id', caseId)
           .order('created_at', { ascending: false })
           .limit(1)
           .single();

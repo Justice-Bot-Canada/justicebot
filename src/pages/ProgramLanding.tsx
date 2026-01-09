@@ -54,7 +54,7 @@ export default function ProgramLanding() {
 
     try {
       // Increment referral count
-      await supabase.rpc('increment_program_referral', { p_program_id: program.id });
+      await supabase.rpc('increment_program_referral', { p_program_slug: program.slug });
 
       // Create case with program tagging
       const { data: newCase, error: caseError } = await supabase

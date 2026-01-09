@@ -32,14 +32,13 @@ export function TestimonialForm({ caseId, caseType }: { caseId?: string; caseTyp
 
     try {
       const { error } = await supabase.from("testimonials").insert({
-        user_id: user.id,
-        case_id: caseId || null,
         name: formData.name,
         location: formData.location,
         case_type: caseType || "General",
         story: formData.story,
         outcome: formData.outcome,
         rating,
+        content: formData.story,
       });
 
       if (error) throw error;

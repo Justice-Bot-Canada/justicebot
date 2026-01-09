@@ -37,11 +37,10 @@ export default function TutorialVideos({ pathwayType, category }: TutorialVideos
 
   const loadVideos = async () => {
     setLoading(true);
-    let query = supabase
+    let query = (supabase
       .from('tutorial_videos')
       .select('*')
-      .eq('is_active', true)
-      .order('step_number', { ascending: true });
+      .order('step_number', { ascending: true })) as any;
 
     if (pathwayType) {
       query = query.eq('pathway_type', pathwayType);
