@@ -124,6 +124,7 @@ const FeatureGuide = lazy(() => import("./pages/FeatureGuide"));
 const ProgramLanding = lazy(() => import("./pages/ProgramLanding"));
 const AdminProgramDashboard = lazy(() => import("./pages/AdminProgramDashboard"));
 const DocumentsUnlocked = lazy(() => import("./pages/DocumentsUnlocked"));
+const CaseWorkspacePage = lazy(() => import("./pages/CaseWorkspacePage"));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -202,6 +203,7 @@ const AppContent = () => {
           <Route path="/assessment" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><CaseAssessment /></Suspense></ProtectedRoute>} />
           <Route path="/settlement-calculator" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SettlementCalculator /></Suspense></ProtectedRoute>} />
           <Route path="/pathway/:caseId" element={<ProtectedRoute><PathwayDecision /></ProtectedRoute>} />
+          <Route path="/case-workspace/:caseId" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><CaseWorkspacePage /></Suspense></ProtectedRoute>} />
 
           {/* Forms Management */}
           <Route path="/forms" element={<Forms />} />
