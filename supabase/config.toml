@@ -164,5 +164,5 @@ verify_jwt = false
 [functions.create_checkout]
 verify_jwt = true
 
-[functions.stripe_webhook]
+[functions.stripe-webhook]
 verify_jwt = false
