@@ -670,6 +670,21 @@ export type Database = {
         }
         Relationships: []
       }
+      healthcheck: {
+        Row: {
+          created_at: string
+          id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+        }
+        Update: {
+          created_at?: string
+          id?: never
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           created_at: string
@@ -1742,6 +1757,11 @@ export type Database = {
       check_free_tier_eligibility: {
         Args: { p_user_id: string }
         Returns: boolean
+      }
+      db_ping: { Args: never; Returns: Json }
+      exec_sql_count: {
+        Args: { p_schema: string; p_table: string }
+        Returns: number
       }
       export_program_summary: { Args: { p_program_id: string }; Returns: Json }
       get_all_admins: { Args: never; Returns: Json }
