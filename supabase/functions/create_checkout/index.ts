@@ -22,15 +22,13 @@ serve(async (req) => {
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
-    logStep("Stripe key verified");
 
     // Parse request body
     const { 
       priceId, 
+      productType = "one_time", // one_time | monthly | yearly | low_income
       successUrl,
       cancelUrl,
-      mode = 'payment', // 'subscription' or 'payment'
-      metadata = {}
     } = await req.json();
 
     if (!priceId) {
@@ -40,7 +38,7 @@ serve(async (req) => {
       });
     }
 
-    logStep("Request body", { priceId, mode });
+    logStep("Request params", { priceId, productType });
 
     // Create Supabase client for auth
     const supabaseClient = createClient(
@@ -48,13 +46,11 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_ANON_KEY") ?? ""
     );
 
-    // CRITICAL: Authentication is REQUIRED
+    // REQUIRED: User must be authenticated
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      logStep("ERROR: No auth header - authentication required");
-      return new Response(JSON.stringify({ 
-        error: "Authentication required before checkout" 
-      }), {
+      logStep("ERROR: No auth header");
+      return new Response(JSON.stringify({ error: "Authentication required" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 401,
       });
@@ -64,126 +60,107 @@ serve(async (req) => {
     const { data: authData, error: authError } = await supabaseClient.auth.getUser(token);
     
     if (authError || !authData.user) {
-      logStep("ERROR: Invalid auth token", { error: authError?.message });
-      return new Response(JSON.stringify({ 
-        error: "Invalid authentication. Please log in again." 
-      }), {
+      logStep("ERROR: Invalid auth", { error: authError?.message });
+      return new Response(JSON.stringify({ error: "Invalid authentication" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 401,
       });
     }
 
     const user = authData.user;
+    const userId = user.id;
     const userEmail = user.email;
     
     if (!userEmail) {
-      logStep("ERROR: User has no email");
-      return new Response(JSON.stringify({ 
-        error: "User email required for checkout" 
-      }), {
+      return new Response(JSON.stringify({ error: "User email required" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
       });
     }
 
-    logStep("User authenticated", { userId: user.id, email: userEmail });
+    logStep("User authenticated", { userId, email: userEmail });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
-    // Create Supabase admin client for database operations
+    // Admin client for stripe_customers lookup
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Check if Stripe customer exists in our database
-    let stripeCustomerId: string | undefined;
+    // Ensure Stripe customer exists
+    let stripeCustomerId: string;
     
     const { data: existingCustomer } = await supabaseAdmin
       .from("stripe_customers")
       .select("stripe_customer_id")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .maybeSingle();
 
     if (existingCustomer?.stripe_customer_id) {
       stripeCustomerId = existingCustomer.stripe_customer_id;
-      logStep("Found existing Stripe customer in DB", { stripeCustomerId });
+      logStep("Found existing customer", { stripeCustomerId });
     } else {
-      // Check Stripe directly by email
+      // Check Stripe by email
       const customers = await stripe.customers.list({ email: userEmail, limit: 1 });
       
       if (customers.data.length > 0) {
         stripeCustomerId = customers.data[0].id;
-        logStep("Found existing Stripe customer by email", { stripeCustomerId });
-        
-        // Save to our database
-        await supabaseAdmin
-          .from("stripe_customers")
-          .upsert({
-            user_id: user.id,
-            stripe_customer_id: stripeCustomerId,
-            created_at: new Date().toISOString(),
-          }, { onConflict: "user_id" });
+        logStep("Found customer by email", { stripeCustomerId });
       } else {
-        // Create new Stripe customer
+        // Create new customer
         const newCustomer = await stripe.customers.create({
           email: userEmail,
-          metadata: {
-            user_id: user.id,
-          },
+          metadata: { user_id: userId },
         });
         stripeCustomerId = newCustomer.id;
-        logStep("Created new Stripe customer", { stripeCustomerId });
-
-        // Save to our database
-        await supabaseAdmin
-          .from("stripe_customers")
-          .insert({
-            user_id: user.id,
-            stripe_customer_id: stripeCustomerId,
-            created_at: new Date().toISOString(),
-          });
+        logStep("Created new customer", { stripeCustomerId });
       }
+
+      // Save to stripe_customers
+      await supabaseAdmin
+        .from("stripe_customers")
+        .upsert({
+          user_id: userId,
+          stripe_customer_id: stripeCustomerId,
+          created_at: new Date().toISOString(),
+        }, { onConflict: "user_id" });
     }
+
+    // Determine checkout mode based on productType
+    const mode = (productType === "monthly" || productType === "yearly") ? "subscription" : "payment";
 
     const origin = req.headers.get("origin") || "https://justice-bot.com";
     const finalSuccessUrl = successUrl || `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
     const finalCancelUrl = cancelUrl || `${origin}/pricing`;
 
-    // Build session params
-    const sessionParams: Stripe.Checkout.SessionCreateParams = {
+    // Create Checkout Session - ONLY this, no access granting
+    const session = await stripe.checkout.sessions.create({
       customer: stripeCustomerId,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      mode: mode as 'subscription' | 'payment',
+      line_items: [{ price: priceId, quantity: 1 }],
+      mode: mode as "subscription" | "payment",
       success_url: finalSuccessUrl,
       cancel_url: finalCancelUrl,
-      client_reference_id: user.id, // Critical for mapping payment to user
+      client_reference_id: userId,
       metadata: {
-        user_id: user.id,
+        user_id: userId,
         price_id: priceId,
-        product_type: mode,
-        ...metadata
+        product_type: productType, // one_time | monthly | yearly | low_income
       },
-    };
-
-    // Add subscription-specific options
-    if (mode === 'subscription') {
-      sessionParams.subscription_data = {
-        metadata: {
-          user_id: user.id,
+      ...(mode === "subscription" && {
+        subscription_data: {
+          metadata: {
+            user_id: userId,
+            product_type: productType,
+          },
         },
-      };
-    }
+      }),
+    });
 
-    const session = await stripe.checkout.sessions.create(sessionParams);
-    logStep("Checkout session created", { sessionId: session.id, url: session.url, mode });
+    logStep("Checkout session created", { sessionId: session.id, mode });
 
-    return new Response(JSON.stringify({ url: session.url, sessionId: session.id }), {
+    // Return ONLY the URL - frontend just redirects
+    return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
