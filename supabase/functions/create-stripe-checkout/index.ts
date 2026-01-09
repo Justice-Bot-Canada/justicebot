@@ -7,7 +7,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const logStep = (step: string, details?: any) => {
+const logStep = (step: string, details?: unknown) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CREATE-STRIPE-CHECKOUT] ${step}${detailsStr}`);
 };
@@ -17,11 +17,6 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-  );
-
   try {
     logStep("Function started");
 
@@ -29,20 +24,31 @@ serve(async (req) => {
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
     logStep("Stripe key verified");
 
-    // Get request body - support both subscriptions and one-time payments
+    // Parse request body
     const { 
       priceId, 
-      planKey, 
-      trialDays = 5,
-      mode = 'subscription', // 'subscription' or 'payment'
       successUrl,
       cancelUrl,
-      caseId,
+      mode = 'payment', // 'subscription' or 'payment'
       metadata = {}
     } = await req.json();
-    logStep("Request body", { priceId, planKey, trialDays, mode, caseId });
 
-    // CRITICAL: Authentication is REQUIRED - no guest checkout allowed
+    if (!priceId) {
+      return new Response(JSON.stringify({ error: "priceId is required" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    logStep("Request body", { priceId, mode });
+
+    // Create Supabase client for auth
+    const supabaseClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+    );
+
+    // CRITICAL: Authentication is REQUIRED
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       logStep("ERROR: No auth header - authentication required");
@@ -55,9 +61,9 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace("Bearer ", "");
-    const { data, error: authError } = await supabaseClient.auth.getUser(token);
+    const { data: authData, error: authError } = await supabaseClient.auth.getUser(token);
     
-    if (authError || !data.user) {
+    if (authError || !authData.user) {
       logStep("ERROR: Invalid auth token", { error: authError?.message });
       return new Response(JSON.stringify({ 
         error: "Invalid authentication. Please log in again." 
@@ -67,7 +73,7 @@ serve(async (req) => {
       });
     }
 
-    const user = data.user;
+    const user = authData.user;
     const userEmail = user.email;
     
     if (!userEmail) {
@@ -84,13 +90,59 @@ serve(async (req) => {
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
-    // Check if customer exists
-    let customerId: string | undefined;
-    if (userEmail) {
+    // Create Supabase admin client for database operations
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+
+    // Check if Stripe customer exists in our database
+    let stripeCustomerId: string | undefined;
+    
+    const { data: existingCustomer } = await supabaseAdmin
+      .from("stripe_customers")
+      .select("stripe_customer_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (existingCustomer?.stripe_customer_id) {
+      stripeCustomerId = existingCustomer.stripe_customer_id;
+      logStep("Found existing Stripe customer in DB", { stripeCustomerId });
+    } else {
+      // Check Stripe directly by email
       const customers = await stripe.customers.list({ email: userEmail, limit: 1 });
+      
       if (customers.data.length > 0) {
-        customerId = customers.data[0].id;
-        logStep("Found existing Stripe customer", { customerId });
+        stripeCustomerId = customers.data[0].id;
+        logStep("Found existing Stripe customer by email", { stripeCustomerId });
+        
+        // Save to our database
+        await supabaseAdmin
+          .from("stripe_customers")
+          .upsert({
+            user_id: user.id,
+            stripe_customer_id: stripeCustomerId,
+            created_at: new Date().toISOString(),
+          }, { onConflict: "user_id" });
+      } else {
+        // Create new Stripe customer
+        const newCustomer = await stripe.customers.create({
+          email: userEmail,
+          metadata: {
+            user_id: user.id,
+          },
+        });
+        stripeCustomerId = newCustomer.id;
+        logStep("Created new Stripe customer", { stripeCustomerId });
+
+        // Save to our database
+        await supabaseAdmin
+          .from("stripe_customers")
+          .insert({
+            user_id: user.id,
+            stripe_customer_id: stripeCustomerId,
+            created_at: new Date().toISOString(),
+          });
       }
     }
 
@@ -98,11 +150,9 @@ serve(async (req) => {
     const finalSuccessUrl = successUrl || `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
     const finalCancelUrl = cancelUrl || `${origin}/pricing`;
 
-    const effectivePlanKey = planKey || metadata?.plan_key || metadata?.product || (mode === 'payment' ? 'form_unlock' : 'unknown');
-    const effectiveProduct = metadata?.product || effectivePlanKey;
-
-    // Build session params based on mode
+    // Build session params
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
+      customer: stripeCustomerId,
       line_items: [
         {
           price: priceId,
@@ -112,13 +162,11 @@ serve(async (req) => {
       mode: mode as 'subscription' | 'payment',
       success_url: finalSuccessUrl,
       cancel_url: finalCancelUrl,
-      client_reference_id: user?.id || undefined, // Critical for mapping payment to user
+      client_reference_id: user.id, // Critical for mapping payment to user
       metadata: {
-        user_id: user?.id || "guest",
-        case_id: caseId || metadata?.case_id || null,
-        plan_key: effectivePlanKey,
-        product: effectiveProduct,
-        source: metadata?.source || "unknown",
+        user_id: user.id,
+        price_id: priceId,
+        product_type: mode,
         ...metadata
       },
     };
@@ -126,19 +174,10 @@ serve(async (req) => {
     // Add subscription-specific options
     if (mode === 'subscription') {
       sessionParams.subscription_data = {
-        trial_period_days: trialDays,
         metadata: {
-          plan_key: planKey || "unknown",
-          user_id: user?.id || "guest",
+          user_id: user.id,
         },
       };
-    }
-
-    // Add customer info
-    if (customerId) {
-      sessionParams.customer = customerId;
-    } else if (userEmail) {
-      sessionParams.customer_email = userEmail;
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
