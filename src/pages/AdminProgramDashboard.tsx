@@ -184,7 +184,7 @@ export default function AdminProgramDashboard() {
       return;
     }
 
-    const summary = (data as ProgramSummary[])[0];
+    const summary = (data as unknown as ProgramSummary[])[0];
     const exportDate = new Date().toLocaleDateString('en-CA');
     
     const csv = [

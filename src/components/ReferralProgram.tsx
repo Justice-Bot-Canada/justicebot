@@ -66,22 +66,21 @@ export default function ReferralProgram() {
     }
 
     // Get referrals
-    const { data: referrals, error: referralsError } = await supabase
+    const { data: referrals, error: referralsError } = await (supabase
       .from('referrals')
       .select('*')
-      .eq('referrer_user_id', user.id)
-      .order('created_at', { ascending: false });
+      .eq('referrer_id', user.id)
+      .order('created_at', { ascending: false }) as any);
 
     if (referralsError) {
       console.error('Error loading referrals:', referralsError);
     }
 
     // Get total credits
-    const { data: credits, error: creditsError } = await supabase
+    const { data: credits, error: creditsError } = await (supabase
       .from('user_credits')
       .select('amount')
-      .eq('user_id', user.id)
-      .eq('source', 'referral');
+      .eq('user_id', user.id) as any);
 
     const totalCredits = credits?.reduce((sum, c) => sum + Number(c.amount), 0) || 0;
 
