@@ -9,7 +9,7 @@ const corsHeaders = {
 
 const logStep = (step: string, details?: unknown) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
-  console.log(`[CREATE-STRIPE-CHECKOUT] ${step}${detailsStr}`);
+  console.log(`[CREATE_CHECKOUT] ${step}${detailsStr}`);
 };
 
 serve(async (req) => {
