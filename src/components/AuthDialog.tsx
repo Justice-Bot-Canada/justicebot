@@ -147,6 +147,8 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     try {
       const redirectUrl = `${window.location.origin}/welcome`;
       
+      console.log('[Auth] Attempting signup for:', email);
+      
       const { error, data } = await supabase.auth.signUp({
         email,
         password,
@@ -159,7 +161,10 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         },
       });
 
+      console.log('[Auth] Signup response:', { error: error?.message, hasUser: !!data?.user, hasSession: !!data?.session });
+
       if (error) {
+        console.error('[Auth] Signup error:', error);
         const errorType = error.message.toLowerCase().includes('already registered') 
           ? 'user_exists' 
           : error.message.toLowerCase().includes('invalid') 
@@ -172,6 +177,13 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
           setEmailError("This email is already registered. Try signing in instead.");
         } else if (error.message.toLowerCase().includes('invalid')) {
           setEmailError("Please check your email format");
+        } else if (error.message.toLowerCase().includes('confirmation')) {
+          // Email sending error - but user may still be created
+          toast({
+            title: "Account may have been created",
+            description: "There was an issue sending confirmation. Try signing in with these credentials.",
+            variant: "default",
+          });
         } else {
           toast({
             title: "Signup Error",
@@ -179,39 +191,13 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
             variant: "destructive",
           });
         }
-      } else if (data.user && !data.session) {
-        // Email confirmation required
-        analytics.signupComplete(email, 'email_pending_confirmation');
-        // New funnel event
-        analytics.signupCompletedEvent('email');
-        // Fire GA4 sign_up event for Canada funnel
-        if (typeof window !== 'undefined' && window.gtag) {
-          window.gtag('event', 'sign_up', {
-            method: 'email',
-            country: 'CA',
-          });
-        }
-        setSignupSuccess(true);
-        toast({
-          title: "Check Your Email ✓",
-          description: "We sent you a confirmation link. Click it to complete signup.",
-        });
-        // Close dialog and redirect after brief delay
-        setTimeout(() => {
-          onOpenChange(false);
-          navigate('/triage');
-        }, 2000);
-      } else {
-        // Immediate login (email confirmation disabled in Supabase)
+      } else if (data.session) {
+        // Immediate login - email confirmation is disabled
+        console.log('[Auth] Immediate session created');
         analytics.signupComplete(email, 'email');
-        // Fire GA4 sign_up event for Canada funnel
         if (typeof window !== 'undefined' && window.gtag) {
-          window.gtag('event', 'sign_up', {
-            method: 'email',
-            country: 'CA',
-          });
+          window.gtag('event', 'sign_up', { method: 'email', country: 'CA' });
         }
-        sessionStorage.setItem('justSignedUp', 'true');
         setSignupSuccess(true);
         toast({
           title: "Account Created ✓",
@@ -219,8 +205,33 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         });
         onOpenChange(false);
         navigate('/welcome');
+      } else if (data.user && !data.session) {
+        // Email confirmation required (shouldn't happen if disabled)
+        console.log('[Auth] User created but no session - email confirmation may be required');
+        analytics.signupComplete(email, 'email_pending_confirmation');
+        analytics.signupCompletedEvent('email');
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('event', 'sign_up', { method: 'email', country: 'CA' });
+        }
+        setSignupSuccess(true);
+        toast({
+          title: "Check Your Email ✓",
+          description: "We sent you a confirmation link. Click it to complete signup.",
+        });
+        setTimeout(() => {
+          onOpenChange(false);
+          navigate('/triage');
+        }, 2000);
+      } else {
+        // Fallback - something unexpected
+        console.warn('[Auth] Unexpected signup state:', data);
+        toast({
+          title: "Please try signing in",
+          description: "Your account may have been created. Try signing in with these credentials.",
+        });
       }
     } catch (error) {
+      console.error('[Auth] Unexpected signup error:', error);
       analytics.signupFailed('unexpected_error');
       toast({
         title: "Error",
