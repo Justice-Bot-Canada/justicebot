@@ -10,19 +10,38 @@ const PRODUCTION_ORIGINS = [
   'https://www.justice-bot.com',
 ];
 
+const PREVIEW_ORIGINS = [
+  // Lovable preview domains
+  /^https:\/\/[a-z0-9-]+\.lovableproject\.com$/,
+];
+
 const LOCALHOST_ORIGINS = [
   'http://localhost:8080',
   'http://localhost:5173',
 ];
 
 // Only include localhost in development environments
-const ALLOWED_ORIGINS = Deno.env.get('ALLOW_LOCALHOST') === 'true'
+const ALLOWED_STATIC_ORIGINS = Deno.env.get('ALLOW_LOCALHOST') === 'true'
   ? [...PRODUCTION_ORIGINS, ...LOCALHOST_ORIGINS]
   : PRODUCTION_ORIGINS;
 
+function isAllowedOrigin(origin: string): boolean {
+  // Check static origins
+  if (ALLOWED_STATIC_ORIGINS.includes(origin)) {
+    return true;
+  }
+  // Check regex patterns (Lovable preview domains)
+  for (const pattern of PREVIEW_ORIGINS) {
+    if (pattern.test(origin)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export function getCorsHeaders(requestOrigin?: string | null): Record<string, string> {
   // Check if the request origin is in our allowed list
-  const origin = requestOrigin && ALLOWED_ORIGINS.includes(requestOrigin) 
+  const origin = requestOrigin && isAllowedOrigin(requestOrigin)
     ? requestOrigin 
     : PRODUCTION_ORIGINS[0]; // Default to production
 
