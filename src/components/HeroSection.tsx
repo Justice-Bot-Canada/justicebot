@@ -21,7 +21,7 @@ const HeroSection = () => {
     setIsCheckoutLoading(true);
     trackEvent('cta_click', { button: 'paid_help_599', location: 'hero' });
     try {
-      const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
+      const { data, error } = await supabase.functions.invoke('create_checkout', {
         body: {
           priceId: 'price_1SYLdJL0pLShFbLttpxYfuas',
           planKey: 'form_unlock',

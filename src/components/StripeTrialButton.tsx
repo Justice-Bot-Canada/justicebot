@@ -24,7 +24,7 @@ const StripeTrialButton = ({ priceId, planKey, trialDays = 5 }: StripeTrialButto
       analytics.beginCheckout(planKey, planKey, 0);
       trackEvent('stripe_trial_started', { plan_key: planKey, trial_days: trialDays });
 
-      const { data, error } = await supabase.functions.invoke("create-stripe-checkout", {
+      const { data, error } = await supabase.functions.invoke("create_checkout", {
         body: { 
           priceId, 
           planKey, 
