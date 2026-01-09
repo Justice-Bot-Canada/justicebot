@@ -124,7 +124,7 @@ export function CourtReadyPaywall({ triageData, caseId, onAccessGranted, onCaseC
         onCaseCreated?.(newCase.id);
       }
 
-      const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
+      const { data, error } = await supabase.functions.invoke('create_checkout', {
         body: {
           priceId: STRIPE_PRICE_ID,
           mode: 'payment',

@@ -105,7 +105,7 @@ export default function IntakeSummary() {
     trackEvent('unlock_click', { ...intakeData });
     
     try {
-      const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
+      const { data, error } = await supabase.functions.invoke('create_checkout', {
         body: {
           priceId: 'price_1SYLdJL0pLShFbLttpxYfuas', // $5.99 Legal Form - One-Time Purchase
           planKey: 'form_unlock',
