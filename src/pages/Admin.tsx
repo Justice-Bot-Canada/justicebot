@@ -61,8 +61,10 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Clock,
-  Zap
+  Zap,
+  Gift
 } from "lucide-react";
+import AdminEntitlementManager from "@/components/admin/AdminEntitlementManager";
 
 interface UserStats {
   totalUsers: number;
@@ -497,10 +499,14 @@ const Admin = () => {
           </div>
         ) : (
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full lg:w-[600px] grid-cols-5">
+            <TabsList className="grid w-full lg:w-[720px] grid-cols-6">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="roles">Roles</TabsTrigger>
+              <TabsTrigger value="entitlements" className="flex items-center gap-1">
+                <Gift className="h-3 w-3" />
+                Entitlements
+              </TabsTrigger>
               <TabsTrigger value="cases">Cases</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
@@ -974,6 +980,10 @@ const Admin = () => {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="entitlements" className="space-y-6">
+              <AdminEntitlementManager />
             </TabsContent>
 
             <TabsContent value="cases" className="space-y-6">

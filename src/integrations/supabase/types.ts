@@ -392,6 +392,39 @@ export type Database = {
           },
         ]
       }
+      entitlement_audit: {
+        Row: {
+          acted_by: string
+          acted_on: string
+          action: string
+          created_at: string
+          ends_at: string | null
+          id: number
+          note: string | null
+          product_id: string
+        }
+        Insert: {
+          acted_by: string
+          acted_on: string
+          action: string
+          created_at?: string
+          ends_at?: string | null
+          id?: number
+          note?: string | null
+          product_id: string
+        }
+        Update: {
+          acted_by?: string
+          acted_on?: string
+          action?: string
+          created_at?: string
+          ends_at?: string | null
+          id?: number
+          note?: string | null
+          product_id?: string
+        }
+        Relationships: []
+      }
       entitlements: {
         Row: {
           access_level: string
