@@ -14,47 +14,360 @@ export type Database = {
   }
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          metrics: Json | null
+          page_url: string | null
+          session_id: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          metrics?: Json | null
+          page_url?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          metrics?: Json | null
+          page_url?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      case_deadlines: {
+        Row: {
+          case_id: string | null
+          completed: boolean
+          created_at: string
+          description: string | null
+          due_date: string
+          id: string
+          priority: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          case_id?: string | null
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          due_date: string
+          id?: string
+          priority?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          case_id?: string | null
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          due_date?: string
+          id?: string
+          priority?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_deadlines_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_events: {
+        Row: {
+          case_id: string
+          created_at: string
+          description: string | null
+          event_date: string
+          event_type: string
+          id: string
+          location: string | null
+          priority: string
+          status: string
+          title: string
+        }
+        Insert: {
+          case_id: string
+          created_at?: string
+          description?: string | null
+          event_date: string
+          event_type?: string
+          id?: string
+          location?: string | null
+          priority?: string
+          status?: string
+          title: string
+        }
+        Update: {
+          case_id?: string
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          event_type?: string
+          id?: string
+          location?: string | null
+          priority?: string
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_events_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_milestones: {
+        Row: {
+          case_id: string
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          id: string
+          milestone_type: string
+          order_index: number
+          title: string
+        }
+        Insert: {
+          case_id: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          milestone_type?: string
+          order_index?: number
+          title: string
+        }
+        Update: {
+          case_id?: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          milestone_type?: string
+          order_index?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_milestones_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_notes: {
+        Row: {
+          case_id: string
+          content: string
+          created_at: string
+          id: string
+          note_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          case_id: string
+          content: string
+          created_at?: string
+          id?: string
+          note_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          case_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          note_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_notes_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cases: {
         Row: {
           created_at: string
           description: string | null
+          flow_step: string | null
           id: string
           law_section: string | null
           merit_score: number | null
           municipality: string | null
           province: string
           status: string | null
+          timeline_viewed: boolean | null
           title: string
+          triage: Json | null
+          triage_complete: boolean | null
           updated_at: string
           user_id: string
+          venue: string | null
         }
         Insert: {
           created_at?: string
           description?: string | null
+          flow_step?: string | null
           id?: string
           law_section?: string | null
           merit_score?: number | null
           municipality?: string | null
           province: string
           status?: string | null
+          timeline_viewed?: boolean | null
           title: string
+          triage?: Json | null
+          triage_complete?: boolean | null
           updated_at?: string
           user_id: string
+          venue?: string | null
         }
         Update: {
           created_at?: string
           description?: string | null
+          flow_step?: string | null
           id?: string
           law_section?: string | null
           merit_score?: number | null
           municipality?: string | null
           province?: string
           status?: string | null
+          timeline_viewed?: boolean | null
+          title?: string
+          triage?: Json | null
+          triage_complete?: boolean | null
+          updated_at?: string
+          user_id?: string
+          venue?: string | null
+        }
+        Relationships: []
+      }
+      document_templates: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          download_count: number
+          file_path: string
+          id: string
+          is_premium: boolean
+          preview_content: string | null
+          tags: string[] | null
+          template_type: string
+          title: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          download_count?: number
+          file_path: string
+          id?: string
+          is_premium?: boolean
+          preview_content?: string | null
+          tags?: string[] | null
+          template_type: string
+          title: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          download_count?: number
+          file_path?: string
+          id?: string
+          is_premium?: boolean
+          preview_content?: string | null
+          tags?: string[] | null
+          template_type?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      documents: {
+        Row: {
+          case_id: string | null
+          content: string | null
+          created_at: string
+          file_path: string | null
+          form_key: string | null
+          id: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          case_id?: string | null
+          content?: string | null
+          created_at?: string
+          file_path?: string | null
+          form_key?: string | null
+          id?: string
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          case_id?: string | null
+          content?: string | null
+          created_at?: string
+          file_path?: string | null
+          form_key?: string | null
+          id?: string
+          status?: string
           title?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "documents_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       entitlements: {
         Row: {
@@ -147,6 +460,67 @@ export type Database = {
           },
         ]
       }
+      evidence_analysis: {
+        Row: {
+          analysis_data: Json
+          created_at: string
+          evidence_id: string
+          id: string
+        }
+        Insert: {
+          analysis_data: Json
+          created_at?: string
+          evidence_id: string
+          id?: string
+        }
+        Update: {
+          analysis_data?: Json
+          created_at?: string
+          evidence_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evidence_analysis_evidence_id_fkey"
+            columns: ["evidence_id"]
+            isOneToOne: false
+            referencedRelation: "evidence"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evidence_metadata: {
+        Row: {
+          created_at: string
+          evidence_id: string
+          id: string
+          metadata_key: string
+          metadata_value: Json | null
+        }
+        Insert: {
+          created_at?: string
+          evidence_id: string
+          id?: string
+          metadata_key: string
+          metadata_value?: Json | null
+        }
+        Update: {
+          created_at?: string
+          evidence_id?: string
+          id?: string
+          metadata_key?: string
+          metadata_value?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evidence_metadata_evidence_id_fkey"
+            columns: ["evidence_id"]
+            isOneToOne: false
+            referencedRelation: "evidence"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       form_usage: {
         Row: {
           case_id: string | null
@@ -212,7 +586,9 @@ export type Database = {
           id: string
           instructions: string | null
           is_active: boolean
+          pdf_url: string | null
           price_cents: number
+          purchasable: boolean
           title: string
           tribunal_type: string
           updated_at: string
@@ -228,7 +604,9 @@ export type Database = {
           id?: string
           instructions?: string | null
           is_active?: boolean
+          pdf_url?: string | null
           price_cents?: number
+          purchasable?: boolean
           title: string
           tribunal_type: string
           updated_at?: string
@@ -244,11 +622,49 @@ export type Database = {
           id?: string
           instructions?: string | null
           is_active?: boolean
+          pdf_url?: string | null
           price_cents?: number
+          purchasable?: boolean
           title?: string
           tribunal_type?: string
           updated_at?: string
           usage_count?: number | null
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          journey: string | null
+          name: string | null
+          payload: Json | null
+          phone: string | null
+          source: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          journey?: string | null
+          name?: string | null
+          payload?: Json | null
+          phone?: string | null
+          source?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          journey?: string | null
+          name?: string | null
+          payload?: Json | null
+          phone?: string | null
+          source?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -338,6 +754,39 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string
+          id: string
+          message: string
+          read: boolean
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           amount_total: number | null
@@ -384,6 +833,56 @@ export type Database = {
             columns: ["price_id"]
             isOneToOne: false
             referencedRelation: "prices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          form_id: string | null
+          id: string
+          payment_id: string | null
+          payment_intent_id: string | null
+          payment_provider: string | null
+          plan_type: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          form_id?: string | null
+          id?: string
+          payment_id?: string | null
+          payment_intent_id?: string | null
+          payment_provider?: string | null
+          plan_type?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          form_id?: string | null
+          id?: string
+          payment_id?: string | null
+          payment_intent_id?: string | null
+          payment_provider?: string | null
+          plan_type?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
             referencedColumns: ["id"]
           },
         ]
@@ -465,7 +964,9 @@ export type Database = {
           first_name: string | null
           id: string
           last_name: string | null
+          onboarding_completed: boolean | null
           phone: string | null
+          selected_province: string | null
           updated_at: string
           user_id: string
         }
@@ -477,7 +978,9 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          onboarding_completed?: boolean | null
           phone?: string | null
+          selected_province?: string | null
           updated_at?: string
           user_id: string
         }
@@ -489,9 +992,119 @@ export type Database = {
           first_name?: string | null
           id?: string
           last_name?: string | null
+          onboarding_completed?: boolean | null
           phone?: string | null
+          selected_province?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      programs: {
+        Row: {
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          features: Json | null
+          id: string
+          is_active: boolean
+          logo_url: string | null
+          name: string
+          organization: string | null
+          primary_color: string | null
+          secondary_color: string | null
+          settings: Json | null
+          slug: string
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name: string
+          organization?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          settings?: Json | null
+          slug: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean
+          logo_url?: string | null
+          name?: string
+          organization?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          settings?: Json | null
+          slug?: string
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          total_credits_earned: number | null
+          user_id: string
+          uses_count: number | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          total_credits_earned?: number | null
+          user_id: string
+          uses_count?: number | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          total_credits_earned?: number | null
+          user_id?: string
+          uses_count?: number | null
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          referee_id: string
+          referrer_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          referee_id: string
+          referrer_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          referee_id?: string
+          referrer_id?: string
+          status?: string
         }
         Relationships: []
       }
@@ -545,6 +1158,294 @@ export type Database = {
           type?: string
         }
         Relationships: []
+      }
+      support_messages: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          sender_name: string
+          sender_type: string
+          ticket_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          sender_name: string
+          sender_type: string
+          ticket_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          sender_name?: string
+          sender_type?: string
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      support_tickets: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      testimonials: {
+        Row: {
+          avatar_url: string | null
+          case_type: string | null
+          content: string
+          created_at: string
+          date_added: string | null
+          id: string
+          is_approved: boolean
+          is_featured: boolean
+          location: string | null
+          name: string
+          outcome: string | null
+          rating: number | null
+          role: string | null
+          story: string | null
+          user_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          case_type?: string | null
+          content: string
+          created_at?: string
+          date_added?: string | null
+          id?: string
+          is_approved?: boolean
+          is_featured?: boolean
+          location?: string | null
+          name: string
+          outcome?: string | null
+          rating?: number | null
+          role?: string | null
+          story?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          case_type?: string | null
+          content?: string
+          created_at?: string
+          date_added?: string | null
+          id?: string
+          is_approved?: boolean
+          is_featured?: boolean
+          location?: string | null
+          name?: string
+          outcome?: string | null
+          rating?: number | null
+          role?: string | null
+          story?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      timeline_events: {
+        Row: {
+          case_id: string
+          created_at: string
+          description: string | null
+          event_date: string
+          event_type: string
+          id: string
+          is_auto: boolean | null
+          metadata: Json | null
+          source: string | null
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          case_id: string
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          event_type: string
+          id?: string
+          is_auto?: boolean | null
+          metadata?: Json | null
+          source?: string | null
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          case_id?: string
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          event_type?: string
+          id?: string
+          is_auto?: boolean | null
+          metadata?: Json | null
+          source?: string | null
+          title?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "timeline_events_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tutorial_videos: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          duration_seconds: number | null
+          id: string
+          is_premium: boolean
+          order_index: number
+          thumbnail_url: string | null
+          title: string
+          video_url: string
+          view_count: number
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          is_premium?: boolean
+          order_index?: number
+          thumbnail_url?: string | null
+          title: string
+          video_url: string
+          view_count?: number
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          is_premium?: boolean
+          order_index?: number
+          thumbnail_url?: string | null
+          title?: string
+          video_url?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
+      user_credits: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_feedback: {
+        Row: {
+          case_id: string | null
+          created_at: string
+          email: string
+          feedback_type: string
+          id: string
+          is_public: boolean
+          message: string
+          name: string
+          rating: number | null
+          subject: string
+          user_id: string | null
+        }
+        Insert: {
+          case_id?: string | null
+          created_at?: string
+          email: string
+          feedback_type: string
+          id?: string
+          is_public?: boolean
+          message: string
+          name: string
+          rating?: number | null
+          subject: string
+          user_id?: string | null
+        }
+        Update: {
+          case_id?: string | null
+          created_at?: string
+          email?: string
+          feedback_type?: string
+          id?: string
+          is_public?: boolean
+          message?: string
+          name?: string
+          rating?: number | null
+          subject?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_feedback_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -641,6 +1542,30 @@ export type Database = {
       }
     }
     Functions: {
+      check_free_tier_eligibility: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
+      export_program_summary: { Args: { program_id: string }; Returns: Json }
+      get_all_admins: {
+        Args: never
+        Returns: {
+          created_at: string
+          role: string
+          user_id: string
+        }[]
+      }
+      get_all_users_admin: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          id: string
+          last_sign_in_at: string
+        }[]
+      }
+      get_program_stats: { Args: { program_slug: string }; Returns: Json }
+      grant_admin_role: { Args: { target_user_id: string }; Returns: undefined }
       has_active_entitlement: {
         Args: { p_product_id: string }
         Returns: boolean
@@ -654,6 +1579,10 @@ export type Database = {
       }
       increment_form_usage: { Args: { form_id: string }; Returns: undefined }
       make_user_admin: { Args: { _email: string }; Returns: undefined }
+      revoke_admin_role: {
+        Args: { target_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
