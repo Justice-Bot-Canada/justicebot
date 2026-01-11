@@ -110,8 +110,8 @@ export default function AdminProgramDashboard() {
     setIsLoading(false);
   };
 
-  const fetchProgramStats = async (programId: string) => {
-    const { data, error } = await supabase.rpc('get_program_stats', { p_program_id: programId });
+  const fetchProgramStats = async (programSlug: string) => {
+    const { data, error } = await supabase.rpc('get_program_stats', { program_slug: programSlug });
     
     if (error) {
       toast.error('Failed to load program stats');
@@ -123,7 +123,7 @@ export default function AdminProgramDashboard() {
 
   const handleSelectProgram = (program: Program) => {
     setSelectedProgram(program);
-    fetchProgramStats(program.id);
+    fetchProgramStats(program.slug);
   };
 
   const handleCreateProgram = async () => {
@@ -177,14 +177,14 @@ export default function AdminProgramDashboard() {
   };
 
   const exportProgramSummary = async (programId: string, programName: string) => {
-    const { data, error } = await supabase.rpc('export_program_summary', { p_program_id: programId });
+    const { data, error } = await supabase.rpc('export_program_summary', { program_id: programId });
     
     if (error) {
       toast.error('Failed to export summary');
       return;
     }
 
-    const summary = (data as unknown as ProgramSummary[])[0];
+    const summary = data as unknown as ProgramSummary;
     const exportDate = new Date().toLocaleDateString('en-CA');
     
     const csv = [

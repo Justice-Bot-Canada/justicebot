@@ -349,7 +349,7 @@ const Admin = () => {
 
     try {
       const { error } = await supabase.rpc('grant_admin_role', {
-        p_user_id: selectedUser.id
+        target_user_id: selectedUser.id
       });
 
       if (error) throw error;
@@ -370,7 +370,7 @@ const Admin = () => {
 
     try {
       const { error } = await supabase.rpc('revoke_admin_role', {
-        p_user_id: selectedUser.id
+        target_user_id: selectedUser.id
       });
 
       if (error) throw error;

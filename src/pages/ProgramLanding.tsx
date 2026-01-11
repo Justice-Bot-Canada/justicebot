@@ -53,8 +53,12 @@ export default function ProgramLanding() {
     });
 
     try {
-      // Increment referral count
-      await supabase.rpc('increment_program_referral', { p_program_slug: program.slug });
+      // Increment referral count - wrap in try/catch as function may not exist
+      try {
+        await supabase.rpc('increment_program_referral', { p_program_slug: program.slug });
+      } catch {
+        console.log('increment_program_referral not available');
+      }
 
       // Create case with program tagging
       const { data: newCase, error: caseError } = await supabase

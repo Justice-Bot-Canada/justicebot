@@ -252,8 +252,8 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
             // Save metadata
             await supabase.from('evidence_metadata').insert({
               evidence_id: evidenceData.id,
-              key: 'analysis',
-              value: JSON.stringify(analysisData.metadata),
+              metadata_key: 'analysis', // Required field name
+              metadata_value: JSON.stringify(analysisData.metadata),
               doc_type: analysisData.metadata.doc_type,
               category: analysisData.metadata.category,
               parties: analysisData.metadata.parties,

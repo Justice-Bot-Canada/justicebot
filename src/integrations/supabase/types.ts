@@ -225,14 +225,19 @@ export type Database = {
       }
       cases: {
         Row: {
+          cohort_batch: string | null
           created_at: string
           description: string | null
           flow_step: string | null
           id: string
+          is_paid: boolean | null
           law_section: string | null
           merit_score: number | null
           municipality: string | null
+          program_id: string | null
+          program_referral_code: string | null
           province: string
+          referral_source: string | null
           status: string | null
           timeline_viewed: boolean | null
           title: string
@@ -243,14 +248,19 @@ export type Database = {
           venue: string | null
         }
         Insert: {
+          cohort_batch?: string | null
           created_at?: string
           description?: string | null
           flow_step?: string | null
           id?: string
+          is_paid?: boolean | null
           law_section?: string | null
           merit_score?: number | null
           municipality?: string | null
+          program_id?: string | null
+          program_referral_code?: string | null
           province: string
+          referral_source?: string | null
           status?: string | null
           timeline_viewed?: boolean | null
           title: string
@@ -261,14 +271,19 @@ export type Database = {
           venue?: string | null
         }
         Update: {
+          cohort_batch?: string | null
           created_at?: string
           description?: string | null
           flow_step?: string | null
           id?: string
+          is_paid?: boolean | null
           law_section?: string | null
           merit_score?: number | null
           municipality?: string | null
+          program_id?: string | null
+          program_referral_code?: string | null
           province?: string
+          referral_source?: string | null
           status?: string | null
           timeline_viewed?: boolean | null
           title?: string
@@ -278,7 +293,15 @@ export type Database = {
           user_id?: string
           venue?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "cases_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       document_templates: {
         Row: {
@@ -372,6 +395,7 @@ export type Database = {
       entitlements: {
         Row: {
           access_level: string
+          case_id: string | null
           ends_at: string | null
           product_id: string
           source: string
@@ -381,6 +405,7 @@ export type Database = {
         }
         Insert: {
           access_level?: string
+          case_id?: string | null
           ends_at?: string | null
           product_id: string
           source?: string
@@ -390,6 +415,7 @@ export type Database = {
         }
         Update: {
           access_level?: string
+          case_id?: string | null
           ends_at?: string | null
           product_id?: string
           source?: string
@@ -398,6 +424,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "entitlements_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "entitlements_product_id_fkey"
             columns: ["product_id"]
@@ -489,27 +522,83 @@ export type Database = {
           },
         ]
       }
-      evidence_metadata: {
+      evidence_links: {
         Row: {
           created_at: string
           evidence_id: string
+          form_id: string
           id: string
-          metadata_key: string
-          metadata_value: Json | null
+          note: string | null
+          section_key: string
         }
         Insert: {
           created_at?: string
           evidence_id: string
+          form_id: string
           id?: string
-          metadata_key: string
-          metadata_value?: Json | null
+          note?: string | null
+          section_key: string
         }
         Update: {
           created_at?: string
           evidence_id?: string
+          form_id?: string
+          id?: string
+          note?: string | null
+          section_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evidence_links_evidence_id_fkey"
+            columns: ["evidence_id"]
+            isOneToOne: false
+            referencedRelation: "evidence"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evidence_metadata: {
+        Row: {
+          category: string | null
+          confidence_score: number | null
+          created_at: string
+          dates: Json | null
+          doc_type: string | null
+          evidence_id: string
+          extracted_text: string | null
+          flags: Json | null
+          id: string
+          metadata_key: string
+          metadata_value: Json | null
+          parties: Json | null
+        }
+        Insert: {
+          category?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          dates?: Json | null
+          doc_type?: string | null
+          evidence_id: string
+          extracted_text?: string | null
+          flags?: Json | null
+          id?: string
+          metadata_key: string
+          metadata_value?: Json | null
+          parties?: Json | null
+        }
+        Update: {
+          category?: string | null
+          confidence_score?: number | null
+          created_at?: string
+          dates?: Json | null
+          doc_type?: string | null
+          evidence_id?: string
+          extracted_text?: string | null
+          flags?: Json | null
           id?: string
           metadata_key?: string
           metadata_value?: Json | null
+          parties?: Json | null
         }
         Relationships: [
           {
@@ -1002,55 +1091,73 @@ export type Database = {
       }
       programs: {
         Row: {
+          cohort_batch: string | null
           contact_email: string | null
           contact_phone: string | null
           created_at: string
           description: string | null
+          disable_ai_beyond_procedural: boolean | null
+          disable_pricing: boolean | null
           features: Json | null
           id: string
           is_active: boolean
           logo_url: string | null
+          max_referrals: number | null
           name: string
           organization: string | null
           primary_color: string | null
+          referral_count: number | null
           secondary_color: string | null
           settings: Json | null
+          show_no_legal_advice_banner: boolean | null
           slug: string
           updated_at: string
           website_url: string | null
         }
         Insert: {
+          cohort_batch?: string | null
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string
           description?: string | null
+          disable_ai_beyond_procedural?: boolean | null
+          disable_pricing?: boolean | null
           features?: Json | null
           id?: string
           is_active?: boolean
           logo_url?: string | null
+          max_referrals?: number | null
           name: string
           organization?: string | null
           primary_color?: string | null
+          referral_count?: number | null
           secondary_color?: string | null
           settings?: Json | null
+          show_no_legal_advice_banner?: boolean | null
           slug: string
           updated_at?: string
           website_url?: string | null
         }
         Update: {
+          cohort_batch?: string | null
           contact_email?: string | null
           contact_phone?: string | null
           created_at?: string
           description?: string | null
+          disable_ai_beyond_procedural?: boolean | null
+          disable_pricing?: boolean | null
           features?: Json | null
           id?: string
           is_active?: boolean
           logo_url?: string | null
+          max_referrals?: number | null
           name?: string
           organization?: string | null
           primary_color?: string | null
+          referral_count?: number | null
           secondary_color?: string | null
           settings?: Json | null
+          show_no_legal_advice_banner?: boolean | null
           slug?: string
           updated_at?: string
           website_url?: string | null
@@ -1229,11 +1336,13 @@ export type Database = {
       }
       testimonials: {
         Row: {
+          approved_at: string | null
           avatar_url: string | null
           case_type: string | null
           content: string
           created_at: string
           date_added: string | null
+          featured: boolean | null
           id: string
           is_approved: boolean
           is_featured: boolean
@@ -1242,15 +1351,18 @@ export type Database = {
           outcome: string | null
           rating: number | null
           role: string | null
+          status: string | null
           story: string | null
           user_id: string | null
         }
         Insert: {
+          approved_at?: string | null
           avatar_url?: string | null
           case_type?: string | null
           content: string
           created_at?: string
           date_added?: string | null
+          featured?: boolean | null
           id?: string
           is_approved?: boolean
           is_featured?: boolean
@@ -1259,15 +1371,18 @@ export type Database = {
           outcome?: string | null
           rating?: number | null
           role?: string | null
+          status?: string | null
           story?: string | null
           user_id?: string | null
         }
         Update: {
+          approved_at?: string | null
           avatar_url?: string | null
           case_type?: string | null
           content?: string
           created_at?: string
           date_added?: string | null
+          featured?: boolean | null
           id?: string
           is_approved?: boolean
           is_featured?: boolean
@@ -1276,6 +1391,7 @@ export type Database = {
           outcome?: string | null
           rating?: number | null
           role?: string | null
+          status?: string | null
           story?: string | null
           user_id?: string | null
         }
@@ -1284,39 +1400,51 @@ export type Database = {
       timeline_events: {
         Row: {
           case_id: string
+          category: string | null
           created_at: string
           description: string | null
           event_date: string
+          event_time: string | null
           event_type: string
           id: string
+          importance: string | null
           is_auto: boolean | null
           metadata: Json | null
+          notes: string | null
           source: string | null
           title: string
           user_id: string | null
         }
         Insert: {
           case_id: string
+          category?: string | null
           created_at?: string
           description?: string | null
           event_date?: string
+          event_time?: string | null
           event_type: string
           id?: string
+          importance?: string | null
           is_auto?: boolean | null
           metadata?: Json | null
+          notes?: string | null
           source?: string | null
           title: string
           user_id?: string | null
         }
         Update: {
           case_id?: string
+          category?: string | null
           created_at?: string
           description?: string | null
           event_date?: string
+          event_time?: string | null
           event_type?: string
           id?: string
+          importance?: string | null
           is_auto?: boolean | null
           metadata?: Json | null
+          notes?: string | null
           source?: string | null
           title?: string
           user_id?: string | null
@@ -1578,6 +1706,10 @@ export type Database = {
         Returns: boolean
       }
       increment_form_usage: { Args: { form_id: string }; Returns: undefined }
+      increment_program_referral: {
+        Args: { p_program_slug: string }
+        Returns: undefined
+      }
       make_user_admin: { Args: { _email: string }; Returns: undefined }
       revoke_admin_role: {
         Args: { target_user_id: string }

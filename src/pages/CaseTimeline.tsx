@@ -92,11 +92,13 @@ export default function CaseTimeline() {
   };
 
   const autoGenerateTimeline = async () => {
-    if (!caseProfile?.timelineSeeds || !user) return;
+    if (!caseProfile?.timelineSeeds || !user || !caseId) return;
 
     try {
       const eventsToInsert = caseProfile.timelineSeeds.map(seed => ({
         user_id: user.id,
+        case_id: caseId, // Required field
+        event_type: 'incident', // Required field
         title: seed.type,
         description: seed.description,
         event_date: seed.date,
