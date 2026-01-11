@@ -51,8 +51,19 @@ export function AddTimelineEventDialog({
 
     setLoading(true);
     try {
+      // Get the user's active case to link timeline event
+      const { data: caseData } = await supabase
+        .from('cases')
+        .select('id')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single();
+
       const { error } = await supabase.from("timeline_events").insert({
         user_id: user.id,
+        case_id: caseData?.id || '', // Required field
+        event_type: formData.category, // Required field - using category as event_type
         title: formData.title,
         description: formData.description || null,
         event_date: formData.event_date,
