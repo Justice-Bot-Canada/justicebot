@@ -84,9 +84,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <EnhancedSEO
-        title="Justice-Bot | Free Legal Orientation for Canadians"
-        description="Not sure what form to file or what happens next? Justice-Bot helps you understand your legal situation, find the right tribunal, and prepare court-ready documents."
-        keywords="legal help Canada, LTB forms, HRTO complaints, small claims court, self-represented litigant, legal orientation"
+        title="Justice-Bot | Free Legal Help Tool for Canadians"
+        description="Fight eviction, file HRTO complaints, or navigate small claims court. Free AI-powered legal orientation helps you find the right forms, understand deadlines, and prepare court-ready documents in minutes."
+        keywords="free legal help Canada, fight eviction Ontario, LTB forms, HRTO complaint, small claims court Ontario, tenant rights, self-represented litigant, legal aid alternative, affordable legal help"
         canonicalUrl="https://www.justice-bot.com/"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
