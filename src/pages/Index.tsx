@@ -4,12 +4,16 @@ import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 import ClinicWelcomeBanner from "@/components/ClinicWelcomeBanner";
-import { Suspense, lazy, useEffect } from "react";
+import ExitIntentModal from "@/components/ExitIntentModal";
+import StickyLeadCapture from "@/components/StickyLeadCapture";
+import FounderTrustBlock from "@/components/FounderTrustBlock";
+import LegalPathReportCTA from "@/components/LegalPathReportCTA";
+import { Suspense, lazy, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { analytics } from "@/utils/analytics";
+import { analytics, trackEvent } from "@/utils/analytics";
 
 // Lazy load below-the-fold components
 const TrustSignals = lazy(() => import("@/components/TrustSignals"));
@@ -24,6 +28,8 @@ const LoadingSection = () => (
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [showExitModal, setShowExitModal] = useState(false);
+  const exitIntentTriggered = useRef(false);
 
   // Redirect authenticated users to dashboard
   useEffect(() => {
@@ -38,6 +44,24 @@ const Index = () => {
       analytics.landingView();
     }
   }, [loading, user]);
+
+  // Exit intent detection
+  useEffect(() => {
+    const hasSeenExitModal = localStorage.getItem('exit_modal_shown');
+    if (hasSeenExitModal) return;
+
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (e.clientY <= 0 && !exitIntentTriggered.current) {
+        exitIntentTriggered.current = true;
+        setShowExitModal(true);
+        localStorage.setItem('exit_modal_shown', 'true');
+        trackEvent('exit_intent_triggered', {});
+      }
+    };
+
+    document.addEventListener('mouseleave', handleMouseLeave);
+    return () => document.removeEventListener('mouseleave', handleMouseLeave);
+  }, []);
 
   const handleGetCourtReadyDocs = () => {
     navigate('/triage');
@@ -96,25 +120,25 @@ const Index = () => {
       <ClinicWelcomeBanner />
       <Header />
       
-      {/* Trust Banner - Above the fold - NO pricing */}
+      {/* Trust Banner - Above the fold - Outcome focused */}
       <section className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-b-2 border-primary/30 py-6">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">
-              Get organized for your legal issue in minutes.
+              Find out if you have a case — in 2 minutes
             </h2>
             <p className="text-muted-foreground mb-4">
-              No legal advice. No commitment required.
+              Answer a few questions. Get your recommended forms and next steps.
             </p>
             <Button
               size="lg"
               onClick={handleGetCourtReadyDocs}
               className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-3 text-lg"
             >
-              Start — no signup required
+              Check my legal options now
             </Button>
             <p className="text-xs text-muted-foreground mt-3">
-              Takes about 2 minutes. Free to start.
+              No signup required • Free to start • Used by 2,000+ Canadians
             </p>
           </div>
         </div>
@@ -220,6 +244,24 @@ const Index = () => {
           </div>
         </section>
 
+        {/* $5.99 Starter Product CTA */}
+        <section className="py-12 bg-background">
+          <div className="container mx-auto px-4">
+            <div className="max-w-xl mx-auto">
+              <LegalPathReportCTA />
+            </div>
+          </div>
+        </section>
+
+        {/* Founder Trust Block */}
+        <section className="py-12 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <FounderTrustBlock />
+            </div>
+          </div>
+        </section>
+
         <Suspense fallback={<LoadingSection />}>
           <TrustSignals />
         </Suspense>
@@ -229,6 +271,15 @@ const Index = () => {
         </Suspense>
       </main>
       <Footer />
+      
+      {/* Exit Intent Modal */}
+      <ExitIntentModal 
+        isOpen={showExitModal} 
+        onClose={() => setShowExitModal(false)} 
+      />
+      
+      {/* Sticky Bottom Lead Capture */}
+      <StickyLeadCapture />
     </div>
   );
 };
