@@ -1,51 +1,30 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Play, Zap } from "lucide-react";
+import { ArrowRight, Play, Clock } from "lucide-react";
 import { trackEvent, analytics } from "@/utils/analytics";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { toast } from "sonner";
+import UrgencyBlock from "@/components/UrgencyBlock";
 
 const HeroSection = () => {
   const navigate = useNavigate();
   const [isCheckoutLoading, setIsCheckoutLoading] = useState(false);
 
-  const handleStart = () => {
-    trackEvent('funnel_start', { location: 'hero' });
-    // Fire GA4 funnel_start event for purchase funnel
+  const handleFindPath = () => {
+    trackEvent('cta_click', { button: 'find_my_path', location: 'hero' });
     analytics.funnelStart(window.location.pathname);
     navigate('/funnel');
   };
 
-  const handlePaidHelp = async () => {
-    setIsCheckoutLoading(true);
-    trackEvent('cta_click', { button: 'paid_help_599', location: 'hero' });
-    try {
-      const { data, error } = await supabase.functions.invoke('create_checkout', {
-        body: {
-          priceId: 'price_1SYLdJL0pLShFbLttpxYfuas',
-          planKey: 'form_unlock',
-          mode: 'payment',
-          successUrl: `${window.location.origin}/unlock-success?session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${window.location.origin}/`,
-          metadata: { product: 'form_unlock', source: 'hero_cta' }
-        }
-      });
-      if (error) throw error;
-      if (data?.url) {
-        window.location.href = data.url; // Same tab - no context loss
-      }
-    } catch (err) {
-      console.error('Checkout error:', err);
-      toast.error('Unable to start checkout. Please try again.');
-    } finally {
-      setIsCheckoutLoading(false);
-    }
+  const handleCheckOptions = () => {
+    trackEvent('cta_click', { button: 'check_legal_options', location: 'hero' });
+    analytics.funnelStart(window.location.pathname);
+    navigate('/triage');
   };
 
   const handleHowItWorks = () => {
     trackEvent('cta_click', { button: 'how_it_works', location: 'hero' });
-    // Scroll to trust section or open modal
     const trustSection = document.getElementById('what-we-do');
     if (trustSection) {
       trustSection.scrollIntoView({ behavior: 'smooth' });
@@ -67,34 +46,49 @@ const HeroSection = () => {
       <div className="container mx-auto px-4 py-12 lg:py-16 relative z-10">
         <div className="max-w-3xl mx-auto text-center space-y-8">
           
-          {/* Clear headline */}
+          {/* Clear outcome-focused headline */}
           <div className="space-y-6 animate-fade-in">
             <h1 
               id="hero-heading" 
               className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight text-foreground"
             >
-              Get the right legal help for your situation — step by step
+              Find out which legal form you need — in 2 minutes
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-              We guide you to the correct forms, courts, and next steps. No guesswork.
+              Answer a few questions. Get your recommended tribunal, forms, and next steps.
             </p>
+
+            {/* Situational urgency */}
+            <div className="flex justify-center">
+              <UrgencyBlock variant="subtle" />
+            </div>
           </div>
 
-          {/* Single Primary CTA - no pricing */}
-          <div className="space-y-4 animate-fade-in pt-6">
+          {/* Outcome-based CTAs */}
+          <div className="space-y-4 animate-fade-in pt-4">
+            {/* Primary CTA - outcome focused */}
             <Button 
               variant="cta" 
               size="lg" 
               className="group text-xl md:text-2xl px-12 py-8 md:py-10 shadow-2xl hover:scale-[1.02] transition-all duration-300 w-full sm:w-auto"
-              onClick={handleStart}
+              onClick={handleFindPath}
             >
-              Start — no signup required
+              Tell me what form I need
               <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
             </Button>
             
-            {/* Secondary CTA */}
-            <div>
+            {/* Secondary CTAs */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="w-full sm:w-auto"
+                onClick={handleCheckOptions}
+              >
+                Check my legal options
+              </Button>
+              
               <Button 
                 variant="ghost" 
                 size="lg"
@@ -105,6 +99,11 @@ const HeroSection = () => {
                 See how it works
               </Button>
             </div>
+
+            {/* Trust micro-copy */}
+            <p className="text-sm text-muted-foreground pt-2">
+              ✓ No signup required • ✓ Free to start • ✓ 2,000+ Canadians helped
+            </p>
           </div>
         </div>
       </div>

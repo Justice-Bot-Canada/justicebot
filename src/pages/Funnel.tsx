@@ -6,6 +6,10 @@ import { Progress } from "@/components/ui/progress";
 import { ArrowRight, ArrowLeft, Home, Users, Heart, Scale, FileText, Check, AlertTriangle, MapPin, Shield, Clock, FileCheck } from "lucide-react";
 import { trackEvent, analytics } from "@/utils/analytics";
 import EnhancedSEO from "@/components/EnhancedSEO";
+import EmailGate from "@/components/EmailGate";
+import LegalPathReportCTA from "@/components/LegalPathReportCTA";
+import UrgencyBlock from "@/components/UrgencyBlock";
+import FounderTrustBlock from "@/components/FounderTrustBlock";
 import { cn } from "@/lib/utils";
 // All Canadian provinces/territories
 const PROVINCES = [
@@ -106,6 +110,8 @@ export default function Funnel() {
   const [province, setProvince] = useState<string | null>(null);
   const [legalArea, setLegalArea] = useState<string | null>(null);
   const [triageAnswers, setTriageAnswers] = useState<Record<number, boolean>>({});
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [showEmailGate, setShowEmailGate] = useState(false);
   
   const totalSteps = 7;
   const progress = (step / totalSteps) * 100;
@@ -121,7 +127,7 @@ export default function Funnel() {
     analytics.funnelStart(window.location.pathname);
   }, []);
 
-  // Persist selections
+  // Persist selections + check for stored email
   useEffect(() => {
     const saved = sessionStorage.getItem('funnel_data');
     if (saved) {
@@ -130,11 +136,20 @@ export default function Funnel() {
       if (data.legalArea) setLegalArea(data.legalArea);
       if (data.triageAnswers) setTriageAnswers(data.triageAnswers);
     }
+    // Check if user already gave email
+    const storedEmail = sessionStorage.getItem('gated_email');
+    if (storedEmail) setUserEmail(storedEmail);
   }, []);
 
   useEffect(() => {
     sessionStorage.setItem('funnel_data', JSON.stringify({ province, legalArea, triageAnswers }));
   }, [province, legalArea, triageAnswers]);
+
+  const handleEmailUnlock = (email: string) => {
+    setUserEmail(email);
+    setShowEmailGate(false);
+    // Now show step 5
+  };
 
   const handleProvinceSelect = (code: string) => {
     setProvince(code);
@@ -169,8 +184,6 @@ export default function Funnel() {
       const questions = TRIAGE_QUESTIONS[legalArea!] || [];
       const allAnswered = questions.every((_, i) => triageAnswers[i] !== undefined);
       if (allAnswered) {
-        setStep(5);
-        trackEvent('form_recommended', { province, legalArea, triageAnswers });
         // Fire GA4 triage_complete - CRITICAL for funnel tracking
         if (!triageCompleteFired.current) {
           triageCompleteFired.current = true;
@@ -181,6 +194,15 @@ export default function Funnel() {
             caseType: legalArea || 'unknown',
             meritRange,
           });
+        }
+        
+        // Gate results behind email if not already captured
+        if (!userEmail) {
+          setShowEmailGate(true);
+          trackEvent('email_gate_shown', { province, legalArea });
+        } else {
+          setStep(5);
+          trackEvent('form_recommended', { province, legalArea, triageAnswers });
         }
       }
     } else if (step === 5) {
@@ -429,10 +451,33 @@ export default function Funnel() {
                 disabled={triageQuestions.some((_, i) => triageAnswers[i] === undefined)}
                 className="flex-1 py-6"
               >
-                See My Recommendation
+                Show my legal path
                 <ArrowRight className="h-5 w-5 ml-2" />
               </Button>
             </div>
+
+            {/* Email Gate Modal */}
+            {showEmailGate && (
+              <div className="mt-6">
+                <EmailGate 
+                  title="See your personalized results"
+                  description="Enter your email to unlock your legal pathway recommendation"
+                  ctaText="Show my results"
+                  source="funnel_email_gate"
+                  onUnlock={(email) => {
+                    handleEmailUnlock(email);
+                    setStep(5);
+                    trackEvent('form_recommended', { province, legalArea, triageAnswers });
+                  }}
+                  benefits={[
+                    "Your recommended tribunal",
+                    "Which forms you need",
+                    "Filing fees and timeframes",
+                    "Step-by-step next actions"
+                  ]}
+                />
+              </div>
+            )}
           </div>
         )}
 
@@ -504,10 +549,13 @@ export default function Funnel() {
                 className="flex-1 py-6 text-lg"
                 variant="cta"
               >
-                Unlock My Forms
+                Get my forms — $5.99
                 <ArrowRight className="h-5 w-5 ml-2" />
               </Button>
             </div>
+
+            {/* Urgency + Trust */}
+            <UrgencyBlock venue={legalArea || undefined} variant="prominent" />
           </div>
         )}
 
