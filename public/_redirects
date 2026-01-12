@@ -3,12 +3,6 @@
 /robots.txt    /robots.txt    200
 /manifest.json /manifest.json 200
 
-# Force www and HTTPS version (canonical domain) - CRITICAL for SEO
-# These MUST come before any other redirects
-https://justice-bot.com/* https://www.justice-bot.com/:splat 301!
-http://justice-bot.com/* https://www.justice-bot.com/:splat 301!
-http://www.justice-bot.com/* https://www.justice-bot.com/:splat 301!
-
 # Remove trailing slashes (prevents duplicate content)
 /*/ /:splat 301!
 
@@ -62,4 +56,3 @@ http://www.justice-bot.com/* https://www.justice-bot.com/:splat 301!
 
 # SPA fallback - all other routes go to index.html
 /*                  /index.html         200
-

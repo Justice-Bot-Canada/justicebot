@@ -2,11 +2,6 @@
 /sitemap.xml   /sitemap.xml   200
 /robots.txt    /robots.txt    200
 
-# Force www version (canonical domain) - must be first!
-https://justice-bot.com/* https://www.justice-bot.com/:splat 301!
-http://justice-bot.com/* https://www.justice-bot.com/:splat 301!
-http://www.justice-bot.com/* https://www.justice-bot.com/:splat 301!
-
 # 301 Redirects for old URLs
 /terms-of-use  /terms         301!
 /account       /profile       301!
