@@ -6,10 +6,12 @@ import { Progress } from "@/components/ui/progress";
 import { ArrowRight, ArrowLeft, Home, Users, Heart, Scale, FileText, Check, AlertTriangle, MapPin, Shield, Clock, FileCheck } from "lucide-react";
 import { trackEvent, analytics } from "@/utils/analytics";
 import EnhancedSEO from "@/components/EnhancedSEO";
-import EmailGate from "@/components/EmailGate";
-import LegalPathReportCTA from "@/components/LegalPathReportCTA";
+import SignupWallModal from "@/components/SignupWallModal";
+import UpgradeCard from "@/components/UpgradeCard";
+import EmailChecklistCapture from "@/components/EmailChecklistCapture";
 import UrgencyBlock from "@/components/UrgencyBlock";
 import FounderTrustBlock from "@/components/FounderTrustBlock";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 // All Canadian provinces/territories
 const PROVINCES = [
@@ -106,14 +108,15 @@ const getTribunalInfo = (legalArea: string, province: string) => {
 
 export default function Funnel() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [province, setProvince] = useState<string | null>(null);
   const [legalArea, setLegalArea] = useState<string | null>(null);
   const [triageAnswers, setTriageAnswers] = useState<Record<number, boolean>>({});
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [showEmailGate, setShowEmailGate] = useState(false);
+  const [showSignupWall, setShowSignupWall] = useState(false);
+  const [showExitCapture, setShowExitCapture] = useState(false);
   
-  const totalSteps = 7;
+  const totalSteps = 6; // Reduced steps
   const progress = (step / totalSteps) * 100;
 
   // Track if triage_start and triage_complete have been fired to prevent duplicates
@@ -127,7 +130,7 @@ export default function Funnel() {
     analytics.funnelStart(window.location.pathname);
   }, []);
 
-  // Persist selections + check for stored email
+  // Persist selections
   useEffect(() => {
     const saved = sessionStorage.getItem('funnel_data');
     if (saved) {
@@ -136,19 +139,46 @@ export default function Funnel() {
       if (data.legalArea) setLegalArea(data.legalArea);
       if (data.triageAnswers) setTriageAnswers(data.triageAnswers);
     }
-    // Check if user already gave email
-    const storedEmail = sessionStorage.getItem('gated_email');
-    if (storedEmail) setUserEmail(storedEmail);
   }, []);
+
+  // Exit intent detection (desktop)
+  useEffect(() => {
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (e.clientY <= 0 && step >= 3 && !user) {
+        setShowExitCapture(true);
+      }
+    };
+    document.addEventListener('mouseleave', handleMouseLeave);
+    return () => document.removeEventListener('mouseleave', handleMouseLeave);
+  }, [step, user]);
 
   useEffect(() => {
     sessionStorage.setItem('funnel_data', JSON.stringify({ province, legalArea, triageAnswers }));
   }, [province, legalArea, triageAnswers]);
 
-  const handleEmailUnlock = (email: string) => {
-    setUserEmail(email);
-    setShowEmailGate(false);
-    // Now show step 5
+  // Generate blurred preview content
+  const getBlurredPreview = () => {
+    const tribunal = legalArea && province ? getTribunalInfo(legalArea, province) : null;
+    return {
+      form: tribunal?.forms[0] || "T2 Application",
+      venue: tribunal?.name || "Landlord and Tenant Board",
+      nextSteps: [
+        "Complete and submit your application",
+        "Gather supporting evidence",
+        "Wait for hearing date"
+      ],
+      evidenceChecklist: [
+        "Lease agreement",
+        "Photos or written complaints",
+        "Communication records"
+      ]
+    };
+  };
+
+  const handleSignupSuccess = () => {
+    setShowSignupWall(false);
+    setStep(5); // Show results
+    trackEvent('form_recommended', { province, legalArea, triageAnswers });
   };
 
   const handleProvinceSelect = (code: string) => {
@@ -196,10 +226,10 @@ export default function Funnel() {
           });
         }
         
-        // Gate results behind email if not already captured
-        if (!userEmail) {
-          setShowEmailGate(true);
-          trackEvent('email_gate_shown', { province, legalArea });
+        // Gate results behind signup if not logged in
+        if (!user) {
+          setShowSignupWall(true);
+          trackEvent('signup_wall_view', { province, legalArea });
         } else {
           setStep(5);
           trackEvent('form_recommended', { province, legalArea, triageAnswers });
@@ -456,30 +486,22 @@ export default function Funnel() {
               </Button>
             </div>
 
-            {/* Email Gate Modal */}
-            {showEmailGate && (
+            {/* Exit capture for desktop */}
+            {showExitCapture && !user && (
               <div className="mt-6">
-                <EmailGate 
-                  title="See your personalized results"
-                  description="Enter your email to unlock your legal pathway recommendation"
-                  ctaText="Show my results"
-                  source="funnel_email_gate"
-                  onUnlock={(email) => {
-                    handleEmailUnlock(email);
-                    setStep(5);
-                    trackEvent('form_recommended', { province, legalArea, triageAnswers });
-                  }}
-                  benefits={[
-                    "Your recommended tribunal",
-                    "Which forms you need",
-                    "Filing fees and timeframes",
-                    "Step-by-step next actions"
-                  ]}
-                />
+                <EmailChecklistCapture legalArea={legalArea || undefined} province={province || undefined} />
               </div>
             )}
           </div>
         )}
+
+        {/* Signup Wall Modal */}
+        <SignupWallModal
+          open={showSignupWall}
+          onOpenChange={setShowSignupWall}
+          preview={getBlurredPreview()}
+          onSuccess={handleSignupSuccess}
+        />
 
         {/* STEP 5 — Recommendation */}
         {step === 5 && tribunal && (
@@ -517,27 +539,8 @@ export default function Funnel() {
               </div>
             </Card>
 
-            <Card className="p-6">
-              <h3 className="font-semibold text-lg mb-4">You'll receive:</h3>
-              <ul className="space-y-2 text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <span>The correct forms, filled with your details</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <span>Step-by-step filing instructions</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <span>Evidence organization checklist</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <span>Deadline tracking and reminders</span>
-                </li>
-              </ul>
-            </Card>
+            {/* Upgrade Card - $5.99 CTA */}
+            <UpgradeCard venue={legalArea || undefined} />
 
             <div className="flex gap-3 pt-4">
               <Button variant="outline" onClick={handleBack} className="flex-1 py-6">
@@ -545,17 +548,20 @@ export default function Funnel() {
                 Back
               </Button>
               <Button 
-                onClick={handleNext}
+                onClick={() => navigate('/legal-path-report')}
                 className="flex-1 py-6 text-lg"
                 variant="cta"
               >
-                Get my forms — $5.99
+                Get my report — $5.99
                 <ArrowRight className="h-5 w-5 ml-2" />
               </Button>
             </div>
 
             {/* Urgency + Trust */}
             <UrgencyBlock venue={legalArea || undefined} variant="prominent" />
+            
+            {/* Founder trust */}
+            <FounderTrustBlock />
           </div>
         )}
 

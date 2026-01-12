@@ -98,6 +98,7 @@ import HowToFightN4Eviction from "./pages/HowToFightN4Eviction";
 import HRTOToronto from "./pages/HRTOToronto";
 import HRTOOttawa from "./pages/HRTOOttawa";
 import LTBCityPage from "./pages/LTBCityPage";
+const LegalPathReportPage = lazy(() => import("./pages/LegalPathReportPage"));
 // Lazy load heavy components
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Admin = lazy(() => import("./pages/Admin"));
@@ -175,6 +176,7 @@ const AppContent = () => {
           <Route path="/case-demo/:caseType" element={<CaseDemo />} />
           <Route path="/journey" element={<Journey />} />
           <Route path="/pricing" element={<Pricing />} />
+          <Route path="/legal-path-report" element={<Suspense fallback={<LoadingFallback />}><LegalPathReportPage /></Suspense>} />
 
           {/* Legal Journey Pathways */}
           <Route path="/hrto-journey" element={<HRTOJourney />} />
