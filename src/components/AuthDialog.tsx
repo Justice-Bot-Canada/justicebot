@@ -29,6 +29,8 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const [termsError, setTermsError] = useState("");
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -87,6 +89,54 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       }
     } catch (error) {
       analytics.signupFailed('login_unexpected_error');
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailError("");
+    
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email.trim()) {
+      setEmailError("Please enter your email address");
+      return;
+    }
+    if (!emailRegex.test(email)) {
+      setEmailError("Please enter a valid email address");
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl,
+      });
+      
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        setResetEmailSent(true);
+        toast({
+          title: "Check your email",
+          description: "We've sent you a password reset link.",
+        });
+      }
+    } catch (error) {
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
@@ -299,16 +349,71 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   required
                 />
               </div>
-              <Button type="submit" className="w-full h-11" disabled={isLoading} size="lg">
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  "Sign In"
-                )}
-              </Button>
+              
+              {!showForgotPassword ? (
+                <>
+                  <Button type="submit" className="w-full h-11" disabled={isLoading} size="lg">
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Signing in...
+                      </>
+                    ) : (
+                      "Sign In"
+                    )}
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(true)}
+                    className="w-full text-sm text-primary hover:underline mt-2"
+                  >
+                    Forgot your password?
+                  </button>
+                </>
+              ) : resetEmailSent ? (
+                <div className="text-center space-y-3">
+                  <CheckCircle className="h-8 w-8 text-green-500 mx-auto" />
+                  <p className="text-sm text-muted-foreground">
+                    Check your email for a password reset link.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForgotPassword(false);
+                      setResetEmailSent(false);
+                    }}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Back to sign in
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <Button 
+                    type="button" 
+                    onClick={handleForgotPassword}
+                    className="w-full h-11" 
+                    disabled={isLoading} 
+                    size="lg"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      "Send Reset Link"
+                    )}
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(false)}
+                    className="w-full text-sm text-muted-foreground hover:underline"
+                  >
+                    Back to sign in
+                  </button>
+                </div>
+              )}
             </form>
           </TabsContent>
           
