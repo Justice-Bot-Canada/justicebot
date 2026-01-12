@@ -800,6 +800,7 @@ export type Database = {
           pathway_type: string
           recommendation: string
           relevant_laws: Json | null
+          user_id: string | null
         }
         Insert: {
           case_id: string
@@ -810,6 +811,7 @@ export type Database = {
           pathway_type: string
           recommendation: string
           relevant_laws?: Json | null
+          user_id?: string | null
         }
         Update: {
           case_id?: string
@@ -820,6 +822,7 @@ export type Database = {
           pathway_type?: string
           recommendation?: string
           relevant_laws?: Json | null
+          user_id?: string | null
         }
         Relationships: [
           {
