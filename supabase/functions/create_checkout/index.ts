@@ -133,6 +133,10 @@ serve(async (req) => {
     const finalSuccessUrl = successUrl || `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
     const finalCancelUrl = cancelUrl || `${origin}/pricing`;
 
+    // Parse additional metadata from request body
+    const requestBody = await req.clone().json();
+    const additionalMetadata = requestBody.metadata || {};
+
     // Create Checkout Session - ONLY this, no access granting
     const session = await stripe.checkout.sessions.create({
       customer: stripeCustomerId,
@@ -145,12 +149,18 @@ serve(async (req) => {
         user_id: userId,
         price_id: priceId,
         product_type: productType, // one_time | monthly | yearly | low_income
+        // Include any additional metadata passed from frontend
+        product_id: additionalMetadata.product_id || additionalMetadata.entitlement_key || priceId,
+        entitlement_key: additionalMetadata.entitlement_key || additionalMetadata.product_id || priceId,
+        case_id: additionalMetadata.case_id || null,
+        product_name: additionalMetadata.product_name || "Justice-Bot Product",
       },
       ...(mode === "subscription" && {
         subscription_data: {
           metadata: {
             user_id: userId,
             product_type: productType,
+            product_id: additionalMetadata.product_id || priceId,
           },
         },
       }),
