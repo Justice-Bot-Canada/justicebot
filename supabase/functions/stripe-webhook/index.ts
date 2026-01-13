@@ -116,6 +116,10 @@ serve(async (req) => {
       const userId = session.metadata?.user_id || session.client_reference_id;
       const priceId = session.metadata?.price_id;
       const productType = session.metadata?.product_type || "one_time";
+      // NEW: Support entitlement_key for specific product entitlements
+      const entitlementKey = session.metadata?.entitlement_key || session.metadata?.product_id || priceId;
+      const caseId = session.metadata?.case_id || null;
+      const productName = session.metadata?.product_name || "Justice-Bot Product";
 
       if (!userId) {
         logStep("ERROR: No user_id in metadata");
@@ -149,33 +153,82 @@ serve(async (req) => {
       if (orderError) {
         logStep("Order error", { error: orderError.message });
       } else {
-        logStep("Order recorded", { sessionId: session.id });
+        logStep("Order recorded", { sessionId: session.id, productName });
       }
 
       // 2. Grant entitlement - THE ONLY PLACE THIS HAPPENS
       const endsAt = calculateEndsAt(productType);
-      const productId = priceId || productType; // Use price_id as product_id
+      // Use entitlement_key for product-specific access
+      const productId = entitlementKey || priceId || productType;
+
+      const entitlementData: Record<string, any> = {
+        user_id: userId,
+        product_id: productId,
+        access_level: productType === "low_income" ? "low_income" : "full",
+        source: "stripe",
+        starts_at: new Date().toISOString(),
+        ends_at: endsAt,
+        updated_at: new Date().toISOString(),
+      };
+
+      // If case_id is provided, scope entitlement to that case
+      if (caseId) {
+        entitlementData.case_id = caseId;
+      }
 
       const { error: entitlementError } = await supabaseAdmin
         .from("entitlements")
-        .upsert({
-          user_id: userId,
-          product_id: productId,
-          access_level: productType === "low_income" ? "low_income" : "full",
-          source: "stripe",
-          starts_at: new Date().toISOString(),
-          ends_at: endsAt,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: "user_id,product_id" });
+        .upsert(entitlementData, { onConflict: "user_id,product_id" });
 
       if (entitlementError) {
         logStep("Entitlement error", { error: entitlementError.message });
         processingError = entitlementError.message;
       } else {
-        logStep("ENTITLEMENT GRANTED", { userId, productId, productType, endsAt });
+        logStep("ENTITLEMENT GRANTED", { 
+          userId, 
+          productId, 
+          productType, 
+          entitlementKey, 
+          caseId, 
+          endsAt,
+          amountPaid: session.amount_total,
+          currency: session.currency,
+        });
       }
 
-      // 3. Store stripe_customer mapping
+      // 3. If case_id is provided, mark the case as paid
+      if (caseId) {
+        const { error: caseError } = await supabaseAdmin
+          .from("cases")
+          .update({
+            is_paid: true,
+            flow_step: "documents_ready",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", caseId)
+          .eq("user_id", userId);
+
+        if (caseError) {
+          logStep("Case update error", { error: caseError.message });
+        } else {
+          logStep("Case marked as paid", { caseId });
+        }
+      }
+
+      // 4. Record in payments table for audit trail
+      await supabaseAdmin
+        .from("payments")
+        .insert({
+          user_id: userId,
+          amount: (session.amount_total || 0) / 100, // Convert cents to dollars
+          currency: session.currency || "cad",
+          status: "completed",
+          payment_intent_id: paymentIntentId,
+          payment_provider: "stripe",
+          plan_type: productId,
+        });
+
+      // 5. Store stripe_customer mapping
       if (session.customer) {
         const stripeCustomerId = typeof session.customer === 'string' 
           ? session.customer 

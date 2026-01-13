@@ -33,6 +33,7 @@ export default function DocumentsUnlocked() {
   const { caseId: paramCaseId } = useParams();
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
+  const productKey = searchParams.get('product') || 'court_ready_pack';
 
   // Support both route param and query param for caseId
   const caseId = paramCaseId || searchParams.get('caseId') || searchParams.get('case');
@@ -40,13 +41,18 @@ export default function DocumentsUnlocked() {
   const [verifying, setVerifying] = useState(!!sessionId);
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [paymentDetails, setPaymentDetails] = useState<{
+    product_id: string;
+    value: number;
+    transaction_id: string;
+  } | null>(null);
   const hasVerified = useRef(false);
   const purchaseEventFired = useRef(false);
 
   useEffect(() => {
     // Track page view
-    trackEvent('next_steps_viewed', { caseId });
-  }, [caseId]);
+    trackEvent('next_steps_viewed', { caseId, product: productKey });
+  }, [caseId, productKey]);
 
   useEffect(() => {
     if (!sessionId || hasVerified.current) {
@@ -67,25 +73,50 @@ export default function DocumentsUnlocked() {
         if (data?.success) {
           setVerified(true);
           
+          // Extract payment details from verification response
+          const verifiedProductId = data.product_id || data.product || productKey;
+          const verifiedValue = data.value || data.amount_total ? (data.amount_total / 100) : 39;
+          const transactionId = data.payment_intent_id || sessionId;
+          
+          setPaymentDetails({
+            product_id: verifiedProductId,
+            value: verifiedValue,
+            transaction_id: transactionId,
+          });
+          
           // CRITICAL: Only fire purchase event AFTER server-side verification confirms payment
           // This ensures GA = Stripe = Supabase (same truth)
           if (!purchaseEventFired.current) {
             purchaseEventFired.current = true;
             
-            // Fire new funnel purchase events (only after verification)
-            analytics.paymentCompletedEvent(sessionId, 39);
+            // Fire GA4 purchase event with CORRECT product_id and value (no more "(not set)")
+            analytics.paymentCompletedEvent(transactionId, verifiedValue);
             analytics.featuresUnlocked(data.caseId || caseId);
             
-            // Fire GA4 purchase event for funnel tracking
+            // Fire GA4 purchase event for funnel tracking with product_id
             analytics.funnelPurchase({
-              transactionId: sessionId,
-              value: 39,
-              itemName: 'Court-Ready Document Pack',
+              transactionId: transactionId,
+              value: verifiedValue,
+              itemName: data.product_name || 'Book of Documents Generator',
+            });
+            
+            // Fire complete purchase event with all required fields
+            trackEvent('purchase', {
+              transaction_id: transactionId,
+              value: verifiedValue,
+              currency: 'CAD',
+              product_id: verifiedProductId,
+              product_name: data.product_name || 'Book of Documents Generator',
+              case_id: data.caseId || caseId,
+              verified_by_server: true,
             });
             
             // Legacy event for backwards compatibility
             trackEvent('payment_completed', {
-              product: 'court_ready_documents',
+              product: verifiedProductId,
+              product_id: verifiedProductId,
+              value: verifiedValue,
+              currency: 'CAD',
               sessionId,
               caseId: data.caseId || caseId,
               verifiedByServer: true,
@@ -94,7 +125,7 @@ export default function DocumentsUnlocked() {
         } else if (data?.alreadyUnlocked) {
           // Already processed by webhook - just mark as verified
           setVerified(true);
-          trackEvent('payment_already_verified', { caseId, sessionId });
+          trackEvent('payment_already_verified', { caseId, sessionId, product: productKey });
         } else {
           setError(data?.error || 'Payment verification failed');
         }
@@ -107,7 +138,7 @@ export default function DocumentsUnlocked() {
     };
 
     verifyPayment();
-  }, [sessionId, caseId]);
+  }, [sessionId, caseId, productKey]);
 
   const handleUploadEvidence = () => {
     trackEvent('evidence_upload_started', { caseId, source: 'next_steps' });

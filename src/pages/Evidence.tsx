@@ -14,11 +14,13 @@ import { CaseMeritScore } from "@/components/CaseMeritScore";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
-import { EvidenceBundlePaywall } from "@/components/paywalls";
+import { BookOfDocsPaywall } from "@/components/paywalls";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import { supabase } from "@/integrations/supabase/client";
 import { trackEvent, analytics } from "@/utils/analytics";
 import { useProgram } from "@/contexts/ProgramContext";
+
+const BOOK_DOCS_PRODUCT_KEY = "book_docs_generator";
 
 const Evidence = () => {
   const navigate = useNavigate();
@@ -27,25 +29,71 @@ const Evidence = () => {
   const { program, isProgramMode } = useProgram();
   const shouldHidePricing = useShouldHidePricing();
   const [searchParams] = useSearchParams();
-  const caseId = searchParams.get('case') || searchParams.get('caseId'); // Support both params
+  const caseId = searchParams.get('case') || searchParams.get('caseId');
   const [caseData, setCaseData] = useState<any>(null);
   const [bookWizardOpen, setBookWizardOpen] = useState(false);
-  const [showBundlePaywall, setShowBundlePaywall] = useState(false);
+  const [showBookPaywall, setShowBookPaywall] = useState(false);
   const [evidenceCount, setEvidenceCount] = useState(0);
+  const [hasBookEntitlement, setHasBookEntitlement] = useState(false);
 
   const isPremium = hasAccess && (tier === 'monthly' || tier === 'yearly');
 
-  // Program users bypass paywall
-  const handleBookClick = () => {
-    if (!isPremium && !isFreeUser && !shouldHidePricing) {
-      setShowBundlePaywall(true);
-      return;
+  // Check if user has Book of Documents entitlement
+  const checkBookEntitlement = async () => {
+    if (!user || !caseId) return;
+    
+    try {
+      const { data } = await supabase
+        .from("entitlements")
+        .select("product_id, ends_at, case_id")
+        .eq("user_id", user.id);
+      
+      if (data) {
+        // Check for global premium OR specific book_docs_generator entitlement
+        const hasEntitlement = data.some(e => {
+          // Global subscriptions
+          if (e.product_id?.toLowerCase().includes('monthly') || 
+              e.product_id?.toLowerCase().includes('yearly') ||
+              e.product_id?.toLowerCase().includes('premium')) {
+            return !e.ends_at || new Date(e.ends_at) > new Date();
+          }
+          // Specific book_docs_generator entitlement
+          if (e.product_id === BOOK_DOCS_PRODUCT_KEY || 
+              e.product_id?.toLowerCase().includes('book')) {
+            // If case-scoped, must match this case
+            if (e.case_id && e.case_id !== caseId) return false;
+            return !e.ends_at || new Date(e.ends_at) > new Date();
+          }
+          return false;
+        });
+        
+        setHasBookEntitlement(hasEntitlement);
+      }
+    } catch (err) {
+      console.error("Error checking entitlement:", err);
     }
-    setBookWizardOpen(true);
   };
 
-  const handleBundlePaywallConfirm = () => {
-    setShowBundlePaywall(false);
+  useEffect(() => {
+    if (user && caseId) {
+      checkBookEntitlement();
+    }
+  }, [user, caseId]);
+
+  // Handle Book of Documents button click
+  const handleBookClick = () => {
+    // Premium users, free users, and program users bypass paywall
+    if (isPremium || isFreeUser || shouldHidePricing || hasBookEntitlement) {
+      setBookWizardOpen(true);
+      return;
+    }
+    // Show paywall for non-premium users
+    setShowBookPaywall(true);
+  };
+
+  const handleBookAccessGranted = () => {
+    setHasBookEntitlement(true);
+    setShowBookPaywall(false);
     setBookWizardOpen(true);
   };
 
@@ -164,10 +212,12 @@ const Evidence = () => {
               </Button>
             </div>
 
-            <EvidenceBundlePaywall
-              open={showBundlePaywall}
-              onOpenChange={setShowBundlePaywall}
-              onConfirm={handleBundlePaywallConfirm}
+            <BookOfDocsPaywall
+              open={showBookPaywall}
+              onOpenChange={setShowBookPaywall}
+              onAccessGranted={handleBookAccessGranted}
+              caseId={caseId}
+              caseTitle={caseData?.title}
             />
 
             <BookOfDocumentsWizard
