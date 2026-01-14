@@ -120,14 +120,16 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: redirectUrl,
+      // Use custom Edge Function that sends via Resend
+      const response = await supabase.functions.invoke('send-password-reset', {
+        body: { email, redirectUrl }
       });
       
-      if (error) {
+      if (response.error) {
+        console.error('[Auth] Password reset error:', response.error);
         toast({
           title: "Error",
-          description: error.message,
+          description: "Something went wrong. Please try again.",
           variant: "destructive",
         });
       } else {
@@ -138,6 +140,7 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         });
       }
     } catch (error) {
+      console.error('[Auth] Unexpected password reset error:', error);
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
