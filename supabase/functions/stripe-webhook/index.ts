@@ -35,39 +35,39 @@ serve(async (req) => {
   const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
   
   if (!stripeKey || !webhookSecret) {
-    logStep("ERROR: Missing env vars");
+    logStep("ERROR: Missing env vars", { hasStripeKey: !!stripeKey, hasWebhookSecret: !!webhookSecret });
     return new Response("Server configuration error", { status: 500 });
   }
 
   const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
   
-  // Get raw body for signature verification
-  const body = await req.text();
+  // Get raw body for signature verification - CRITICAL: must use .text() not .json()
+  const rawBody = await req.text();
   const signature = req.headers.get("stripe-signature");
 
   if (!signature) {
-    logStep("ERROR: No signature");
-    return new Response("No signature", { status: 400 });
+    logStep("ERROR: No stripe-signature header");
+    return new Response("Missing signature", { status: 400 });
   }
 
   // Verify Stripe signature
   let event: Stripe.Event;
   try {
-    event = await stripe.webhooks.constructEventAsync(body, signature, webhookSecret);
-    logStep("Event verified", { type: event.type, id: event.id });
+    event = await stripe.webhooks.constructEventAsync(rawBody, signature, webhookSecret);
+    logStep("Event verified", { type: event.type, id: event.id, livemode: event.livemode });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    logStep("Signature failed", { message });
-    return new Response(`Signature verification failed: ${message}`, { status: 400 });
+    logStep("Signature verification FAILED", { message });
+    return new Response(`Webhook signature verification failed: ${message}`, { status: 400 });
   }
 
-  // Supabase admin client (service role for writes)
+  // Supabase admin client (service role bypasses RLS)
   const supabaseAdmin = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
   );
 
-  // ============== IDEMPOTENCY: Store event, skip if already processed ==============
+  // ============== IDEMPOTENCY: Check if event already processed ==============
   const { data: existingEvent } = await supabaseAdmin
     .from("stripe_webhook_events")
     .select("id, processed_at")
@@ -75,13 +75,14 @@ serve(async (req) => {
     .maybeSingle();
 
   if (existingEvent?.processed_at) {
-    logStep("Event already processed", { eventId: event.id });
+    logStep("Event already processed - skipping", { eventId: event.id });
     return new Response(JSON.stringify({ received: true, duplicate: true }), { 
-      status: 200, headers: { "Content-Type": "application/json" }
+      status: 200, 
+      headers: { "Content-Type": "application/json" }
     });
   }
 
-  // Insert/update event record
+  // Insert event record first (idempotency key)
   await supabaseAdmin
     .from("stripe_webhook_events")
     .upsert({
@@ -102,48 +103,113 @@ serve(async (req) => {
       logStep("Processing checkout.session.completed", { 
         sessionId: session.id,
         paymentStatus: session.payment_status,
+        amountTotal: session.amount_total,
+        currency: session.currency,
         metadata: session.metadata
       });
 
+      // CRITICAL: Only process if payment is actually completed
       if (session.payment_status !== "paid") {
-        logStep("Payment not complete", { status: session.payment_status });
-        return new Response(JSON.stringify({ received: true }), { 
-          status: 200, headers: { "Content-Type": "application/json" }
+        logStep("Payment not complete - waiting for payment", { status: session.payment_status });
+        return new Response(JSON.stringify({ received: true, pending: true }), { 
+          status: 200, 
+          headers: { "Content-Type": "application/json" }
         });
       }
 
-      // Extract metadata - source of truth
-      const userId = session.metadata?.user_id || session.client_reference_id;
-      const priceId = session.metadata?.price_id;
-      const productType = session.metadata?.product_type || "one_time";
-      // NEW: Support entitlement_key for specific product entitlements
-      const entitlementKey = session.metadata?.entitlement_key || session.metadata?.product_id || priceId;
-      const caseId = session.metadata?.case_id || null;
-      const productName = session.metadata?.product_name || "Justice-Bot Product";
+      // Extract metadata - this is the source of truth
+      const md = session.metadata || {};
+      const userId = md.user_id || session.client_reference_id;
+      const priceId = md.price_id;
+      const productType = md.product_type || "one_time";
+      const productId = md.product_id || priceId;
+      const entitlementKey = md.entitlement_key || productId;
+      const caseId = md.case_id || null;
+      const productName = md.product_name || "Justice-Bot Product";
+      const paymentIdFromMeta = md.payment_id;
 
       if (!userId) {
-        logStep("ERROR: No user_id in metadata");
-        processingError = "no_user_id";
-        throw new Error("No user_id in metadata");
+        processingError = "no_user_id_in_metadata";
+        logStep("ERROR: No user_id found", { metadata: md, clientRefId: session.client_reference_id });
+        throw new Error("No user_id in session metadata");
       }
 
-      // Get IDs
-      const paymentIntentId = typeof session.payment_intent === 'string' 
+      // Get payment identifiers
+      const stripeCheckoutSessionId = session.id;
+      const stripePaymentIntentId = typeof session.payment_intent === 'string' 
         ? session.payment_intent 
-        : session.payment_intent?.id;
+        : session.payment_intent?.id || null;
       const subscriptionId = typeof session.subscription === 'string' 
         ? session.subscription 
-        : session.subscription?.id;
+        : session.subscription?.id || null;
 
-      // 1. Create/update order (idempotent)
+      logStep("Extracted data", { 
+        userId, 
+        productId, 
+        entitlementKey, 
+        caseId, 
+        stripePaymentIntentId,
+        productType 
+      });
+
+      // ============ STEP 1: Update or create payment row ============
+      let paymentId = paymentIdFromMeta;
+      
+      // Try to update existing payment row first (created by create_checkout)
+      const { data: updatedPayment, error: updateError } = await supabaseAdmin
+        .from("payments")
+        .update({
+          status: "paid",
+          paid_at: new Date().toISOString(),
+          stripe_checkout_session_id: stripeCheckoutSessionId,
+          payment_intent_id: stripePaymentIntentId,
+        })
+        .eq("stripe_checkout_session_id", stripeCheckoutSessionId)
+        .select()
+        .maybeSingle();
+
+      if (updatedPayment) {
+        paymentId = updatedPayment.id;
+        logStep("Payment row updated to PAID", { paymentId, sessionId: stripeCheckoutSessionId });
+      } else if (updateError || !updatedPayment) {
+        // No existing row - create one (fallback for edge cases)
+        const { data: newPayment, error: insertError } = await supabaseAdmin
+          .from("payments")
+          .insert({
+            user_id: userId,
+            case_id: caseId || null,
+            product_id: productId,
+            entitlement_key: entitlementKey,
+            amount: (session.amount_total || 0) / 100,
+            amount_cents: session.amount_total || 0,
+            currency: session.currency || "cad",
+            status: "paid",
+            paid_at: new Date().toISOString(),
+            stripe_checkout_session_id: stripeCheckoutSessionId,
+            payment_intent_id: stripePaymentIntentId,
+            payment_provider: "stripe",
+            plan_type: productType,
+          })
+          .select()
+          .single();
+
+        if (insertError) {
+          logStep("Payment insert error", { error: insertError.message });
+        } else {
+          paymentId = newPayment.id;
+          logStep("Payment row created (fallback)", { paymentId });
+        }
+      }
+
+      // ============ STEP 2: Create order record ============
       const { error: orderError } = await supabaseAdmin
         .from("orders")
         .upsert({
           user_id: userId,
-          stripe_checkout_session_id: session.id,
-          stripe_payment_intent_id: paymentIntentId || null,
-          stripe_subscription_id: subscriptionId || null,
-          price_id: priceId || null,
+          stripe_checkout_session_id: stripeCheckoutSessionId,
+          stripe_payment_intent_id: stripePaymentIntentId,
+          stripe_subscription_id: subscriptionId,
+          price_id: priceId,
           amount_total: session.amount_total || 0,
           currency: session.currency || "cad",
           status: "paid",
@@ -151,19 +217,17 @@ serve(async (req) => {
         }, { onConflict: "stripe_checkout_session_id" });
 
       if (orderError) {
-        logStep("Order error", { error: orderError.message });
+        logStep("Order record error", { error: orderError.message });
       } else {
-        logStep("Order recorded", { sessionId: session.id, productName });
+        logStep("Order recorded", { sessionId: stripeCheckoutSessionId, amount: session.amount_total });
       }
 
-      // 2. Grant entitlement - THE ONLY PLACE THIS HAPPENS
+      // ============ STEP 3: Grant entitlement (THE PAYWALL TRUTH) ============
       const endsAt = calculateEndsAt(productType);
-      // Use entitlement_key for product-specific access
-      const productId = entitlementKey || priceId || productType;
 
       const entitlementData: Record<string, any> = {
         user_id: userId,
-        product_id: productId,
+        product_id: entitlementKey, // Use entitlement_key as product_id
         access_level: productType === "low_income" ? "low_income" : "full",
         source: "stripe",
         starts_at: new Date().toISOString(),
@@ -171,7 +235,7 @@ serve(async (req) => {
         updated_at: new Date().toISOString(),
       };
 
-      // If case_id is provided, scope entitlement to that case
+      // Scope to case if provided
       if (caseId) {
         entitlementData.case_id = caseId;
       }
@@ -181,27 +245,28 @@ serve(async (req) => {
         .upsert(entitlementData, { onConflict: "user_id,product_id" });
 
       if (entitlementError) {
-        logStep("Entitlement error", { error: entitlementError.message });
         processingError = entitlementError.message;
+        logStep("ENTITLEMENT ERROR", { error: entitlementError.message });
       } else {
-        logStep("ENTITLEMENT GRANTED", { 
+        logStep("✅ ENTITLEMENT GRANTED", { 
           userId, 
-          productId, 
+          entitlementKey,
           productType, 
-          entitlementKey, 
           caseId, 
           endsAt,
           amountPaid: session.amount_total,
           currency: session.currency,
+          productName,
         });
       }
 
-      // 3. If case_id is provided, mark the case as paid
+      // ============ STEP 4: Mark case as paid (if case_id provided) ============
       if (caseId) {
         const { error: caseError } = await supabaseAdmin
           .from("cases")
           .update({
             is_paid: true,
+            paid_at: new Date().toISOString(),
             flow_step: "documents_ready",
             updated_at: new Date().toISOString(),
           })
@@ -209,26 +274,13 @@ serve(async (req) => {
           .eq("user_id", userId);
 
         if (caseError) {
-          logStep("Case update error", { error: caseError.message });
+          logStep("Case update error", { error: caseError.message, caseId });
         } else {
-          logStep("Case marked as paid", { caseId });
+          logStep("✅ Case marked as PAID", { caseId });
         }
       }
 
-      // 4. Record in payments table for audit trail
-      await supabaseAdmin
-        .from("payments")
-        .insert({
-          user_id: userId,
-          amount: (session.amount_total || 0) / 100, // Convert cents to dollars
-          currency: session.currency || "cad",
-          status: "completed",
-          payment_intent_id: paymentIntentId,
-          payment_provider: "stripe",
-          plan_type: productId,
-        });
-
-      // 5. Store stripe_customer mapping
+      // ============ STEP 5: Store stripe_customer mapping ============
       if (session.customer) {
         const stripeCustomerId = typeof session.customer === 'string' 
           ? session.customer 
@@ -242,9 +294,60 @@ serve(async (req) => {
             created_at: new Date().toISOString(),
           }, { onConflict: "user_id" });
       }
+
+      logStep("checkout.session.completed processing COMPLETE", { 
+        userId, 
+        entitlementKey, 
+        amount: session.amount_total,
+        caseId 
+      });
     }
 
-    // ============== invoice.payment_succeeded ==============
+    // ============== charge.refunded ==============
+    else if (event.type === "charge.refunded") {
+      const charge = event.data.object as Stripe.Charge;
+      
+      logStep("Processing charge.refunded", { chargeId: charge.id, paymentIntent: charge.payment_intent });
+
+      const paymentIntentId = typeof charge.payment_intent === 'string' 
+        ? charge.payment_intent 
+        : charge.payment_intent?.id;
+
+      if (paymentIntentId) {
+        // Mark payment as refunded
+        const { data: refundedPayment } = await supabaseAdmin
+          .from("payments")
+          .update({
+            status: "refunded",
+          })
+          .eq("payment_intent_id", paymentIntentId)
+          .select()
+          .maybeSingle();
+
+        if (refundedPayment) {
+          logStep("Payment marked as refunded", { paymentId: refundedPayment.id });
+
+          // Optionally revoke entitlement
+          if (refundedPayment.entitlement_key && refundedPayment.user_id) {
+            await supabaseAdmin
+              .from("entitlements")
+              .update({
+                ends_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              })
+              .eq("user_id", refundedPayment.user_id)
+              .eq("product_id", refundedPayment.entitlement_key);
+
+            logStep("Entitlement revoked due to refund", { 
+              userId: refundedPayment.user_id, 
+              entitlementKey: refundedPayment.entitlement_key 
+            });
+          }
+        }
+      }
+    }
+
+    // ============== invoice.payment_succeeded (subscription renewals) ==============
     else if (event.type === "invoice.payment_succeeded") {
       const invoice = event.data.object as Stripe.Invoice;
       
@@ -275,54 +378,6 @@ serve(async (req) => {
             const priceId = subscription.items.data[0]?.price.id;
             const productType = subscription.metadata?.product_type || "monthly";
 
-            const { error: entitlementError } = await supabaseAdmin
-              .from("entitlements")
-              .upsert({
-                user_id: customerData.user_id,
-                product_id: priceId || "subscription",
-                access_level: "full",
-                source: "stripe",
-                starts_at: new Date().toISOString(),
-                ends_at: endsAt,
-                updated_at: new Date().toISOString(),
-              }, { onConflict: "user_id,product_id" });
-
-            if (entitlementError) {
-              logStep("Entitlement renewal error", { error: entitlementError.message });
-            } else {
-              logStep("ENTITLEMENT RENEWED", { userId: customerData.user_id, endsAt });
-            }
-          }
-        }
-      }
-    }
-
-    // ============== customer.subscription.updated ==============
-    else if (event.type === "customer.subscription.updated") {
-      const subscription = event.data.object as Stripe.Subscription;
-      
-      logStep("Processing subscription.updated", {
-        subscriptionId: subscription.id,
-        status: subscription.status
-      });
-
-      const stripeCustomerId = typeof subscription.customer === 'string' 
-        ? subscription.customer 
-        : subscription.customer?.id;
-
-      if (stripeCustomerId) {
-        const { data: customerData } = await supabaseAdmin
-          .from("stripe_customers")
-          .select("user_id")
-          .eq("stripe_customer_id", stripeCustomerId)
-          .maybeSingle();
-
-        if (customerData?.user_id) {
-          const priceId = subscription.items.data[0]?.price.id;
-
-          if (subscription.status === "active" || subscription.status === "trialing") {
-            const endsAt = new Date(subscription.current_period_end * 1000).toISOString();
-            
             await supabaseAdmin
               .from("entitlements")
               .upsert({
@@ -335,7 +390,7 @@ serve(async (req) => {
                 updated_at: new Date().toISOString(),
               }, { onConflict: "user_id,product_id" });
 
-            logStep("ENTITLEMENT UPDATED", { userId: customerData.user_id, status: subscription.status, endsAt });
+            logStep("✅ Subscription entitlement renewed", { userId: customerData.user_id, endsAt });
           }
         }
       }
@@ -361,8 +416,8 @@ serve(async (req) => {
         if (customerData?.user_id) {
           const priceId = subscription.items.data[0]?.price.id;
 
-          // REVOKE ACCESS: Set ends_at to now
-          const { error } = await supabaseAdmin
+          // Revoke: set ends_at to now
+          await supabaseAdmin
             .from("entitlements")
             .update({
               ends_at: new Date().toISOString(),
@@ -371,11 +426,7 @@ serve(async (req) => {
             .eq("user_id", customerData.user_id)
             .eq("product_id", priceId || "subscription");
 
-          if (error) {
-            logStep("Revoke error", { error: error.message });
-          } else {
-            logStep("ENTITLEMENT REVOKED", { userId: customerData.user_id });
-          }
+          logStep("Subscription entitlement revoked", { userId: customerData.user_id });
         }
       }
     }
@@ -389,11 +440,11 @@ serve(async (req) => {
       })
       .eq("stripe_event_id", event.id);
 
-    logStep("Event processing complete", { eventId: event.id });
+    logStep("Event processing complete", { eventId: event.id, type: event.type });
 
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : String(err);
-    logStep("ERROR", { eventId: event.id, error: errorMessage });
+    logStep("PROCESSING ERROR", { eventId: event.id, error: errorMessage });
     
     await supabaseAdmin
       .from("stripe_webhook_events")
@@ -401,8 +452,9 @@ serve(async (req) => {
       .eq("stripe_event_id", event.id);
   }
 
-  // Always return 200 to acknowledge receipt
+  // Always return 200 to acknowledge receipt (Stripe retries on non-2xx)
   return new Response(JSON.stringify({ received: true }), { 
-    status: 200, headers: { "Content-Type": "application/json" }
+    status: 200, 
+    headers: { "Content-Type": "application/json" }
   });
 });

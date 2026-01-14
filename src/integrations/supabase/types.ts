@@ -234,6 +234,7 @@ export type Database = {
           law_section: string | null
           merit_score: number | null
           municipality: string | null
+          paid_at: string | null
           program_id: string | null
           program_referral_code: string | null
           province: string
@@ -257,6 +258,7 @@ export type Database = {
           law_section?: string | null
           merit_score?: number | null
           municipality?: string | null
+          paid_at?: string | null
           program_id?: string | null
           program_referral_code?: string | null
           province: string
@@ -280,6 +282,7 @@ export type Database = {
           law_section?: string | null
           merit_score?: number | null
           municipality?: string | null
+          paid_at?: string | null
           program_id?: string | null
           program_referral_code?: string | null
           province?: string
@@ -965,44 +968,69 @@ export type Database = {
       payments: {
         Row: {
           amount: number
+          amount_cents: number | null
+          case_id: string | null
           created_at: string
           currency: string
+          entitlement_key: string | null
           form_id: string | null
           id: string
+          paid_at: string | null
           payment_id: string | null
           payment_intent_id: string | null
           payment_provider: string | null
           plan_type: string | null
+          product_id: string | null
           status: string
+          stripe_checkout_session_id: string | null
           user_id: string
         }
         Insert: {
           amount: number
+          amount_cents?: number | null
+          case_id?: string | null
           created_at?: string
           currency?: string
+          entitlement_key?: string | null
           form_id?: string | null
           id?: string
+          paid_at?: string | null
           payment_id?: string | null
           payment_intent_id?: string | null
           payment_provider?: string | null
           plan_type?: string | null
+          product_id?: string | null
           status?: string
+          stripe_checkout_session_id?: string | null
           user_id: string
         }
         Update: {
           amount?: number
+          amount_cents?: number | null
+          case_id?: string | null
           created_at?: string
           currency?: string
+          entitlement_key?: string | null
           form_id?: string | null
           id?: string
+          paid_at?: string | null
           payment_id?: string | null
           payment_intent_id?: string | null
           payment_provider?: string | null
           plan_type?: string | null
+          product_id?: string | null
           status?: string
+          stripe_checkout_session_id?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "payments_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "payments_form_id_fkey"
             columns: ["form_id"]
