@@ -983,6 +983,7 @@ export type Database = {
           product_id: string | null
           status: string
           stripe_checkout_session_id: string | null
+          stripe_payment_intent_id: string | null
           user_id: string
         }
         Insert: {
@@ -1002,6 +1003,7 @@ export type Database = {
           product_id?: string | null
           status?: string
           stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
           user_id: string
         }
         Update: {
@@ -1021,6 +1023,7 @@ export type Database = {
           product_id?: string | null
           status?: string
           stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
           user_id?: string
         }
         Relationships: [
@@ -1657,6 +1660,36 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      webhook_events: {
+        Row: {
+          event_type: string
+          id: string
+          payload: Json
+          processed_at: string | null
+          processing_error: string | null
+          received_at: string
+          stripe_event_id: string
+        }
+        Insert: {
+          event_type: string
+          id?: string
+          payload: Json
+          processed_at?: string | null
+          processing_error?: string | null
+          received_at?: string
+          stripe_event_id: string
+        }
+        Update: {
+          event_type?: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          processing_error?: string | null
+          received_at?: string
+          stripe_event_id?: string
         }
         Relationships: []
       }
