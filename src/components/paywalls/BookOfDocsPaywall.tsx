@@ -102,19 +102,17 @@ export function BookOfDocsPaywall({
     analytics.beginCheckout(PRODUCT_KEY, "Book of Documents Generator", PRODUCT_PRICE);
 
     try {
+      // Call create_checkout with all required parameters at top level
       const { data, error } = await supabase.functions.invoke("create_checkout", {
         body: {
           priceId: STRIPE_PRICE_ID,
           productType: "one_time",
+          productId: PRODUCT_KEY,           // e.g. 'book_docs_39' or 'book_docs_generator'
+          entitlementKey: PRODUCT_KEY,      // What entitlement to grant
+          caseId: caseId,                   // Scope access to this case
+          productName: "Book of Documents Generator",
           successUrl: `${window.location.origin}/documents-unlocked?session_id={CHECKOUT_SESSION_ID}&case=${caseId}&product=${PRODUCT_KEY}`,
           cancelUrl: `${window.location.origin}/evidence?case=${caseId}`,
-          metadata: {
-            product_id: PRODUCT_KEY,
-            entitlement_key: PRODUCT_KEY,
-            case_id: caseId,
-            price_id: STRIPE_PRICE_ID,
-            product_name: "Book of Documents Generator",
-          },
         },
       });
 

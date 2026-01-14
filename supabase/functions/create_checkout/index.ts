@@ -26,6 +26,10 @@ serve(async (req) => {
     const { 
       priceId, 
       productType = "one_time", // one_time | monthly | yearly | low_income
+      productId,      // e.g. 'book_docs_39'
+      entitlementKey, // e.g. 'book_docs_generator'
+      caseId,         // optional: case-scoped access
+      productName,    // for display
       successUrl,
       cancelUrl,
     } = await req.json();
@@ -37,7 +41,7 @@ serve(async (req) => {
       });
     }
 
-    logStep("Request params", { priceId, productType });
+    logStep("Request params", { priceId, productType, productId, entitlementKey, caseId });
 
     // Create Supabase client for auth
     const supabaseClient = createClient(
@@ -81,7 +85,7 @@ serve(async (req) => {
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
-    // Admin client for stripe_customers lookup
+    // Admin client for database operations
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
@@ -126,19 +130,50 @@ serve(async (req) => {
         }, { onConflict: "user_id" });
     }
 
+    // Get the price to determine amount
+    const price = await stripe.prices.retrieve(priceId);
+    const amountCents = price.unit_amount || 3900;
+    const currency = price.currency || "cad";
+
+    // Determine final values for metadata
+    const finalProductId = productId || entitlementKey || priceId;
+    const finalEntitlementKey = entitlementKey || productId || priceId;
+    const finalProductName = productName || "Justice-Bot Product";
+
+    // ============ STEP 1: Create payment row BEFORE redirecting to Stripe ============
+    const { data: paymentRow, error: paymentError } = await supabaseAdmin
+      .from("payments")
+      .insert({
+        user_id: userId,
+        case_id: caseId || null,
+        product_id: finalProductId,
+        entitlement_key: finalEntitlementKey,
+        amount: amountCents / 100, // Store in dollars for legacy compatibility
+        amount_cents: amountCents,
+        currency: currency,
+        status: "created", // Will be updated to 'paid' by webhook
+        payment_provider: "stripe",
+        plan_type: productType,
+      })
+      .select()
+      .single();
+
+    if (paymentError) {
+      logStep("Payment row creation failed", { error: paymentError.message });
+      // Continue anyway - webhook can still process without pre-created row
+    } else {
+      logStep("Payment row created", { paymentId: paymentRow.id });
+    }
+
     // Determine checkout mode based on productType
     const mode = (productType === "monthly" || productType === "yearly") ? "subscription" : "payment";
 
-    const origin = req.headers.get("origin") || "https://justice-bot.com";
-    const finalSuccessUrl = successUrl || `${origin}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
-    const finalCancelUrl = cancelUrl || `${origin}/pricing`;
+    const requestOrigin = req.headers.get("origin") || "https://justice-bot.com";
+    const finalSuccessUrl = successUrl || `${requestOrigin}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
+    const finalCancelUrl = cancelUrl || `${requestOrigin}/pricing`;
 
-    // Parse additional metadata from request body
-    const requestBody = await req.clone().json();
-    const additionalMetadata = requestBody.metadata || {};
-
-    // Create Checkout Session - ONLY this, no access granting
-    const session = await stripe.checkout.sessions.create({
+    // ============ STEP 2: Create Stripe Checkout Session ============
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       customer: stripeCustomerId,
       line_items: [{ price: priceId, quantity: 1 }],
       mode: mode as "subscription" | "payment",
@@ -148,25 +183,41 @@ serve(async (req) => {
       metadata: {
         user_id: userId,
         price_id: priceId,
-        product_type: productType, // one_time | monthly | yearly | low_income
-        // Include any additional metadata passed from frontend
-        product_id: additionalMetadata.product_id || additionalMetadata.entitlement_key || priceId,
-        entitlement_key: additionalMetadata.entitlement_key || additionalMetadata.product_id || priceId,
-        case_id: additionalMetadata.case_id || null,
-        product_name: additionalMetadata.product_name || "Justice-Bot Product",
+        product_type: productType,
+        product_id: finalProductId,
+        entitlement_key: finalEntitlementKey,
+        case_id: caseId || "",
+        product_name: finalProductName,
+        payment_id: paymentRow?.id || "",
       },
-      ...(mode === "subscription" && {
-        subscription_data: {
-          metadata: {
-            user_id: userId,
-            product_type: productType,
-            product_id: additionalMetadata.product_id || priceId,
-          },
+    };
+
+    // Add subscription metadata if applicable
+    if (mode === "subscription") {
+      sessionParams.subscription_data = {
+        metadata: {
+          user_id: userId,
+          product_type: productType,
+          product_id: finalProductId,
         },
-      }),
-    });
+      };
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     logStep("Checkout session created", { sessionId: session.id, mode });
+
+    // ============ STEP 3: Update payment row with session ID ============
+    if (paymentRow?.id) {
+      await supabaseAdmin
+        .from("payments")
+        .update({
+          stripe_checkout_session_id: session.id,
+        })
+        .eq("id", paymentRow.id);
+      
+      logStep("Payment row updated with session ID", { paymentId: paymentRow.id, sessionId: session.id });
+    }
 
     // Return ONLY the URL - frontend just redirects
     return new Response(JSON.stringify({ url: session.url }), {
