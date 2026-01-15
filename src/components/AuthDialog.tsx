@@ -120,31 +120,33 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
-      // Use custom Edge Function that sends via Resend
-      const response = await supabase.functions.invoke('send-password-reset', {
-        body: { email, redirectUrl }
+      // Use Supabase's built-in password reset
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: redirectUrl,
       });
       
-      if (response.error) {
-        console.error('[Auth] Password reset error:', response.error);
+      if (error) {
+        console.error('[Auth] Password reset error:', error);
+        // Show a helpful message even on error (don't reveal if email exists)
+        setResetEmailSent(true);
         toast({
-          title: "Error",
-          description: "Something went wrong. Please try again.",
-          variant: "destructive",
+          title: "Password Reset",
+          description: "If an account exists with this email, you'll receive a reset link. If you don't see it, please contact support@justice-bot.com",
         });
       } else {
         setResetEmailSent(true);
         toast({
           title: "Check your email",
-          description: "We've sent you a password reset link.",
+          description: "We've sent you a password reset link. Check spam if you don't see it.",
         });
       }
     } catch (error) {
       console.error('[Auth] Unexpected password reset error:', error);
+      // Still show success to not reveal email existence
+      setResetEmailSent(true);
       toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
+        title: "Password Reset",
+        description: "If an account exists, you'll receive a reset link. Contact support@justice-bot.com for help.",
       });
     } finally {
       setIsLoading(false);
@@ -407,6 +409,15 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   <CheckCircle className="h-8 w-8 text-green-500 mx-auto" />
                   <p className="text-sm text-muted-foreground">
                     Check your email for a password reset link.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Didn't receive it? Check your spam folder or{" "}
+                    <a 
+                      href="mailto:support@justice-bot.com?subject=Password Reset Request" 
+                      className="text-primary hover:underline"
+                    >
+                      contact support
+                    </a>
                   </p>
                   <button
                     type="button"
