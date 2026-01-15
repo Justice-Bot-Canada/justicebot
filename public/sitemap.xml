@@ -8,14 +8,14 @@
   <!-- Homepage -->
   <url>
     <loc>https://www.justice-bot.com/</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/demo-journey</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
@@ -23,22 +23,29 @@
   <!-- Main Services -->
   <url>
     <loc>https://www.justice-bot.com/pricing</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/triage</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://www.justice-bot.com/welcome</loc>
+    <lastmod>2026-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
   </url>
 
   <!-- LTB Help - Primary Landing Page -->
   <url>
     <loc>https://www.justice-bot.com/ltb-help</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
   </url>
@@ -46,42 +53,42 @@
   <!-- Journey Hubs - High Priority -->
   <url>
     <loc>https://www.justice-bot.com/journey</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/ltb-journey</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/how-to-fight-n4-eviction-ontario</loc>
-    <lastmod>2026-01-12</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/hrto-toronto</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/hrto-ottawa</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/ltb-toronto</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
   </url>
@@ -89,171 +96,171 @@
   <!-- LTB City-Specific Pages -->
   <url>
     <loc>https://www.justice-bot.com/ltb-ottawa</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-mississauga</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-hamilton</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-brampton</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-london</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-kitchener</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-windsor</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-markham</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-vaughan</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-oakville</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-burlington</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-oshawa</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-barrie</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-guelph</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-cambridge</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-whitby</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-ajax</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-richmond-hill</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.justice-bot.com/ltb-sudbury</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/how-to-file-t2-ontario</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/how-to-file-t6-ontario</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/tenant-rights-repairs-not-done</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/tenant-rights-harassment-by-landlord</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/tenant-rights-unsafe-housing</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/tenant-rights-privacy-violations</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/hrto-journey</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/small-claims-journey</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
   </url>
@@ -261,7 +268,7 @@
   <!-- Small Claims Court - Primary SEO Page -->
   <url>
     <loc>https://www.justice-bot.com/small-claims</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
   </url>
@@ -269,7 +276,7 @@
   <!-- Child Custody & Family Court - High Traffic -->
   <url>
     <loc>https://www.justice-bot.com/family-journey</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
   </url>
@@ -277,56 +284,56 @@
   <!-- Employment Law / Workers Rights / WSIB -->
   <url>
     <loc>https://www.justice-bot.com/labour-board-journey</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/criminal-journey</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/immigration-journey</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/cas-journey</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/superior-court-journey</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/police-accountability-journey</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/provincial-accountability-journey</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/accountability-journey</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -334,76 +341,76 @@
   <!-- Resources -->
   <url>
     <loc>https://www.justice-bot.com/forms</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/templates</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/tutorials</loc>
-    <lastmod>2026-01-05</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
     <video:video>
-      <video:thumbnail_loc>https://justice-bot.com/how-it-works-thumbnail.jpg</video:thumbnail_loc>
+      <video:thumbnail_loc>https://www.justice-bot.com/how-it-works-thumbnail.jpg</video:thumbnail_loc>
       <video:title>How to File an LTB Application</video:title>
       <video:description>Step-by-step walkthrough of filing a Landlord and Tenant Board application in Ontario</video:description>
-      <video:content_loc>https://justice-bot.com/tutorials/ltb-filing-tutorial.mp4</video:content_loc>
+      <video:content_loc>https://www.justice-bot.com/tutorials/ltb-filing-tutorial.mp4</video:content_loc>
       <video:duration>300</video:duration>
-      <video:publication_date>2026-01-05</video:publication_date>
+      <video:publication_date>2026-01-15</video:publication_date>
       <video:family_friendly>yes</video:family_friendly>
     </video:video>
     <video:video>
-      <video:thumbnail_loc>https://justice-bot.com/how-it-works-thumbnail.jpg</video:thumbnail_loc>
+      <video:thumbnail_loc>https://www.justice-bot.com/how-it-works-thumbnail.jpg</video:thumbnail_loc>
       <video:title>Filing an HRTO Complaint</video:title>
       <video:description>Complete guide to filing a Human Rights Tribunal of Ontario complaint</video:description>
-      <video:content_loc>https://justice-bot.com/tutorials/hrto-complaint-tutorial.mp4</video:content_loc>
+      <video:content_loc>https://www.justice-bot.com/tutorials/hrto-complaint-tutorial.mp4</video:content_loc>
       <video:duration>300</video:duration>
-      <video:publication_date>2026-01-05</video:publication_date>
+      <video:publication_date>2026-01-15</video:publication_date>
       <video:family_friendly>yes</video:family_friendly>
     </video:video>
     <video:video>
-      <video:thumbnail_loc>https://justice-bot.com/how-it-works-thumbnail.jpg</video:thumbnail_loc>
+      <video:thumbnail_loc>https://www.justice-bot.com/how-it-works-thumbnail.jpg</video:thumbnail_loc>
       <video:title>Small Claims Court Filing Guide</video:title>
       <video:description>Learn how to file a Small Claims Court case for claims under $35,000</video:description>
-      <video:content_loc>https://justice-bot.com/tutorials/small-claims-tutorial.mp4</video:content_loc>
+      <video:content_loc>https://www.justice-bot.com/tutorials/small-claims-tutorial.mp4</video:content_loc>
       <video:duration>300</video:duration>
-      <video:publication_date>2026-01-05</video:publication_date>
+      <video:publication_date>2026-01-15</video:publication_date>
       <video:family_friendly>yes</video:family_friendly>
     </video:video>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/legal-resources</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/faq</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/tribunal-locator</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/court</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -411,35 +418,35 @@
   <!-- About & Info -->
   <url>
     <loc>https://www.justice-bot.com/about</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/blog</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/what-we-do</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/team</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/roadmap</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -447,28 +454,28 @@
   <!-- Contact & Support -->
   <url>
     <loc>https://www.justice-bot.com/contact</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/feedback</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/troubleshooting</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/accessibility</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -476,42 +483,42 @@
   <!-- Legal Pages -->
   <url>
     <loc>https://www.justice-bot.com/privacy</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/terms</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/disclaimer</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/liability</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/payment-policy</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/scope</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -519,28 +526,28 @@
   <!-- Partnership & Media -->
   <url>
     <loc>https://www.justice-bot.com/partners</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/referrals</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/media-inquiries</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
     <loc>https://www.justice-bot.com/government-inquiries</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -548,7 +555,7 @@
   <!-- Special Programs -->
   <url>
     <loc>https://www.justice-bot.com/low-income</loc>
-    <lastmod>2025-12-20</lastmod>
+    <lastmod>2026-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

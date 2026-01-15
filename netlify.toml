@@ -26,6 +26,11 @@
 
 # Redirect old paths to canonical URLs
 [[redirects]]
+  from = "/auth"
+  to = "/welcome"
+  status = 301
+
+[[redirects]]
   from = "/terms-of-use"
   to = "/terms"
   status = 301
@@ -68,6 +73,89 @@
 [[redirects]]
   from = "/demo-video"
   to = "/"
+  status = 301
+
+# Legacy city pages -> current LTB pages (Ontario)
+[[redirects]]
+  from = "/legal-help-toronto"
+  to = "/ltb-toronto"
+  status = 301
+
+[[redirects]]
+  from = "/legal-help-ottawa"
+  to = "/ltb-ottawa"
+  status = 301
+
+[[redirects]]
+  from = "/legal-help-mississauga"
+  to = "/ltb-mississauga"
+  status = 301
+
+[[redirects]]
+  from = "/legal-help-brampton"
+  to = "/ltb-brampton"
+  status = 301
+
+[[redirects]]
+  from = "/legal-help-hamilton"
+  to = "/ltb-hamilton"
+  status = 301
+
+[[redirects]]
+  from = "/legal-help-london"
+  to = "/ltb-london"
+  status = 301
+
+[[redirects]]
+  from = "/legal-help-markham"
+  to = "/ltb-markham"
+  status = 301
+
+[[redirects]]
+  from = "/legal-help-vaughan"
+  to = "/ltb-vaughan"
+  status = 301
+
+[[redirects]]
+  from = "/legal-help-kitchener"
+  to = "/ltb-kitchener"
+  status = 301
+
+[[redirects]]
+  from = "/legal-help-windsor"
+  to = "/ltb-windsor"
+  status = 301
+
+# Non-Ontario cities -> triage
+[[redirects]]
+  from = "/legal-help-edmonton"
+  to = "/triage"
+  status = 301
+
+[[redirects]]
+  from = "/legal-help-vancouver"
+  to = "/triage"
+  status = 301
+
+[[redirects]]
+  from = "/legal-help-calgary"
+  to = "/triage"
+  status = 301
+
+[[redirects]]
+  from = "/legal-help-montreal"
+  to = "/triage"
+  status = 301
+
+[[redirects]]
+  from = "/legal-help-winnipeg"
+  to = "/triage"
+  status = 301
+
+# Catch-all for other legacy city pages
+[[redirects]]
+  from = "/legal-help-*"
+  to = "/triage"
   status = 301
 
 # 404 for non-existent pages
