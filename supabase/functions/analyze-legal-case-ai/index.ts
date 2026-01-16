@@ -74,8 +74,8 @@ serve(async (req) => {
         .eq('case_id', caseId);
       
       if (rawEvidence?.length) {
-        evidenceContext = evidenceContext || { count: rawEvidence.length };
-        evidenceContext.rawEvidence = rawEvidence.map((e: any) => ({
+        evidenceContext = evidenceContext || { count: rawEvidence.length, analysis: null, rawEvidence: [] as any[] };
+        (evidenceContext as any).rawEvidence = rawEvidence.map((e: any) => ({
           name: e.file_name,
           type: e.file_type,
           description: e.description,
@@ -121,12 +121,13 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in analyze-legal-case-ai:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error.message 
+        error: errorMessage 
       }),
       { 
         status: 500, 

@@ -96,10 +96,11 @@ Base your calculations on Canadian personal injury precedents, consider the spec
       }
     );
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Settlement calculation error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500 

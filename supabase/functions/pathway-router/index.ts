@@ -247,10 +247,11 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Pathway router error:", error);
+    const errorMessage = error instanceof Error ? error.message : 'Routing failed';
     return new Response(
-      JSON.stringify({ error: error.message || "Routing failed" }),
+      JSON.stringify({ error: errorMessage }),
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
