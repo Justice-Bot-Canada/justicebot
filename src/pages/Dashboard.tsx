@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { Helmet } from "react-helmet-async";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -253,7 +254,12 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+        <title>Dashboard | Justice-Bot</title>
+      </Helmet>
+      <div className="min-h-screen bg-background flex flex-col">
       <DashboardHeader />
       <ProgramBanner />
       
@@ -640,6 +646,7 @@ const Dashboard = () => {
         </div>
       </footer>
     </div>
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -229,7 +230,12 @@ const Welcome = () => {
   // Not logged in - prompt to sign in
   if (!user) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <>
+        <Helmet>
+          <meta name="robots" content="noindex, nofollow" />
+          <title>Welcome | Justice-Bot</title>
+        </Helmet>
+        <div className="min-h-screen bg-background flex flex-col">
         <FlowHeader currentStep="welcome" showProgress={false} />
         <main className="flex-1 flex items-center justify-center p-4">
           <Card className="max-w-md w-full">
@@ -255,6 +261,7 @@ const Welcome = () => {
         </main>
         <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
       </div>
+      </>
     );
   }
 
@@ -262,7 +269,12 @@ const Welcome = () => {
   // STEP 1: GATED ENTRY - Province Selection
   // ============================================
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+        <title>Get Started | Justice-Bot</title>
+      </Helmet>
+      <div className="min-h-screen bg-background flex flex-col">
       <FlowHeader currentStep="welcome" />
       <ProgramBanner />
       
@@ -358,6 +370,7 @@ const Welcome = () => {
         </div>
       </main>
     </div>
+    </>
   );
 };
 
