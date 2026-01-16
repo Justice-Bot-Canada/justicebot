@@ -114,10 +114,11 @@ serve(async (req) => {
         );
     }
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Marketing automation error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ success: false, error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
@@ -263,11 +264,12 @@ async function processScheduledEmails(supabase: any, headers: Record<string, str
           .eq('id', email.id);
         failed++;
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(`Error sending email ${email.id}:`, error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       await supabase
         .from('email_queue')
-        .update({ status: 'failed', error: error.message })
+        .update({ status: 'failed', error: errorMessage })
         .eq('id', email.id);
       failed++;
     }

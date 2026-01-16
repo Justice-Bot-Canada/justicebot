@@ -700,6 +700,44 @@ export type Database = {
           },
         ]
       }
+      formal_merit_scores: {
+        Row: {
+          band: string | null
+          case_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          result: Json
+          score: number | null
+        }
+        Insert: {
+          band?: string | null
+          case_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          result: Json
+          score?: number | null
+        }
+        Update: {
+          band?: string | null
+          case_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          result?: Json
+          score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "formal_merit_scores_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       forms: {
         Row: {
           category: string
