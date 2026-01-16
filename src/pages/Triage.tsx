@@ -136,7 +136,8 @@ const Triage = () => {
     setIsSavingDocuments(true);
 
     try {
-      // Create a case with triage data
+      // Create a case with triage data - CRITICAL: populate merit_score column
+      const meritScoreFromTriage = Math.round(triageResult.confidence);
       const { data: caseData, error: caseError } = await supabase
         .from('cases')
         .insert({
@@ -146,6 +147,7 @@ const Triage = () => {
           venue: triageResult.venue,
           province: province,
           status: 'pending',
+          merit_score: meritScoreFromTriage, // Store confidence as merit score
           triage: {
             venue: triageResult.venue,
             venueTitle: triageResult.venueTitle,

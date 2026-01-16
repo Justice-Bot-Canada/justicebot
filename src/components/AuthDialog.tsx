@@ -118,7 +118,7 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     setIsLoading(true);
     
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}/reset-password`;
       
       // Use Supabase's built-in password reset
       const { error } = await supabase.auth.resetPasswordForEmail(email, {

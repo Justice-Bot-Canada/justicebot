@@ -25,6 +25,7 @@ import PaymentCancel from "./pages/PaymentCancel";
 import ThankYou from "./pages/ThankYou";
 import NotFound from "./pages/NotFound";
 import Welcome from "./pages/Welcome";
+import ResetPassword from "./pages/ResetPassword";
 import Triage from "./pages/Triage";
 import FormSelector from "./pages/FormSelector";
 import Forms from "./pages/Forms";
@@ -164,6 +165,7 @@ const AppContent = () => {
           <Route path="/" element={<Index />} />
           <Route path="/demo-journey" element={<DemoJourney />} />
           <Route path="/welcome" element={<Welcome />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/intake" element={<Intake />} />
           <Route path="/intake/summary" element={<IntakeSummary />} />
           <Route path="/funnel" element={<Funnel />} />
