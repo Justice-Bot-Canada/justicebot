@@ -26,8 +26,9 @@ export function NextStepsActionPanel({
     {
       id: "generate-form",
       icon: FileText,
-      title: "Generate the recommended legal form",
-      description: "Auto-fill forms based on your case details",
+      title: "Generate the correct legal form",
+      description: "We'll identify the forms that match your situation and pre-fill them using your evidence.",
+      buttonText: "Generate my legal form",
       onClick: () => {
         if (caseId) {
           navigate(`/smart-documents?case=${caseId}`);
@@ -38,15 +39,30 @@ export function NextStepsActionPanel({
       primary: true,
     },
     {
+      id: "upload-evidence",
+      icon: Upload,
+      title: "Strengthen your case",
+      description: "Add more documents or information to improve your score and analysis.",
+      buttonText: "Upload more evidence",
+      onClick: () => {
+        if (caseId) {
+          navigate(`/evidence?case=${caseId}`);
+        } else {
+          navigate("/evidence");
+        }
+      },
+      primary: false,
+    },
+    {
       id: "filing-guide",
       icon: MapPin,
-      title: "View step-by-step filing guide",
-      description: "Learn exactly how and where to file",
+      title: "See the step-by-step process",
+      description: "Understand what filing involves, where to file, and what usually happens next.",
+      buttonText: "View step-by-step guide",
       onClick: () => {
         if (caseId && venue) {
           navigate(`/case-timeline?caseId=${caseId}`);
         } else if (venue) {
-          // Route to venue-specific guide
           const guideRoutes: Record<string, string> = {
             ltb: "/ltb-guide",
             hrto: "/human-rights-guide",
@@ -61,86 +77,97 @@ export function NextStepsActionPanel({
       },
       primary: false,
     },
-    {
-      id: "upload-evidence",
-      icon: Upload,
-      title: "Upload more evidence to strengthen your case",
-      description: "Add documents to improve your merit score",
-      onClick: () => {
-        if (caseId) {
-          navigate(`/evidence?case=${caseId}`);
-        } else {
-          navigate("/evidence");
-        }
-      },
-      primary: false,
-    },
   ];
 
   if (variant === "compact") {
     return (
-      <div className={`p-3 sm:p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-2 sm:space-y-3 ${className}`}>
+      <div className={`p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-3 ${className}`}>
         <h4 className="font-semibold text-sm flex items-center gap-2">
           <ArrowRight className="h-4 w-4 text-primary" />
           What happens next?
         </h4>
-        <div className="flex flex-col sm:flex-row flex-wrap gap-2">
+        <p className="text-xs text-muted-foreground">
+          Choose what makes sense for you right now.
+        </p>
+        <div className="flex flex-col gap-2">
           {actions.map((action) => (
             <Button
               key={action.id}
               variant={action.primary ? "default" : "outline"}
               size="sm"
               onClick={action.onClick}
-              className="gap-1 justify-start sm:justify-center text-xs"
+              className="gap-2 justify-start text-xs"
             >
               <action.icon className="h-3 w-3 flex-shrink-0" />
-              <span className="truncate">{action.title.split(" ").slice(0, 4).join(" ")}...</span>
+              {action.buttonText}
             </Button>
           ))}
         </div>
+        <p className="text-xs text-muted-foreground text-center pt-2">
+          You stay in control at every step.
+        </p>
       </div>
     );
   }
 
   return (
     <Card className={`border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-background ${className}`}>
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
+      <CardHeader className="pb-4 text-center">
+        <CardTitle className="flex items-center justify-center gap-2 text-xl">
           <ArrowRight className="h-5 w-5 text-primary" />
           What happens next?
         </CardTitle>
+        <p className="text-sm text-muted-foreground mt-2">
+          You have a few clear options. Choose what makes sense for you right now.
+        </p>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-4">
         {actions.map((action, index) => (
-          <button
+          <div
             key={action.id}
-            onClick={action.onClick}
-            className={`w-full text-left p-4 rounded-lg border transition-all hover:border-primary/50 hover:shadow-sm ${
+            className={`p-4 rounded-lg border ${
               action.primary 
                 ? "bg-primary/10 border-primary/30" 
                 : "bg-card border-border"
             }`}
           >
             <div className="flex items-start gap-4">
-              <div className={`p-2 rounded-lg ${action.primary ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
+              <div className={`p-2 rounded-lg flex-shrink-0 ${action.primary ? "bg-primary text-primary-foreground" : "bg-muted"}`}>
                 <action.icon className="h-5 w-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 mb-1">
                   <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center font-medium">
                     {index + 1}
                   </span>
                   <h4 className="font-medium text-sm">{action.title}</h4>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1 pl-7">{action.description}</p>
+                <p className="text-xs text-muted-foreground mb-3 pl-7">{action.description}</p>
+                <div className="pl-7">
+                  <Button
+                    variant={action.primary ? "default" : "outline"}
+                    size="sm"
+                    onClick={action.onClick}
+                    className="gap-2"
+                  >
+                    {action.buttonText}
+                    <ArrowRight className="h-3 w-3" />
+                  </Button>
+                </div>
               </div>
-              <ArrowRight className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-1" />
             </div>
-          </button>
+          </div>
         ))}
-        <p className="text-xs text-center text-muted-foreground pt-2">
-          Nothing is filed without your approval. You're always in control.
-        </p>
+        
+        {/* Reassurance */}
+        <div className="text-center pt-4 border-t border-border">
+          <p className="text-xs text-muted-foreground">
+            You stay in control at every step.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Nothing is filed, sent, or shared unless you choose to proceed.
+          </p>
+        </div>
       </CardContent>
     </Card>
   );
