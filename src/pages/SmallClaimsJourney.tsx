@@ -170,15 +170,14 @@ const SmallClaimsJourney = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <div className="lg:col-span-2">
-              <PremiumGate feature="Small Claims Court Journey Guide">
-                <UserJourney 
-                  venue="small-claims"
-                  userSituation={userSituation}
-                  onStepComplete={(stepId) => {
-                    console.log("Step completed:", stepId);
-                  }}
-                />
-              </PremiumGate>
+              {/* Journey guide is FREE to view (never paywall curiosity) */}
+              <UserJourney 
+                venue="small-claims"
+                userSituation={userSituation}
+                onStepComplete={(stepId) => {
+                  console.log("Step completed:", stepId);
+                }}
+              />
             </div>
             <div>
               <ContentFunnel 

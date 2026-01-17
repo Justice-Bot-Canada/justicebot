@@ -113,15 +113,14 @@ const LTBJourney = () => {
 
           <CrossTribunalBanner currentTribunal="ltb" />
 
-          <PremiumGate feature="LTB Legal Journey Guide">
-            <UserJourney 
-              venue="ltb"
-              userSituation={userSituation}
-              onStepComplete={(stepId) => {
-                console.log("Step completed:", stepId);
-              }}
-            />
-          </PremiumGate>
+          {/* Journey guide is FREE to view (never paywall curiosity) */}
+          <UserJourney 
+            venue="ltb"
+            userSituation={userSituation}
+            onStepComplete={(stepId) => {
+              console.log("Step completed:", stepId);
+            }}
+          />
         </div>
       </main>
       
