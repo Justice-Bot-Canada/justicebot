@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 
 const ThankYou = () => {
   const [searchParams] = useSearchParams();
@@ -13,17 +14,17 @@ const ThankYou = () => {
   const { toast } = useToast();
   const [countdown, setCountdown] = useState(10);
   const [isProcessing, setIsProcessing] = useState(false);
+  const { refetch: refetchPremiumAccess } = usePremiumAccess();
 
-  const token = searchParams.get("token"); // PayPal order ID
-  const payerId = searchParams.get("PayerID");
-  const orderId = searchParams.get("orderId") || token || "Pending";
+  const sessionId = searchParams.get("session_id");
+  const orderId = sessionId || "Pending";
   const product = searchParams.get("product") || "Subscription / Document Access";
   const email = searchParams.get("email") || "your email";
 
   useEffect(() => {
-    // If PayPal redirect, verify and capture payment
-    if (token && payerId && !isProcessing) {
-      capturePayPalPayment(token, payerId);
+    // If Stripe redirect, verify and capture payment
+    if (sessionId && !isProcessing) {
+      verifyStripePayment(sessionId);
     }
 
     // Store order info in session storage
@@ -47,35 +48,34 @@ const ThankYou = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [token, payerId, orderId, product, navigate, isProcessing]);
+  }, [sessionId, orderId, product, navigate, isProcessing]);
 
-  const capturePayPalPayment = async (paymentId: string, payerId: string) => {
+  const verifyStripePayment = async (sessionId: string) => {
     setIsProcessing(true);
     try {
-      const { data, error } = await supabase.functions.invoke('verify-paypal-payment', {
-        body: { paymentId, payerId }
+      const { data, error } = await supabase.functions.invoke('verify-stripe-payment', {
+        body: { sessionId }
       });
 
       if (error) throw error;
 
       if (data?.success) {
+        await refetchPremiumAccess();
         toast({
           title: "Payment Confirmed!",
           description: "Your premium access has been activated.",
         });
       } else {
         toast({
-          title: "Payment Verification Failed",
-          description: "Please contact support if you were charged.",
-          variant: "destructive",
+          title: "Payment Verification Pending",
+          description: "Your access will be activated shortly.",
         });
       }
     } catch (error) {
-      console.error('Payment capture error:', error);
+      console.error('Payment verification error:', error);
       toast({
-        title: "Payment Processing Error",
+        title: "Payment Processing",
         description: "We're verifying your payment. Check your email for confirmation.",
-        variant: "destructive",
       });
     } finally {
       setIsProcessing(false);
@@ -111,7 +111,7 @@ const ThankYou = () => {
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
               {isProcessing 
-                ? "Please wait while we confirm your payment with PayPal..."
+                ? "Please wait while we confirm your payment..."
                 : "You now have access to your Justice-Bot tools."
               }
             </p>

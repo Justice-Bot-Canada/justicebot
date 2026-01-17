@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Check, ClipboardList, ArrowRight, ArrowLeft } from "lucide-react";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import { useShouldHidePricing } from "@/components/ProgramBanner";
-import PayPalTrialButton from "@/components/PayPalTrialButton";
+import StripeTrialButton from "@/components/StripeTrialButton";
 
-const PAYPAL_PLAN_ID = "P-0FR50831D4940483BNFBBB7Y";
+// Stripe Price ID for Professional plan ($29.99/mo)
+const STRIPE_PRICE_ID = "price_1SgdzJL0pLShFbLtcFrnbeiV";
 
 interface FilingInstructionsPaywallProps {
   open: boolean;
@@ -107,7 +108,7 @@ export function FilingInstructionsPaywall({
         </div>
 
         <DialogFooter className="flex-col gap-3 pt-2">
-          <PayPalTrialButton planId={PAYPAL_PLAN_ID} trialDays={5} />
+          <StripeTrialButton priceId={STRIPE_PRICE_ID} planKey="professional" trialDays={5} />
           
           <Button
             variant="ghost"

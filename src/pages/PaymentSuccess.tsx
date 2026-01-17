@@ -20,26 +20,21 @@ const PaymentSuccess = () => {
   useEffect(() => {
     const verifyPayment = async () => {
       try {
-        // Get payment details from URL
-        const token = searchParams.get('token');
-        const payerId = searchParams.get('PayerID');
+        // Get payment details from URL - Stripe uses session_id
+        const sessionId = searchParams.get('session_id');
         const formIdParam = searchParams.get('formId');
         
         if (formIdParam) setFormId(formIdParam);
         
-        if (!token) {
-          console.error('No payment token in URL');
+        if (!sessionId) {
+          console.error('No session ID in URL');
           setVerifying(false);
           return;
         }
 
-        // Verify and capture payment
-        const { data, error } = await supabase.functions.invoke('verify-paypal-payment', {
-          body: { 
-            paymentId: token,
-            payerId: payerId || undefined,
-            formId: formIdParam || undefined
-          }
+        // Verify payment with Stripe
+        const { data, error } = await supabase.functions.invoke('verify-stripe-payment', {
+          body: { sessionId }
         });
 
         if (error) throw error;
@@ -52,22 +47,22 @@ const PaymentSuccess = () => {
           
           // Track payment completion with legacy analytics
           const plan = searchParams.get('plan') || 'form_purchase';
-          const amount = searchParams.get('amount') || '29.99';
-          analytics.paymentCompleted(plan, amount, token);
+          const amount = searchParams.get('amount') || '39';
+          analytics.paymentCompleted(plan, amount, sessionId);
           
           // Fire GA4 purchase event - NON-NEGOTIABLE for funnel tracking
           // Only fire once to prevent duplicates on refresh
           if (!purchaseEventFired.current) {
             purchaseEventFired.current = true;
-            const value = parseFloat(amount) || 5.99;
+            const value = parseFloat(amount) || 39;
             
             // New funnel events
-            analytics.paymentCompletedEvent(token || crypto.randomUUID(), value);
+            analytics.paymentCompletedEvent(sessionId || crypto.randomUUID(), value);
             analytics.featuresUnlocked(formIdParam || undefined);
             
             // Legacy GA4 purchase event
             analytics.funnelPurchase({
-              transactionId: token || crypto.randomUUID(),
+              transactionId: sessionId || crypto.randomUUID(),
               value,
               itemName: plan === 'form_purchase' ? 'Legal Form' : 'Case Assessment',
             });

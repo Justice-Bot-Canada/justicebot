@@ -20,17 +20,13 @@ export default function SubscriptionSuccess() {
   const { refetch: refetchPremiumAccess } = usePremiumAccess();
 
   const sessionId = searchParams.get('session_id');
-  const subscriptionId = searchParams.get('subscription_id') || searchParams.get('token');
   const planType = searchParams.get('plan');
   const isTrial = searchParams.get('trial') === 'true';
 
   useEffect(() => {
     const verifySubscription = async () => {
-      // For Stripe, we verify via session_id or just check subscription status
-      // For PayPal, we use subscriptionId
-      
       try {
-        // If coming from Stripe checkout, use check-stripe-subscription
+        // Verify via Stripe session_id
         if (sessionId) {
           const { data, error } = await supabase.functions.invoke('check-stripe-subscription');
           
@@ -71,31 +67,6 @@ export default function SubscriptionSuccess() {
             }, 3000);
             return;
           }
-        } 
-        // Legacy PayPal flow
-        else if (subscriptionId) {
-          const { data, error } = await supabase.functions.invoke('verify-subscription-status', {
-            body: { subscriptionId }
-          });
-
-          if (error) throw error;
-
-          if (data.success) {
-            setVerified(true);
-            await refetchPremiumAccess();
-            toast({
-              title: isTrial ? '🎉 Free Trial Started!' : 'Subscription Activated!',
-              description: isTrial 
-                ? 'Enjoy 5 days of full premium access. No charge until trial ends!'
-                : 'Your premium access has been granted.',
-            });
-            
-            setTimeout(() => {
-              window.location.href = '/dashboard';
-            }, 3000);
-          } else {
-            setError(data.message || 'Subscription verification failed');
-          }
         } else {
           setError('No subscription information found');
         }
@@ -108,7 +79,7 @@ export default function SubscriptionSuccess() {
     };
 
     verifySubscription();
-  }, [subscriptionId, toast, isTrial]);
+  }, [sessionId, toast, isTrial]);
 
   const getPlanName = (plan: string | null) => {
     if (isTrial) return '5-Day Free Trial';
@@ -135,7 +106,7 @@ export default function SubscriptionSuccess() {
                   </div>
                   <CardTitle>Verifying Your Subscription</CardTitle>
                   <CardDescription>
-                    Please wait while we confirm your payment with PayPal...
+                    Please wait while we confirm your payment...
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -228,10 +199,10 @@ export default function SubscriptionSuccess() {
 
                   <div className="space-y-3">
                     <p className="text-sm text-muted-foreground">
-                      This can take a few minutes. If your subscription doesn't appear within 10 minutes, please contact support with your subscription ID:
+                      This can take a few minutes. If your subscription doesn't appear within 10 minutes, please contact support with your session ID:
                     </p>
                     <div className="bg-muted p-3 rounded font-mono text-xs break-all">
-                      {subscriptionId}
+                      {sessionId}
                     </div>
                     <div className="flex gap-3">
                       <Button 

@@ -227,7 +227,7 @@ const Pricing = () => {
   const faqData = [
     {
       question: "What payment methods do you accept?",
-      answer: "We accept PayPal and e-transfer payments. PayPal provides instant access, while e-transfer activation takes 24 hours."
+      answer: "We accept credit/debit cards and e-transfer payments. Card payments via Stripe provide instant access, while e-transfer activation takes 24 hours."
     },
     {
       question: "Can I cancel my subscription anytime?",

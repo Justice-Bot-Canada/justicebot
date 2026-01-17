@@ -1,9 +1,10 @@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Check, Unlock, Bookmark, Shield } from "lucide-react";
-import PayPalTrialButton from "@/components/PayPalTrialButton";
+import StripeTrialButton from "@/components/StripeTrialButton";
 
-const PAYPAL_PLAN_ID = "P-5ML4271244454362LMUCPG7I";
+// Stripe Price ID for Professional plan ($29.99/mo)
+const STRIPE_PRICE_ID = "price_1SgdzJL0pLShFbLtcFrnbeiV";
 
 interface PaymentUnlockModalProps {
   open: boolean;
@@ -71,7 +72,7 @@ export function PaymentUnlockModal({
         </div>
 
         <DialogFooter className="flex-col gap-3 pt-4">
-          <PayPalTrialButton planId={PAYPAL_PLAN_ID} trialDays={5} />
+          <StripeTrialButton priceId={STRIPE_PRICE_ID} planKey="professional" trialDays={5} />
           
           <Button
             variant="ghost"
