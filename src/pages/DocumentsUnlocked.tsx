@@ -226,10 +226,10 @@ export default function DocumentsUnlocked() {
               <CheckCircle className="h-10 w-10 text-green-600" />
             </div>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground">
-              You're all set. Let's prepare your documents.
+              Access unlocked. You can continue.
             </h1>
             <p className="text-muted-foreground">
-              Your one-time payment unlocked document preparation for this case.
+              Document preparation is now available for this case. Let's keep going.
             </p>
           </div>
 
