@@ -6,6 +6,7 @@ import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -14,6 +15,7 @@ const PaymentSuccess = () => {
   const [verified, setVerified] = useState(false);
   const [formId, setFormId] = useState<string | null>(null);
   const purchaseEventFired = useRef(false);
+  const { refetch: refetchPremiumAccess } = usePremiumAccess();
   
   useEffect(() => {
     const verifyPayment = async () => {
@@ -44,6 +46,9 @@ const PaymentSuccess = () => {
 
         if (data?.success) {
           setVerified(true);
+          
+          // CRITICAL: Refresh premium access state immediately after payment
+          await refetchPremiumAccess();
           
           // Track payment completion with legacy analytics
           const plan = searchParams.get('plan') || 'form_purchase';
