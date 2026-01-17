@@ -179,116 +179,187 @@ const Evidence = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
-        title="Evidence Hub - Upload Your Documents | Justice Bot"
-        description="Upload once, use everywhere. Smart AI tagging automatically organizes your evidence for forms, timelines, and tribunal hearings."
-        keywords="evidence management, document organization, legal evidence, AI tagging, tribunal documents"
+        title="Upload Evidence - Let's See If You Have a Case | Justice Bot"
+        description="Upload your documents and get a clear, plain-language assessment of your case strength. Private, secure, and built for Canadian law."
+        keywords="evidence upload, case assessment, legal documents, AI analysis, Canadian law"
         canonicalUrl="https://justice-bot.com/evidence"
       />
       <FlowHeader currentStep="evidence" caseTitle={caseData?.title} />
       <ProgramBanner />
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
+      <main className="flex-1 container mx-auto px-4 py-6 sm:py-8">
+        <div className="max-w-3xl mx-auto">
           {/* Progress indicator */}
           <div className="mb-6">
             <FlowProgressIndicator currentStep="evidence" />
           </div>
 
-          {/* Step header */}
-          <div className="mb-8">
-            <div className="flex items-start justify-between flex-wrap gap-4">
-              <div>
-                <h1 className="text-3xl font-bold mb-2">Upload Your Evidence</h1>
-                <p className="text-muted-foreground">
-                  Add documents that support your case. You can upload now or come back later — progress is saved automatically.
-                </p>
-              </div>
-              <Button 
-                variant="outline" 
-                className="gap-2"
-                onClick={handleBookClick}
-              >
-                <BookOpen className="h-4 w-4" />
-                Generate Book of Documents
-              </Button>
-            </div>
-
-            <BookOfDocsPaywall
-              open={showBookPaywall}
-              onOpenChange={setShowBookPaywall}
-              onAccessGranted={handleBookAccessGranted}
-              caseId={caseId}
-              caseTitle={caseData?.title}
-            />
-
-            <BookOfDocumentsWizard
-              caseId={caseId}
-              caseTitle={caseData?.title}
-              open={bookWizardOpen}
-              onOpenChange={setBookWizardOpen}
-            />
+          {/* Onboarding header - calming, guided intro */}
+          <div className="text-center mb-8">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">
+              Let's see if you have a case
+            </h1>
+            <p className="text-muted-foreground text-base sm:text-lg mb-2">
+              You're not committing to anything yet.
+            </p>
+            <p className="text-muted-foreground text-sm sm:text-base">
+              This takes a few minutes and helps you understand where you stand.
+            </p>
           </div>
 
-          {/* Reassurance message */}
-          <Alert className="mb-6 bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800">
-            <Upload className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-800 dark:text-green-200">
-              <strong>Progress saves automatically.</strong> You can add, remove, or replace evidence anytime before generating documents.
-            </AlertDescription>
-          </Alert>
+          {/* What you'll do next - process explanation */}
+          <Card className="mb-8 border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+            <CardContent className="py-6">
+              <h2 className="font-semibold text-lg mb-4">What you'll do next</h2>
+              <ol className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary text-sm font-medium flex items-center justify-center">1</span>
+                  <span className="text-sm sm:text-base">Upload any documents, photos, or notices related to your situation</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary text-sm font-medium flex items-center justify-center">2</span>
+                  <span className="text-sm sm:text-base">We'll review them using Canadian law and similar cases</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary text-sm font-medium flex items-center justify-center">3</span>
+                  <span className="text-sm sm:text-base">You'll get a clear explanation of your case strength and options</span>
+                </li>
+              </ol>
+            </CardContent>
+          </Card>
 
+          {/* Upload examples helper */}
+          <div className="mb-6">
+            <p className="text-sm font-medium mb-3 text-center">What should I upload?</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs sm:text-sm text-muted-foreground">
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                <FileText className="h-4 w-4 flex-shrink-0" />
+                <span>Notices or letters</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                <FileText className="h-4 w-4 flex-shrink-0" />
+                <span>Emails or texts</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                <FileText className="h-4 w-4 flex-shrink-0" />
+                <span>Photos or videos</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                <FileText className="h-4 w-4 flex-shrink-0" />
+                <span>Court documents</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                <FileText className="h-4 w-4 flex-shrink-0" />
+                <span>Applications</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                <FileText className="h-4 w-4 flex-shrink-0" />
+                <span>Anything relevant</span>
+              </div>
+            </div>
+            <p className="text-xs text-muted-foreground text-center mt-3">
+              You don't need everything. Upload what you have.
+            </p>
+          </div>
+
+          {/* Evidence upload area */}
           <PremiumGate feature="Evidence Management">
             <div className="space-y-6">
-              {/* Case-Specific Merit Score */}
-              <CaseMeritScore 
-                caseId={caseId}
-                caseType={caseData?.venue}
-                caseDescription={caseData?.description}
-              />
-              
-              <EvidenceAnalyzer 
-                caseId={caseId} 
-                caseType={caseData?.venue}
-                caseDescription={caseData?.description}
-              />
               <EvidenceHub caseId={caseId} />
+              
+              {/* Show analyzer and merit score after uploads */}
+              {evidenceCount > 0 && (
+                <>
+                  <EvidenceAnalyzer 
+                    caseId={caseId} 
+                    caseType={caseData?.venue}
+                    caseDescription={caseData?.description}
+                  />
+                  <CaseMeritScore 
+                    caseId={caseId}
+                    caseType={caseData?.venue}
+                    caseDescription={caseData?.description}
+                  />
+                </>
+              )}
             </div>
           </PremiumGate>
 
-          {/* Continue CTA */}
+          {/* Primary action CTA */}
           <Card className="mt-8 border-primary/20 bg-gradient-to-r from-primary/5 to-background">
             <CardContent className="py-6">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex flex-col items-center text-center gap-4">
                 <div>
-                  <p className="font-medium">
+                  <p className="font-medium text-lg">
                     {evidenceCount > 0 
                       ? `${evidenceCount} document${evidenceCount !== 1 ? 's' : ''} uploaded`
-                      : 'No documents uploaded yet'}
+                      : 'Upload evidence to continue'}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {evidenceCount > 0 
-                      ? 'Ready to generate your documents'
-                      : 'Upload at least one document to continue'}
+                      ? 'Ready to analyze your case and generate documents'
+                      : 'Add at least one document to get your case assessment'}
                   </p>
                 </div>
-                <Button 
-                  onClick={handleGenerateDocuments}
-                  disabled={evidenceCount === 0}
-                  size="lg"
-                  className="gap-2 w-full sm:w-auto bg-slate-800 hover:bg-slate-900 text-white"
-                >
-                  <FileText className="h-4 w-4" />
-                  Generate My Documents
-                  <ArrowRight className="h-4 w-4" />
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                  <Button 
+                    onClick={handleGenerateDocuments}
+                    disabled={evidenceCount === 0}
+                    size="lg"
+                    className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground"
+                  >
+                    <FileText className="h-4 w-4" />
+                    {evidenceCount > 0 ? 'Continue to Analysis' : 'Upload Evidence First'}
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="gap-2"
+                    onClick={handleBookClick}
+                  >
+                    <BookOpen className="h-4 w-4" />
+                    Generate Book of Documents
+                  </Button>
+                </div>
               </div>
-              {/* Refund-prevention micro-copy */}
-              {evidenceCount > 0 && (
-                <p className="text-xs text-muted-foreground text-center mt-4 pt-4 border-t border-border">
-                  Make sure all evidence is uploaded before generating documents.
-                </p>
-              )}
             </CardContent>
           </Card>
+
+          {/* Security reassurance */}
+          <div className="mt-6 text-center">
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Your files are private and secure.
+            </p>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Nothing is filed or shared without your permission.
+            </p>
+          </div>
+
+          {/* Dashboard link for returning users */}
+          <div className="mt-8 text-center">
+            <Button 
+              variant="link" 
+              className="text-muted-foreground text-sm"
+              onClick={() => navigate('/dashboard')}
+            >
+              Already started a case? Go to my dashboard
+            </Button>
+          </div>
+
+          {/* Hidden components for paywall flow */}
+          <BookOfDocsPaywall
+            open={showBookPaywall}
+            onOpenChange={setShowBookPaywall}
+            onAccessGranted={handleBookAccessGranted}
+            caseId={caseId}
+            caseTitle={caseData?.title}
+          />
+
+          <BookOfDocumentsWizard
+            caseId={caseId}
+            caseTitle={caseData?.title}
+            open={bookWizardOpen}
+            onOpenChange={setBookWizardOpen}
+          />
         </div>
       </main>
     </div>
