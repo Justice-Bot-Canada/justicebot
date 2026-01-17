@@ -95,22 +95,25 @@ export const MeritScoreCTA = ({ variant = "banner", className = "" }: MeritScore
           
           <div className="relative bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 rounded-xl p-[2px] sm:p-1">
             <div className="bg-background rounded-lg p-4 sm:p-6 md:p-8">
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+              <div className="flex flex-col items-center text-center gap-4">
                 <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
                   <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
-                <div className="flex-1 text-center sm:text-left">
-                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2">
-                    Find out now if you have a case
+                <div className="flex-1">
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">
+                    Not sure if you have a legal case?
                   </h3>
-                  <p className="text-sm sm:text-base text-muted-foreground mb-4">
-                    Upload your evidence and get your merit score instantly. No commitment required.
+                  <p className="text-base sm:text-lg font-medium text-foreground/80 mb-3">
+                    Find out now — before deadlines make the decision for you.
+                  </p>
+                  <p className="text-sm sm:text-base text-muted-foreground mb-5 max-w-xl mx-auto">
+                    Upload your evidence and get a clear, plain-language assessment of your case strength, possible next steps, and the legal forms that may apply — all in one place.
                   </p>
                   <Button
                     size="lg"
                     onClick={handleClick}
                     disabled={isLoading}
-                    className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold gap-2 text-sm sm:text-base"
+                    className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold gap-2 text-sm sm:text-base px-6 py-3"
                   >
                     {isLoading ? (
                       <>
@@ -120,14 +123,13 @@ export const MeritScoreCTA = ({ variant = "banner", className = "" }: MeritScore
                     ) : (
                       <>
                         <Upload className="h-4 w-4 sm:h-5 sm:w-5" />
-                        <span className="hidden sm:inline">Upload Evidence & Get My Score</span>
-                        <span className="sm:hidden">Get My Score</span>
+                        Find out if you have a case
                         <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
                       </>
                     )}
                   </Button>
-                  <p className="text-xs text-muted-foreground mt-3">
-                    Free • 2 minutes • Private
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-4">
+                    Private. Secure. Built for Canadian law.
                   </p>
                 </div>
               </div>
