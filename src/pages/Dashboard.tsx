@@ -30,6 +30,7 @@ import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import { useNextAction, NextActionType } from "@/hooks/useNextAction";
 import { EvidenceHub } from "@/components/EvidenceHub";
 import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
+import { BookOfDocumentsPreview } from "@/components/BookOfDocumentsPreview";
 import DashboardHeader from "@/components/DashboardHeader";
 import { ProgramBanner } from "@/components/ProgramBanner";
 import { ResumeCaseCard } from "@/components/ResumeCaseCard";
@@ -80,6 +81,7 @@ const Dashboard = () => {
   const [evidenceStats, setEvidenceStats] = useState<EvidenceStats>({ total: 0, processing: 0, complete: 0 });
   const [loading, setLoading] = useState(true);
   const [showBookWizard, setShowBookWizard] = useState(false);
+  const [showBookPreview, setShowBookPreview] = useState(false);
   const [progressOpen, setProgressOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
 
@@ -570,6 +572,23 @@ const Dashboard = () => {
             <CollapsibleContent>
               <CardContent className="pt-0">
                 <div className="grid gap-2">
+                  {/* Book of Documents - Quick Access (always visible if case exists) */}
+                  {activeCase && (
+                    <Button 
+                      variant="ghost" 
+                      className="justify-start gap-3 h-auto py-3 border border-primary/20 bg-primary/5 hover:bg-primary/10"
+                      onClick={() => setShowBookPreview(true)}
+                    >
+                      <BookOpen className="h-4 w-4 text-primary" />
+                      <div className="text-left flex-1">
+                        <div className="font-medium">View Book of Documents</div>
+                        <div className="text-xs text-muted-foreground">
+                          {evidenceStats.total} evidence item{evidenceStats.total !== 1 ? 's' : ''} compiled
+                        </div>
+                      </div>
+                    </Button>
+                  )}
+                  
                   <Button 
                     variant="ghost" 
                     className="justify-start gap-3 h-auto py-3"
@@ -625,7 +644,18 @@ const Dashboard = () => {
           </Card>
         </Collapsible>
 
-        {/* Book of Documents Wizard (modal) */}
+        {/* Book of Documents Preview (quick view - free to view, download paywalled) */}
+        {activeCase && (
+          <BookOfDocumentsPreview
+            caseId={activeCase.id}
+            caseTitle={activeCase.title}
+            open={showBookPreview}
+            onOpenChange={setShowBookPreview}
+            onOpenFullWizard={() => setShowBookWizard(true)}
+          />
+        )}
+
+        {/* Book of Documents Wizard (full customization - modal) */}
         {activeCase && (
           <BookOfDocumentsWizard 
             caseId={activeCase.id} 

@@ -74,8 +74,8 @@ const PaymentSuccess = () => {
           }
           
           toast({
-            title: "Payment Successful!",
-            description: "You now have access to this form.",
+            title: "Access Unlocked",
+            description: "You can continue right away.",
           });
         } else {
           throw new Error('Payment verification failed');
