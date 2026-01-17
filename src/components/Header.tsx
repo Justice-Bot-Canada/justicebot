@@ -39,33 +39,33 @@ const Header = () => {
       <SkipToContent />
       <PremiumStatusBanner />
       <header className="bg-background border-b border-border sticky top-0 z-50" role="banner">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+      <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <a 
               href="/" 
-              className="flex items-center gap-3" 
+              className="flex items-center gap-2 sm:gap-3" 
               aria-label="Justice-Bot - Legal clarity, simplified - Go to homepage"
             >
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg overflow-hidden">
+              <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg overflow-hidden">
                 <img 
                   src={justiceBotLogo} 
                   alt="Justice-Bot logo - Lion with scales of justice" 
-                  className="w-12 h-12 object-contain"
+                  className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
                   width="48"
                   height="48"
                   loading="eager"
                   decoding="async"
                 />
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-foreground">Justice-Bot</h1>
-                <p className="text-xs text-muted-foreground">Legal clarity, simplified</p>
+              <div className="hidden xs:block">
+                <h1 className="text-lg sm:text-xl font-bold text-foreground leading-tight">Justice-Bot</h1>
+                <p className="text-xs text-muted-foreground hidden sm:block">Legal clarity, simplified</p>
               </div>
             </a>
           </div>
           
-            <nav id="main-navigation" className="hidden lg:flex items-center gap-6" role="navigation" aria-label="Main navigation">
+            <nav id="main-navigation" className="hidden md:flex items-center gap-4 lg:gap-6" role="navigation" aria-label="Main navigation">
               <div className="relative group">
                 <button 
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
@@ -161,14 +161,15 @@ const Header = () => {
               <HighContrastToggle />
             </nav>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-3">
             {user && <NotificationBell />}
             {user ? (
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <Button 
                   variant="ghost" 
+                  size="sm"
                   onClick={() => window.location.href = "/profile"}
-                  className="hidden md:inline-flex"
+                  className="hidden lg:inline-flex"
                   aria-label="View and edit your profile"
                 >
                   <User className="w-4 h-4 mr-2" aria-hidden="true" />
@@ -176,19 +177,18 @@ const Header = () => {
                 </Button>
                 <Button 
                   variant="ghost" 
+                  size="sm"
                   onClick={() => window.location.href = "/dashboard"}
                   className="hidden md:inline-flex"
                   aria-label="Go to dashboard"
                 >
                   Dashboard
                 </Button>
-                <span className="text-sm text-muted-foreground hidden md:inline" aria-live="polite">
-                  {user.email}
-                </span>
                 <Button 
                   variant="ghost" 
+                  size="sm"
                   onClick={handleSignOut} 
-                  className="hidden md:inline-flex"
+                  className="hidden lg:inline-flex"
                   aria-label="Sign out of your account"
                 >
                   <LogOut className="w-4 h-4 mr-2" aria-hidden="true" />
@@ -198,6 +198,7 @@ const Header = () => {
             ) : (
               <Button 
                 variant="ghost" 
+                size="sm"
                 className="hidden md:inline-flex" 
                 onClick={handleSignIn}
                 aria-label="Sign in to your account"
@@ -206,29 +207,19 @@ const Header = () => {
               </Button>
             )}
             
-            {/* Always show sign out on mobile if user exists */}
-            {user && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={handleSignOut} 
-                className="md:hidden"
-                aria-label="Sign out"
-              >
-                <LogOut className="w-4 h-4" aria-hidden="true" />
-              </Button>
-            )}
             <Button 
               variant="cta" 
+              size="sm"
               onClick={handleGetStarted}
               aria-label={user ? "Start a new case" : "Get started with Justice-Bot"}
+              className="text-xs sm:text-sm px-3 sm:px-4"
             >
-              {user ? "Start Case" : "Get Started"}
+              {user ? "Start" : "Get Started"}
             </Button>
             <Button 
               variant="ghost" 
               size="icon" 
-              className="md:hidden"
+              className="md:hidden flex-shrink-0"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
               aria-expanded={mobileMenuOpen}
