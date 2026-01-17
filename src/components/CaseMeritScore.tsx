@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Scale, TrendingUp, AlertCircle, RefreshCw, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { NextStepsActionPanel } from "@/components/NextStepsActionPanel";
 
 interface CaseMeritScoreProps {
   caseId: string;
@@ -206,6 +207,16 @@ export function CaseMeritScore({ caseId, caseType, caseDescription }: CaseMeritS
             </>
           )}
         </Button>
+
+        {/* What Happens Next - Action Panel (only show if score exists) */}
+        {score > 0 && (
+          <NextStepsActionPanel 
+            caseId={caseId} 
+            venue={caseData.venue} 
+            variant="compact" 
+            className="mt-4" 
+          />
+        )}
 
         <p className="text-xs text-center text-muted-foreground">
           AI-generated assessment for {venueLabel} cases. Not legal advice.

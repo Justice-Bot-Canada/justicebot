@@ -4,13 +4,16 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertCircle, CheckCircle, TrendingUp, Scale, FileText, Clock, DollarSign } from 'lucide-react';
+import { NextStepsActionPanel } from '@/components/NextStepsActionPanel';
 import type { LegalAnalysis } from '@/hooks/useLegalAnalysis';
 
 interface LegalAnalysisResultsProps {
   analysis: LegalAnalysis;
+  caseId?: string;
+  venue?: string;
 }
 
-const LegalAnalysisResults: React.FC<LegalAnalysisResultsProps> = ({ analysis }) => {
+const LegalAnalysisResults: React.FC<LegalAnalysisResultsProps> = ({ analysis, caseId, venue }) => {
   const getScoreColor = (score: number) => {
     if (score >= 70) return 'text-green-600';
     if (score >= 40) return 'text-yellow-600';
@@ -78,6 +81,9 @@ const LegalAnalysisResults: React.FC<LegalAnalysisResultsProps> = ({ analysis })
           </div>
         </CardContent>
       </Card>
+
+      {/* What Happens Next - Action Panel */}
+      <NextStepsActionPanel caseId={caseId} venue={venue} />
 
       {/* Summary */}
       <Card>

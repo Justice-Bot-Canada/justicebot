@@ -10,6 +10,7 @@ import { useLegalResearch, CaseResult } from '@/hooks/useLegalResearch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
+import { NextStepsActionPanel } from '@/components/NextStepsActionPanel';
 
 interface LegalResearchPanelProps {
   defaultQuery?: string;
@@ -267,6 +268,9 @@ export function LegalResearchPanel({ defaultQuery = '', caseId: propCaseId }: Le
               </div>
             ))}
             </div>
+
+            {/* What Happens Next - Action Panel */}
+            <NextStepsActionPanel caseId={selectedCaseId} variant="compact" className="mt-4" />
           </>
         )}
 
