@@ -11,13 +11,17 @@ import { Separator } from "@/components/ui/separator";
 import SEOHead from "@/components/SEOHead";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import PayPalSubscriptionManager from "@/components/PayPalSubscriptionManager";
-import { User, Mail, Phone, FileText, Settings } from "lucide-react";
+import { usePremiumAccess } from "@/hooks/usePremiumAccess";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import { User, Mail, Phone, FileText, Settings, Crown, CreditCard, ExternalLink, Loader2 } from "lucide-react";
 
 export default function Profile() {
   const { user } = useAuth();
   const { profile, loading, updateProfile } = useProfile();
+  const { isPremium, tier, loading: premiumLoading } = usePremiumAccess();
   const [isEditing, setIsEditing] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -57,6 +61,30 @@ export default function Profile() {
       });
     }
     setIsEditing(false);
+  };
+
+  const handleManageSubscription = async () => {
+    setPortalLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('stripe-customer-portal');
+      
+      if (error) throw error;
+      
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      } else {
+        throw new Error('No portal URL returned');
+      }
+    } catch (error) {
+      console.error('Portal error:', error);
+      toast({
+        title: "Error",
+        description: "Unable to open billing portal. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setPortalLoading(false);
+    }
   };
 
   if (loading) {
@@ -205,7 +233,89 @@ export default function Profile() {
             </Card>
 
             {/* Subscription Card */}
-            <PayPalSubscriptionManager />
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Crown className="h-5 w-5 text-amber-500" />
+                  Subscription
+                </CardTitle>
+                <CardDescription>
+                  Manage your subscription and billing
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {premiumLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : isPremium ? (
+                  <>
+                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Crown className="h-5 w-5 text-amber-600" />
+                        <span className="font-semibold text-amber-900 dark:text-amber-100">
+                          Premium Member
+                        </span>
+                      </div>
+                      <p className="text-sm text-amber-800 dark:text-amber-200">
+                        {tier ? `${tier.charAt(0).toUpperCase() + tier.slice(1)} Plan` : 'Active Subscription'}
+                      </p>
+                    </div>
+                    
+                    <Button 
+                      onClick={handleManageSubscription}
+                      disabled={portalLoading}
+                      className="w-full"
+                      variant="outline"
+                    >
+                      {portalLoading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Opening...
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          Manage Subscription
+                          <ExternalLink className="h-3 w-3 ml-2" />
+                        </>
+                      )}
+                    </Button>
+                    
+                    <p className="text-xs text-muted-foreground text-center">
+                      Update payment method, view invoices, or cancel subscription
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="bg-muted/50 p-4 rounded-lg">
+                      <p className="text-sm text-muted-foreground text-center">
+                        You're on the free plan. Upgrade to unlock all features.
+                      </p>
+                    </div>
+                    
+                    <Button 
+                      onClick={() => window.location.href = '/pricing'}
+                      className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+                    >
+                      <Crown className="h-4 w-4 mr-2" />
+                      Upgrade to Premium
+                    </Button>
+                  </>
+                )}
+
+                <Separator />
+                
+                <div className="text-center">
+                  <p className="text-xs text-muted-foreground">
+                    Questions about billing?{" "}
+                    <a href="mailto:admin@justice-bot.com" className="text-primary hover:underline">
+                      Contact support
+                    </a>
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

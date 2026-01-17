@@ -7,8 +7,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import { useShouldHidePricing } from "@/components/ProgramBanner";
-import PayPalTrialButton from "@/components/PayPalTrialButton";
+import StripeTrialButton from "@/components/StripeTrialButton";
 import { analytics } from "@/utils/analytics";
+
+// Stripe Price IDs
+const STRIPE_PRICE_IDS = {
+  basic: "price_1SgdrpL0pLShFbLtWKJfGCO3",
+  professional: "price_1SgdzJL0pLShFbLtcFrnbeiV",
+  premium: "price_1Sge6YL0pLShFbLtR8BpRnuM",
+  oneTimeDocument: "price_1SmUwAL0pLShFbLtIK429fdX", // $39 one-time
+};
 
 interface FormPaywallProps {
   formId: string;
@@ -72,11 +80,11 @@ export default function FormPaywall({
     }
   }, [checkingAccess, isPremium, hasAccess, hasPurchased, formTitle]);
 
-  // Handle one-time form purchase via edge function
+  // Handle one-time form purchase via Stripe
   const handleFormPurchase = async () => {
     setLoading("form");
-    // Fire GA4 begin_checkout event
-    analytics.funnelBeginCheckout({ value: 5.99, itemName: formTitle || 'Legal Form' });
+    analytics.funnelBeginCheckout({ value: 39, itemName: formTitle || 'Legal Form' });
+    
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -89,20 +97,21 @@ export default function FormPaywall({
         return;
       }
 
-      // Get promo code from localStorage if available
-      const promoCode = localStorage.getItem('appliedPromoCode') || undefined;
-
-      const { data, error } = await supabase.functions.invoke('create-form-payment', {
-        body: { formId, promoCode }
+      const { data, error } = await supabase.functions.invoke('create_checkout', {
+        body: { 
+          priceId: STRIPE_PRICE_IDS.oneTimeDocument,
+          planKey: 'one_time_document',
+          successUrl: `${window.location.origin}/payment-success?formId=${formId}&session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: window.location.href
+        }
       });
 
       if (error) throw error;
       
-      if (data?.approvalUrl) {
-        console.log('Redirecting to PayPal:', data.approvalUrl);
-        window.location.href = data.approvalUrl;
+      if (data?.url) {
+        window.location.href = data.url;
       } else {
-        throw new Error('No approval URL received from PayPal');
+        throw new Error('No checkout URL received');
       }
     } catch (error: any) {
       console.error("Payment error:", error);
@@ -129,35 +138,6 @@ export default function FormPaywall({
   if (isPremium || hasAccess || hasPurchased || shouldHidePricing) {
     return <>{children}</>;
   }
-  // PayPal plan IDs
-  const PAYPAL_PLAN_IDS = {
-    basic: "P-913106187H1268013NFBA72I",
-    professional: "P-0FR50831D4940483BNFBBB7Y",
-    premium: "P-2GT19989129104740NFBBDVY",
-  };
-
-  const handleSubscription = async () => {
-    setLoading("subscription");
-    try {
-      const { data, error } = await supabase.functions.invoke('create-paypal-subscription', {
-        body: { planId: PAYPAL_PLAN_IDS.professional }
-      });
-
-      if (error) throw error;
-      if (data?.approvalUrl) {
-        window.location.href = data.approvalUrl;
-      }
-    } catch (error: any) {
-      console.error("Payment error:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to start checkout",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(null);
-    }
-  };
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -199,7 +179,7 @@ export default function FormPaywall({
             </div>
             <CardDescription>Perfect if you need just this form</CardDescription>
             <div className="mt-4">
-              <div className="text-4xl font-bold">$5.99</div>
+              <div className="text-4xl font-bold">$39</div>
               <div className="text-sm text-muted-foreground">one-time payment</div>
             </div>
           </CardHeader>
@@ -233,7 +213,7 @@ export default function FormPaywall({
               {loading === "form" ? (
                 "Processing..."
               ) : (
-                "Pay with PayPal - $5.99"
+                "Pay with Card - $39"
               )}
             </Button>
           </CardContent>
@@ -253,10 +233,10 @@ export default function FormPaywall({
               <CardTitle className="text-2xl">Unlimited</CardTitle>
               <Badge variant="outline">Try Free</Badge>
             </div>
-            <CardDescription>Full access for 5 days, then $19/mo</CardDescription>
+            <CardDescription>Full access for 5 days, then $29/mo</CardDescription>
             <div className="mt-4">
               <div className="text-4xl font-bold text-green-600">FREE</div>
-              <div className="text-sm text-muted-foreground">for 5 days, then $19/mo</div>
+              <div className="text-sm text-muted-foreground">for 5 days, then $29/mo</div>
             </div>
           </CardHeader>
 
@@ -280,7 +260,7 @@ export default function FormPaywall({
               </li>
             </ul>
 
-            <PayPalTrialButton planId={PAYPAL_PLAN_IDS.professional} trialDays={5} />
+            <StripeTrialButton priceId={STRIPE_PRICE_IDS.professional} planKey="professional" trialDays={5} />
           </CardContent>
         </Card>
       </div>
@@ -297,7 +277,7 @@ export default function FormPaywall({
       )}
 
       <div className="mt-8 text-center text-sm text-muted-foreground">
-        <p>🔒 Secure payment powered by PayPal • 30-day money-back guarantee</p>
+        <p>🔒 Secure payment powered by Stripe • 30-day money-back guarantee</p>
       </div>
     </div>
   );
