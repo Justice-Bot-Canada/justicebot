@@ -264,7 +264,7 @@ const Evidence = () => {
           {/* Evidence upload area */}
           {/* Evidence upload + merit score = ALWAYS FREE (never paywall curiosity) */}
           <div className="space-y-6">
-            <EvidenceHub caseId={caseId} />
+            <EvidenceHub caseId={caseId} onUploadComplete={setEvidenceCount} />
             
             {/* Show analyzer and merit score after uploads */}
             {evidenceCount > 0 && (
