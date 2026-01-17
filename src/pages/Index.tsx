@@ -8,6 +8,7 @@ import ExitIntentModal from "@/components/ExitIntentModal";
 import StickyLeadCapture from "@/components/StickyLeadCapture";
 import FounderTrustBlock from "@/components/FounderTrustBlock";
 import LegalPathReportCTA from "@/components/LegalPathReportCTA";
+import { MeritScoreCTA } from "@/components/MeritScoreCTA";
 import { Suspense, lazy, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -120,12 +121,21 @@ const Index = () => {
       <ClinicWelcomeBanner />
       <Header />
       
+      {/* HIGH-VISIBILITY URGENCY CTA - Merit Score */}
+      <section className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-red-500/10 border-b-2 border-amber-500/30 py-8">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto">
+            <MeritScoreCTA variant="hero" />
+          </div>
+        </div>
+      </section>
+
       {/* Trust Banner - Above the fold - Outcome focused */}
-      <section className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-b-2 border-primary/30 py-6">
+      <section className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-b border-primary/20 py-6">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-xl md:text-2xl font-bold text-foreground mb-2">
-              Find out if you have a case — in 2 minutes
+              Not sure what you're dealing with?
             </h2>
             <p className="text-muted-foreground mb-4">
               Answer a few questions. Get your recommended forms and next steps.
