@@ -4,14 +4,17 @@ import { Progress } from "@/components/ui/progress";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { CheckCircle, AlertTriangle, XCircle, ChevronDown, Scale, FileText, Gavel, Clock, TrendingUp } from "lucide-react";
 import { MeritScoreResult, getBandColor, getComponentColor } from "@/hooks/useFormalMeritScore";
+import { NextStepsActionPanel } from "@/components/NextStepsActionPanel";
 import { cn } from "@/lib/utils";
 
 interface MeritScoreDisplayProps {
   result: MeritScoreResult;
   compact?: boolean;
+  caseId?: string;
+  venue?: string;
 }
 
-export function MeritScoreDisplay({ result, compact = false }: MeritScoreDisplayProps) {
+export function MeritScoreDisplay({ result, compact = false, caseId, venue }: MeritScoreDisplayProps) {
   const { score, band, breakdown, top_strengths, top_risks, next_best_actions, element_coverage, deadline_warnings } = result;
 
   if (compact) {
@@ -169,6 +172,9 @@ export function MeritScoreDisplay({ result, compact = false }: MeritScoreDisplay
             </CollapsibleContent>
           </Collapsible>
         )}
+
+        {/* What Happens Next - Action Panel */}
+        {!compact && <NextStepsActionPanel caseId={caseId} venue={venue} variant="compact" className="mt-4" />}
       </CardContent>
     </Card>
   );

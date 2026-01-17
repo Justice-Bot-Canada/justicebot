@@ -2,6 +2,7 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { NextStepsActionPanel } from "@/components/NextStepsActionPanel";
 import { 
   ArrowRight, 
   ArrowLeft,
@@ -47,6 +48,7 @@ interface TriageResultsProps {
   result: TriageResult;
   description: string;
   province: string;
+  caseId?: string;
   onProceed: () => void;
   onBack: () => void;
   onSelectForm: (form: FormRecommendation) => void;
@@ -93,6 +95,7 @@ const TriageResults: React.FC<TriageResultsProps> = ({
   result,
   description,
   province,
+  caseId,
   onProceed,
   onBack,
   onSelectForm,
@@ -191,26 +194,8 @@ const TriageResults: React.FC<TriageResultsProps> = ({
         </CardContent>
       </Card>
 
-      {/* Next Steps Card */}
-      {result.nextSteps.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Next Steps</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ol className="space-y-3">
-              {result.nextSteps.map((step, index) => (
-                <li key={index} className="flex gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm flex items-center justify-center font-medium">
-                    {index + 1}
-                  </span>
-                  <span className="text-sm pt-0.5">{step}</span>
-                </li>
-              ))}
-            </ol>
-          </CardContent>
-        </Card>
-      )}
+      {/* What Happens Next - Action Panel */}
+      <NextStepsActionPanel caseId={caseId} venue={result.venue} />
 
       {/* Additional Forms (collapsed) */}
       {result.recommendedForms.length > 1 && (

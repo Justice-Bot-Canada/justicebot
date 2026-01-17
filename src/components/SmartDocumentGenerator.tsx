@@ -13,6 +13,7 @@ import { usePremiumAccess } from '@/hooks/usePremiumAccess';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { NextStepsActionPanel } from '@/components/NextStepsActionPanel';
 
 interface SavedResearch {
   id: string;
@@ -441,6 +442,13 @@ export function SmartDocumentGenerator() {
                 <div className="p-4 bg-muted rounded-lg max-h-[600px] overflow-y-auto">
                   <pre className="whitespace-pre-wrap font-mono text-sm">{generatedDoc}</pre>
                 </div>
+
+                {/* What Happens Next - Action Panel */}
+                <NextStepsActionPanel 
+                  caseId={selectedCaseId} 
+                  variant="compact" 
+                  className="mt-4" 
+                />
               </>
             ) : (
               <div className="text-center py-12 text-muted-foreground">
