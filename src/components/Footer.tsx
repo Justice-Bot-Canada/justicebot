@@ -3,10 +3,10 @@ import { Facebook, Twitter, Linkedin, Instagram, Youtube } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer id="footer" className="bg-foreground text-background py-16" role="contentinfo" aria-label="Site footer">
-      <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-5 gap-8 mb-8" role="navigation" aria-label="Footer navigation">
-          <div className="space-y-4">
+    <footer id="footer" className="bg-foreground text-background py-8 sm:py-12 md:py-16" role="contentinfo" aria-label="Site footer">
+      <div className="container mx-auto px-3 sm:px-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 mb-8" role="navigation" aria-label="Footer navigation">
+          <div className="col-span-2 sm:col-span-3 lg:col-span-1 space-y-4">
             <div className="flex items-center gap-3">
               <div className="flex items-center justify-center w-8 h-8 bg-background rounded-lg">
                 <img 
@@ -23,192 +23,127 @@ const Footer = () => {
           </div>
 
           <nav aria-labelledby="services-heading">
-            <h3 id="services-heading" className="font-semibold mb-4">Services</h3>
-            <ul className="space-y-2 text-sm text-background/80">
-              <li><a href="/triage" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Smart Triage</a></li>
-              <li><a href="/tribunal-locator" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Court Locator</a></li>
-              <li><a href="/forms" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Legal Forms</a></li>
-              <li><a href="/assessment" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Merit Score</a></li>
-              <li><a href="/pricing" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Pricing</a></li>
-              <li><a href="/low-income" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Low-Income Program</a></li>
+            <h3 id="services-heading" className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Services</h3>
+            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-background/80">
+              <li><a href="/triage" className="hover:text-background transition-colors">Smart Triage</a></li>
+              <li><a href="/tribunal-locator" className="hover:text-background transition-colors">Court Locator</a></li>
+              <li><a href="/forms" className="hover:text-background transition-colors">Legal Forms</a></li>
+              <li><a href="/assessment" className="hover:text-background transition-colors">Merit Score</a></li>
+              <li><a href="/pricing" className="hover:text-background transition-colors">Pricing</a></li>
             </ul>
           </nav>
 
           <nav aria-labelledby="guides-heading">
-            <h3 id="guides-heading" className="font-semibold mb-4">Popular Guides</h3>
-            <ul className="space-y-2 text-sm text-background/80">
-              <li><a href="/ltb-toronto" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">LTB Toronto Guide</a></li>
-              <li><a href="/how-to-fight-n4-eviction-ontario" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Fight N4 Eviction</a></li>
-              <li><a href="/how-to-file-t2-ontario" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">How to File T2</a></li>
-              <li><a href="/how-to-file-t6-ontario" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">How to File T6</a></li>
-              <li><a href="/hrto-toronto" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">HRTO Toronto</a></li>
-              <li><a href="/tenant-rights-harassment-by-landlord" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Landlord Harassment</a></li>
+            <h3 id="guides-heading" className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Guides</h3>
+            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-background/80">
+              <li><a href="/ltb-toronto" className="hover:text-background transition-colors">LTB Toronto</a></li>
+              <li><a href="/how-to-fight-n4-eviction-ontario" className="hover:text-background transition-colors">Fight N4 Eviction</a></li>
+              <li><a href="/how-to-file-t2-ontario" className="hover:text-background transition-colors">File T2</a></li>
+              <li><a href="/hrto-toronto" className="hover:text-background transition-colors">HRTO Toronto</a></li>
             </ul>
           </nav>
 
           <nav aria-labelledby="company-heading">
-            <h3 id="company-heading" className="font-semibold mb-4">Company</h3>
-            <ul className="space-y-2 text-sm text-background/80">
-              <li><a href="/team" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Our Team</a></li>
-              <li><a href="/about" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">About</a></li>
-              <li><a href="/blog" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Blog</a></li>
-              <li><a href="/roadmap" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Roadmap</a></li>
-              <li><a href="/partners" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Partners</a></li>
-              <li><a href="/press" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Press</a></li>
-              <li><a href="/government" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Government</a></li>
-              <li><a href="/contact" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Contact</a></li>
+            <h3 id="company-heading" className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Company</h3>
+            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-background/80">
+              <li><a href="/about" className="hover:text-background transition-colors">About</a></li>
+              <li><a href="/blog" className="hover:text-background transition-colors">Blog</a></li>
+              <li><a href="/contact" className="hover:text-background transition-colors">Contact</a></li>
+              <li><a href="/partners" className="hover:text-background transition-colors">Partners</a></li>
             </ul>
           </nav>
 
           <nav aria-labelledby="legal-heading">
-            <h3 id="legal-heading" className="font-semibold mb-4">Legal</h3>
-            <ul className="space-y-2 text-sm text-background/80">
-              <li><a href="/liability" className="hover:text-background transition-colors text-red-300 focus:outline-none focus:ring-2 focus:ring-background/50 rounded" aria-label="Legal liability and disclaimers">⚠️ Legal Disclaimer</a></li>
-              <li><a href="/terms" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Terms of Service</a></li>
-              <li><a href="/privacy" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Privacy Policy</a></li>
-              <li><a href="/accessibility" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Accessibility</a></li>
-              <li><a href="/payment-policy" className="hover:text-background transition-colors focus:outline-none focus:ring-2 focus:ring-background/50 rounded">Payment & Refunds</a></li>
+            <h3 id="legal-heading" className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Legal</h3>
+            <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-background/80">
+              <li><a href="/liability" className="hover:text-background transition-colors text-red-300">⚠️ Disclaimer</a></li>
+              <li><a href="/terms" className="hover:text-background transition-colors">Terms</a></li>
+              <li><a href="/privacy" className="hover:text-background transition-colors">Privacy</a></li>
+              <li><a href="/accessibility" className="hover:text-background transition-colors">Accessibility</a></li>
             </ul>
           </nav>
-
-          <div>
-            <h3 className="font-semibold mb-4">Coverage</h3>
-            <ul className="space-y-2 text-sm text-background/80">
-              <li>All Canadian Provinces & Territories</li>
-              <li>Updated Daily at 5am</li>
-              <li>Mobile Optimized</li>
-              <li>Free Beta Access</li>
-            </ul>
-          </div>
         </div>
 
-        <div className="border-t border-background/20 pt-8">
-          {/* Critical Legal Warnings Section */}
-          <div className="mb-6 p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
-            <div className="text-center mb-3">
-              <span className="text-red-300 font-bold text-lg">⚠️ CRITICAL LEGAL NOTICE ⚠️</span>
+        <div className="border-t border-background/20 pt-6 sm:pt-8">
+          {/* Critical Legal Warnings Section - Simplified for mobile */}
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-red-900/20 border border-red-500/30 rounded-lg">
+            <div className="text-center mb-2 sm:mb-3">
+              <span className="text-red-300 font-bold text-sm sm:text-lg">⚠️ NOT LEGAL ADVICE ⚠️</span>
             </div>
-            <div className="grid md:grid-cols-2 gap-4 text-xs text-background/90 leading-relaxed">
-              <div>
-                <p className="font-semibold text-red-300 mb-2">NOT LEGAL ADVICE:</p>
-                <ul className="space-y-1 text-background/80">
-                  <li>• Not a law firm or attorney service</li>
-                  <li>• No lawyer-client relationship created</li>
-                  <li>• Information for educational purposes only</li>
-                  <li>• Always consult qualified legal counsel</li>
-                </ul>
-              </div>
-              <div>
-                <p className="font-semibold text-red-300 mb-2">USE AT YOUR OWN RISK:</p>
-                <ul className="space-y-1 text-background/80">
-                  <li>• No liability for legal outcomes</li>
-                  <li>• No warranty of accuracy or completeness</li>
-                  <li>• User assumes all risks and liability</li>
-                  <li>• Time-sensitive matters require immediate legal help</li>
-                </ul>
-              </div>
-            </div>
-            <div className="mt-3 text-center">
-              <p className="text-red-300 font-semibold text-xs">
-                EMERGENCY? Contact: Legal Aid Ontario 1-800-668-8258 | Law Society Referral 1-855-947-5255
+            <div className="text-xs text-background/80 text-center space-y-1">
+              <p>Not a law firm. No lawyer-client relationship. Information only.</p>
+              <p className="text-red-300 font-semibold">
+                Emergency? Legal Aid: 1-800-668-8258
               </p>
             </div>
           </div>
 
-          {/* Brand Disambiguation */}
-          <div className="mb-4 p-3 bg-background/10 rounded-lg border border-background/20">
-            <p className="text-xs text-background/80 text-center">
-              <strong>⚠️ Not affiliated with justicebot.org</strong> — Justice-Bot (Canada) is an independent Canadian platform 
-              providing AI-powered legal help for Ontario tribunals and courts. We are not associated with any other "JusticeBot" services.
-            </p>
-          </div>
-
-          {/* Social Media Links */}
-          <div className="mb-6 flex justify-center">
-            <div className="flex flex-col items-center gap-3">
-              <span className="text-sm text-background/80 font-semibold">Connect With Us:</span>
-              <div className="flex flex-wrap justify-center gap-3">
-                <a 
-                  href="https://www.facebook.com/profile.php?id=61579916761955"
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-background/50"
-                  aria-label="Follow Justice-Bot on Facebook"
-                >
-                  <Facebook className="w-4 h-4" />
-                  <span className="text-sm">Facebook</span>
-                </a>
-                <a 
-                  href="https://twitter.com/JusticeBotCA" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-background/50"
-                  aria-label="Follow us on Twitter"
-                >
-                  <Twitter className="w-4 h-4" />
-                  <span className="text-sm">Twitter</span>
-                </a>
-                <a 
-                  href="https://www.linkedin.com/company/justice-bot" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-background/50"
-                  aria-label="Follow us on LinkedIn"
-                >
-                  <Linkedin className="w-4 h-4" />
-                  <span className="text-sm">LinkedIn</span>
-                </a>
-                <a 
-                  href="https://www.instagram.com/justicebotofficial" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-background/50"
-                  aria-label="Follow us on Instagram"
-                >
-                  <Instagram className="w-4 h-4" />
-                  <span className="text-sm">Instagram</span>
-                </a>
-                <a 
-                  href="https://www.youtube.com/@JusticeBot" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-3 py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-background/50"
-                  aria-label="Subscribe on YouTube"
-                >
-                  <Youtube className="w-4 h-4" />
-                  <span className="text-sm">YouTube</span>
-                </a>
-              </div>
+          {/* Social Media Links - More compact on mobile */}
+          <div className="mb-4 sm:mb-6 flex justify-center">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+              <a 
+                href="https://www.facebook.com/profile.php?id=61579916761955"
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="p-2 sm:px-3 sm:py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors"
+                aria-label="Facebook"
+              >
+                <Facebook className="w-4 h-4" />
+              </a>
+              <a 
+                href="https://twitter.com/JusticeBotCA" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="p-2 sm:px-3 sm:py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors"
+                aria-label="Twitter"
+              >
+                <Twitter className="w-4 h-4" />
+              </a>
+              <a 
+                href="https://www.linkedin.com/company/justice-bot" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="p-2 sm:px-3 sm:py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors"
+                aria-label="LinkedIn"
+              >
+                <Linkedin className="w-4 h-4" />
+              </a>
+              <a 
+                href="https://www.instagram.com/justicebotofficial" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="p-2 sm:px-3 sm:py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors"
+                aria-label="Instagram"
+              >
+                <Instagram className="w-4 h-4" />
+              </a>
+              <a 
+                href="https://www.youtube.com/@JusticeBot" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="p-2 sm:px-3 sm:py-2 bg-background/10 hover:bg-background/20 rounded-lg transition-colors"
+                aria-label="YouTube"
+              >
+                <Youtube className="w-4 h-4" />
+              </a>
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-sm text-background/80">
-              © 2024 Justice-Bot Technologies Inc. All rights reserved. | Ontario, Canada
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
+            <div className="text-xs sm:text-sm text-background/80 text-center sm:text-left">
+              © 2024 Justice-Bot Technologies Inc. | Ontario, Canada
             </div>
-            <div className="flex gap-6 text-sm text-background/80">
-              <a href="/liability" className="hover:text-background transition-colors text-red-300 font-semibold">⚠️ Liability & Disclaimers</a>
-              <a href="/privacy" className="hover:text-background transition-colors">Privacy Policy</a>
-              <a href="/terms" className="hover:text-background transition-colors">Terms of Service</a>
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-background/80">
+              <a href="/liability" className="hover:text-background transition-colors text-red-300 font-semibold">⚠️ Disclaimer</a>
+              <a href="/privacy" className="hover:text-background transition-colors">Privacy</a>
+              <a href="/terms" className="hover:text-background transition-colors">Terms</a>
             </div>
           </div>
           
-          {/* Data Protection Notice */}
-          <div className="mt-4 p-4 bg-background/10 rounded-lg">
-            <p className="text-xs text-background/70 leading-relaxed">
-              <strong>Data Protection & Privacy:</strong> Your personal information is protected with enterprise-grade encryption. 
-              We comply with PIPEDA, GDPR, and implement HIPAA-level security standards. Data is stored in Canadian facilities 
-              with strict access controls. We never sell your data. 
-              <span className="font-semibold text-background/90"> By using this service, you acknowledge reading our complete 
-              legal disclaimers and privacy policy.</span>
-            </p>
-          </div>
-
-          {/* Regulatory Compliance */}
-          <div className="mt-3 p-3 bg-background/5 rounded text-center">
-            <p className="text-xs text-background/60">
-              Licensed Technology Provider | PIPEDA Compliant | ISO 27001 Security Standards | 
-              Accessible under AODA | Professional Liability Insured
+          {/* Simplified Data Protection Notice */}
+          <div className="mt-4 p-3 bg-background/10 rounded-lg">
+            <p className="text-xs text-background/60 leading-relaxed text-center">
+              Enterprise-grade encryption. Canadian data storage. PIPEDA compliant.
             </p>
           </div>
         </div>

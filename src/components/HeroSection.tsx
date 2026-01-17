@@ -33,29 +33,29 @@ const HeroSection = () => {
 
   return (
     <section 
-      className="relative min-h-[85vh] bg-gradient-to-br from-background via-primary/5 to-background overflow-hidden flex items-center" 
+      className="relative min-h-[60vh] sm:min-h-[70vh] md:min-h-[80vh] bg-gradient-to-br from-background via-primary/5 to-background overflow-hidden flex items-center" 
       aria-labelledby="hero-heading" 
       role="banner"
     >
       {/* Subtle background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 -left-40 w-80 h-80 bg-accent/8 rounded-full blur-3xl" />
+        <div className="absolute -top-20 -right-20 sm:-top-40 sm:-right-40 w-48 h-48 sm:w-96 sm:h-96 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 -left-20 sm:-left-40 w-40 h-40 sm:w-80 sm:h-80 bg-accent/8 rounded-full blur-3xl" />
       </div>
 
-      <div className="container mx-auto px-4 py-12 lg:py-16 relative z-10">
-        <div className="max-w-3xl mx-auto text-center space-y-8">
+      <div className="container mx-auto px-4 py-8 sm:py-12 lg:py-16 relative z-10">
+        <div className="max-w-3xl mx-auto text-center space-y-5 sm:space-y-8">
           
           {/* Clear outcome-focused headline */}
-          <div className="space-y-6 animate-fade-in">
+          <div className="space-y-4 sm:space-y-6 animate-fade-in">
             <h1 
               id="hero-heading" 
-              className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight text-foreground"
+              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight tracking-tight text-foreground px-2"
             >
               Find out which legal form you need — in 2 minutes
             </h1>
             
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto px-4">
               Answer a few questions. Get your recommended tribunal, forms, and next steps.
             </p>
 
@@ -66,24 +66,24 @@ const HeroSection = () => {
           </div>
 
           {/* Outcome-based CTAs */}
-          <div className="space-y-4 animate-fade-in pt-4">
+          <div className="space-y-3 sm:space-y-4 animate-fade-in pt-2 sm:pt-4 px-2">
             {/* Primary CTA - outcome focused */}
             <Button 
               variant="cta" 
               size="lg" 
-              className="group text-xl md:text-2xl px-12 py-8 md:py-10 shadow-2xl hover:scale-[1.02] transition-all duration-300 w-full sm:w-auto"
+              className="group text-base sm:text-lg md:text-xl lg:text-2xl px-6 sm:px-8 md:px-12 py-5 sm:py-6 md:py-8 lg:py-10 shadow-2xl hover:scale-[1.02] transition-all duration-300 w-full sm:w-auto"
               onClick={handleFindPath}
             >
               Tell me what form I need
-              <ArrowRight className="w-6 h-6 ml-3 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 ml-2 sm:ml-3 group-hover:translate-x-1 transition-transform" />
             </Button>
             
             {/* Secondary CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
               <Button 
                 variant="outline" 
-                size="lg"
-                className="w-full sm:w-auto"
+                size="default"
+                className="w-full sm:w-auto text-sm sm:text-base"
                 onClick={handleCheckOptions}
               >
                 Check my legal options
@@ -91,8 +91,8 @@ const HeroSection = () => {
               
               <Button 
                 variant="ghost" 
-                size="lg"
-                className="text-muted-foreground hover:text-foreground"
+                size="default"
+                className="text-muted-foreground hover:text-foreground text-sm sm:text-base"
                 onClick={handleHowItWorks}
               >
                 <Play className="w-4 h-4 mr-2" />
@@ -101,8 +101,8 @@ const HeroSection = () => {
             </div>
 
             {/* Trust micro-copy */}
-            <p className="text-sm text-muted-foreground pt-2">
-              ✓ No signup required • ✓ Free to start • ✓ 2,000+ Canadians helped
+            <p className="text-xs sm:text-sm text-muted-foreground pt-2">
+              ✓ No signup • ✓ Free to start • ✓ 2,000+ helped
             </p>
           </div>
         </div>

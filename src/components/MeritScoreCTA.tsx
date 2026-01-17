@@ -93,40 +93,41 @@ export const MeritScoreCTA = ({ variant = "banner", className = "" }: MeritScore
           {/* Pulsing background effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-red-500/20 rounded-xl blur-xl animate-pulse" />
           
-          <div className="relative bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 rounded-xl p-1">
-            <div className="bg-background rounded-lg p-6 md:p-8">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-                  <Zap className="h-6 w-6 text-white" />
+          <div className="relative bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 rounded-xl p-[2px] sm:p-1">
+            <div className="bg-background rounded-lg p-4 sm:p-6 md:p-8">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+                  <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-xl md:text-2xl font-bold mb-2">
+                <div className="flex-1 text-center sm:text-left">
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2">
                     Find out now if you have a case
                   </h3>
-                  <p className="text-muted-foreground mb-4">
+                  <p className="text-sm sm:text-base text-muted-foreground mb-4">
                     Upload your evidence and get your merit score instantly. No commitment required.
                   </p>
                   <Button
                     size="lg"
                     onClick={handleClick}
                     disabled={isLoading}
-                    className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold gap-2"
+                    className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold gap-2 text-sm sm:text-base"
                   >
                     {isLoading ? (
                       <>
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        {creating ? "Creating case..." : "Loading..."}
+                        <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                        {creating ? "Creating..." : "Loading..."}
                       </>
                     ) : (
                       <>
-                        <Upload className="h-5 w-5" />
-                        Upload Evidence & Get My Score
-                        <ArrowRight className="h-5 w-5" />
+                        <Upload className="h-4 w-4 sm:h-5 sm:w-5" />
+                        <span className="hidden sm:inline">Upload Evidence & Get My Score</span>
+                        <span className="sm:hidden">Get My Score</span>
+                        <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
                       </>
                     )}
                   </Button>
                   <p className="text-xs text-muted-foreground mt-3">
-                    Free to check • Takes 2 minutes • Your data stays private
+                    Free • 2 minutes • Private
                   </p>
                 </div>
               </div>

@@ -79,22 +79,22 @@ export function NextStepsActionPanel({
 
   if (variant === "compact") {
     return (
-      <div className={`p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-3 ${className}`}>
+      <div className={`p-3 sm:p-4 bg-primary/5 border border-primary/20 rounded-lg space-y-2 sm:space-y-3 ${className}`}>
         <h4 className="font-semibold text-sm flex items-center gap-2">
           <ArrowRight className="h-4 w-4 text-primary" />
           What happens next?
         </h4>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-2">
           {actions.map((action) => (
             <Button
               key={action.id}
               variant={action.primary ? "default" : "outline"}
               size="sm"
               onClick={action.onClick}
-              className="gap-1"
+              className="gap-1 justify-start sm:justify-center text-xs"
             >
-              <action.icon className="h-3 w-3" />
-              <span className="text-xs">{action.title.split(" ").slice(0, 3).join(" ")}...</span>
+              <action.icon className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate">{action.title.split(" ").slice(0, 4).join(" ")}...</span>
             </Button>
           ))}
         </div>
