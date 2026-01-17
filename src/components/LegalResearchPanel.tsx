@@ -1,22 +1,76 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Search, ExternalLink, BookOpen, Sparkles } from 'lucide-react';
+import { Loader2, Search, ExternalLink, BookOpen, Sparkles, Save, Check } from 'lucide-react';
 import { useLegalResearch, CaseResult } from '@/hooks/useLegalResearch';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 interface LegalResearchPanelProps {
   defaultQuery?: string;
+  caseId?: string;
 }
 
-export function LegalResearchPanel({ defaultQuery = '' }: LegalResearchPanelProps) {
-  const { loading, results, searchCases } = useLegalResearch();
+export function LegalResearchPanel({ defaultQuery = '', caseId: propCaseId }: LegalResearchPanelProps) {
+  const { loading, saving, results, searchCases, saveToCase } = useLegalResearch();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const [savedResults, setSavedResults] = useState<Set<number>>(new Set());
+  const [cases, setCases] = useState<{ id: string; title: string }[]>([]);
+  const [selectedCaseId, setSelectedCaseId] = useState<string>(propCaseId || '');
+  const [loadingCases, setLoadingCases] = useState(false);
+
+  // Load user's cases for saving research
+  useEffect(() => {
+    if (!user) return;
+    
+    const loadCases = async () => {
+      setLoadingCases(true);
+      try {
+        const { data, error } = await supabase
+          .from('cases')
+          .select('id, title')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(20);
+        
+        if (error) throw error;
+        setCases(data || []);
+        
+        // Auto-select first case if none provided
+        if (!propCaseId && data && data.length > 0) {
+          setSelectedCaseId(data[0].id);
+        }
+      } catch (error) {
+        console.error('Error loading cases:', error);
+      } finally {
+        setLoadingCases(false);
+      }
+    };
+    
+    loadCases();
+  }, [user, propCaseId]);
+
+  const handleSaveToCase = async (result: CaseResult, index: number) => {
+    if (!user || !selectedCaseId) {
+      toast({
+        title: "Cannot Save",
+        description: user ? "Please select a case first" : "Please sign in to save research",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const success = await saveToCase(selectedCaseId, user.id, result);
+    if (success) {
+      setSavedResults(prev => new Set(prev).add(index));
+    }
+  };
   const [query, setQuery] = useState(defaultQuery);
   const [jurisdiction, setJurisdiction] = useState('on');
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
@@ -126,22 +180,38 @@ export function LegalResearchPanel({ defaultQuery = '' }: LegalResearchPanelProp
 
         {!loading && results.length > 0 && (
           <>
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
               <p className="text-sm text-muted-foreground">
                 Found {results.length} relevant case{results.length !== 1 ? 's' : ''}
               </p>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                onClick={handleAIAnalysis}
-                disabled={analyzingAI}
-              >
-                {analyzingAI ? (
-                  <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Analyzing...</>
-                ) : (
-                  <><Sparkles className="h-3 w-3 mr-1" /> AI Analysis</>
+              <div className="flex items-center gap-2">
+                {user && cases.length > 0 && (
+                  <Select value={selectedCaseId} onValueChange={setSelectedCaseId}>
+                    <SelectTrigger className="w-40 h-8 text-xs">
+                      <SelectValue placeholder="Select case" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {cases.map((c) => (
+                        <SelectItem key={c.id} value={c.id} className="text-xs">
+                          {c.title.length > 25 ? c.title.slice(0, 25) + '...' : c.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 )}
-              </Button>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={handleAIAnalysis}
+                  disabled={analyzingAI}
+                >
+                  {analyzingAI ? (
+                    <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Analyzing...</>
+                  ) : (
+                    <><Sparkles className="h-3 w-3 mr-1" /> AI Analysis</>
+                  )}
+                </Button>
+              </div>
             </div>
 
             {aiAnalysis && (
@@ -168,7 +238,23 @@ export function LegalResearchPanel({ defaultQuery = '' }: LegalResearchPanelProp
                     Relevance: {Math.round(result.relevance * 10) / 10}
                   </Badge>
                 </div>
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-2">
+                  {user && selectedCaseId && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleSaveToCase(result, i)}
+                      disabled={saving || savedResults.has(i)}
+                    >
+                      {savedResults.has(i) ? (
+                        <><Check className="mr-2 h-3 w-3 text-green-600" /> Saved</>
+                      ) : saving ? (
+                        <><Loader2 className="mr-2 h-3 w-3 animate-spin" /> Saving...</>
+                      ) : (
+                        <><Save className="mr-2 h-3 w-3" /> Save to Case</>
+                      )}
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="sm"

@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { analytics } from "@/utils/analytics";
 import { supabase } from "@/integrations/supabase/client";
+import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 
 /**
  * Success page specifically for $5.99 Form Unlock purchase
@@ -19,6 +20,7 @@ const UnlockSuccess = () => {
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const verificationAttempted = useRef(false);
+  const { refetch: refetchPremiumAccess } = usePremiumAccess();
 
   useEffect(() => {
     const verifyPayment = async () => {
@@ -40,6 +42,10 @@ const UnlockSuccess = () => {
 
         if (data?.success) {
           setVerified(true);
+          
+          // CRITICAL: Refresh premium access state immediately after payment
+          await refetchPremiumAccess();
+          
           analytics.funnelPurchase({
             transactionId: sessionId,
             value: 5.99,

@@ -8,6 +8,7 @@ import { CheckCircle2, Loader2, Crown, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { usePremiumAccess } from '@/hooks/usePremiumAccess';
 
 export default function SubscriptionSuccess() {
   const [searchParams] = useSearchParams();
@@ -16,6 +17,7 @@ export default function SubscriptionSuccess() {
   const [verifying, setVerifying] = useState(true);
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { refetch: refetchPremiumAccess } = usePremiumAccess();
 
   const sessionId = searchParams.get('session_id');
   const subscriptionId = searchParams.get('subscription_id') || searchParams.get('token');
@@ -36,6 +38,10 @@ export default function SubscriptionSuccess() {
 
           if (data.subscribed) {
             setVerified(true);
+            
+            // CRITICAL: Refresh premium access state immediately after subscription
+            await refetchPremiumAccess();
+            
             toast({
               title: data.is_trial ? '🎉 Free Trial Started!' : 'Subscription Activated!',
               description: data.is_trial 
@@ -52,6 +58,7 @@ export default function SubscriptionSuccess() {
               const { data: retryData } = await supabase.functions.invoke('check-stripe-subscription');
               if (retryData?.subscribed) {
                 setVerified(true);
+                await refetchPremiumAccess();
                 toast({
                   title: retryData.is_trial ? '🎉 Free Trial Started!' : 'Subscription Activated!',
                   description: 'Your premium access has been granted.',
@@ -75,6 +82,7 @@ export default function SubscriptionSuccess() {
 
           if (data.success) {
             setVerified(true);
+            await refetchPremiumAccess();
             toast({
               title: isTrial ? '🎉 Free Trial Started!' : 'Subscription Activated!',
               description: isTrial 

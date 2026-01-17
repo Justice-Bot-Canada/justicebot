@@ -1,23 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, FileText, Download, Copy } from 'lucide-react';
+import { Loader2, FileText, Download, Copy, BookOpen, RefreshCw } from 'lucide-react';
 import { useSmartDocument, DocumentType, ToneType, CaseContext } from '@/hooks/useSmartDocument';
 import { toast } from '@/hooks/use-toast';
 import { DocumentGenerationPaywall } from '@/components/paywalls';
 import { usePremiumAccess } from '@/hooks/usePremiumAccess';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+
+interface SavedResearch {
+  id: string;
+  content: string;
+  created_at: string;
+}
 
 export function SmartDocumentGenerator() {
   const { hasAccess, isFreeUser } = usePremiumAccess();
+  const { user } = useAuth();
   const [showPaywall, setShowPaywall] = useState(false);
   const { loading, document: generatedDoc, generateDocument, clearDocument } = useSmartDocument();
+  const isGenerating = useRef(false); // Prevent double submissions
   
   const [documentType, setDocumentType] = useState<DocumentType>('demand_letter');
   const [tone, setTone] = useState<ToneType>('formal');
+  const [cases, setCases] = useState<{ id: string; title: string }[]>([]);
+  const [selectedCaseId, setSelectedCaseId] = useState<string>('');
+  const [savedResearch, setSavedResearch] = useState<SavedResearch[]>([]);
+  const [loadingResearch, setLoadingResearch] = useState(false);
   const [caseContext, setCaseContext] = useState<CaseContext>({
     caseType: '',
     province: 'ON',
@@ -31,7 +46,87 @@ export function SmartDocumentGenerator() {
     desiredOutcome: '',
   });
 
-  const handleGenerateClick = () => {
+  // Load user's cases
+  useEffect(() => {
+    if (!user) return;
+    
+    const loadCases = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('cases')
+          .select('id, title')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(20);
+        
+        if (error) throw error;
+        setCases(data || []);
+      } catch (error) {
+        console.error('Error loading cases:', error);
+      }
+    };
+    
+    loadCases();
+  }, [user]);
+
+  // Load saved research when case is selected
+  useEffect(() => {
+    if (!selectedCaseId || !user) {
+      setSavedResearch([]);
+      return;
+    }
+    
+    const loadResearch = async () => {
+      setLoadingResearch(true);
+      try {
+        const { data, error } = await supabase
+          .from('case_notes')
+          .select('id, content, created_at')
+          .eq('case_id', selectedCaseId)
+          .eq('note_type', 'legal_research')
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        setSavedResearch(data || []);
+      } catch (error) {
+        console.error('Error loading research:', error);
+      } finally {
+        setLoadingResearch(false);
+      }
+    };
+    
+    loadResearch();
+  }, [selectedCaseId, user]);
+
+  const applyResearchToContext = (research: SavedResearch) => {
+    // Extract relevant info and add to evidence/issues
+    const currentEvidence = caseContext.evidence || [];
+    const researchSummary = research.content.split('\n').slice(0, 5).join('\n'); // First 5 lines
+    
+    setCaseContext({
+      ...caseContext,
+      evidence: [...currentEvidence, researchSummary],
+      issues: caseContext.issues 
+        ? `${caseContext.issues}\n\nSupporting case law:\n${researchSummary}`
+        : `Supporting case law:\n${researchSummary}`,
+    });
+    
+    toast({
+      title: "Research Applied",
+      description: "Case law has been added to your document context",
+    });
+  };
+
+  const handleGenerateClick = async () => {
+    // Prevent double submissions
+    if (isGenerating.current || loading) {
+      toast({
+        title: "Please Wait",
+        description: "Document generation is already in progress",
+      });
+      return;
+    }
+
     if (!caseContext.facts || !caseContext.issues) {
       toast({
         title: "Missing Information",
@@ -47,12 +142,22 @@ export function SmartDocumentGenerator() {
       return;
     }
 
-    generateDocument({ documentType, tone, caseContext });
+    isGenerating.current = true;
+    try {
+      await generateDocument({ documentType, tone, caseContext });
+    } finally {
+      isGenerating.current = false;
+    }
   };
 
-  const handlePaywallConfirm = () => {
+  const handlePaywallConfirm = async () => {
     setShowPaywall(false);
-    generateDocument({ documentType, tone, caseContext });
+    isGenerating.current = true;
+    try {
+      await generateDocument({ documentType, tone, caseContext });
+    } finally {
+      isGenerating.current = false;
+    }
   };
 
   const handleCopy = () => {
@@ -99,6 +204,59 @@ export function SmartDocumentGenerator() {
             <CardDescription>Select document type, tone, and provide case details</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Case Selection for Research */}
+            {user && cases.length > 0 && (
+              <div className="space-y-2">
+                <Label>Link to Case (for saved research)</Label>
+                <Select value={selectedCaseId} onValueChange={setSelectedCaseId}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a case..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cases.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {/* Saved Research */}
+            {selectedCaseId && savedResearch.length > 0 && (
+              <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
+                <BookOpen className="h-4 w-4 text-blue-600" />
+                <AlertDescription>
+                  <p className="font-medium mb-2">Saved Legal Research ({savedResearch.length})</p>
+                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                    {savedResearch.map((r) => (
+                      <div key={r.id} className="flex items-center justify-between text-xs bg-white dark:bg-background p-2 rounded">
+                        <span className="truncate flex-1 mr-2">
+                          {r.content.split('\n')[0].slice(0, 50)}...
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => applyResearchToContext(r)}
+                          className="h-6 text-xs"
+                        >
+                          Use
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {loadingResearch && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Loading saved research...
+              </div>
+            )}
+
             {/* Document Type */}
             <div className="space-y-2">
               <Label>Document Type</Label>
@@ -226,14 +384,14 @@ export function SmartDocumentGenerator() {
 
             <Button 
               onClick={handleGenerateClick} 
-              disabled={loading}
+              disabled={loading || isGenerating.current}
               className="w-full"
               size="lg"
             >
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating...
+                  Generating... Please wait
                 </>
               ) : (
                 <>
@@ -242,6 +400,12 @@ export function SmartDocumentGenerator() {
                 </>
               )}
             </Button>
+
+            {loading && (
+              <p className="text-xs text-center text-muted-foreground">
+                This may take 15-30 seconds. Do not refresh the page.
+              </p>
+            )}
 
             <DocumentGenerationPaywall
               open={showPaywall}

@@ -18,6 +18,7 @@ import {
   Unlock,
   RefreshCw,
 } from 'lucide-react';
+import { usePremiumAccess } from '@/hooks/usePremiumAccess';
 
 type StepStatus = 'complete' | 'current' | 'upcoming';
 
@@ -48,6 +49,7 @@ export default function DocumentsUnlocked() {
   } | null>(null);
   const hasVerified = useRef(false);
   const purchaseEventFired = useRef(false);
+  const { refetch: refetchPremiumAccess } = usePremiumAccess();
 
   useEffect(() => {
     // Track page view
@@ -72,6 +74,9 @@ export default function DocumentsUnlocked() {
 
         if (data?.success) {
           setVerified(true);
+          
+          // CRITICAL: Refresh premium access state immediately after payment
+          await refetchPremiumAccess();
           
           // Extract payment details from verification response
           const verifiedProductId = data.product_id || data.product || productKey;
