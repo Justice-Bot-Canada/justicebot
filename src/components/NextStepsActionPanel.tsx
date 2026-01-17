@@ -1,83 +1,143 @@
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, MapPin, Upload, ArrowRight } from "lucide-react";
+import { FileText, MapPin, Upload, ArrowRight, BookOpen } from "lucide-react";
 
 interface NextStepsActionPanelProps {
   caseId?: string;
   venue?: string;
   variant?: "default" | "compact";
   className?: string;
+  /** Merit score to customize actions by range */
+  score?: number;
 }
 
 /**
  * Post-result action panel that appears after merit score, AI analysis, or CanLII results.
  * Provides exactly 3 clear next steps to keep users moving forward.
+ * Actions are ordered based on merit score range (LOW/MEDIUM/HIGH).
  */
 export function NextStepsActionPanel({ 
   caseId, 
   venue,
   variant = "default",
-  className = ""
+  className = "",
+  score
 }: NextStepsActionPanelProps) {
   const navigate = useNavigate();
 
-  const actions = [
-    {
-      id: "generate-form",
-      icon: FileText,
-      title: "Generate the correct legal form",
-      description: "We'll identify the forms that match your situation and pre-fill them using your evidence.",
-      buttonText: "Generate my legal form",
-      onClick: () => {
-        if (caseId) {
-          navigate(`/smart-documents?case=${caseId}`);
-        } else {
-          navigate("/smart-documents");
-        }
-      },
-      primary: true,
+  // Determine score range: LOW (0-39), MEDIUM (40-69), HIGH (70-100)
+  const getScoreRange = (): 'low' | 'medium' | 'high' | undefined => {
+    if (score === undefined) return undefined;
+    if (score >= 70) return 'high';
+    if (score >= 40) return 'medium';
+    return 'low';
+  };
+
+  const scoreRange = getScoreRange();
+
+  // Base actions
+  const generateFormAction = {
+    id: "generate-form",
+    icon: FileText,
+    title: "Generate the correct legal form",
+    description: "We'll identify the forms that match your situation and pre-fill them using your evidence.",
+    buttonText: "Generate my legal form",
+    onClick: () => {
+      if (caseId) {
+        navigate(`/smart-documents?case=${caseId}`);
+      } else {
+        navigate("/smart-documents");
+      }
     },
-    {
-      id: "upload-evidence",
-      icon: Upload,
-      title: "Strengthen your case",
-      description: "Add more documents or information to improve your score and analysis.",
-      buttonText: "Upload more evidence",
-      onClick: () => {
-        if (caseId) {
-          navigate(`/evidence?case=${caseId}`);
-        } else {
-          navigate("/evidence");
-        }
-      },
-      primary: false,
+    primary: true,
+  };
+
+  const uploadEvidenceAction = {
+    id: "upload-evidence",
+    icon: Upload,
+    title: "Strengthen your case",
+    description: "Add more documents or information to improve your score and analysis.",
+    buttonText: "Upload more evidence",
+    onClick: () => {
+      if (caseId) {
+        navigate(`/evidence?case=${caseId}`);
+      } else {
+        navigate("/evidence");
+      }
     },
-    {
-      id: "filing-guide",
-      icon: MapPin,
-      title: "See the step-by-step process",
-      description: "Understand what filing involves, where to file, and what usually happens next.",
-      buttonText: "View step-by-step guide",
-      onClick: () => {
-        if (caseId && venue) {
-          navigate(`/case-timeline?caseId=${caseId}`);
-        } else if (venue) {
-          const guideRoutes: Record<string, string> = {
-            ltb: "/ltb-guide",
-            hrto: "/human-rights-guide",
-            "small-claims": "/small-claims-court",
-            family: "/family-law-guide",
-            criminal: "/criminal-court-guide",
-          };
-          navigate(guideRoutes[venue.toLowerCase()] || "/forms");
-        } else {
-          navigate("/forms");
-        }
-      },
-      primary: false,
+    primary: false,
+  };
+
+  const filingGuideAction = {
+    id: "filing-guide",
+    icon: MapPin,
+    title: "See the step-by-step process",
+    description: "Understand what filing involves, where to file, and what usually happens next.",
+    buttonText: "View step-by-step guide",
+    onClick: () => {
+      if (caseId && venue) {
+        navigate(`/case-timeline?caseId=${caseId}`);
+      } else if (venue) {
+        const guideRoutes: Record<string, string> = {
+          ltb: "/ltb-guide",
+          hrto: "/human-rights-guide",
+          "small-claims": "/small-claims-court",
+          family: "/family-law-guide",
+          criminal: "/criminal-court-guide",
+        };
+        navigate(guideRoutes[venue.toLowerCase()] || "/forms");
+      } else {
+        navigate("/forms");
+      }
     },
-  ];
+    primary: false,
+  };
+
+  const learnRightsAction = {
+    id: "learn-rights",
+    icon: BookOpen,
+    title: "Learn about your rights anyway",
+    description: "Understand what legal protections may apply to your situation.",
+    buttonText: "See what evidence usually matters",
+    onClick: () => navigate("/legal-resources"),
+    primary: false,
+  };
+
+  // Order actions based on score range
+  let actions;
+  if (scoreRange === 'low') {
+    // LOW: Primary = Upload more evidence
+    actions = [
+      { ...uploadEvidenceAction, primary: true },
+      learnRightsAction,
+      { ...generateFormAction, primary: false },
+    ];
+  } else if (scoreRange === 'medium') {
+    // MEDIUM: Primary = Strengthen case
+    actions = [
+      { ...uploadEvidenceAction, primary: true },
+      generateFormAction,
+      filingGuideAction,
+    ];
+  } else {
+    // HIGH or undefined: Primary = Generate form
+    actions = [
+      generateFormAction,
+      filingGuideAction,
+      { ...uploadEvidenceAction, primary: false },
+    ];
+  }
+
+  // Get reassurance text based on score range
+  const getReassuranceText = () => {
+    if (scoreRange === 'low') {
+      return "This score is informational. It helps you decide whether gathering more evidence is worthwhile.";
+    } else if (scoreRange === 'medium') {
+      return "Improving your evidence can meaningfully change this score.";
+    }
+    return "You remain in control. Nothing is filed without your approval.";
+  };
 
   if (variant === "compact") {
     return (
@@ -104,7 +164,7 @@ export function NextStepsActionPanel({
           ))}
         </div>
         <p className="text-xs text-muted-foreground text-center pt-2">
-          You stay in control at every step.
+          {getReassuranceText()}
         </p>
       </div>
     );
@@ -159,14 +219,16 @@ export function NextStepsActionPanel({
           </div>
         ))}
         
-        {/* Reassurance */}
+        {/* Reassurance - Score-specific */}
         <div className="text-center pt-4 border-t border-border">
           <p className="text-xs text-muted-foreground">
-            You stay in control at every step.
+            {getReassuranceText()}
           </p>
-          <p className="text-xs text-muted-foreground">
-            Nothing is filed, sent, or shared unless you choose to proceed.
-          </p>
+          {scoreRange !== 'low' && (
+            <p className="text-xs text-muted-foreground mt-1">
+              Nothing is filed, sent, or shared unless you choose to proceed.
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>

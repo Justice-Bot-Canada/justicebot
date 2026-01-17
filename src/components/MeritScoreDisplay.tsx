@@ -43,17 +43,80 @@ export function MeritScoreDisplay({ result, compact = false, caseId, venue }: Me
     );
   }
 
-  // Generate dynamic explanation based on score
-  const getScoreExplanation = () => {
-    if (score >= 70) {
-      return "Based on the evidence you uploaded and similar Canadian cases, your situation shows moderate to strong legal merit. This means you likely have valid legal issues worth pursuing, though outcomes can depend on next steps and additional evidence.";
-    } else if (score >= 50) {
-      return "Based on your evidence and similar Canadian cases, your situation shows some legal merit. There may be valid issues to pursue, but strengthening your evidence or addressing gaps could significantly improve your position.";
-    } else if (score >= 35) {
-      return "Based on your evidence, your situation shows limited legal merit at this time. This doesn't mean you have no case, but it may require additional evidence or a different approach to strengthen your position.";
-    }
-    return "Based on the current evidence, your situation shows weak legal merit. Consider gathering more documentation or consulting with a legal professional to better understand your options.";
+  // Determine score range: LOW (0-39), MEDIUM (40-69), HIGH (70-100)
+  const getScoreRange = (): 'low' | 'medium' | 'high' => {
+    if (score >= 70) return 'high';
+    if (score >= 40) return 'medium';
+    return 'low';
   };
+
+  const scoreRange = getScoreRange();
+
+  // Generate dynamic explanation based on score range
+  const getScoreExplanation = () => {
+    if (scoreRange === 'high') {
+      return "Your evidence shows strong legal merit. Similar cases have proceeded successfully, and your situation appears well-supported.";
+    } else if (scoreRange === 'medium') {
+      return "Your evidence shows possible legal issues, but the case may need clarification or stronger proof to proceed confidently.";
+    }
+    return "Based on the evidence provided, your situation currently shows low legal merit. This doesn't mean nothing happened — it means the available evidence may not clearly support a legal claim yet.";
+  };
+
+  // Get strengths/weaknesses copy based on range
+  const getStrengthsCopy = () => {
+    if (scoreRange === 'high') {
+      return {
+        title: "Why your score is strong",
+        items: top_strengths.length > 0 ? top_strengths : [
+          "Evidence aligns with recognized legal issues",
+          "Timelines and documentation are clear",
+          "Comparable cases support your position"
+        ]
+      };
+    } else if (scoreRange === 'medium') {
+      return {
+        title: "What's working",
+        items: top_strengths.length > 0 ? top_strengths : [
+          "Some evidence supports your concerns",
+          "Issues raised are recognized under Canadian law"
+        ]
+      };
+    }
+    return {
+      title: "Common reasons for a low score",
+      items: top_strengths.length > 0 ? top_strengths : [
+        "Key documents or dates are missing",
+        "Evidence doesn't clearly show a legal breach",
+        "More context is needed to connect events to legal rights"
+      ]
+    };
+  };
+
+  const getWeaknessesCopy = () => {
+    if (scoreRange === 'high') {
+      return {
+        title: "Important",
+        message: "Strong merit does not guarantee outcomes, but it does support moving forward.",
+        items: top_risks
+      };
+    } else if (scoreRange === 'medium') {
+      return {
+        title: "What could improve",
+        items: top_risks.length > 0 ? top_risks : [
+          "Additional documents or timelines",
+          "Clear proof of impact or breach"
+        ]
+      };
+    }
+    return {
+      title: "Important",
+      message: "Many cases start here and improve once the right evidence is added.",
+      items: top_risks
+    };
+  };
+
+  const strengthsCopy = getStrengthsCopy();
+  const weaknessesCopy = getWeaknessesCopy();
 
   return (
     <Card className="border-2 border-primary/20">
@@ -110,58 +173,63 @@ export function MeritScoreDisplay({ result, compact = false, caseId, venue }: Me
           </div>
         )}
 
-        {/* Strengths & Weaknesses - Plain Language */}
+        {/* Strengths & Weaknesses - Range-specific copy */}
         <div className="grid sm:grid-cols-2 gap-4">
-          <div className="p-4 bg-green-500/5 border border-green-500/20 rounded-lg">
+          <div className={cn(
+            "p-4 rounded-lg border",
+            scoreRange === 'high' ? "bg-green-500/5 border-green-500/20" :
+            scoreRange === 'medium' ? "bg-blue-500/5 border-blue-500/20" :
+            "bg-amber-500/5 border-amber-500/20"
+          )}>
             <h4 className="font-medium text-sm flex items-center gap-2 mb-3">
-              <CheckCircle className="w-4 h-4 text-green-600" />
-              What strengthens your case
+              {scoreRange === 'high' ? (
+                <CheckCircle className="w-4 h-4 text-green-600" />
+              ) : scoreRange === 'medium' ? (
+                <CheckCircle className="w-4 h-4 text-blue-600" />
+              ) : (
+                <AlertTriangle className="w-4 h-4 text-amber-600" />
+              )}
+              {strengthsCopy.title}
             </h4>
             <ul className="space-y-2">
-              {top_strengths.length > 0 ? top_strengths.map((s, idx) => (
+              {strengthsCopy.items.map((s, idx) => (
                 <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
-                  <span className="text-green-600 mt-0.5">•</span>
+                  <span className={cn(
+                    "mt-0.5",
+                    scoreRange === 'high' ? "text-green-600" :
+                    scoreRange === 'medium' ? "text-blue-600" : "text-amber-600"
+                  )}>•</span>
                   {s}
                 </li>
-              )) : (
-                <>
-                  <li className="text-sm text-muted-foreground flex items-start gap-2">
-                    <span className="text-green-600 mt-0.5">•</span>
-                    Evidence supports your version of events
-                  </li>
-                  <li className="text-sm text-muted-foreground flex items-start gap-2">
-                    <span className="text-green-600 mt-0.5">•</span>
-                    Issues raised are recognized under Canadian law
-                  </li>
-                </>
-              )}
+              ))}
             </ul>
           </div>
           
-          <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-lg">
+          <div className={cn(
+            "p-4 rounded-lg border",
+            scoreRange === 'low' ? "bg-blue-500/5 border-blue-500/20" : "bg-amber-500/5 border-amber-500/20"
+          )}>
             <h4 className="font-medium text-sm flex items-center gap-2 mb-3">
-              <AlertTriangle className="w-4 h-4 text-amber-600" />
-              What could weaken your case
-            </h4>
-            <ul className="space-y-2">
-              {top_risks.length > 0 ? top_risks.map((r, idx) => (
-                <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
-                  <span className="text-amber-600 mt-0.5">•</span>
-                  {r}
-                </li>
-              )) : (
-                <>
-                  <li className="text-sm text-muted-foreground flex items-start gap-2">
-                    <span className="text-amber-600 mt-0.5">•</span>
-                    Some timelines or documents may be missing
-                  </li>
-                  <li className="text-sm text-muted-foreground flex items-start gap-2">
-                    <span className="text-amber-600 mt-0.5">•</span>
-                    Additional proof could improve clarity
-                  </li>
-                </>
+              {scoreRange === 'high' ? (
+                <Scale className="w-4 h-4 text-amber-600" />
+              ) : (
+                <AlertTriangle className="w-4 h-4 text-amber-600" />
               )}
-            </ul>
+              {weaknessesCopy.title}
+            </h4>
+            {weaknessesCopy.message && (
+              <p className="text-sm text-muted-foreground mb-2">{weaknessesCopy.message}</p>
+            )}
+            {weaknessesCopy.items && weaknessesCopy.items.length > 0 && (
+              <ul className="space-y-2">
+                {weaknessesCopy.items.map((r, idx) => (
+                  <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
+                    <span className="text-amber-600 mt-0.5">•</span>
+                    {r}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
 
@@ -248,7 +316,7 @@ export function MeritScoreDisplay({ result, compact = false, caseId, venue }: Me
         )}
 
         {/* What Happens Next - Action Panel (integrated, not separate) */}
-        {!compact && <NextStepsActionPanel caseId={caseId} venue={venue} className="mt-6" />}
+        {!compact && <NextStepsActionPanel caseId={caseId} venue={venue} score={score} className="mt-6" />}
       </CardContent>
     </Card>
   );
