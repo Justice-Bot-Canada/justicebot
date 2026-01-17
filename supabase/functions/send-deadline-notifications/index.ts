@@ -6,6 +6,13 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+interface CaseRecord {
+  id?: string;
+  title?: string;
+  user_id?: string;
+  profiles?: { email?: string; notification_preferences?: unknown }[];
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -136,65 +143,67 @@ serve(async (req) => {
     if (!eventsError && events && events.length > 0) {
       console.log(`Found ${events.length} events to process`);
 
-    for (const event of events) {
-      const eventDate = new Date(event.event_date);
-      const daysUntil = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      
-      // Determine notification timing
-      let shouldNotify = false;
-      if (event.priority === 'high' && [1, 3, 7].includes(daysUntil)) {
-        shouldNotify = true;
-      } else if (event.priority === 'medium' && [1, 3].includes(daysUntil)) {
-        shouldNotify = true;
-      } else if (event.priority === 'low' && daysUntil === 1) {
-        shouldNotify = true;
-      }
-
-      if (!shouldNotify) continue;
-
-      // Check if notification already sent for this timing
-      const { data: existingNotif } = await supabase
-        .from('notifications')
-        .select('id')
-        .eq('event_id', event.id)
-        .eq('notification_type', `${daysUntil}d_before`)
-        .single();
-
-      if (existingNotif) continue; // Already sent
-
-      // Create notification
-      const notification = {
-        user_id: event.cases.user_id,
-        title: `${event.event_type === 'filing_deadline' ? '⚠️ Deadline' : '📅 Event'}: ${event.title}`,
-        message: `${event.description || 'Important date'} - ${daysUntil} day${daysUntil > 1 ? 's' : ''} away`,
-        type: event.event_type === 'filing_deadline' ? 'deadline' : 'reminder',
-        priority: event.priority,
-        related_case_id: event.case_id,
-        event_id: event.id,
-        notification_type: `${daysUntil}d_before`,
-        metadata: {
-          event_date: event.event_date,
-          location: event.location,
-          days_until: daysUntil
+      for (const event of events) {
+        const eventDate = new Date(event.event_date);
+        const daysUntil = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        
+        // Determine notification timing
+        let shouldNotify = false;
+        if (event.priority === 'high' && [1, 3, 7].includes(daysUntil)) {
+          shouldNotify = true;
+        } else if (event.priority === 'medium' && [1, 3].includes(daysUntil)) {
+          shouldNotify = true;
+        } else if (event.priority === 'low' && daysUntil === 1) {
+          shouldNotify = true;
         }
-      };
 
-      const { data: created, error: createError } = await supabase
-        .from('notifications')
-        .insert(notification)
-        .select()
-        .single();
+        if (!shouldNotify) continue;
 
-      if (createError) {
-        console.error('Error creating notification:', createError);
-        continue;
+        // Check if notification already sent for this timing
+        const { data: existingNotif } = await supabase
+          .from('notifications')
+          .select('id')
+          .eq('event_id', event.id)
+          .eq('notification_type', `${daysUntil}d_before`)
+          .single();
+
+        if (existingNotif) continue; // Already sent
+
+        // Create notification - properly type the case data
+        const caseData = Array.isArray(event.cases) ? event.cases[0] : event.cases;
+        const caseRecord = caseData as CaseRecord | undefined;
+        const notification = {
+          user_id: caseRecord?.user_id,
+          title: `${event.event_type === 'filing_deadline' ? '⚠️ Deadline' : '📅 Event'}: ${event.title}`,
+          message: `${event.description || 'Important date'} - ${daysUntil} day${daysUntil > 1 ? 's' : ''} away`,
+          type: event.event_type === 'filing_deadline' ? 'deadline' : 'reminder',
+          priority: event.priority,
+          related_case_id: event.case_id,
+          event_id: event.id,
+          notification_type: `${daysUntil}d_before`,
+          metadata: {
+            event_date: event.event_date,
+            location: event.location,
+            days_until: daysUntil
+          }
+        };
+
+        const { data: created, error: createError } = await supabase
+          .from('notifications')
+          .insert(notification)
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('Error creating notification:', createError);
+          continue;
+        }
+
+        notifications.push(created);
+        notificationsSent++;
+
+        console.log(`Notification created for event ${event.id} (${daysUntil} days before)`);
       }
-
-      notifications.push(created);
-      notificationsSent++;
-
-      console.log(`Notification created for event ${event.id} (${daysUntil} days before)`);
-    }
     }
 
     return new Response(
@@ -209,7 +218,7 @@ serve(async (req) => {
       }
     );
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in send-deadline-notifications:', error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),

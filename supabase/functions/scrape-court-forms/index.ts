@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
+import { DOMParser, Element as DOMElement } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': 'https://justice-bot.com',
@@ -242,8 +242,9 @@ async function scrapeOntarioCourtForms(url: string, category: string): Promise<S
       const links = doc.querySelectorAll(selector);
       
       for (const link of links) {
-        const href = link.getAttribute('href');
-        const text = link.textContent?.trim() || '';
+        const element = link as DOMElement;
+        const href = element.getAttribute?.('href');
+        const text = element.textContent?.trim() || '';
         
         if (href && (href.includes('.pdf') || href.includes('.docx'))) {
           const fullUrl = href.startsWith('http') ? href : new URL(href, url).toString();
@@ -259,7 +260,7 @@ async function scrapeOntarioCourtForms(url: string, category: string): Promise<S
           forms.push({
             form_code: formCode,
             title: text || `Form ${formCodeMatch?.[1] || 'Unknown'}`,
-            description: extractDescription(link, doc),
+            description: extractDescription(element, doc),
             tribunal_type: getCategoryTribunal(category),
             category: category,
             pdf_url: fullUrl,
@@ -309,8 +310,9 @@ async function scrapeTribunalsForms(url: string, tribunal: string): Promise<Scra
     const links = doc.querySelectorAll('a[href*=".pdf"], a[href*="/documents/"]');
     
     for (const link of links) {
-      const href = link.getAttribute('href');
-      const text = link.textContent?.trim() || '';
+      const element = link as DOMElement;
+      const href = element.getAttribute?.('href');
+      const text = element.textContent?.trim() || '';
       
       if (href && text) {
         const fullUrl = href.startsWith('http') ? href : new URL(href, url).toString();
@@ -324,7 +326,7 @@ async function scrapeTribunalsForms(url: string, tribunal: string): Promise<Scra
         forms.push({
           form_code: formCode,
           title: text,
-          description: extractDescription(link, doc),
+          description: extractDescription(element, doc),
           tribunal_type: getTribunalName(tribunal),
           category: tribunal,
           pdf_url: fullUrl,
@@ -342,7 +344,7 @@ async function scrapeTribunalsForms(url: string, tribunal: string): Promise<Scra
   }
 }
 
-function extractDescription(link: any, doc: any): string {
+function extractDescription(link: DOMElement, doc: Document): string {
   // Try to find description near the link
   const parent = link.parentElement;
   if (parent) {

@@ -15,6 +15,7 @@ export interface CaseResult {
 export function useLegalResearch() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<CaseResult[]>([]);
+  const [saving, setSaving] = useState(false);
 
   const searchCases = async (query: string, jurisdiction: string = 'on', maxResults: number = 10) => {
     setLoading(true);
@@ -65,14 +66,50 @@ export function useLegalResearch() {
     }
   };
 
+  const saveToCase = async (caseId: string, userId: string, caseResult: CaseResult) => {
+    setSaving(true);
+    try {
+      const content = `**${caseResult.title}**\n\nCitation: ${caseResult.citation}\nCourt: ${caseResult.court}\nDate: ${caseResult.date}\n\n${caseResult.summary}\n\nSource: ${caseResult.url}`;
+      
+      const { error } = await supabase
+        .from('case_notes')
+        .insert({
+          case_id: caseId,
+          user_id: userId,
+          content,
+          note_type: 'legal_research',
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Saved to Case",
+        description: `"${caseResult.title}" added to your case notes`,
+      });
+      return true;
+    } catch (error: unknown) {
+      console.error('Error saving to case:', error);
+      toast({
+        title: "Save Failed",
+        description: error instanceof Error ? error.message : 'Failed to save research',
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const clearResults = () => {
     setResults([]);
   };
 
   return {
     loading,
+    saving,
     results,
     searchCases,
+    saveToCase,
     clearResults,
   };
 }
