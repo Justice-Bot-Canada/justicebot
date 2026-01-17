@@ -17,47 +17,10 @@ const getCorsHeaders = (origin?: string | null) => ({
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 });
 
-const PRODUCT_IDS = {
-  'low-income': 'prod_justice_low_income',
-  'monthly': 'prod_justice_monthly',
-  'yearly': 'prod_justice_yearly',
-};
-
 const logStep = (step: string, details?: any) => {
   const timestamp = new Date().toISOString();
   console.log(`[${timestamp}] [VERIFY-SUBSCRIPTION] ${step}`, details ? JSON.stringify(details) : '');
 };
-
-async function getPayPalAccessToken(): Promise<string> {
-  const clientId = Deno.env.get('PAYPAL_CLIENT_ID');
-  const clientSecret = Deno.env.get('PAYPAL_CLIENT_SECRET');
-  
-  if (!clientId || !clientSecret) {
-    throw new Error('PayPal credentials not configured');
-  }
-
-  const auth = btoa(`${clientId}:${clientSecret}`);
-  const isProd = clientId.startsWith('A');
-  const baseURL = isProd 
-    ? 'https://api-m.paypal.com'
-    : 'https://api-m.sandbox.paypal.com';
-
-  const response = await fetch(`${baseURL}/v1/oauth2/token`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Basic ${auth}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: 'grant_type=client_credentials',
-  });
-
-  if (!response.ok) {
-    throw new Error('PayPal authentication failed');
-  }
-
-  const data = await response.json();
-  return data.access_token;
-}
 
 Deno.serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get('Origin'));
@@ -88,93 +51,36 @@ Deno.serve(async (req) => {
 
     logStep('User authenticated', { userId: user.id, email: user.email });
 
-    const { subscriptionId } = await req.json();
+    // Check entitlements directly in the database (Stripe is source of truth via webhook)
+    const { data: entitlements, error: entError } = await supabaseClient
+      .from('entitlements')
+      .select('*')
+      .eq('user_id', user.id)
+      .or('ends_at.is.null,ends_at.gt.now()');
 
-    if (!subscriptionId) {
-      throw new Error('No subscription ID provided');
+    if (entError) {
+      logStep('Entitlement query error', { error: entError });
+      throw new Error('Failed to check subscription status');
     }
 
-    logStep('Verifying subscription', { subscriptionId });
-
-    const accessToken = await getPayPalAccessToken();
-    const clientId = Deno.env.get('PAYPAL_CLIENT_ID');
-    const isProd = clientId?.startsWith('A');
-    const baseURL = isProd 
-      ? 'https://api-m.paypal.com'
-      : 'https://api-m.sandbox.paypal.com';
-
-    const response = await fetch(`${baseURL}/v1/billing/subscriptions/${subscriptionId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
+    const hasActiveSubscription = entitlements && entitlements.length > 0;
+    
+    logStep('Subscription status checked', { 
+      hasActiveSubscription,
+      entitlementCount: entitlements?.length || 0
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      logStep('PayPal API error', { status: response.status, error: errorText });
-      throw new Error(`PayPal verification failed: ${errorText}`);
-    }
-
-    const subscription = await response.json();
-    logStep('Subscription retrieved', { 
-      status: subscription.status,
-      planId: subscription.plan_id 
-    });
-
-    if (subscription.status === 'ACTIVE') {
-      // Determine product ID based on plan
-      let productId = PRODUCT_IDS['monthly']; // default
+    if (hasActiveSubscription) {
+      const primaryEntitlement = entitlements[0];
       
-      const planId = subscription.plan_id;
-      if (planId.includes('MZPQD7A')) {
-        productId = PRODUCT_IDS['low-income'];
-      } else if (planId.includes('MZPQA2A')) {
-        productId = PRODUCT_IDS['yearly'];
-      }
-
-      logStep('Granting entitlement', { productId });
-
-      // Grant entitlement
-      const { error: entitlementError } = await supabaseClient
-        .from('entitlements')
-        .upsert({
-          user_id: user.id,
-          product_id: productId,
-          subscription_id: subscriptionId,
-          status: 'active',
-          current_period_end: new Date(subscription.billing_info.next_billing_time).toISOString()
-        }, {
-          onConflict: 'user_id,product_id'
-        });
-
-      if (entitlementError) {
-        logStep('Entitlement error', { error: entitlementError });
-        throw entitlementError;
-      }
-
-      // Update payment audit
-      await supabaseClient
-        .from('payment_audit')
-        .update({
-          status: 'completed',
-          metadata: { 
-            subscription_status: subscription.status,
-            verified_at: new Date().toISOString()
-          }
-        })
-        .eq('payment_id', subscriptionId)
-        .eq('user_id', user.id);
-
-      logStep('Subscription verified and entitlement granted');
-
       return new Response(
         JSON.stringify({ 
           success: true,
-          status: subscription.status,
-          productId,
-          nextBillingDate: subscription.billing_info.next_billing_time
+          status: 'ACTIVE',
+          productId: primaryEntitlement.product_id,
+          accessLevel: primaryEntitlement.access_level,
+          endsAt: primaryEntitlement.ends_at,
+          source: primaryEntitlement.source
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -182,13 +88,13 @@ Deno.serve(async (req) => {
         }
       );
     } else {
-      logStep('Subscription not active', { status: subscription.status });
+      logStep('No active subscription found');
       
       return new Response(
         JSON.stringify({ 
           success: false,
-          status: subscription.status,
-          message: 'Subscription is not active'
+          status: 'INACTIVE',
+          message: 'No active subscription found'
         }),
         {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },

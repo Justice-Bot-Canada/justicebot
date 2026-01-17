@@ -11,12 +11,12 @@ project_id = "vkzquzjtewqhcisvhsvg"
 # CRITICAL FUNCTIONS (MUST keep verify_jwt = true):
 # - ai-legal-triage, legal-chat: AI/LLM calls (cost exposure risk)
 # - analyze-* family: Analysis functions (API cost exposure)
-# - create-paypal-payment, create-stripe-checkout: Payment creation
+# - create_checkout: Payment creation
 # - generate-document: Document generation
 #
 # PUBLIC FUNCTIONS (verify_jwt = false is acceptable):
 # - submit-contact, submit-feedback, submit-lead: Public forms
-# - paypal-webhook: Payment webhook (verifies PayPal signature internally)
+# - stripe-webhook: Payment webhook (verifies Stripe signature internally)
 # - process-email-queue, send-deadline-notifications: Background jobs
 # - sweep-canlii-updates: Scheduled data scraper
 # - smart-triage: Public triage (has input validation + rate limits)
@@ -33,9 +33,6 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.submit-lead]
-verify_jwt = false
-
-[functions.paypal-webhook]
 verify_jwt = false
 
 [functions.process-email-queue]
@@ -101,24 +98,6 @@ verify_jwt = true
 [functions.verify-subscription-status]
 verify_jwt = true
 
-[functions.create-paypal-subscription]
-verify_jwt = true
-
-[functions.verify-paypal-subscription]
-verify_jwt = true
-
-[functions.check-paypal-subscription]
-verify_jwt = true
-
-[functions.create-paypal-payment]
-verify_jwt = true
-
-[functions.verify-paypal-payment]
-verify_jwt = true
-
-[functions.create-form-payment]
-verify_jwt = true
-
 [functions.smart-triage]
 verify_jwt = false
 
@@ -127,9 +106,6 @@ verify_jwt = false
 
 [functions.sweep-canlii-updates]
 verify_jwt = false
-
-[functions.cancel-paypal-subscription]
-verify_jwt = true
 
 [functions.customer-portal]
 verify_jwt = true
@@ -169,3 +145,9 @@ verify_jwt = false
 
 [functions.send-password-reset]
 verify_jwt = false
+
+[functions.check-stripe-subscription]
+verify_jwt = true
+
+[functions.stripe-customer-portal]
+verify_jwt = true

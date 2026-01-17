@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Justice-Bot — Fast access to the right legal forms</title>
-  <meta name="description" content="Justice-Bot helps you sign in securely, pay with PayPal, and download the forms you need." />
+  <meta name="description" content="Justice-Bot helps you sign in securely, pay securely, and download the forms you need." />
   <link rel="icon" href="/favicon.ico">
 
   <!-- Manifest -->
@@ -60,7 +60,7 @@
     <section class="hero">
       <div>
         <h1 class="h1">Get the right legal documents, fast.</h1>
-        <p class="lead">Sign in securely, pay with PayPal, and download the forms you need. No appointments, no guesswork — just the files.</p>
+        <p class="lead">Sign in securely, pay securely with Stripe, and download the forms you need. No appointments, no guesswork — just the files.</p>
         <div class="cta">
           <a class="btn primary" href="/dev">Open App</a>
           <a class="btn" href="mailto:payments@justice-bot.com">Contact support</a>
@@ -70,7 +70,7 @@
         <div class="kicker">How it works</div>
         <ol style="margin:10px 0 0 18px">
           <li>Sign in with email & password (Supabase Auth).</li>
-          <li>Purchase the doc you need (PayPal).</li>
+          <li>Purchase the doc you need (Stripe Checkout).</li>
           <li>Instant download unlock — tied to your account.</li>
         </ol>
         <p style="color:#9fb3d9;margin-top:10px">Use the developer console at <strong>/dev</strong> to test health, whoami, payments, and entitlements.</p>
@@ -85,13 +85,13 @@
       </div>
       <div class="panel">
         <div class="kicker">Payments</div>
-        <h3 style="margin:.2rem 0 0">PayPal checkout</h3>
-        <p style="color:#9fb3d9">Card or balance via PayPal. Server verifies captures to prevent fraud.</p>
+        <h3 style="margin:.2rem 0 0">Stripe Checkout</h3>
+        <p style="color:#9fb3d9">Card payments via Stripe. Server verifies charges to prevent fraud.</p>
       </div>
       <div class="panel">
         <div class="kicker">Roadmap</div>
         <h3 style="margin:.2rem 0 0">More provinces, more forms</h3>
-        <p style="color:#9fb3d9">We’ll keep adding document packs as you tell us what you need.</p>
+        <p style="color:#9fb3d9">We'll keep adding document packs as you tell us what you need.</p>
       </div>
     </section>
 
@@ -106,4 +106,3 @@
 
 </body>
 </html>
-

@@ -1,23 +1,47 @@
-/* X-Frame-Options: DENY X-Content-Type-Options: nosniff X-XSS-Protection: 1; mode=block Referrer-Policy: strict-origin-when-cross-origin Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=() Strict-Transport-Security: max-age=31536000; includeSubDomains; preload Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vkzquzjtewqhcisvhsvg.supabase.co https://www.googletagmanager.com https://www.google-analytics.com https://static.cloudflareinsights.com https://*.cloudflare.com https://static.klaviyo.com https://www.paypal.com https://www.paypalobjects.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.justice-bot.com https://vkzquzjtewqhcisvhsvg.supabase.co wss://vkzquzjtewqhcisvhsvg.supabase.co https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://stats.g.doubleclick.net https://cloudflareinsights.com https://*.cloudflare.com https://a.klaviyo.com https://www.paypal.com; media-src 'self'; frame-src 'self' https://challenges.cloudflare.com https://www.paypal.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.paypal.com; frame-ancestors 'none' X-Permitted-Cross-Domain-Policies: none Cross-Origin-Embedder-Policy: unsafe-none Cross-Origin-Opener-Policy: same-origin-allow-popups Cross-Origin-Resource-Policy: cross-origin Cache-Control: public, max-age=31536000, immutable*
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vkzquzjtewqhcisvhsvg.supabase.co https://www.googletagmanager.com https://www.google-analytics.com https://static.cloudflareinsights.com https://*.cloudflare.com https://static.klaviyo.com https://js.stripe.com https://checkout.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.justice-bot.com https://vkzquzjtewqhcisvhsvg.supabase.co wss://vkzquzjtewqhcisvhsvg.supabase.co https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://stats.g.doubleclick.net https://cloudflareinsights.com https://*.cloudflare.com https://a.klaviyo.com https://api.stripe.com; media-src 'self'; frame-src 'self' https://challenges.cloudflare.com https://js.stripe.com https://checkout.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  X-Permitted-Cross-Domain-Policies: none
+  Cross-Origin-Embedder-Policy: unsafe-none
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Cross-Origin-Resource-Policy: cross-origin
+  Cache-Control: public, max-age=31536000, immutable
 
-/index.html Cache-Control: no-cache, no-store, must-revalidate
+/index.html
+  Cache-Control: no-cache, no-store, must-revalidate
 
-/.js Cache-Control: public, max-age=31536000, immutable
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
 
-/.css Cache-Control: public, max-age=31536000, immutable
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
 
-/assets/* Cache-Control: public, max-age=31536000, immutable*
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
 
-/.woff2 Cache-Control: public, max-age=31536000, immutable
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
 
-/.jpg Cache-Control: public, max-age=31536000, immutable
+/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
 
-/.png Cache-Control: public, max-age=31536000, immutable
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
 
-/.svg Cache-Control: public, max-age=31536000, immutable
+/*.svg
+  Cache-Control: public, max-age=31536000, immutable
 
-/sitemap.xml Cache-Control: public, max-age=3600
+/sitemap.xml
+  Cache-Control: public, max-age=3600
 
-/robots.txt Cache-Control: public, max-age=3600
+/robots.txt
+  Cache-Control: public, max-age=3600
 
-/config.json Cache-Control: no-store X-Robots-Tag: noindex
+/config.json
+  Cache-Control: no-store
+  X-Robots-Tag: noindex

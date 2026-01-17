@@ -2,7 +2,6 @@
    - Reads /config.json
    - Supabase auth (sign up/in/out/reset)
    - Calls your API via /api/* with Bearer token
-   - Optional PayPal buttons if PAYPAL_CLIENT_ID + #paypal-container present
 */
 
 (async () => {
@@ -31,9 +30,6 @@
   const outLog      = $id('log');
   const cfgUrl      = $id('cfg-url');
   const cfgApi      = $id('cfg-api');
-  const cfgPp       = $id('cfg-pp');
-  const paypalWrap  = $id('paypal-container');
-  const paypalNote  = $id('paypal-note');
   const aSupport    = $id('supportEmail');
 
   const logMsg = (msg) => setText(outLog, msg);
@@ -50,24 +46,16 @@
 
   const SUPABASE_URL = cfg.SUPABASE_URL || '';
   const ANON_KEY     = cfg.SUPABASE_ANON_KEY || '';
-  const PAYPAL_ID    = cfg.PAYPAL_CLIENT_ID || '';
   let   API_BASE     = cfg.API_BASE_URL || '/api';
-
-  // You can force the Worker URL if testing on *.pages.dev:
-  // if (location.hostname.endsWith('.pages.dev')) {
-  //   API_BASE = 'https://jb-api-proxy.smartdisputecanada.workers.dev';
-  // }
 
   // show env in either style of page
   if (cfgUrl) setText(cfgUrl, SUPABASE_URL || '(missing)');
   if (cfgApi) setText(cfgApi, API_BASE);
-  if (cfgPp)  setText(cfgPp, PAYPAL_ID ? '(set)' : '(missing)');
 
   if (panelEnv) {
     setHtml(panelEnv,
       `SUPABASE_URL: <code>${SUPABASE_URL || '(missing)'}</code><br>` +
-      `API_BASE_URL: <code>${API_BASE}</code><br>` +
-      `PAYPAL_CLIENT_ID: <code>${PAYPAL_ID ? '(set)' : '(missing)'}</code>`
+      `API_BASE_URL: <code>${API_BASE}</code>`
     );
   }
   if (cfg.SUPPORT_EMAIL && aSupport) {
@@ -171,49 +159,4 @@
     try { setText(outApi, await callApi('/entitlements')); }
     catch (e) { setText(outApi, String(e)); }
   });
-
-  // ---------- 6) Optional: PayPal buttons ----------
-  if (paypalWrap) {
-    if (!PAYPAL_ID) {
-      paypalNote && (paypalNote.textContent = 'No PAYPAL_CLIENT_ID in config.json — PayPal disabled.');
-    } else {
-      const sdk = document.createElement('script');
-      sdk.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(PAYPAL_ID)}&currency=CAD&intent=capture&components=buttons`;
-      sdk.onload = renderPayPalButtons;
-      sdk.onerror = () => { paypalNote && (paypalNote.textContent = 'Failed to load PayPal SDK.'); };
-      document.head.appendChild(sdk);
-    }
-  }
-
-  function renderPayPalButtons() {
-    // global paypal from SDK
-     
-    paypal.Buttons({
-      async createOrder() {
-        const r = await callApi('/payments/create-order', {
-          method: 'POST',
-          body: { productId: 'doc_small' }
-        });
-        if (r.status !== 200 || !r.body?.id) {
-          throw new Error('Create order failed: ' + JSON.stringify(r.body));
-        }
-        return r.body.id;
-      },
-      async onApprove(data) {
-        const r = await callApi('/payments/capture-order', {
-          method: 'POST',
-          body: { orderId: data.orderID, productId: 'doc_small' }
-        });
-        if (r.status !== 200) {
-          alert('Payment error: ' + JSON.stringify(r.body));
-          return;
-        }
-        alert('Payment captured! Entitlement granted.');
-        btnEnts && btnEnts.click();
-      },
-      onError(err) {
-        alert('Payment error: ' + err);
-      }
-    }).render('#paypal-container');
-  }
 })();
