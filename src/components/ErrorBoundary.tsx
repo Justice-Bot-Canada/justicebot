@@ -29,11 +29,9 @@ class ErrorBoundary extends Component<Props, State> {
     this.setState({ errorInfo });
     this.props.onError?.(error, errorInfo);
     
-    // Log error in development
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error Boundary caught an error:', error);
-      console.error('Error Info:', errorInfo);
-    }
+    // Always log errors (helps debug production issues)
+    console.error('Error Boundary caught an error:', error);
+    console.error('Error Info:', errorInfo);
   }
 
   handleRetry = () => {
@@ -66,15 +64,15 @@ class ErrorBoundary extends Component<Props, State> {
                 We're sorry, but something unexpected happened. Please try refreshing the page or go back to the home page.
               </p>
               
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+              {this.state.error && (
                 <details className="bg-muted p-3 rounded text-xs">
                   <summary className="cursor-pointer font-medium mb-2">
-                    Error Details (Development)
+                    Error Details
                   </summary>
                   <pre className="whitespace-pre-wrap text-destructive">
                     {this.state.error.toString()}
                   </pre>
-                  {this.state.errorInfo && (
+                  {process.env.NODE_ENV === 'development' && this.state.errorInfo && (
                     <pre className="whitespace-pre-wrap mt-2 text-muted-foreground">
                       {this.state.errorInfo.componentStack}
                     </pre>
