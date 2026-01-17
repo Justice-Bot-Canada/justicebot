@@ -26,6 +26,72 @@ function calculateEndsAt(productType: string): string | null {
   }
 }
 
+// Send purchase event to GA4 via Measurement Protocol
+async function sendGA4PurchaseEvent(params: {
+  clientId: string;
+  transactionId: string;
+  value: number;
+  currency: string;
+  itemName: string;
+  userId?: string;
+}) {
+  const measurementId = Deno.env.get("GA4_MEASUREMENT_ID");
+  const apiSecret = Deno.env.get("GA4_API_SECRET");
+
+  if (!measurementId || !apiSecret) {
+    logStep("GA4 Measurement Protocol not configured - skipping purchase event");
+    return;
+  }
+
+  const payload = {
+    client_id: params.clientId,
+    user_id: params.userId,
+    events: [
+      {
+        name: "purchase",
+        params: {
+          transaction_id: params.transactionId,
+          value: params.value,
+          currency: params.currency.toUpperCase(),
+          items: [
+            {
+              item_name: params.itemName,
+              quantity: 1,
+              price: params.value,
+            },
+          ],
+        },
+      },
+    ],
+  };
+
+  try {
+    const response = await fetch(
+      `https://www.google-analytics.com/mp/collect?measurement_id=${measurementId}&api_secret=${apiSecret}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (response.ok) {
+      logStep("✅ GA4 purchase event sent", { 
+        transactionId: params.transactionId, 
+        value: params.value,
+        currency: params.currency 
+      });
+    } else {
+      logStep("GA4 purchase event failed", { 
+        status: response.status, 
+        statusText: response.statusText 
+      });
+    }
+  } catch (error) {
+    logStep("GA4 purchase event error", { error: error.message });
+  }
+}
+
 serve(async (req) => {
   if (req.method !== "POST") {
     return new Response("Method not allowed", { status: 405 });
@@ -127,6 +193,7 @@ serve(async (req) => {
       const caseId = md.case_id || null;
       const productName = md.product_name || "Justice-Bot Product";
       const paymentIdFromMeta = md.payment_id;
+      const clientId = md.ga_client_id || session.id; // Use GA client_id if passed, fallback to session.id
 
       if (!userId) {
         processingError = "no_user_id_in_metadata";
@@ -257,6 +324,16 @@ serve(async (req) => {
           amountPaid: session.amount_total,
           currency: session.currency,
           productName,
+        });
+
+        // ============ STEP 3b: Send GA4 purchase event AFTER entitlement granted ============
+        await sendGA4PurchaseEvent({
+          clientId: clientId,
+          transactionId: stripePaymentIntentId || stripeCheckoutSessionId,
+          value: (session.amount_total || 0) / 100,
+          currency: session.currency || "cad",
+          itemName: productName,
+          userId: userId,
         });
       }
 

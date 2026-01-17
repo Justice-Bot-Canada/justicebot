@@ -99,21 +99,19 @@
     </style>
 
     <!-- Google tag (gtag.js) - GA4 Configuration -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZELN2X9X6P"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X6LZQRFGGH"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){ dataLayer.push(arguments); }
       gtag('js', new Date());
-      
-      // Set default consent mode - allows basic page_view for landing page attribution
+
       gtag('consent', 'default', {
-        'analytics_storage': 'granted',  // Allow basic tracking for landing page attribution
-        'ad_storage': 'denied'
+        analytics_storage: 'granted',
+        ad_storage: 'denied'
       });
 
-      // Configure GA4 - send initial page_view IMMEDIATELY to fix "(not set)" landing pages
-      gtag('config', 'G-ZELN2X9X6P', {
-        send_page_view: true,  // Send page_view immediately on load
+      gtag('config', 'G-X6LZQRFGGH', {
+        send_page_view: true,
         cookie_flags: 'SameSite=None;Secure'
       });
     </script>
