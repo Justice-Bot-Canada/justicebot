@@ -33,6 +33,13 @@ export function CaseMeritScore({ caseId, caseType, caseDescription }: CaseMeritS
     fetchCaseData();
   }, [caseId]);
 
+  // Auto-calculate merit score when first loading if no score exists
+  useEffect(() => {
+    if (!loading && caseData && caseData.merit_score === null && !analyzing) {
+      recalculateMerit();
+    }
+  }, [loading, caseData?.merit_score]);
+
   const fetchCaseData = async () => {
     try {
       const { data, error } = await supabase

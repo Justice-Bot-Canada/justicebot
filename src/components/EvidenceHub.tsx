@@ -63,9 +63,10 @@ interface EvidenceHubProps {
   onEvidenceSelect?: (evidence: Evidence[]) => void;
   selectionMode?: boolean;
   onBuildBook?: () => void;
+  onUploadComplete?: (count: number) => void;
 }
 
-export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelect, selectionMode = false, onBuildBook }: EvidenceHubProps) {
+export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelect, selectionMode = false, onBuildBook, onUploadComplete }: EvidenceHubProps) {
   const [evidence, setEvidence] = useState<Evidence[]>([]);
   const [selectedEvidence, setSelectedEvidence] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -159,6 +160,8 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
       }) || [];
 
       setEvidence(transformedData);
+      // Notify parent of new evidence count
+      onUploadComplete?.(transformedData.length);
     } catch (error) {
       console.error('Error fetching evidence:', error);
       toast.error('Failed to load evidence');
