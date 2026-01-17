@@ -25,6 +25,25 @@
   <meta name="apple-mobile-web-app-title" content="JusticeBot">
   <meta name="description" content="AI legal assistant.">
 
+  <!-- Google tag (gtag.js) - GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-X6LZQRFGGH"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    // Landing page (marketing) defaults
+    gtag('consent', 'default', {
+      analytics_storage: 'granted',
+      ad_storage: 'denied'
+    });
+
+    gtag('config', 'G-X6LZQRFGGH', {
+      send_page_view: true,
+      cookie_flags: 'SameSite=None;Secure'
+    });
+  </script>
+
   <style>
     :root { --bg:#0b1220; --panel:#0f172a; --muted:#94a3b8; --text:#e2e8f0; --brand:#3b82f6; --brand-2:#60a5fa; }
     *{box-sizing:border-box}
