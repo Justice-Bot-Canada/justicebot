@@ -108,7 +108,7 @@ const Dashboard = () => {
       progress += 15; // Timeline viewed = +15% (55% total)
     }
     
-    if (activeCase.merit_score) {
+    if (activeCase.merit_score !== null && activeCase.merit_score !== undefined) {
       progress += 10; // Merit score = +10% (65% total)
     }
     
@@ -515,16 +515,16 @@ const Dashboard = () => {
 
                   {/* Merit score */}
                   <div className="flex items-center gap-3">
-                    {activeCase?.merit_score ? (
+                    {activeCase?.merit_score !== null && activeCase?.merit_score !== undefined ? (
                       <CheckCircle className="h-5 w-5 text-green-600" />
                     ) : (
                       <Circle className="h-5 w-5 text-muted-foreground" />
                     )}
-                    <span className={activeCase?.merit_score ? 'text-green-700 dark:text-green-300' : 'text-muted-foreground'}>
+                    <span className={activeCase?.merit_score !== null && activeCase?.merit_score !== undefined ? 'text-green-700 dark:text-green-300' : 'text-muted-foreground'}>
                       Case strength
                     </span>
                     <span className="text-sm text-muted-foreground ml-auto">
-                      {activeCase?.merit_score ? `${activeCase.merit_score}%` : 'Pending'}
+                      {activeCase?.merit_score !== null && activeCase?.merit_score !== undefined ? `${activeCase.merit_score}%` : 'Pending'}
                     </span>
                   </div>
 

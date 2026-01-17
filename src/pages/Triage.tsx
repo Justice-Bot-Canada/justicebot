@@ -137,7 +137,13 @@ const Triage = () => {
 
     try {
       // Create a case with triage data - CRITICAL: populate merit_score column
-      const meritScoreFromTriage = Math.round(triageResult.confidence);
+      // triageResult.confidence is sometimes 0-1 (probability) and sometimes 0-100 (percentage)
+      const rawConfidence = Number(triageResult.confidence);
+      const normalizedConfidence = Number.isFinite(rawConfidence)
+        ? (rawConfidence <= 1 ? rawConfidence * 100 : rawConfidence)
+        : 0;
+      const meritScoreFromTriage = Math.min(100, Math.max(1, Math.round(normalizedConfidence)));
+
       const { data: caseData, error: caseError } = await supabase
         .from('cases')
         .insert({
@@ -147,7 +153,7 @@ const Triage = () => {
           venue: triageResult.venue,
           province: province,
           status: 'pending',
-          merit_score: meritScoreFromTriage, // Store confidence as merit score
+          merit_score: meritScoreFromTriage, // Store confidence as merit score (1-100)
           triage: {
             venue: triageResult.venue,
             venueTitle: triageResult.venueTitle,
