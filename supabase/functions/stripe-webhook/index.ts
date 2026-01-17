@@ -26,69 +26,62 @@ function calculateEndsAt(productType: string): string | null {
   }
 }
 
-// Send purchase event to GA4 via Measurement Protocol
-async function sendGA4PurchaseEvent(params: {
-  clientId: string;
-  transactionId: string;
-  value: number;
-  currency: string;
-  itemName: string;
-  userId?: string;
-}) {
+// GA4 Measurement Protocol: Generate stable client_id from identifiers
+function stableClientId(input: string): string {
+  let h = 0;
+  for (let i = 0; i < input.length; i++) {
+    h = (h * 31 + input.charCodeAt(i)) | 0;
+  }
+  const a = Math.abs(h) + 100000;
+  const b = (Math.abs(h * 7) % 1000000) + 100000;
+  return `${a}.${b}`;
+}
+
+// GA4 Measurement Protocol: Send any event
+async function ga4SendEvent(eventName: string, params: Record<string, unknown>, clientIdSeed: string) {
   const measurementId = Deno.env.get("GA4_MEASUREMENT_ID");
   const apiSecret = Deno.env.get("GA4_API_SECRET");
 
   if (!measurementId || !apiSecret) {
-    logStep("GA4 Measurement Protocol not configured - skipping purchase event");
+    logStep("GA4 Measurement Protocol not configured - skipping event", { eventName });
     return;
   }
 
+  const url = `https://www.google-analytics.com/mp/collect?measurement_id=${encodeURIComponent(
+    measurementId,
+  )}&api_secret=${encodeURIComponent(apiSecret)}`;
+
+  const client_id = stableClientId(clientIdSeed);
+
   const payload = {
-    client_id: params.clientId,
-    user_id: params.userId,
+    client_id,
     events: [
       {
-        name: "purchase",
+        name: eventName,
         params: {
-          transaction_id: params.transactionId,
-          value: params.value,
-          currency: params.currency.toUpperCase(),
-          items: [
-            {
-              item_name: params.itemName,
-              quantity: 1,
-              price: params.value,
-            },
-          ],
+          ...params,
+          engagement_time_msec: 1,
         },
       },
     ],
   };
 
   try {
-    const response = await fetch(
-      `https://www.google-analytics.com/mp/collect?measurement_id=${measurementId}&api_secret=${apiSecret}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }
-    );
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-    if (response.ok) {
-      logStep("✅ GA4 purchase event sent", { 
-        transactionId: params.transactionId, 
-        value: params.value,
-        currency: params.currency 
-      });
+    // GA often returns 204 No Content on success
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      logStep("GA4 send failed", { status: res.status, body: text, eventName });
     } else {
-      logStep("GA4 purchase event failed", { 
-        status: response.status, 
-        statusText: response.statusText 
-      });
+      logStep(`✅ GA4 ${eventName} event sent`, { client_id, params });
     }
   } catch (error) {
-    logStep("GA4 purchase event error", { error: error.message });
+    logStep("GA4 send error", { error: error.message, eventName });
   }
 }
 
@@ -327,14 +320,44 @@ serve(async (req) => {
         });
 
         // ============ STEP 3b: Send GA4 purchase event AFTER entitlement granted ============
-        await sendGA4PurchaseEvent({
-          clientId: clientId,
-          transactionId: stripePaymentIntentId || stripeCheckoutSessionId,
-          value: (session.amount_total || 0) / 100,
-          currency: session.currency || "cad",
-          itemName: productName,
-          userId: userId,
-        });
+        const transactionId = stripePaymentIntentId || stripeCheckoutSessionId;
+        const value = (session.amount_total || 0) / 100;
+        const currency = (session.currency || "cad").toUpperCase();
+        
+        // Stable client seed using salt + user identifiers
+        const seedSalt = Deno.env.get("GA4_CLIENT_ID_SALT") ?? "";
+        const clientSeed = `${seedSalt}|${userId || ""}|${session.customer_email || ""}|${transactionId}`;
+        
+        // Determine item info from metadata
+        const itemName = productName || "Monthly Justice-Bot Access";
+        const itemId = priceId || entitlementKey || "monthly_access";
+
+        // Fire purchase ONLY on confirmed success (Stripe + Supabase both done)
+        await ga4SendEvent(
+          "purchase",
+          {
+            transaction_id: transactionId,
+            value,
+            currency,
+            items: [
+              {
+                item_id: itemId,
+                item_name: itemName,
+                item_category: productType === "monthly" || productType === "yearly" ? "subscription" : "one_time",
+                price: value,
+                quantity: 1,
+              },
+            ],
+          },
+          clientSeed,
+        );
+
+        // Also fire access_unlocked event for internal tracking
+        await ga4SendEvent(
+          "access_unlocked",
+          { method: "stripe", transaction_id: transactionId, product_type: productType },
+          clientSeed,
+        );
       }
 
       // ============ STEP 4: Mark case as paid (if case_id provided) ============
