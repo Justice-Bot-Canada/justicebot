@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Check, Lock, ArrowLeft, Bookmark } from "lucide-react";
+import { Check, Unlock, Bookmark, Shield } from "lucide-react";
 import PayPalTrialButton from "@/components/PayPalTrialButton";
 
 const PAYPAL_PLAN_ID = "P-5ML4271244454362LMUCPG7I";
@@ -16,6 +16,10 @@ interface PaymentUnlockModalProps {
 /**
  * Payment unlock modal - appears when user clicks a gated action.
  * Calm, honest, non-pushy copy focused on continuation.
+ * 
+ * RULES:
+ * - Never paywall curiosity (signup, evidence upload, merit score, viewing results)
+ * - Only paywall action (form generation, document download, advanced drafting)
  */
 export function PaymentUnlockModal({ 
   open, 
@@ -29,20 +33,20 @@ export function PaymentUnlockModal({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <div className="flex items-center gap-2 mb-2">
-            <Lock className="h-5 w-5 text-primary" />
+            <Unlock className="h-5 w-5 text-primary" />
           </div>
           <DialogTitle className="text-xl">
-            Continue with {actionName}
+            You're ready to move forward
           </DialogTitle>
           <DialogDescription className="text-base pt-2">
-            You've already seen your case assessment.
-            To continue with this action, you'll need to unlock access.
+            You've reviewed your case assessment.
+            To continue with {actionName}, you'll need to unlock access.
           </DialogDescription>
         </DialogHeader>
 
         <div className="py-4 space-y-4">
           <p className="text-sm font-medium text-foreground">
-            What you're unlocking
+            This unlock gives you:
           </p>
           <ul className="space-y-3">
             <li className="flex items-start gap-3">
@@ -55,12 +59,18 @@ export function PaymentUnlockModal({
             </li>
             <li className="flex items-start gap-3">
               <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-              <span className="text-sm">Continued case analysis and guidance</span>
+              <span className="text-sm">Ongoing guidance for this case</span>
             </li>
           </ul>
         </div>
 
-        <DialogFooter className="flex-col gap-3 pt-2">
+        {/* Trust signal */}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
+          <Shield className="h-4 w-4 flex-shrink-0" />
+          <span>You won't lose your work. Your case, evidence, and score are already saved.</span>
+        </div>
+
+        <DialogFooter className="flex-col gap-3 pt-4">
           <PayPalTrialButton planId={PAYPAL_PLAN_ID} trialDays={5} />
           
           <Button
@@ -75,15 +85,6 @@ export function PaymentUnlockModal({
             Save my progress and come back later
           </Button>
         </DialogFooter>
-
-        <div className="text-center pt-4 border-t">
-          <p className="text-xs text-muted-foreground">
-            Your case and evidence are saved.
-          </p>
-          <p className="text-xs text-muted-foreground">
-            You won't lose your work if you leave.
-          </p>
-        </div>
       </DialogContent>
     </Dialog>
   );

@@ -117,13 +117,13 @@ const PaymentSuccess = () => {
             <CheckCircle className="w-16 h-16 text-green-500" />
           </div>
           <CardTitle className="text-2xl font-bold text-green-700">
-            {verified ? 'Payment Successful!' : 'Thank You!'}
+            {verified ? 'Access Unlocked' : 'Thank You!'}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground">
             {verified 
-              ? 'Your payment has been confirmed. You now have full access to your purchased form.'
+              ? 'You can continue right away. Your access is now active.'
               : 'Your transaction has been processed. You should receive a confirmation email shortly.'}
           </p>
           <div className="space-y-2">

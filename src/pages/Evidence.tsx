@@ -262,27 +262,26 @@ const Evidence = () => {
           </div>
 
           {/* Evidence upload area */}
-          <PremiumGate feature="Evidence Management">
-            <div className="space-y-6">
-              <EvidenceHub caseId={caseId} />
-              
-              {/* Show analyzer and merit score after uploads */}
-              {evidenceCount > 0 && (
-                <>
-                  <EvidenceAnalyzer 
-                    caseId={caseId} 
-                    caseType={caseData?.venue}
-                    caseDescription={caseData?.description}
-                  />
-                  <CaseMeritScore 
-                    caseId={caseId}
-                    caseType={caseData?.venue}
-                    caseDescription={caseData?.description}
-                  />
-                </>
-              )}
-            </div>
-          </PremiumGate>
+          {/* Evidence upload + merit score = ALWAYS FREE (never paywall curiosity) */}
+          <div className="space-y-6">
+            <EvidenceHub caseId={caseId} />
+            
+            {/* Show analyzer and merit score after uploads */}
+            {evidenceCount > 0 && (
+              <>
+                <EvidenceAnalyzer 
+                  caseId={caseId} 
+                  caseType={caseData?.venue}
+                  caseDescription={caseData?.description}
+                />
+                <CaseMeritScore 
+                  caseId={caseId}
+                  caseType={caseData?.venue}
+                  caseDescription={caseData?.description}
+                />
+              </>
+            )}
+          </div>
 
           {/* Primary action CTA */}
           <Card className="mt-8 border-primary/20 bg-gradient-to-r from-primary/5 to-background">
