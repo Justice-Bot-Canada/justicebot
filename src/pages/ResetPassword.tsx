@@ -129,9 +129,9 @@ const ResetPassword = () => {
       setSuccess(true);
       toast.success("Password updated successfully!");
       
-      // Redirect to dashboard after short delay
+      // Redirect to dashboard after short delay using window.location for cross-domain reliability
       setTimeout(() => {
-        navigate("/dashboard");
+        window.location.href = "/dashboard";
       }, 2000);
     } catch (err: any) {
       console.error("[ResetPassword] Update error:", err);
