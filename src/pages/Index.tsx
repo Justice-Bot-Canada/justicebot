@@ -121,41 +121,42 @@ const Index = () => {
       <ClinicWelcomeBanner />
       <Header />
       
-      {/* HIGH-VISIBILITY URGENCY CTA - Merit Score */}
-      <section className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-red-500/10 border-b-2 border-amber-500/30 py-4 sm:py-6 md:py-8">
-        <div className="container mx-auto px-3 sm:px-4">
-          <div className="max-w-3xl mx-auto">
-            <MeritScoreCTA variant="hero" />
-          </div>
-        </div>
-      </section>
-
-      {/* Trust Banner - Above the fold - Outcome focused */}
-      <section className="bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 border-b border-primary/20 py-4 sm:py-6">
-        <div className="container mx-auto px-3 sm:px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground mb-2">
-              Not sure what you're dealing with?
-            </h2>
-            <p className="text-sm sm:text-base text-muted-foreground mb-4">
-              Answer a few questions. Get your recommended forms and next steps.
-            </p>
-            <Button
-              size="default"
-              onClick={handleGetCourtReadyDocs}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-base sm:text-lg w-full sm:w-auto"
-            >
-              Check my legal options now
-            </Button>
-            <p className="text-xs text-muted-foreground mt-3">
-              No signup • Free to start • 2,000+ Canadians helped
-            </p>
-          </div>
-        </div>
-      </section>
-
       <main id="main-content" tabIndex={-1}>
+        {/* Hero Section - First impression with Canadian flag */}
         <HeroSection />
+        
+        {/* HIGH-VISIBILITY URGENCY CTA - Merit Score */}
+        <section className="bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border-b-2 border-primary/30 py-4 sm:py-6 md:py-8">
+          <div className="container mx-auto px-3 sm:px-4">
+            <div className="max-w-3xl mx-auto">
+              <MeritScoreCTA variant="hero" />
+            </div>
+          </div>
+        </section>
+
+        {/* Trust Banner - Outcome focused */}
+        <section className="bg-gradient-to-r from-muted via-background to-muted border-b border-border py-4 sm:py-6">
+          <div className="container mx-auto px-3 sm:px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-foreground mb-2">
+                Not sure what you're dealing with?
+              </h2>
+              <p className="text-sm sm:text-base text-muted-foreground mb-4">
+                Answer a few questions. Get your recommended forms and next steps.
+              </p>
+              <Button
+                size="default"
+                onClick={handleGetCourtReadyDocs}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6 sm:px-8 py-2.5 sm:py-3 text-base sm:text-lg w-full sm:w-auto"
+              >
+                Check my legal options now
+              </Button>
+              <p className="text-xs text-muted-foreground mt-3">
+                No signup • Free to start • 2,000+ Canadians helped
+              </p>
+            </div>
+          </div>
+        </section>
         
         {/* What We Do / Don't Do - Clear trust building */}
         <section id="what-we-do" className="py-8 sm:py-12 md:py-16 bg-background">

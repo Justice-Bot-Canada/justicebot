@@ -1,4 +1,4 @@
-import { Menu, LogOut, User } from "lucide-react";
+import { Menu, LogOut, User, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -38,29 +38,21 @@ const Header = () => {
     <>
       <SkipToContent />
       <PremiumStatusBanner />
-      <header className="bg-background border-b border-border sticky top-0 z-50" role="banner">
+      <header className="bg-background border-b-2 border-primary/20 sticky top-0 z-50 shadow-sm" role="banner">
       <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <a 
               href="/" 
               className="flex items-center gap-2 sm:gap-3" 
-              aria-label="Justice-Bot - Legal clarity, simplified - Go to homepage"
+              aria-label="Justice-Bot Technologies Inc. - Ignorance is not an option - Go to homepage"
             >
-              <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg overflow-hidden">
-                <img 
-                  src={justiceBotLogo} 
-                  alt="Justice-Bot logo - Lion with scales of justice" 
-                  className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
-                  width="48"
-                  height="48"
-                  loading="eager"
-                  decoding="async"
-                />
+              <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg overflow-hidden bg-primary">
+                <Scale className="w-6 h-6 sm:w-7 sm:h-7 text-primary-foreground" />
               </div>
               <div className="hidden xs:block">
                 <h1 className="text-lg sm:text-xl font-bold text-foreground leading-tight">Justice-Bot</h1>
-                <p className="text-xs text-muted-foreground hidden sm:block">Legal clarity, simplified</p>
+                <p className="text-xs text-primary font-medium hidden sm:block">Ignorance is not an option</p>
               </div>
             </a>
           </div>

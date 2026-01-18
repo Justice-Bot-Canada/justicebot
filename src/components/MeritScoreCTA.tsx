@@ -90,14 +90,14 @@ export const MeritScoreCTA = ({ variant = "banner", className = "" }: MeritScore
     return (
       <>
         <div className={`relative ${className}`}>
-          {/* Pulsing background effect */}
-          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-red-500/20 rounded-xl blur-xl animate-pulse" />
+          {/* Pulsing background effect - Canadian red theme */}
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-xl blur-xl animate-pulse" />
           
-          <div className="relative bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 rounded-xl p-[2px] sm:p-1">
+          <div className="relative bg-gradient-to-r from-primary via-accent to-primary rounded-xl p-[2px] sm:p-1">
             <div className="bg-background rounded-lg p-4 sm:p-6 md:p-8">
               <div className="flex flex-col items-center text-center gap-4">
-                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-                  <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                  <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">
@@ -113,7 +113,7 @@ export const MeritScoreCTA = ({ variant = "banner", className = "" }: MeritScore
                     size="lg"
                     onClick={handleClick}
                     disabled={isLoading}
-                    className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold gap-2 text-sm sm:text-base px-6 py-3"
+                    className="w-full sm:w-auto bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-semibold gap-2 text-sm sm:text-base px-6 py-3"
                   >
                     {isLoading ? (
                       <>
@@ -174,14 +174,14 @@ export const MeritScoreCTA = ({ variant = "banner", className = "" }: MeritScore
     );
   }
 
-  // Default: banner variant
+  // Default: banner variant - Canadian red theme
   return (
     <>
-      <div className={`bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-red-500/10 border-2 border-amber-500/30 rounded-xl p-6 ${className}`}>
+      <div className={`bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border-2 border-primary/30 rounded-xl p-6 ${className}`}>
         <div className="flex flex-col md:flex-row items-center gap-4">
           <div className="flex-shrink-0">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-              <Zap className="h-6 w-6 text-white" />
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+              <Zap className="h-6 w-6 text-primary-foreground" />
             </div>
           </div>
           <div className="flex-1 text-center md:text-left">
@@ -196,7 +196,7 @@ export const MeritScoreCTA = ({ variant = "banner", className = "" }: MeritScore
             size="lg"
             onClick={handleClick}
             disabled={isLoading}
-            className="w-full md:w-auto bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold gap-2"
+            className="w-full md:w-auto bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground font-semibold gap-2"
           >
             {isLoading ? (
               <>

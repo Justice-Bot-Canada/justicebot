@@ -16,121 +16,127 @@
   }
 }
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* Definition of the design system - Canadian Theme: Red & Black
+   Representing a nation seeking justice, hope through knowledge and rights
+   All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 213 27% 14%;
+    /* Canadian-inspired palette: Red, Black, White, with storm grey tones */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 8%;
 
     --card: 0 0% 100%;
-    --card-foreground: 213 27% 14%;
+    --card-foreground: 0 0% 8%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 213 27% 14%;
+    --popover-foreground: 0 0% 8%;
 
-    --primary: 0 85% 45%;
+    /* Canadian Red - bold and powerful */
+    --primary: 0 85% 40%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 213 12% 95%;
-    --secondary-foreground: 213 27% 14%;
+    /* Storm grey for secondary elements */
+    --secondary: 210 8% 92%;
+    --secondary-foreground: 0 0% 12%;
 
-    --muted: 213 12% 95%;
-    --muted-foreground: 213 20% 35%;
+    --muted: 210 8% 90%;
+    --muted-foreground: 210 10% 35%;
 
-    --accent: 0 75% 55%;
+    /* Deep crimson accent */
+    --accent: 0 75% 35%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 213 27% 91%;
-    --input: 213 27% 91%;
-    --ring: 0 85% 45%;
+    /* Charcoal black borders */
+    --border: 0 0% 85%;
+    --input: 0 0% 85%;
+    --ring: 0 85% 40%;
 
-    --warning: 32 95% 44%;
-    --warning-foreground: 0 0% 100%;
+    /* Justice gold for highlights - subtle, not overpowering */
+    --warning: 45 90% 45%;
+    --warning-foreground: 0 0% 10%;
 
-    --success: 142 76% 36%;
+    /* Hope green - muted, symbolic */
+    --success: 150 50% 35%;
     --success-foreground: 0 0% 100%;
 
-    --trust: 0 65% 55%;
-    --trust-light: 0 45% 85%;
+    /* Trust - deep Canadian red */
+    --trust: 0 70% 45%;
+    --trust-light: 0 30% 90%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(0 85% 45%), hsl(0 75% 55%));
-    --gradient-accent: linear-gradient(135deg, hsl(0 75% 55%), hsl(0 65% 60%));
-    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(213 12% 98%));
+    /* Gradients - stormy, powerful */
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 15%), hsl(0 85% 35%));
+    --gradient-accent: linear-gradient(135deg, hsl(0 75% 40%), hsl(0 85% 30%));
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 98%), hsl(210 8% 94%));
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
+    --sidebar-background: 0 0% 97%;
+    --sidebar-foreground: 0 0% 15%;
+    --sidebar-primary: 0 0% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 0 0% 94%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 0 0% 88%;
+    --sidebar-ring: 0 85% 40%;
   }
 
   .dark {
-    --background: 213 27% 8%;
+    /* Dark mode - charcoal black with red accents */
+    --background: 0 0% 6%;
     --foreground: 0 0% 95%;
 
-    --card: 213 27% 10%;
+    --card: 0 0% 9%;
     --card-foreground: 0 0% 95%;
 
-    --popover: 213 27% 10%;
+    --popover: 0 0% 9%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 0 75% 55%;
-    --primary-foreground: 213 27% 8%;
+    /* Canadian Red - slightly brighter for dark mode */
+    --primary: 0 80% 50%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 213 27% 16%;
+    --secondary: 0 0% 14%;
     --secondary-foreground: 0 0% 95%;
 
-    --muted: 213 27% 16%;
-    --muted-foreground: 213 16% 65%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 0 65% 50%;
-    --accent-foreground: 213 27% 8%;
+    --accent: 0 70% 45%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62.8% 50.6%;
-    --destructive-foreground: 0 0% 95%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 213 27% 20%;
-    --input: 213 27% 16%;
-    --ring: 0 75% 55%;
+    --border: 0 0% 18%;
+    --input: 0 0% 14%;
+    --ring: 0 80% 50%;
 
-    --warning: 32 95% 50%;
-    --warning-foreground: 213 27% 8%;
+    --warning: 45 85% 50%;
+    --warning-foreground: 0 0% 10%;
 
-    --success: 0 45% 45%;
-    --success-foreground: 213 27% 8%;
+    --success: 150 45% 40%;
+    --success-foreground: 0 0% 100%;
 
-    --trust: 0 55% 55%;
-    --trust-light: 213 27% 16%;
+    --trust: 0 65% 50%;
+    --trust-light: 0 0% 14%;
 
-    --gradient-hero: linear-gradient(135deg, hsl(0 75% 35%), hsl(0 65% 45%));
-    --gradient-accent: linear-gradient(135deg, hsl(0 65% 50%), hsl(0 55% 55%));
-    --gradient-subtle: linear-gradient(180deg, hsl(213 27% 8%), hsl(213 27% 12%));
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --gradient-hero: linear-gradient(135deg, hsl(0 0% 8%), hsl(0 75% 30%));
+    --gradient-accent: linear-gradient(135deg, hsl(0 70% 40%), hsl(0 80% 25%));
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 6%), hsl(0 0% 10%));
+    
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 0 80% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 0 80% 50%;
   }
 }
 
@@ -155,19 +161,19 @@ All colors MUST be HSL.
   --card-foreground: 0 0% 100%;
   --popover: 0 0% 5%;
   --popover-foreground: 0 0% 100%;
-  --primary: 60 100% 50%;
-  --primary-foreground: 0 0% 0%;
+  --primary: 0 100% 50%;
+  --primary-foreground: 0 0% 100%;
   --secondary: 0 0% 20%;
   --secondary-foreground: 0 0% 100%;
   --muted: 0 0% 15%;
   --muted-foreground: 0 0% 85%;
-  --accent: 60 100% 50%;
-  --accent-foreground: 0 0% 0%;
+  --accent: 0 100% 50%;
+  --accent-foreground: 0 0% 100%;
   --destructive: 0 100% 50%;
   --destructive-foreground: 0 0% 100%;
   --border: 0 0% 30%;
   --input: 0 0% 20%;
-  --ring: 60 100% 50%;
+  --ring: 0 100% 50%;
 }
 
 .reduce-motion,
@@ -255,19 +261,19 @@ All colors MUST be HSL.
     --card-foreground: 0 0% 100%;
     --popover: 0 0% 5%;
     --popover-foreground: 0 0% 100%;
-    --primary: 60 100% 50%;
-    --primary-foreground: 0 0% 0%;
+    --primary: 0 100% 50%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 0 0% 20%;
     --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 85%;
-    --accent: 60 100% 50%;
-    --accent-foreground: 0 0% 0%;
+    --accent: 0 100% 50%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 100% 60%;
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 30%;
     --input: 0 0% 30%;
-    --ring: 60 100% 50%;
+    --ring: 0 100% 50%;
   }
 
   /* Screen reader only class */
@@ -292,7 +298,7 @@ All colors MUST be HSL.
 
   /* High contrast focus for accessibility */
   .high-contrast *:focus-visible {
-    outline: 4px solid hsl(60 100% 50%);
+    outline: 4px solid hsl(0 100% 50%);
     outline-offset: 3px;
   }
 
@@ -414,5 +420,20 @@ All colors MUST be HSL.
   /* High contrast video controls */
   .high-contrast video::-webkit-media-controls {
     filter: contrast(150%) brightness(120%);
+  }
+}
+
+/* Custom Canadian theme utilities */
+@layer utilities {
+  .text-shadow-hero {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .border-canada {
+    border-color: hsl(0 85% 40%);
+  }
+  
+  .bg-storm {
+    background: linear-gradient(180deg, hsl(210 15% 25%), hsl(210 20% 15%));
   }
 }
