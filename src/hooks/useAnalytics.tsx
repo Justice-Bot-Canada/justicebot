@@ -31,9 +31,9 @@ export function useAnalytics() {
   const { user } = useAuth();
   const location = useLocation();
   const { hasConsent } = useConsent();
-  const initialPageViewSent = useRef(false);
+  const lastTrackedPath = useRef<string | null>(null);
 
-  const sendGA4PageView = useCallback(() => {
+  const sendGA4PageView = useCallback((pathname: string, search: string) => {
     if (typeof window === 'undefined' || !window.gtag) return;
 
     // Capture and store UTM params
@@ -47,14 +47,11 @@ export function useAnalytics() {
     const isSessionStart = isNewSession();
     
     // Build page path - ensure it's never empty
-    const pagePath = location.pathname || '/';
-    const pageSearch = location.search || '';
-    const fullPath = pagePath + pageSearch;
+    const pagePath = pathname || '/';
+    const fullPath = pagePath + (search || '');
     
     // Build complete page location
-    const pageLocation = typeof window !== 'undefined' 
-      ? window.location.href 
-      : `https://justice-bot.com${fullPath}`;
+    const pageLocation = window.location.href || `https://justice-bot.com${fullPath}`;
     
     // Send page_view with session_start flag for proper landing page attribution
     // Explicitly set page_path and page_location to prevent (not set) values
@@ -75,43 +72,37 @@ export function useAnalytics() {
       ...(utm.utm_term && { utm_term: utm.utm_term }),
       ...(utm.utm_content && { utm_content: utm.utm_content }),
     });
-  }, [location.pathname, location.search]);
+  }, []);
 
-  const trackPageViewToSupabase = useCallback(async () => {
+  const trackPageViewToSupabase = useCallback(async (pathname: string) => {
     if (!hasConsent) return;
     
     try {
       await supabase.from('analytics_events').insert([{
         user_id: user?.id || null,
         event_type: 'page_view',
-        page_url: location.pathname,
+        page_url: pathname,
         user_agent: navigator.userAgent,
       }]);
     } catch (error) {
       console.error('Analytics tracking error:', error);
     }
-  }, [location.pathname, user?.id, hasConsent]);
+  }, [user?.id, hasConsent]);
 
-  // CRITICAL: Fire page_view immediately on mount for GA4 landing page attribution
+  // Single unified effect for all page view tracking
+  // This ensures hooks are always called in the same order
   useEffect(() => {
-    if (!initialPageViewSent.current) {
-      initialPageViewSent.current = true;
-      // Send synchronously on first load - don't wait for anything
-      sendGA4PageView();
-      trackPageViewToSupabase();
-    }
-  }, []); // Empty deps - only on mount
-
-  // Track subsequent page views on route changes
-  useEffect(() => {
-    // Skip the initial page view (already handled above)
-    if (initialPageViewSent.current) {
-      sendGA4PageView();
-      trackPageViewToSupabase();
+    const fullPath = location.pathname + location.search;
+    
+    // Only track if this is a new path (prevent duplicate fires)
+    if (lastTrackedPath.current !== fullPath) {
+      lastTrackedPath.current = fullPath;
+      sendGA4PageView(location.pathname, location.search);
+      trackPageViewToSupabase(location.pathname);
     }
   }, [location.pathname, location.search, sendGA4PageView, trackPageViewToSupabase]);
 
-  const trackEvent = async (eventType: string, eventData?: Record<string, unknown>) => {
+  const trackEvent = useCallback(async (eventType: string, eventData?: Record<string, unknown>) => {
     // Only track if user has given consent
     if (!hasConsent) {
       return;
@@ -134,11 +125,11 @@ export function useAnalytics() {
     } catch (error) {
       console.error('Analytics tracking error:', error);
     }
-  };
+  }, [hasConsent, user?.id, location.pathname]);
 
-  const trackConversion = async (conversionData: Record<string, unknown>) => {
+  const trackConversion = useCallback(async (conversionData: Record<string, unknown>) => {
     await trackEvent('conversion', conversionData);
-  };
+  }, [trackEvent]);
 
   return {
     trackEvent,
