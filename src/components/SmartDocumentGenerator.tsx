@@ -146,9 +146,11 @@ export function SmartDocumentGenerator() {
 
     isGenerating.current = true;
     try {
-      // Fire GA4 generate_document event (mark as conversion in GA4 Admin)
-      analytics.generateDocumentGA4(documentType, selectedCaseId);
-      await generateDocument({ documentType, tone, caseContext });
+      const result = await generateDocument({ documentType, tone, caseContext });
+      // Fire GA4 generate_document event ONLY on successful generation
+      if (result) {
+        analytics.generateDocumentGA4(documentType, selectedCaseId);
+      }
     } finally {
       isGenerating.current = false;
     }
