@@ -12,6 +12,8 @@ import { CanonicalURL } from "@/components/CanonicalURL";
 import { ConsentProvider } from "@/hooks/useConsent";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { ProgramProvider } from "@/contexts/ProgramContext";
+import DemoModeWrapper from "@/components/DemoModeWrapper";
+import DemoModeBanner from "@/components/DemoModeBanner";
 import Index from "./pages/Index";
 import PathwayDecision from "./pages/PathwayDecision";
 import Pricing from "./pages/Pricing";
@@ -156,12 +158,14 @@ const AppContent = () => {
   
   return (
     <ErrorBoundary>
-      <div className="min-h-screen">
-        <CanonicalURL />
-        <SkipToContent />
-        <LiveSupportWidget />
-        <KlaviyoTracking />
-      <Routes>
+      <DemoModeWrapper>
+        <div className="min-h-screen">
+          <DemoModeBanner />
+          <CanonicalURL />
+          <SkipToContent />
+          <LiveSupportWidget />
+          <KlaviyoTracking />
+        <Routes>
           {/* Main Landing & Getting Started */}
           <Route path="/" element={<Index />} />
           <Route path="/demo-journey" element={<DemoJourney />} />
@@ -323,7 +327,8 @@ const AppContent = () => {
           {/* 404 Catch-all */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </div>
+        </div>
+      </DemoModeWrapper>
     </ErrorBoundary>
   );
 };
