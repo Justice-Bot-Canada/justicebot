@@ -9,6 +9,7 @@ import StickyLeadCapture from "@/components/StickyLeadCapture";
 import FounderTrustBlock from "@/components/FounderTrustBlock";
 import LegalPathReportCTA from "@/components/LegalPathReportCTA";
 import { MeritScoreCTA } from "@/components/MeritScoreCTA";
+import { CountrySelector } from "@/components/CountrySelector";
 import { Suspense, lazy, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -291,6 +292,9 @@ const Index = () => {
       
       {/* Sticky Bottom Lead Capture */}
       <StickyLeadCapture />
+      
+      {/* Country Selector Modal */}
+      <CountrySelector />
     </div>
   );
 };
