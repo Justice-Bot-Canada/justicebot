@@ -39,14 +39,14 @@ const UrgencyBlock = ({ venue, variant = 'subtle' }: UrgencyBlockProps) => {
 
   if (variant === 'prominent') {
     return (
-      <div className="p-4 rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
+      <div className="p-4 rounded-lg border border-primary/30 bg-primary/5 dark:border-primary/40 dark:bg-primary/10">
         <div className="flex items-start gap-3">
-          <Icon className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+          <Icon className="h-5 w-5 text-primary dark:text-primary shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold text-amber-700 dark:text-amber-300">
+            <p className="font-semibold text-foreground">
               {urgency.message}
             </p>
-            <p className="text-sm text-amber-600 dark:text-amber-400 mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               {urgency.detail}
             </p>
           </div>
@@ -56,8 +56,8 @@ const UrgencyBlock = ({ venue, variant = 'subtle' }: UrgencyBlockProps) => {
   }
 
   return (
-    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-      <Icon className="h-4 w-4 text-amber-500" />
+    <div className="flex items-center gap-2 text-sm text-white/70">
+      <Icon className="h-4 w-4 text-white/60" />
       <span>{urgency.message}</span>
     </div>
   );

@@ -1,24 +1,26 @@
-import justiceBotLogo from "@/assets/justice-bot-logo.jpeg";
-import { Facebook, Twitter, Linkedin, Instagram, Youtube } from "lucide-react";
+import justiceBotLogo from "@/assets/justice-bot-logo.png";
+import { Facebook, Twitter, Linkedin, Instagram, Youtube, Scale } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer id="footer" className="bg-foreground text-background py-8 sm:py-12 md:py-16" role="contentinfo" aria-label="Site footer">
+    <footer id="footer" className="bg-foreground text-background py-8 sm:py-12 md:py-16 border-t-4 border-primary" role="contentinfo" aria-label="Site footer">
       <div className="container mx-auto px-3 sm:px-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 mb-8" role="navigation" aria-label="Footer navigation">
           <div className="col-span-2 sm:col-span-3 lg:col-span-1 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-8 h-8 bg-background rounded-lg">
-                <img 
-                  src={justiceBotLogo} 
-                  alt="Justice-Bot logo featuring scales of justice symbolizing legal balance and fairness" 
-                  className="w-6 h-6 object-contain"
-                />
+              <div className="flex items-center justify-center w-10 h-10 bg-primary rounded-lg">
+                <Scale className="w-6 h-6 text-primary-foreground" />
               </div>
-              <span className="text-lg font-bold">Justice-Bot</span>
+              <div>
+                <span className="text-lg font-bold block">Justice-Bot</span>
+                <span className="text-xs text-background/60 uppercase tracking-wider">Technologies Inc.</span>
+              </div>
             </div>
+            <p className="text-sm text-primary font-semibold italic border-l-2 border-primary pl-3">
+              "Ignorance is not an option."
+            </p>
             <p className="text-sm text-background/80 leading-relaxed">
-              Cutting through legal noise so you can move forward with confidence.
+              Empowering Canadians with knowledge of their rights.
             </p>
           </div>
 
@@ -131,7 +133,7 @@ const Footer = () => {
 
           <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
             <div className="text-xs sm:text-sm text-background/80 text-center sm:text-left">
-              © 2024 Justice-Bot Technologies Inc. | Ontario, Canada
+              © 2025 Justice Bot Technologies Inc. | Ontario, Canada
             </div>
             <div className="flex flex-wrap justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-background/80">
               <a href="/liability" className="hover:text-background transition-colors text-red-300 font-semibold">⚠️ Disclaimer</a>

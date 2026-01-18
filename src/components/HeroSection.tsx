@@ -1,11 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Play, Clock } from "lucide-react";
+import { ArrowRight, Play, Scale, Shield } from "lucide-react";
 import { trackEvent, analytics } from "@/utils/analytics";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
-import { toast } from "sonner";
 import UrgencyBlock from "@/components/UrgencyBlock";
+import canadaFlagHero from "@/assets/canada-flag-hero.png";
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -33,57 +32,84 @@ const HeroSection = () => {
 
   return (
     <section 
-      className="relative min-h-[60vh] sm:min-h-[70vh] md:min-h-[80vh] bg-gradient-to-br from-background via-primary/5 to-background overflow-hidden flex items-center" 
+      className="relative min-h-[70vh] sm:min-h-[80vh] md:min-h-[90vh] overflow-hidden flex items-center" 
       aria-labelledby="hero-heading" 
       role="banner"
     >
-      {/* Subtle background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div className="absolute -top-20 -right-20 sm:-top-40 sm:-right-40 w-48 h-48 sm:w-96 sm:h-96 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 -left-20 sm:-left-40 w-40 h-40 sm:w-80 sm:h-80 bg-accent/8 rounded-full blur-3xl" />
+      {/* Hero background image - weathered Canadian flag */}
+      <div 
+        className="absolute inset-0 z-0"
+        aria-hidden="true"
+      >
+        <img 
+          src={canadaFlagHero}
+          alt=""
+          className="w-full h-full object-cover"
+          loading="eager"
+        />
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
+        {/* Red accent overlay at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary" />
       </div>
 
-      <div className="container mx-auto px-4 py-8 sm:py-12 lg:py-16 relative z-10">
-        <div className="max-w-3xl mx-auto text-center space-y-5 sm:space-y-8">
+      <div className="container mx-auto px-4 py-12 sm:py-16 lg:py-20 relative z-10">
+        <div className="max-w-4xl space-y-6 sm:space-y-8">
           
-          {/* Clear outcome-focused headline */}
-          <div className="space-y-4 sm:space-y-6 animate-fade-in">
+          {/* Company branding */}
+          <div className="space-y-2 animate-fade-in">
+            <div className="flex items-center gap-3 mb-4">
+              <Scale className="w-8 h-8 sm:w-10 sm:h-10 text-primary" aria-hidden="true" />
+              <span className="text-sm sm:text-base font-semibold tracking-widest uppercase text-primary">
+                Justice Bot Technologies Inc.
+              </span>
+            </div>
+            
+            {/* Main headline */}
             <h1 
               id="hero-heading" 
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-tight tracking-tight text-foreground px-2"
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-tight tracking-tight text-white text-shadow-hero"
             >
-              Find out which legal form you need — in 2 minutes
+              Know Your Rights.
+              <br />
+              <span className="text-primary">Fight Back.</span>
             </h1>
             
-            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto px-4">
-              Answer a few questions. Get your recommended tribunal, forms, and next steps.
+            {/* Tagline */}
+            <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white/90 mt-4 border-l-4 border-primary pl-4">
+              Ignorance is not an option.
+            </p>
+            
+            <p className="text-base sm:text-lg md:text-xl text-white/80 max-w-2xl mt-4">
+              Free legal navigation for Canadians. Find your forms, understand your rights, and take action — all in minutes.
             </p>
 
             {/* Situational urgency */}
-            <div className="flex justify-center">
+            <div className="pt-4">
               <UrgencyBlock variant="subtle" />
             </div>
           </div>
 
           {/* Outcome-based CTAs */}
-          <div className="space-y-3 sm:space-y-4 animate-fade-in pt-2 sm:pt-4 px-2">
-            {/* Primary CTA - outcome focused */}
+          <div className="space-y-4 animate-fade-in pt-4">
+            {/* Primary CTA */}
             <Button 
               variant="cta" 
               size="lg" 
-              className="group text-base sm:text-lg md:text-xl lg:text-2xl px-6 sm:px-8 md:px-12 py-5 sm:py-6 md:py-8 lg:py-10 shadow-2xl hover:scale-[1.02] transition-all duration-300 w-full sm:w-auto"
+              className="group text-base sm:text-lg md:text-xl lg:text-2xl px-8 sm:px-10 md:px-14 py-6 sm:py-7 md:py-8 lg:py-10 shadow-2xl hover:scale-[1.02] transition-all duration-300 border-2 border-primary-foreground/20"
               onClick={handleFindPath}
             >
+              <Shield className="w-5 h-5 sm:w-6 sm:h-6 mr-3" aria-hidden="true" />
               Tell me what form I need
-              <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 ml-2 sm:ml-3 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 ml-3 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
             </Button>
             
             {/* Secondary CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <Button 
                 variant="outline" 
                 size="default"
-                className="w-full sm:w-auto text-sm sm:text-base"
+                className="text-sm sm:text-base bg-white/10 border-white/30 text-white hover:bg-white/20 hover:border-white/50"
                 onClick={handleCheckOptions}
               >
                 Check my legal options
@@ -92,17 +118,28 @@ const HeroSection = () => {
               <Button 
                 variant="ghost" 
                 size="default"
-                className="text-muted-foreground hover:text-foreground text-sm sm:text-base"
+                className="text-white/80 hover:text-white hover:bg-white/10 text-sm sm:text-base"
                 onClick={handleHowItWorks}
               >
-                <Play className="w-4 h-4 mr-2" />
+                <Play className="w-4 h-4 mr-2" aria-hidden="true" />
                 See how it works
               </Button>
             </div>
 
             {/* Trust micro-copy */}
-            <p className="text-xs sm:text-sm text-muted-foreground pt-2">
-              ✓ No signup • ✓ Free to start • ✓ 2,000+ helped
+            <p className="text-sm text-white/70 pt-2 flex items-center gap-4 flex-wrap">
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 bg-primary rounded-full" aria-hidden="true" />
+                No signup required
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 bg-primary rounded-full" aria-hidden="true" />
+                Free to start
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 bg-primary rounded-full" aria-hidden="true" />
+                2,000+ Canadians helped
+              </span>
             </p>
           </div>
         </div>
