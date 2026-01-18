@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { logAuditEvent, createAuditClient, hashEmail } from "../_shared/auditLog.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -104,6 +105,21 @@ serve(async (req: Request) => {
     if (docError) {
       console.error('Database error:', docError);
     }
+
+    // SOC2 Audit Log: Document generation success
+    const auditClient = createAuditClient();
+    await logAuditEvent(auditClient, {
+      action: 'document.generated',
+      resource_type: 'document',
+      resource_id: docRecord?.id || case_id,
+      user_id: caseData.user_id,
+      metadata: {
+        doc_type,
+        case_id,
+        storage_path: storagePath,
+        email_hash: user_email ? await hashEmail(user_email) : null,
+      }
+    }, req);
 
     // Queue email notification with download link
     if (user_email) {

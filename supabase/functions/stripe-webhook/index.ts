@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { logAuditEvent } from "../_shared/auditLog.ts";
 
 const logStep = (step: string, details?: unknown) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
@@ -358,6 +359,34 @@ serve(async (req) => {
           { method: "stripe", transaction_id: transactionId, product_type: productType },
           clientSeed,
         );
+
+        // ============ SOC2 Audit Log: Payment completed & Entitlement granted ============
+        await logAuditEvent(supabaseAdmin, {
+          action: 'payment.completed',
+          resource_type: 'payment',
+          resource_id: paymentId,
+          user_id: userId,
+          metadata: {
+            amount_cents: session.amount_total,
+            currency: session.currency,
+            product_type: productType,
+            case_id: caseId,
+            stripe_session_id: stripeCheckoutSessionId,
+          }
+        });
+
+        await logAuditEvent(supabaseAdmin, {
+          action: 'entitlement.granted',
+          resource_type: 'entitlement',
+          resource_id: entitlementKey,
+          user_id: userId,
+          metadata: {
+            product_type: productType,
+            case_id: caseId,
+            ends_at: endsAt,
+            source: 'stripe',
+          }
+        });
       }
 
       // ============ STEP 4: Mark case as paid (if case_id provided) ============
@@ -441,6 +470,29 @@ serve(async (req) => {
             logStep("Entitlement revoked due to refund", { 
               userId: refundedPayment.user_id, 
               entitlementKey: refundedPayment.entitlement_key 
+            });
+
+            // ============ SOC2 Audit Log: Refund & Entitlement revocation ============
+            await logAuditEvent(supabaseAdmin, {
+              action: 'payment.refunded',
+              resource_type: 'payment',
+              resource_id: refundedPayment.id,
+              user_id: refundedPayment.user_id,
+              metadata: {
+                payment_intent_id: paymentIntentId,
+                entitlement_key: refundedPayment.entitlement_key,
+              }
+            });
+
+            await logAuditEvent(supabaseAdmin, {
+              action: 'entitlement.revoked',
+              resource_type: 'entitlement',
+              resource_id: refundedPayment.entitlement_key,
+              user_id: refundedPayment.user_id,
+              metadata: {
+                reason: 'refund',
+                payment_id: refundedPayment.id,
+              }
             });
           }
         }

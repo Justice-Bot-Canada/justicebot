@@ -2,6 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { logAuditEvent, createAuditClient } from "../_shared/auditLog.ts";
 
 interface EvidenceItem {
   id: string;
@@ -185,6 +186,20 @@ Provide a strategic evidence analysis identifying strengths, weaknesses, gaps, a
     }
 
     console.log('Evidence analysis complete');
+
+    // SOC2 Audit Log: Evidence analysis completed
+    const auditClient = createAuditClient();
+    await logAuditEvent(auditClient, {
+      action: 'evidence.analyzed',
+      resource_type: 'evidence',
+      resource_id: caseId,
+      user_id: user.id,
+      metadata: {
+        case_type: caseType,
+        evidence_count: evidence.length,
+        analysis_stored: !insertError,
+      }
+    }, req);
 
     return new Response(
       JSON.stringify({
