@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { logAuditEvent, createAuditClient } from "../_shared/auditLog.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -176,6 +177,21 @@ Generate a complete, professional document ready for review and customization.`;
     const generatedDocument = data.choices[0].message.content;
 
     console.log('Document generated successfully');
+
+    // SOC2 Audit Log: Smart document generation success
+    const auditClient = createAuditClient();
+    await logAuditEvent(auditClient, {
+      action: 'document.generated',
+      resource_type: 'document',
+      resource_id: null,
+      user_id: user.id,
+      metadata: {
+        document_type: documentType,
+        tone,
+        case_type: caseContext.caseType,
+        province: caseContext.province,
+      }
+    }, req);
 
     return new Response(
       JSON.stringify({

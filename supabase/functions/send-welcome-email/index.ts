@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { logAuditEvent, hashEmail } from "../_shared/auditLog.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -188,6 +189,19 @@ serve(async (req) => {
     });
 
     console.log("Welcome email sent:", result.id);
+
+    // SOC2 Audit Log: User signup / welcome email sent
+    await logAuditEvent(supabase, {
+      action: 'auth.signup',
+      resource_type: 'user',
+      resource_id: userId || null,
+      user_id: userId || null,
+      metadata: {
+        email_hash: await hashEmail(userEmail),
+        welcome_email_sent: true,
+        resend_id: result.id,
+      }
+    }, req);
 
     // Log the email
     await supabase.from('email_queue').insert({

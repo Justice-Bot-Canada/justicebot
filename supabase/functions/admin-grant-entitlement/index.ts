@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { logAuditEvent } from "../_shared/auditLog.ts";
 
 const logStep = (step: string, details?: unknown) => {
   console.log(`[ADMIN-GRANT-ENTITLEMENT] ${step}`, details ? JSON.stringify(details) : "");
@@ -136,7 +137,7 @@ serve(async (req: Request) => {
       logStep("Entitlement granted/extended");
     }
 
-    // Write audit log
+    // Write audit log (entitlement_audit table)
     const { error: auditError } = await supabaseAdmin
       .from('entitlement_audit')
       .insert({
@@ -153,6 +154,21 @@ serve(async (req: Request) => {
       // Don't fail the request for audit errors
     }
     logStep("Audit log written");
+
+    // SOC2 Security Audit Log
+    await logAuditEvent(supabaseAdmin, {
+      action: action === 'revoke' ? 'admin.revoke_access' : 'admin.grant_access',
+      resource_type: 'entitlement',
+      resource_id: product_id,
+      user_id: adminUser.id,
+      metadata: {
+        target_user_id: targetUserId,
+        target_email: targetUser.email,
+        product_id,
+        ends_at: calculatedEndsAt,
+        note,
+      }
+    }, req);
 
     return new Response(
       JSON.stringify({

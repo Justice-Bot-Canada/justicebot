@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { logAuditEvent, createAuditClient } from "../_shared/auditLog.ts";
 
 // Input validation schema with size limits
 const TriageRequestSchema = z.object({
@@ -282,6 +283,22 @@ Provide your analysis in the specified JSON format. Be thorough but practical. F
     triageResult.nextSteps = triageResult.nextSteps || [];
     triageResult.urgentDeadlines = triageResult.urgentDeadlines || [];
     triageResult.flags = triageResult.flags || [];
+
+    // SOC2 Audit Log: Triage completed
+    const auditClient = createAuditClient();
+    await logAuditEvent(auditClient, {
+      action: 'case.triage_completed',
+      resource_type: 'case',
+      resource_id: null,
+      user_id: null, // Anonymous triage allowed
+      metadata: {
+        venue: triageResult.venue,
+        confidence: triageResult.confidence,
+        province: parsedInput.province,
+        forms_recommended: triageResult.recommendedForms.length,
+        has_urgent_deadlines: triageResult.urgentDeadlines.length > 0,
+      }
+    }, req);
 
     return new Response(
       JSON.stringify(triageResult),
