@@ -63,6 +63,7 @@ import OntarioSmallClaimsCourt2025 from "./pages/blog/OntarioSmallClaimsCourt202
 import Scope from "./pages/Scope";
 import Accessibility from "./pages/Accessibility";
 import PaymentPolicy from "./pages/PaymentPolicy";
+import ComplaintProcess from "./pages/ComplaintProcess";
 import Roadmap from "./pages/Roadmap";
 import Troubleshooting from "./pages/Troubleshooting";
 import MediaInquiries from "./pages/MediaInquiries";
@@ -290,6 +291,7 @@ const AppContent = () => {
           <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/payment-policy" element={<PaymentPolicy />} />
           <Route path="/accessibility" element={<Accessibility />} />
+          <Route path="/complaint-process" element={<ComplaintProcess />} />
 
           {/* Admin */}
           <Route path="/admin" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Admin /></Suspense></ProtectedRoute>} />
