@@ -51,16 +51,14 @@ export const CountrySelector = () => {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent 
         className="sm:max-w-md"
-        aria-labelledby="country-selector-title"
-        aria-describedby="country-selector-description"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
         <DialogHeader className="text-center">
-          <DialogTitle id="country-selector-title" className="text-2xl font-bold text-center">
+          <DialogTitle className="text-2xl font-bold text-center">
             Welcome to Justice-Bot
           </DialogTitle>
-          <DialogDescription id="country-selector-description" className="text-center text-base">
+          <DialogDescription className="text-center text-base">
             Select your country to ensure you see information specific to your legal system.
           </DialogDescription>
         </DialogHeader>
