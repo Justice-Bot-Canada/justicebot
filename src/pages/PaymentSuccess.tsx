@@ -56,6 +56,9 @@ const PaymentSuccess = () => {
             purchaseEventFired.current = true;
             const value = parseFloat(amount) || 39;
             
+            // CONVERSION: payment_completed GA4 event (mark in GA4 Admin)
+            analytics.paymentCompletedGA4(sessionId || crypto.randomUUID(), value, plan === 'form_purchase' ? 'Legal Form' : 'Case Assessment');
+            
             // New funnel events
             analytics.paymentCompletedEvent(sessionId || crypto.randomUUID(), value);
             analytics.featuresUnlocked(formIdParam || undefined);

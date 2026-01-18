@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { NextStepsActionPanel } from '@/components/NextStepsActionPanel';
+import { analytics } from '@/utils/analytics';
 
 interface SavedResearch {
   id: string;
@@ -145,6 +146,8 @@ export function SmartDocumentGenerator() {
 
     isGenerating.current = true;
     try {
+      // Fire GA4 generate_document event (mark as conversion in GA4 Admin)
+      analytics.generateDocumentGA4(documentType, selectedCaseId);
       await generateDocument({ documentType, tone, caseContext });
     } finally {
       isGenerating.current = false;

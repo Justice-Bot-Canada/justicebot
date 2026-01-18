@@ -46,13 +46,28 @@ export function useAnalytics() {
     const utm = getCurrentUTMParams();
     const isSessionStart = isNewSession();
     
+    // Build page path - ensure it's never empty
+    const pagePath = location.pathname || '/';
+    const pageSearch = location.search || '';
+    const fullPath = pagePath + pageSearch;
+    
+    // Build complete page location
+    const pageLocation = typeof window !== 'undefined' 
+      ? window.location.href 
+      : `https://justice-bot.com${fullPath}`;
+    
     // Send page_view with session_start flag for proper landing page attribution
+    // Explicitly set page_path and page_location to prevent (not set) values
     window.gtag('event', 'page_view', {
-      page_path: location.pathname + location.search,
-      page_title: document.title,
-      page_location: window.location.href,
+      page_path: fullPath,
+      page_title: document.title || 'Justice-Bot',
+      page_location: pageLocation,
       // Session start flag helps GA4 identify landing pages
-      ...(isSessionStart && { session_start: true }),
+      ...(isSessionStart && { 
+        session_start: true,
+        // Explicitly mark landing page for GA4
+        landing_page: fullPath,
+      }),
       // Include UTM params for attribution
       ...(utm.utm_source && { utm_source: utm.utm_source }),
       ...(utm.utm_medium && { utm_medium: utm.utm_medium }),

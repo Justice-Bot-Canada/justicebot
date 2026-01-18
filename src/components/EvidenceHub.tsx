@@ -269,11 +269,13 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
               }
             });
             toast.success(`${file.name} uploaded and analyzed`);
-            // Track evidence uploaded
+            // Track evidence uploaded - GA4 event (fires once per upload)
+            analytics.evidenceUploadedGA4(evidence.length + 1, caseId, file.type);
             analytics.evidenceUploaded(evidence.length + 1, caseId);
           } else {
             toast.success(`${file.name} uploaded`);
-            // Track evidence uploaded
+            // Track evidence uploaded - GA4 event (fires once per upload)
+            analytics.evidenceUploadedGA4(evidence.length + 1, caseId, file.type);
             analytics.evidenceUploaded(evidence.length + 1, caseId);
           }
 

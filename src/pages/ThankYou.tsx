@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle, FileText, Calendar, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
+import { analytics } from "@/utils/analytics";
 
 const ThankYou = () => {
   const [searchParams] = useSearchParams();
@@ -15,6 +16,7 @@ const ThankYou = () => {
   const [countdown, setCountdown] = useState(10);
   const [isProcessing, setIsProcessing] = useState(false);
   const { refetch: refetchPremiumAccess } = usePremiumAccess();
+  const purchaseEventFired = useRef(false);
 
   const sessionId = searchParams.get("session_id");
   const orderId = sessionId || "Pending";
@@ -61,6 +63,18 @@ const ThankYou = () => {
 
       if (data?.success) {
         await refetchPremiumAccess();
+        
+        // CONVERSION: payment_completed GA4 event (mark in GA4 Admin) - fire once
+        if (!purchaseEventFired.current) {
+          purchaseEventFired.current = true;
+          analytics.paymentCompletedGA4(sessionId, data.amount || 39, product);
+          analytics.funnelPurchase({
+            transactionId: sessionId,
+            value: data.amount || 39,
+            itemName: product,
+          });
+        }
+        
         toast({
           title: "Payment Confirmed!",
           description: "Your premium access has been activated.",
