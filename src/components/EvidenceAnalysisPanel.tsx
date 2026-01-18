@@ -43,10 +43,25 @@ export function EvidenceAnalysisPanel({
   useEffect(() => {
     const loadExistingAnalysis = async () => {
       try {
+        // First get the first evidence item for this case to find linked analysis
+        const { data: evidenceData } = await supabase
+          .from('evidence')
+          .select('id')
+          .eq('case_id', caseId)
+          .order('upload_date', { ascending: true })
+          .limit(1)
+          .single();
+
+        if (!evidenceData) {
+          setLoadingExisting(false);
+          return;
+        }
+
+        // Now fetch the analysis linked to this evidence
         const { data, error } = await supabase
           .from('evidence_analysis')
           .select('analysis_data, created_at')
-          .eq('evidence_id', caseId)
+          .eq('evidence_id', evidenceData.id)
           .order('created_at', { ascending: false })
           .limit(1)
           .single();
