@@ -37,6 +37,19 @@ const Evidence = () => {
 
   const isPremium = hasAccess && (tier === 'monthly' || tier === 'yearly');
 
+  // Case pipeline hook for post-evidence analysis
+  const { runPipeline, result: pipelineResult, loading: pipelineLoading } = useCasePipeline();
+
+  // Handler called after evidence upload completes
+  const handleEvidenceUploaded = async (count: number) => {
+    setEvidenceCount(count);
+    
+    // Automatically run the pipeline after evidence is uploaded
+    if (count > 0 && caseId && !pipelineResult) {
+      await runPipeline(caseId, caseData?.description, caseData?.province);
+    }
+  };
+
   // Check if user has Book of Documents entitlement
   const checkBookEntitlement = async () => {
     if (!user || !caseId) return;
