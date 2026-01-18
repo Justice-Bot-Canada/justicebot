@@ -172,11 +172,31 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
 
   const onDrop = async (acceptedFiles: File[]) => {
     setUploading(true);
+    let successfulUploads = 0;
 
     // Get current user ID for storage path
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       toast.error('You must be logged in to upload evidence');
+      setUploading(false);
+      return;
+    }
+
+    // Verify case exists and belongs to user
+    const { data: caseData, error: caseError } = await supabase
+      .from('cases')
+      .select('id, user_id, description, venue')
+      .eq('id', caseId)
+      .maybeSingle();
+
+    if (caseError || !caseData) {
+      toast.error('Case not found. Please create a case first.');
+      setUploading(false);
+      return;
+    }
+
+    if (caseData.user_id !== user.id) {
+      toast.error('You do not have permission to upload to this case.');
       setUploading(false);
       return;
     }
@@ -195,7 +215,11 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
             upsert: false
           });
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          console.error('Storage upload error:', uploadError);
+          toast.error(`Failed to upload ${file.name}: ${uploadError.message}`);
+          continue;
+        }
         setUploadProgress(prev => ({ ...prev, [fileId]: 50 }));
 
         // Get public URL from storage
@@ -217,8 +241,15 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
           .select()
           .single();
 
-        if (evidenceError) throw evidenceError;
+        if (evidenceError) {
+          console.error('Evidence record error:', evidenceError);
+          toast.error(`Failed to save ${file.name}: ${evidenceError.message}`);
+          // Try to clean up the uploaded file
+          await supabase.storage.from('evidence').remove([filePath]);
+          continue;
+        }
         setUploadProgress(prev => ({ ...prev, [fileId]: 75 }));
+        successfulUploads++;
 
         // Analyze document with AI - use storage path for binary files
         try {
@@ -280,17 +311,45 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
           }
 
           setUploadProgress(prev => ({ ...prev, [fileId]: 100 }));
-          fetchEvidence();
         } catch (analysisErr) {
           console.error('Analysis error:', analysisErr);
           toast.warning(`${file.name} uploaded but analysis failed`);
           setUploadProgress(prev => ({ ...prev, [fileId]: 100 }));
-          fetchEvidence();
         }
 
       } catch (error) {
         console.error('Upload error:', error);
         toast.error(`Failed to upload ${file.name}`);
+      }
+    }
+
+    // Refresh evidence list
+    fetchEvidence();
+    
+    // Notify parent of upload completion
+    if (successfulUploads > 0 && onUploadComplete) {
+      onUploadComplete(evidence.length + successfulUploads);
+    }
+
+    // Trigger legal pathway analysis after successful uploads
+    if (successfulUploads > 0) {
+      try {
+        toast.info('Analyzing your evidence for legal pathways...');
+        const { data: analysisResult, error: analysisError } = await supabase.functions.invoke('analyze-legal-case', {
+          body: {
+            caseId,
+            description: caseData.description || '',
+            province: 'ON', // Default to Ontario
+          }
+        });
+
+        if (analysisError) {
+          console.error('Legal analysis error:', analysisError);
+        } else if (analysisResult) {
+          toast.success('Legal pathway analysis complete! Check your recommended forms below.');
+        }
+      } catch (err) {
+        console.error('Failed to analyze legal pathway:', err);
       }
     }
 
