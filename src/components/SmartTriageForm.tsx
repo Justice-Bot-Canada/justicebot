@@ -185,7 +185,8 @@ const SmartTriageForm: React.FC<SmartTriageFormProps> = ({
       return;
     }
 
-    // Track triage started
+    // Track triage started - GA4 event (fires once)
+    analytics.triageStartedGA4(province);
     analytics.triageStarted(province);
     analytics.triageStart();
     trackEvent("triage_submit", { province, description_length: description.length });
@@ -216,6 +217,9 @@ const SmartTriageForm: React.FC<SmartTriageFormProps> = ({
       // Small delay to show 100% progress
       await new Promise((resolve) => setTimeout(resolve, 300));
 
+      // Fire GA4 triage_completed event
+      analytics.triageCompletedGA4(data?.venue || 'unknown', province, data?.merit_score);
+      
       onTriageComplete(data, description, province, uploadedFiles.length);
       toast.success("Analysis complete!");
     } catch (error: any) {

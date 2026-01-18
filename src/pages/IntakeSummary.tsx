@@ -12,7 +12,7 @@ import {
   ArrowLeft,
   Lock
 } from "lucide-react";
-import { trackEvent } from "@/utils/analytics";
+import { trackEvent, analytics } from "@/utils/analytics";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -102,6 +102,8 @@ export default function IntakeSummary() {
 
   const handleUnlock = async () => {
     setIsLoading(true);
+    // Fire GA4 payment_started event
+    analytics.paymentStartedGA4('form_unlock', 5.99);
     trackEvent('unlock_click', { ...intakeData });
     
     try {

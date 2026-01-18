@@ -92,7 +92,90 @@ const createItem = (planKey: string, planName: string, price: number) => ({
 // Predefined tracking functions
 export const analytics = {
   // ==========================================
-  // MINIMUM VIABLE CONVERSION FUNNEL EVENTS
+  // CORE GA4 CUSTOM EVENTS (MARK AS CONVERSIONS)
+  // These fire via gtag and should be marked as conversions in GA4 Admin
+  // ==========================================
+
+  // CONVERSION EVENT: signup_completed
+  signupCompletedGA4: (method: string) => {
+    sendGA4Event('signup_completed', {
+      method,
+      page_path: window.location.pathname,
+    });
+  },
+
+  // CONVERSION EVENT: generate_document
+  generateDocumentGA4: (documentType: string, caseId?: string) => {
+    sendGA4Event('generate_document', {
+      document_type: documentType,
+      case_id: caseId || 'unknown',
+      page_path: window.location.pathname,
+    });
+  },
+
+  // CONVERSION EVENT: payment_completed
+  paymentCompletedGA4: (transactionId: string, value: number, productName?: string) => {
+    sendGA4Event('payment_completed', {
+      transaction_id: transactionId,
+      value,
+      currency: 'CAD',
+      product_name: productName || 'Legal Form',
+      page_path: window.location.pathname,
+    });
+  },
+
+  // ==========================================
+  // STANDARD GA4 EVENTS (fire once per action)
+  // ==========================================
+
+  // triage_started - when user clicks "Analyze My Case"
+  triageStartedGA4: (province?: string) => {
+    sendGA4Event('triage_started', {
+      province: province || 'unknown',
+      page_path: window.location.pathname,
+    });
+  },
+
+  // triage_completed - when triage finishes successfully
+  triageCompletedGA4: (venue: string, province: string, meritScore?: number) => {
+    sendGA4Event('triage_completed', {
+      venue,
+      province,
+      merit_score: meritScore || 0,
+      page_path: window.location.pathname,
+    });
+  },
+
+  // evidence_uploaded - when evidence upload succeeds
+  evidenceUploadedGA4: (fileCount: number, caseId?: string, fileType?: string) => {
+    sendGA4Event('evidence_uploaded', {
+      file_count: fileCount,
+      case_id: caseId || 'unknown',
+      file_type: fileType || 'unknown',
+      page_path: window.location.pathname,
+    });
+  },
+
+  // login - successful login
+  loginGA4: (method: string) => {
+    sendGA4Event('login', {
+      method,
+      page_path: window.location.pathname,
+    });
+  },
+
+  // payment_started - user clicks checkout/pay
+  paymentStartedGA4: (product: string, value: number) => {
+    sendGA4Event('payment_started', {
+      product,
+      value,
+      currency: 'CAD',
+      page_path: window.location.pathname,
+    });
+  },
+
+  // ==========================================
+  // MINIMUM VIABLE CONVERSION FUNNEL EVENTS (legacy)
   // These 10 events are NON-NEGOTIABLE for scaling
   // ==========================================
 
@@ -100,6 +183,7 @@ export const analytics = {
   landingView: () => {
     sendGA4Event('landing_view', {
       landing_page: window.location.pathname,
+      page_location: typeof window !== 'undefined' ? window.location.href : '',
     });
   },
 
@@ -126,7 +210,7 @@ export const analytics = {
     });
   },
 
-  // Step 3: signup_completed - user creates account
+  // Step 3: signup_completed - user creates account (legacy)
   signupCompletedEvent: (method: string) => {
     sendGA4Event('signup_completed', {
       method,

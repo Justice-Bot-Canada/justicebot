@@ -46,6 +46,9 @@ const UnlockSuccess = () => {
           // CRITICAL: Refresh premium access state immediately after payment
           await refetchPremiumAccess();
           
+          // CONVERSION: payment_completed GA4 event (mark in GA4 Admin)
+          analytics.paymentCompletedGA4(sessionId, 5.99, data.product || 'Emergency Form Unlock');
+          
           analytics.funnelPurchase({
             transactionId: sessionId,
             value: 5.99,

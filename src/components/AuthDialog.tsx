@@ -77,9 +77,11 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
             title: "Sign In Error",
             description: error.message,
             variant: "destructive",
-          });
+        });
         }
       } else {
+        // Fire GA4 login event
+        analytics.loginGA4('email');
         analytics.signUp('email_login');
         toast({
           title: "Welcome back!",
@@ -279,6 +281,8 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         // Immediate login - email confirmation is disabled
         console.log('[Auth] Immediate session created');
         analytics.signupComplete(email, 'email');
+        // Fire GA4 signup_completed event (mark as conversion in GA4 Admin)
+        analytics.signupCompletedGA4('email');
         if (typeof window !== 'undefined' && window.gtag) {
           window.gtag('event', 'sign_up', { method: 'email', country: 'CA' });
         }
