@@ -25,6 +25,10 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [rememberDevice, setRememberDevice] = useState(() => {
+    // Default to true if user previously chose to remember, or true by default for convenience
+    return localStorage.getItem('jb_remember_device') !== 'false';
+  });
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [termsError, setTermsError] = useState("");
@@ -34,6 +38,14 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Load remembered email on mount
+  useEffect(() => {
+    const rememberedEmail = localStorage.getItem('jb_remembered_email');
+    if (rememberedEmail && rememberDevice) {
+      setEmail(rememberedEmail);
+    }
+  }, []);
 
   // Lock body scroll when dialog is open
   useEffect(() => {
@@ -62,6 +74,16 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     analytics.signupAttempt(email);
 
     try {
+      // Store remember device preference
+      localStorage.setItem('jb_remember_device', rememberDevice ? 'true' : 'false');
+      
+      // If remember device is enabled, also store email for convenience
+      if (rememberDevice) {
+        localStorage.setItem('jb_remembered_email', email);
+      } else {
+        localStorage.removeItem('jb_remembered_email');
+      }
+      
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -381,6 +403,20 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   placeholder="Your password"
                   required
                 />
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="remember-device"
+                  checked={rememberDevice}
+                  onCheckedChange={(checked) => setRememberDevice(checked === true)}
+                />
+                <Label 
+                  htmlFor="remember-device" 
+                  className="text-sm font-normal text-muted-foreground cursor-pointer"
+                >
+                  Remember this device
+                </Label>
               </div>
               
               {!showForgotPassword ? (
