@@ -170,9 +170,9 @@ const TriageResults: React.FC<TriageResultsProps> = ({
       <Card className="border-2 border-primary bg-gradient-to-r from-primary/5 to-primary/10">
         <CardContent className="pt-6 pb-6">
           <div className="text-center space-y-4">
-            <h3 className="text-xl font-bold">Save my case & continue</h3>
+            <h3 className="text-xl font-bold">Save your case and documents</h3>
             <p className="text-muted-foreground">
-              You can come back anytime. Nothing is filed without you.
+              Create a free account to save your answers, evidence, and access your documents later.
             </p>
             <Button onClick={onProceed} size="lg" className="gap-2" disabled={isLoading}>
               {isLoading ? (
@@ -188,7 +188,7 @@ const TriageResults: React.FC<TriageResultsProps> = ({
               )}
             </Button>
             <p className="text-xs text-muted-foreground">
-              ✓ Come back anytime • ✓ No payment yet • ✓ Nothing shared
+              ✓ Return anytime • ✓ No payment yet • ✓ Your data stays private
             </p>
           </div>
         </CardContent>
