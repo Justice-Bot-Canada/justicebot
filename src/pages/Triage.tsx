@@ -13,7 +13,7 @@ import TriageResults from "@/components/TriageResults";
 import { TriageDiscountModal } from "@/components/TriageDiscountModal";
 import { TriageDocumentUpload, PendingDocument } from "@/components/TriageDocumentUpload";
 import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
-import AuthDialog from "@/components/AuthDialog";
+import SaveCaseSignupModal from "@/components/SaveCaseSignupModal";
 import { ProgramBanner, useShouldHidePricing } from "@/components/ProgramBanner";
 import { CourtReadyPaywall } from "@/components/CourtReadyPaywall";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, BookOpen, FileCheck, ArrowRight, ArrowLeft, UserPlus, Shield, Sparkles, CheckCircle, Info } from "lucide-react";
+import { Loader2, BookOpen, FileCheck, ArrowRight, ArrowLeft, Save, Shield, Sparkles, CheckCircle, Info } from "lucide-react";
 import { analytics, trackEvent } from "@/utils/analytics";
 import { useProgramCaseFields } from "@/hooks/useProgramCaseFields";
 import { useProgram } from "@/contexts/ProgramContext";
@@ -358,26 +358,30 @@ const Triage = () => {
 
           {step === 1 && triageResult && (
             <>
-              {/* Create Free Account CTA for anonymous users */}
+              {/* Save Case CTA for anonymous users - reframed for conversion */}
               {!user && (
                 <Card className="mb-6 border-primary bg-gradient-to-r from-primary/10 via-primary/5 to-background overflow-hidden">
                   <CardContent className="p-6">
                     <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                       <div className="flex-shrink-0 p-3 rounded-full bg-primary/20">
-                        <Sparkles className="h-8 w-8 text-primary" />
+                        <Save className="h-8 w-8 text-primary" />
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-lg font-semibold">Save Your Case Overview — It's Free!</h3>
-                          <Badge variant="secondary" className="text-xs">100% Free</Badge>
+                          <h3 className="text-lg font-semibold">Save your case and documents</h3>
+                          <Badge variant="secondary" className="text-xs">Free</Badge>
                         </div>
                         <p className="text-sm text-muted-foreground mb-3">
-                          Create your free account to save this analysis, upload documents, and track your legal journey.
+                          Create a free account to save your answers, evidence, and access your documents later.
                         </p>
                         <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <CheckCircle className="h-3 w-3 text-green-500" />
-                            Save case overview
+                            Save triage results
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3 text-green-500" />
+                            Generate documents
                           </span>
                           <span className="flex items-center gap-1">
                             <CheckCircle className="h-3 w-3 text-green-500" />
@@ -385,11 +389,7 @@ const Triage = () => {
                           </span>
                           <span className="flex items-center gap-1">
                             <CheckCircle className="h-3 w-3 text-green-500" />
-                            Track deadlines
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <CheckCircle className="h-3 w-3 text-green-500" />
-                            AI form assistance
+                            Return anytime
                           </span>
                         </div>
                       </div>
@@ -398,8 +398,8 @@ const Triage = () => {
                         onClick={() => setShowAuthDialog(true)}
                         className="whitespace-nowrap"
                       >
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        Create Free Account
+                        <Save className="h-4 w-4 mr-2" />
+                        Save my case
                       </Button>
                     </div>
                   </CardContent>
@@ -465,8 +465,8 @@ const Triage = () => {
                       Create a free account to securely upload and store your documents
                     </p>
                     <Button variant="outline" onClick={() => setShowAuthDialog(true)}>
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      Sign Up to Upload
+                      <Save className="h-4 w-4 mr-2" />
+                      Save & Upload
                     </Button>
                   </CardContent>
                 </Card>
@@ -564,10 +564,19 @@ const Triage = () => {
         onClose={() => setShowDiscountModal(false)} 
       />
       
-      {/* Auth Dialog for signup */}
-      <AuthDialog 
+      {/* Save Case Signup Modal - post-triage conversion gate */}
+      <SaveCaseSignupModal 
         open={showAuthDialog} 
-        onOpenChange={setShowAuthDialog} 
+        onOpenChange={setShowAuthDialog}
+        onSuccess={() => {
+          setShowAuthDialog(false);
+          // After successful signup, proceed with the flow
+          if (triageResult && userHasAccess) {
+            setStep(2);
+          }
+        }}
+        venue={triageResult?.venue}
+        venueTitle={triageResult?.venueTitle}
       />
       
       {/* Book of Documents Wizard */}
