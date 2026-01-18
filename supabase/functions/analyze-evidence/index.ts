@@ -171,18 +171,29 @@ Provide a strategic evidence analysis identifying strengths, weaknesses, gaps, a
 
     const analysis = JSON.parse(analysisText);
 
-    // Store analysis result
-    const { error: insertError } = await supabaseClient
-      .from('evidence_analysis')
-      .insert({
-        case_id: caseId,
-        user_id: user.id,
-        analysis_data: analysis,
-        evidence_count: evidence.length,
-      });
-
-    if (insertError) {
-      console.error('Error storing analysis:', insertError);
+    // Store analysis result linked to the first evidence item (schema requires evidence_id)
+    // The evidence_analysis table uses evidence_id as foreign key, not case_id
+    let insertError = null;
+    if (evidence.length > 0) {
+      const { error } = await supabaseClient
+        .from('evidence_analysis')
+        .upsert({
+          evidence_id: evidence[0].id, // Link to first evidence item
+          analysis_data: {
+            ...analysis,
+            case_id: caseId,
+            user_id: user.id,
+            evidence_count: evidence.length,
+            analyzed_at: new Date().toISOString(),
+          },
+        }, {
+          onConflict: 'evidence_id',
+        });
+      insertError = error;
+      
+      if (insertError) {
+        console.error('Error storing analysis:', insertError);
+      }
     }
 
     console.log('Evidence analysis complete');
