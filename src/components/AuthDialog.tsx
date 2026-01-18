@@ -333,15 +333,10 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent 
-        className="sm:max-w-[425px]" 
-        role="dialog" 
-        aria-labelledby="auth-dialog-title"
-        aria-describedby="auth-dialog-description"
-      >
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle id="auth-dialog-title">Welcome to Justice-Bot</DialogTitle>
-          <DialogDescription id="auth-dialog-description">
+          <DialogTitle>Welcome to Justice-Bot</DialogTitle>
+          <DialogDescription>
             Sign in to your account or create a new one to get started with your legal case assessment.
           </DialogDescription>
         </DialogHeader>
