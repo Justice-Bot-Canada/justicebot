@@ -62,6 +62,7 @@ const Footer = () => {
               <li><a href="/terms" className="hover:text-background transition-colors">Terms</a></li>
               <li><a href="/privacy" className="hover:text-background transition-colors">Privacy</a></li>
               <li><a href="/accessibility" className="hover:text-background transition-colors">Accessibility</a></li>
+              <li><a href="/complaint-process" className="hover:text-background transition-colors">Complaints</a></li>
             </ul>
           </nav>
         </div>
