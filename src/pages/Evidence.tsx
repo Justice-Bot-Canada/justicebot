@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { BookOpen, ArrowRight, Upload, FileText, Plus } from "lucide-react";
+import { BookOpen, ArrowRight, Upload, FileText, Plus, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { FlowHeader } from "@/components/FlowHeader";
 import { FlowProgressIndicator } from "@/components/FlowProgressIndicator";
 import { ProgramBanner, useShouldHidePricing } from "@/components/ProgramBanner";
 import SEOHead from "@/components/SEOHead";
 import { EvidenceHub } from "@/components/EvidenceHub";
-import { EvidenceAnalyzer } from "@/components/EvidenceAnalyzer";
-import { PremiumGate } from "@/components/PremiumGate";
-import { CaseMeritScore } from "@/components/CaseMeritScore";
+import { CaseAnalysisResults } from "@/components/CaseAnalysisResults";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
 import { BookOfDocsPaywall } from "@/components/paywalls";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
+import { useCasePipeline } from "@/hooks/useCasePipeline";
 import { supabase } from "@/integrations/supabase/client";
 import { trackEvent, analytics } from "@/utils/analytics";
 import { useProgram } from "@/contexts/ProgramContext";
@@ -264,22 +263,29 @@ const Evidence = () => {
           {/* Evidence upload area */}
           {/* Evidence upload + merit score = ALWAYS FREE (never paywall curiosity) */}
           <div className="space-y-6">
-            <EvidenceHub caseId={caseId} onUploadComplete={setEvidenceCount} />
+            <EvidenceHub 
+              caseId={caseId} 
+              onUploadComplete={handleEvidenceUploaded} 
+            />
             
-            {/* Show analyzer and merit score after uploads */}
-            {evidenceCount > 0 && (
-              <>
-                <EvidenceAnalyzer 
-                  caseId={caseId} 
-                  caseType={caseData?.venue}
-                  caseDescription={caseData?.description}
-                />
-                <CaseMeritScore 
-                  caseId={caseId}
-                  caseType={caseData?.venue}
-                  caseDescription={caseData?.description}
-                />
-              </>
+            {/* Show full analysis results after pipeline runs */}
+            {pipelineResult && (
+              <CaseAnalysisResults 
+                result={pipelineResult} 
+                caseId={caseId}
+                onUnlockClick={() => navigate('/pricing')}
+              />
+            )}
+            
+            {/* Show loading state while pipeline runs */}
+            {pipelineLoading && (
+              <Card>
+                <CardContent className="py-8 text-center">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary mb-4" />
+                  <p className="font-medium">Analyzing your evidence...</p>
+                  <p className="text-sm text-muted-foreground">Finding legal pathways and matching forms</p>
+                </CardContent>
+              </Card>
             )}
           </div>
 
