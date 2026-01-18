@@ -305,7 +305,7 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
       'text/*': ['.txt'],
       'message/rfc822': ['.eml']
     },
-    maxSize: 20 * 1024 * 1024 // 20MB
+    maxSize: 100 * 1024 * 1024 // 100MB for large legal documents
   });
 
   const reprocessOCR = async (evidenceId: string, filePath: string, fileType: string) => {
