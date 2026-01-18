@@ -160,7 +160,11 @@ export function SmartDocumentGenerator() {
     setShowPaywall(false);
     isGenerating.current = true;
     try {
-      await generateDocument({ documentType, tone, caseContext });
+      const result = await generateDocument({ documentType, tone, caseContext });
+      // Fire GA4 generate_document event ONLY on successful generation
+      if (result) {
+        analytics.generateDocumentGA4(documentType, selectedCaseId);
+      }
     } finally {
       isGenerating.current = false;
     }
