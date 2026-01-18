@@ -45,14 +45,14 @@ const Header = () => {
             <a 
               href="/" 
               className="flex items-center gap-2 sm:gap-3" 
-              aria-label="Justice-Bot Technologies Inc. - Ignorance is not an option - Go to homepage"
+              aria-label="Justice-Bot Technologies Inc. - ignorance is not an option - Go to homepage"
             >
               <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg overflow-hidden bg-primary">
                 <Scale className="w-6 h-6 sm:w-7 sm:h-7 text-primary-foreground" />
               </div>
               <div className="hidden xs:block">
                 <h1 className="text-lg sm:text-xl font-bold text-foreground leading-tight">Justice-Bot</h1>
-                <p className="text-xs text-primary font-medium hidden sm:block">Ignorance is not an option</p>
+                <p className="text-xs text-primary font-medium hidden sm:block">ignorance is not an option</p>
               </div>
             </a>
           </div>

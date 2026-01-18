@@ -77,7 +77,7 @@ const HeroSection = () => {
             
             {/* Tagline */}
             <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white/90 mt-4 border-l-4 border-primary pl-4">
-              Ignorance is not an option.
+              ignorance is not an option
             </p>
             
             <p className="text-base sm:text-lg md:text-xl text-white/80 max-w-2xl mt-4">

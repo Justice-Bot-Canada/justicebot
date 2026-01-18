@@ -17,7 +17,7 @@ const Footer = () => {
               </div>
             </div>
             <p className="text-sm text-primary font-semibold italic border-l-2 border-primary pl-3">
-              "Ignorance is not an option."
+              ignorance is not an option
             </p>
             <p className="text-sm text-background/80 leading-relaxed">
               Empowering Canadians with knowledge of their rights.
