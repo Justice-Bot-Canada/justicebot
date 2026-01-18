@@ -117,9 +117,14 @@ const ResetPassword = () => {
     setLoading(true);
     
     try {
-      const { error } = await supabase.auth.updateUser({ password });
+      const { data, error } = await supabase.auth.updateUser({ password });
       
       if (error) throw error;
+      
+      // Refresh the session to ensure new credentials are stored
+      if (data.user) {
+        await supabase.auth.refreshSession();
+      }
       
       setSuccess(true);
       toast.success("Password updated successfully!");
