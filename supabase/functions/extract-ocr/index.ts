@@ -51,15 +51,29 @@ serve(async (req) => {
     if (fileType === 'application/pdf') {
       try {
         const arrayBuffer = await fileData.arrayBuffer();
+        const fileSizeMB = arrayBuffer.byteLength / (1024 * 1024);
         
-        // Check file size limit (20MB)
-        const MAX_SIZE = 20 * 1024 * 1024;
+        // Increased limit to 100MB - large legal documents are common
+        // For files > 50MB, we'll process first 50MB to avoid AI timeout
+        const MAX_SIZE = 100 * 1024 * 1024;
+        const AI_PROCESSING_LIMIT = 50 * 1024 * 1024;
+        
         if (arrayBuffer.byteLength > MAX_SIZE) {
-          throw new Error(`PDF too large (${Math.round(arrayBuffer.byteLength / 1024 / 1024)}MB). Maximum size is 20MB.`);
+          throw new Error(`PDF too large (${Math.round(fileSizeMB)}MB). Maximum size is 100MB.`);
         }
         
-        const base64 = arrayBufferToBase64(arrayBuffer);
-        console.log(`PDF converted to base64: ${base64.length} characters`);
+        // For large files, only process first portion for AI extraction
+        const processBuffer = arrayBuffer.byteLength > AI_PROCESSING_LIMIT 
+          ? arrayBuffer.slice(0, AI_PROCESSING_LIMIT)
+          : arrayBuffer;
+        
+        const isPartialExtraction = arrayBuffer.byteLength > AI_PROCESSING_LIMIT;
+        if (isPartialExtraction) {
+          console.log(`Large PDF (${Math.round(fileSizeMB)}MB) - processing first 50MB for text extraction`);
+        }
+        
+        const base64 = arrayBufferToBase64(processBuffer);
+        console.log(`PDF converted to base64: ${base64.length} characters (partial: ${isPartialExtraction})`);
         
         // Use Lovable AI to extract text from PDF
         const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
@@ -96,6 +110,9 @@ serve(async (req) => {
           if (aiResponse.ok) {
             const aiData = await aiResponse.json();
             extractedText = aiData.choices?.[0]?.message?.content || '';
+            if (isPartialExtraction) {
+              extractedText = `[Note: This is a large document (${Math.round(fileSizeMB)}MB). Text extracted from first portion.]\n\n${extractedText}`;
+            }
             console.log(`PDF text extracted: ${extractedText.length} characters`);
           } else if (aiResponse.status === 429) {
             throw new Error('Rate limit exceeded. Please try again later.');
@@ -121,10 +138,10 @@ serve(async (req) => {
       try {
         const arrayBuffer = await fileData.arrayBuffer();
         
-        // Check file size limit (20MB)
-        const MAX_SIZE = 20 * 1024 * 1024;
+        // Increased limit to 50MB for high-res scanned documents
+        const MAX_SIZE = 50 * 1024 * 1024;
         if (arrayBuffer.byteLength > MAX_SIZE) {
-          throw new Error(`Image too large (${Math.round(arrayBuffer.byteLength / 1024 / 1024)}MB). Maximum size is 20MB.`);
+          throw new Error(`Image too large (${Math.round(arrayBuffer.byteLength / 1024 / 1024)}MB). Maximum size is 50MB.`);
         }
         
         const base64 = arrayBufferToBase64(arrayBuffer);

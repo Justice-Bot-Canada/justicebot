@@ -38,7 +38,7 @@ export function TriageDocumentUpload({
   onDocumentsChange,
   disabled = false,
   maxFiles = 10,
-  maxSizeMB = 20
+  maxSizeMB = 100 // Increased to 100MB for large legal PDFs
 }: TriageDocumentUploadProps) {
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const remainingSlots = maxFiles - documents.length;

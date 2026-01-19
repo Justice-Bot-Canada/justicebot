@@ -131,11 +131,11 @@ const Index = () => {
               </div>
             </div>
             
-            {/* Secondary CTA */}
+            {/* Secondary CTA - same destination as hero */}
             <div className="text-center mt-8">
               <Button 
                 size="lg" 
-                onClick={() => navigate('/triage')}
+                onClick={() => navigate('/upload')}
                 className="px-8"
               >
                 Start Free Now

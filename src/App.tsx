@@ -83,6 +83,7 @@ import DemoJourney from "./pages/DemoJourney";
 import UrgentTriage from "./pages/UrgentTriage";
 import FindMyPath from "./pages/FindMyPath";
 import UploadFirst from "./pages/UploadFirst";
+import Upload from "./pages/Upload";
 import ExplainMyOptions from "./pages/ExplainMyOptions";
 import Intake from "./pages/Intake";
 import IntakeSummary from "./pages/IntakeSummary";
@@ -179,6 +180,7 @@ const AppContent = () => {
           <Route path="/triage" element={<Triage />} />
           <Route path="/urgent-triage" element={<UrgentTriage />} />
           <Route path="/find-my-path" element={<FindMyPath />} />
+          <Route path="/upload" element={<Upload />} />
           <Route path="/upload-first" element={<UploadFirst />} />
           <Route path="/explain-my-options" element={<ExplainMyOptions />} />
           <Route path="/case-demo" element={<CaseDemo />} />
