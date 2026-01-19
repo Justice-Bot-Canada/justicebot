@@ -35,12 +35,31 @@ serve(async (req) => {
 
     let extractedText = '';
 
+    // Helper function to convert ArrayBuffer to base64 (handles large files)
+    function arrayBufferToBase64(buffer: ArrayBuffer): string {
+      const bytes = new Uint8Array(buffer);
+      const CHUNK_SIZE = 32768; // Process in 32KB chunks to avoid stack overflow
+      let binary = '';
+      for (let i = 0; i < bytes.length; i += CHUNK_SIZE) {
+        const chunk = bytes.subarray(i, Math.min(i + CHUNK_SIZE, bytes.length));
+        binary += String.fromCharCode.apply(null, Array.from(chunk));
+      }
+      return btoa(binary);
+    }
+
     // Handle PDFs - extract text directly
     if (fileType === 'application/pdf') {
       try {
-        // For PDFs, we'll use pdfjs or send to AI for extraction
         const arrayBuffer = await fileData.arrayBuffer();
-        const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+        
+        // Check file size limit (20MB)
+        const MAX_SIZE = 20 * 1024 * 1024;
+        if (arrayBuffer.byteLength > MAX_SIZE) {
+          throw new Error(`PDF too large (${Math.round(arrayBuffer.byteLength / 1024 / 1024)}MB). Maximum size is 20MB.`);
+        }
+        
+        const base64 = arrayBufferToBase64(arrayBuffer);
+        console.log(`PDF converted to base64: ${base64.length} characters`);
         
         // Use Lovable AI to extract text from PDF
         const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
@@ -55,24 +74,44 @@ serve(async (req) => {
               model: 'google/gemini-2.5-flash',
               messages: [
                 {
-                  role: 'system',
-                  content: 'Extract all text content from the provided document. Return only the extracted text, preserving structure and formatting where possible.'
-                },
-                {
                   role: 'user',
-                  content: `Extract text from this PDF document (base64): ${base64.substring(0, 50000)}...`
+                  content: [
+                    {
+                      type: 'text',
+                      text: 'Extract all text content from this PDF document. Return only the extracted text, preserving structure and formatting where possible. Include all pages.'
+                    },
+                    {
+                      type: 'image_url',
+                      image_url: {
+                        url: `data:application/pdf;base64,${base64}`
+                      }
+                    }
+                  ]
                 }
               ],
+              max_tokens: 16000,
             }),
           });
 
           if (aiResponse.ok) {
             const aiData = await aiResponse.json();
             extractedText = aiData.choices?.[0]?.message?.content || '';
+            console.log(`PDF text extracted: ${extractedText.length} characters`);
+          } else if (aiResponse.status === 429) {
+            throw new Error('Rate limit exceeded. Please try again later.');
+          } else if (aiResponse.status === 402) {
+            throw new Error('AI service credits exhausted. Please add credits to continue.');
+          } else {
+            const errorText = await aiResponse.text();
+            console.error('AI extraction failed:', aiResponse.status, errorText);
+            throw new Error(`AI extraction failed: ${aiResponse.status}`);
           }
         }
       } catch (error) {
         console.error('PDF extraction error:', error);
+        if (error instanceof Error && error.message.includes('too large')) {
+          throw error;
+        }
         extractedText = '[PDF text extraction failed - file may contain scanned images]';
       }
     }
@@ -81,7 +120,15 @@ serve(async (req) => {
     if (fileType?.startsWith('image/')) {
       try {
         const arrayBuffer = await fileData.arrayBuffer();
-        const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+        
+        // Check file size limit (20MB)
+        const MAX_SIZE = 20 * 1024 * 1024;
+        if (arrayBuffer.byteLength > MAX_SIZE) {
+          throw new Error(`Image too large (${Math.round(arrayBuffer.byteLength / 1024 / 1024)}MB). Maximum size is 20MB.`);
+        }
+        
+        const base64 = arrayBufferToBase64(arrayBuffer);
+        console.log(`Image converted to base64: ${base64.length} characters`);
         
         const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
         if (LOVABLE_API_KEY) {
@@ -110,16 +157,22 @@ serve(async (req) => {
                   ]
                 }
               ],
+              max_tokens: 8000,
             }),
           });
 
           if (aiResponse.ok) {
             const aiData = await aiResponse.json();
             extractedText = aiData.choices?.[0]?.message?.content || '';
+            console.log(`Image text extracted: ${extractedText.length} characters`);
           } else if (aiResponse.status === 429) {
             throw new Error('Rate limit exceeded. Please try again later.');
           } else if (aiResponse.status === 402) {
             throw new Error('AI service credits exhausted. Please add credits to continue.');
+          } else {
+            const errorText = await aiResponse.text();
+            console.error('AI OCR failed:', aiResponse.status, errorText);
+            throw new Error(`AI OCR failed: ${aiResponse.status}`);
           }
         }
       } catch (error) {
