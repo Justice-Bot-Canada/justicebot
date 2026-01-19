@@ -53,6 +53,7 @@ import ProvincialAccountabilityJourney from "./pages/ProvincialAccountabilityJou
 import ErrorBoundary from "./components/ErrorBoundary";
 import LiveSupportWidget from "./components/LiveSupportWidget";
 import Disclaimer from "./pages/Disclaimer";
+import UserTerms from "./pages/UserTerms";
 import About from "./pages/About";
 import FAQ from "./pages/FAQ";
 import WhatWeDo from "./pages/WhatWeDo";
@@ -292,6 +293,7 @@ const AppContent = () => {
           {/* Legal & Policies */}
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/user-terms" element={<UserTerms />} />
           <Route path="/liability" element={<Liability />} />
           <Route path="/disclaimer" element={<Disclaimer />} />
           <Route path="/payment-policy" element={<PaymentPolicy />} />
