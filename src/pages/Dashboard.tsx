@@ -34,6 +34,7 @@ import { BookOfDocumentsPreview } from "@/components/BookOfDocumentsPreview";
 import DashboardHeader from "@/components/DashboardHeader";
 import { ProgramBanner } from "@/components/ProgramBanner";
 import { ResumeCaseCard } from "@/components/ResumeCaseCard";
+import { MeritScoreBadge } from "@/components/MeritScoreBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { analytics } from "@/utils/analytics";
@@ -273,6 +274,17 @@ const Dashboard = () => {
             <p className="text-muted-foreground text-sm">
               {activeCase.venue || activeCase.province} • Last updated {new Date(activeCase.created_at).toLocaleDateString()}
             </p>
+          </div>
+        )}
+
+        {/* MERIT SCORE - Prominently displayed on dashboard */}
+        {activeCase && activeCase.merit_score !== null && (
+          <div className="mb-6">
+            <MeritScoreBadge 
+              score={activeCase.merit_score} 
+              showExplanation={true}
+              compact={false}
+            />
           </div>
         )}
 
