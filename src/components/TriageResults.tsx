@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { NextStepsActionPanel } from "@/components/NextStepsActionPanel";
+import { MeritScoreBadge } from "@/components/MeritScoreBadge";
 import { 
   ArrowRight, 
   ArrowLeft,
@@ -130,11 +131,21 @@ const TriageResults: React.FC<TriageResultsProps> = ({
             </div>
           </div>
 
+          {/* MERIT SCORE - Prominently displayed */}
+          <MeritScoreBadge 
+            score={result.confidence} 
+            showExplanation={true}
+            compact={false}
+          />
+
           {/* Primary Form */}
           {primaryForms.length > 0 && (
             <div className="p-4 rounded-lg border bg-muted/30">
-              <p className="text-sm font-medium text-muted-foreground mb-1">Correct Form</p>
+              <p className="text-sm font-medium text-muted-foreground mb-1">Recommended Form</p>
               <h4 className="font-bold text-lg">{primaryForms[0].formCode} – {primaryForms[0].formTitle}</h4>
+              <p className="text-xs text-muted-foreground mt-1">
+                Based on your merit score of {result.confidence}/100
+              </p>
             </div>
           )}
 

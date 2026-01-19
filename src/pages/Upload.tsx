@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDropzone } from "react-dropzone";
-import { Upload as UploadIcon, FileText, ArrowRight, Loader2, CheckCircle, Shield, AlertTriangle, Sparkles } from "lucide-react";
+import { Upload as UploadIcon, FileText, ArrowRight, Loader2, CheckCircle, Shield, AlertTriangle, Sparkles, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EnhancedSEO from "@/components/EnhancedSEO";
+import { MeritScoreBadge, getMeritBand, getMeritColor } from "@/components/MeritScoreBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { analytics, trackEvent } from "@/utils/analytics";
@@ -29,6 +30,7 @@ interface AnalysisResult {
   nextSteps: string[];
   recommendedForm: string;
   meritSignal: 'strong' | 'moderate' | 'needs-review';
+  meritScore: number; // 0-100 numeric score
   urgentDeadlines: string[];
 }
 
@@ -123,6 +125,11 @@ const Upload = () => {
         throw new Error('Failed to analyze document');
       }
 
+      // Calculate numeric merit score from confidence
+      const confidence = triageData?.confidence || 50;
+      const meritScore = typeof confidence === 'number' ? Math.round(confidence) : 50;
+      const meritSignal = meritScore >= 70 ? 'strong' : meritScore >= 40 ? 'moderate' : 'needs-review';
+
       // Process result
       const result: AnalysisResult = {
         venue: triageData?.venue || 'general',
@@ -130,7 +137,8 @@ const Upload = () => {
         explanation: triageData?.reasoning || 'Your document has been reviewed.',
         nextSteps: triageData?.nextSteps || ['Review the explanation', 'Generate your response form'],
         recommendedForm: triageData?.recommendedForms?.[0]?.formCode || 'general-response',
-        meritSignal: triageData?.confidence > 70 ? 'strong' : triageData?.confidence > 40 ? 'moderate' : 'needs-review',
+        meritSignal: meritSignal as 'strong' | 'moderate' | 'needs-review',
+        meritScore: meritScore,
         urgentDeadlines: triageData?.urgentDeadlines || []
       };
 
@@ -354,6 +362,13 @@ const Upload = () => {
         {/* Step 2: Explanation (FREE) */}
         {analysisResult && !showPaymentStep && (
           <div className="space-y-6">
+            {/* PROMINENT MERIT SCORE - Decision Anchor */}
+            <MeritScoreBadge 
+              score={analysisResult.meritScore} 
+              showExplanation={true}
+              compact={false}
+            />
+
             <Card className="border-green-200 bg-green-50/50">
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -361,7 +376,6 @@ const Upload = () => {
                     <CheckCircle className="w-5 h-5 text-green-600" />
                     Document Analyzed
                   </CardTitle>
-                  {getMeritBadge(analysisResult.meritSignal)}
                 </div>
                 <CardDescription>
                   Here's what your document means in plain language
