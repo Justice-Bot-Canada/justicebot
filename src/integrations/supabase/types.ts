@@ -159,6 +159,53 @@ export type Database = {
           },
         ]
       }
+      case_merit: {
+        Row: {
+          case_id: string
+          components: Json
+          created_at: string
+          gaps: string[] | null
+          id: string
+          reasons: Json
+          score_total: number
+          strengths: string[] | null
+          updated_at: string
+          weaknesses: string[] | null
+        }
+        Insert: {
+          case_id: string
+          components?: Json
+          created_at?: string
+          gaps?: string[] | null
+          id?: string
+          reasons?: Json
+          score_total: number
+          strengths?: string[] | null
+          updated_at?: string
+          weaknesses?: string[] | null
+        }
+        Update: {
+          case_id?: string
+          components?: Json
+          created_at?: string
+          gaps?: string[] | null
+          id?: string
+          reasons?: Json
+          score_total?: number
+          strengths?: string[] | null
+          updated_at?: string
+          weaknesses?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_merit_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: true
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       case_milestones: {
         Row: {
           case_id: string
@@ -759,6 +806,7 @@ export type Database = {
       forms: {
         Row: {
           category: string
+          checksum: string | null
           created_at: string
           description: string | null
           filing_requirements: Json | null
@@ -767,16 +815,23 @@ export type Database = {
           id: string
           instructions: string | null
           is_active: boolean
+          jurisdiction: string | null
+          last_verified_at: string | null
           pdf_url: string | null
           price_cents: number
+          province: string | null
           purchasable: boolean
+          source_url: string | null
+          status: string | null
           title: string
           tribunal_type: string
           updated_at: string
           usage_count: number | null
+          version_date: string | null
         }
         Insert: {
           category: string
+          checksum?: string | null
           created_at?: string
           description?: string | null
           filing_requirements?: Json | null
@@ -785,16 +840,23 @@ export type Database = {
           id?: string
           instructions?: string | null
           is_active?: boolean
+          jurisdiction?: string | null
+          last_verified_at?: string | null
           pdf_url?: string | null
           price_cents?: number
+          province?: string | null
           purchasable?: boolean
+          source_url?: string | null
+          status?: string | null
           title: string
           tribunal_type: string
           updated_at?: string
           usage_count?: number | null
+          version_date?: string | null
         }
         Update: {
           category?: string
+          checksum?: string | null
           created_at?: string
           description?: string | null
           filing_requirements?: Json | null
@@ -803,15 +865,59 @@ export type Database = {
           id?: string
           instructions?: string | null
           is_active?: boolean
+          jurisdiction?: string | null
+          last_verified_at?: string | null
           pdf_url?: string | null
           price_cents?: number
+          province?: string | null
           purchasable?: boolean
+          source_url?: string | null
+          status?: string | null
           title?: string
           tribunal_type?: string
           updated_at?: string
           usage_count?: number | null
+          version_date?: string | null
         }
         Relationships: []
+      }
+      funnel_events: {
+        Row: {
+          case_id: string | null
+          created_at: string
+          event_data: Json | null
+          event_type: string
+          id: string
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          case_id?: string | null
+          created_at?: string
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          case_id?: string | null
+          created_at?: string
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "funnel_events_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       leads: {
         Row: {
@@ -1020,6 +1126,69 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      pathway_rules: {
+        Row: {
+          amount_max: number | null
+          amount_min: number | null
+          category: string
+          created_at: string
+          filing_fee: string | null
+          id: string
+          is_active: boolean | null
+          issue_keywords: string[]
+          pathway_id: string
+          priority: number | null
+          province: string | null
+          reasoning: string | null
+          recommended_forms: string[] | null
+          rule_name: string
+          success_rate: number | null
+          timeframe: string | null
+          tribunal: string
+          updated_at: string
+        }
+        Insert: {
+          amount_max?: number | null
+          amount_min?: number | null
+          category: string
+          created_at?: string
+          filing_fee?: string | null
+          id?: string
+          is_active?: boolean | null
+          issue_keywords?: string[]
+          pathway_id: string
+          priority?: number | null
+          province?: string | null
+          reasoning?: string | null
+          recommended_forms?: string[] | null
+          rule_name: string
+          success_rate?: number | null
+          timeframe?: string | null
+          tribunal: string
+          updated_at?: string
+        }
+        Update: {
+          amount_max?: number | null
+          amount_min?: number | null
+          category?: string
+          created_at?: string
+          filing_fee?: string | null
+          id?: string
+          is_active?: boolean | null
+          issue_keywords?: string[]
+          pathway_id?: string
+          priority?: number | null
+          province?: string | null
+          reasoning?: string | null
+          recommended_forms?: string[] | null
+          rule_name?: string
+          success_rate?: number | null
+          timeframe?: string | null
+          tribunal?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       payments: {
         Row: {
@@ -1493,6 +1662,45 @@ export type Database = {
         }
         Relationships: []
       }
+      sweep_runs: {
+        Row: {
+          created_at: string
+          errors: Json | null
+          finished_at: string | null
+          forms_changed: number | null
+          forms_checked: number | null
+          forms_deprecated: number | null
+          id: string
+          metadata: Json | null
+          started_at: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          errors?: Json | null
+          finished_at?: string | null
+          forms_changed?: number | null
+          forms_checked?: number | null
+          forms_deprecated?: number | null
+          id?: string
+          metadata?: Json | null
+          started_at?: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          errors?: Json | null
+          finished_at?: string | null
+          forms_changed?: number | null
+          forms_checked?: number | null
+          forms_deprecated?: number | null
+          id?: string
+          metadata?: Json | null
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       testimonials: {
         Row: {
           approved_at: string | null
@@ -1657,6 +1865,36 @@ export type Database = {
           title?: string
           video_url?: string
           view_count?: number
+        }
+        Relationships: []
+      }
+      user_access: {
+        Row: {
+          access_expires_at: string | null
+          access_unlocked: boolean
+          created_at: string
+          purchased_form_ids: string[] | null
+          tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_expires_at?: string | null
+          access_unlocked?: boolean
+          created_at?: string
+          purchased_form_ids?: string[] | null
+          tier?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_expires_at?: string | null
+          access_unlocked?: boolean
+          created_at?: string
+          purchased_form_ids?: string[] | null
+          tier?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
