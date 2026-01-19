@@ -294,7 +294,7 @@ Provide your analysis in the specified JSON format. Be thorough but practical. F
       metadata: {
         venue: triageResult.venue,
         confidence: triageResult.confidence,
-        province: parsedInput.province,
+        province: province,
         forms_recommended: triageResult.recommendedForms.length,
         has_urgent_deadlines: triageResult.urgentDeadlines.length > 0,
       }
