@@ -165,12 +165,50 @@ export const analytics = {
     });
   },
 
+  // evidence_upload_success - CRITICAL: fires when evidence is successfully saved
+  evidenceUploadSuccess: (fileCount: number, caseId?: string) => {
+    sendGA4Event('evidence_upload_success', {
+      file_count: fileCount,
+      case_id: caseId || 'unknown',
+      page_path: window.location.pathname,
+    });
+  },
+
   // redirect_to_dashboard_success - when user is redirected to dashboard after upload
   redirectToDashboardSuccess: (fromPage: string, caseId?: string) => {
     sendGA4Event('redirect_to_dashboard_success', {
       from_page: fromPage,
       case_id: caseId || 'unknown',
       page_path: '/dashboard',
+    });
+  },
+
+  // merit_score_generated - CRITICAL: fires when merit score is calculated
+  meritScoreGenerated: (score: number, caseId?: string) => {
+    sendGA4Event('merit_score_generated', {
+      score,
+      score_band: score >= 70 ? 'strong' : score >= 40 ? 'moderate' : 'weak',
+      case_id: caseId || 'unknown',
+      page_path: window.location.pathname,
+    });
+  },
+
+  // paywall_triggered - CRITICAL: fires when paywall blocks user action
+  paywallTriggered: (action: string, caseId?: string, venue?: string) => {
+    sendGA4Event('paywall_triggered', {
+      blocked_action: action,
+      case_id: caseId || 'unknown',
+      venue: venue || 'unknown',
+      page_path: window.location.pathname,
+    });
+  },
+
+  // form_generated - CRITICAL: fires when a form is successfully generated
+  formGenerated: (formType: string, caseId?: string) => {
+    sendGA4Event('form_generated', {
+      form_type: formType,
+      case_id: caseId || 'unknown',
+      page_path: window.location.pathname,
     });
   },
 

@@ -4,19 +4,40 @@ import { Navigate, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/lib/toast-stub";
+import { analytics } from "@/utils/analytics";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiresCase?: boolean;
-  flowStep?: 'triage' | 'evidence' | 'timeline' | 'documents';
+  flowStep?: 'triage' | 'evidence' | 'timeline' | 'documents' | 'forms' | 'generate';
+  requiresMeritScore?: boolean;
+  requiresPayment?: boolean;
 }
 
-// Routes that require flow enforcement
-const FLOW_ROUTES: Record<string, 'triage' | 'evidence' | 'timeline' | 'documents'> = {
-  '/triage': 'triage',
-  '/evidence': 'evidence',
-  '/case-timeline': 'timeline',
-  '/dashboard': 'documents',
+/**
+ * FUNNEL GUARDRAILS - DO NOT TOUCH
+ * 
+ * Routes that require flow enforcement and their requirements:
+ * - /triage: requires province
+ * - /evidence: requires triage_complete
+ * - /case-timeline: requires evidence_uploaded
+ * - /dashboard: requires triage_complete
+ * - /forms: requires merit_score_generated
+ * - /generate: requires ALL (triage + evidence + merit + payment)
+ */
+const FLOW_ROUTES: Record<string, {
+  step: 'triage' | 'evidence' | 'timeline' | 'documents' | 'forms' | 'generate';
+  requiresMeritScore?: boolean;
+  requiresPayment?: boolean;
+}> = {
+  '/triage': { step: 'triage' },
+  '/evidence': { step: 'evidence' },
+  '/case-timeline': { step: 'timeline' },
+  '/dashboard': { step: 'documents' },
+  '/forms': { step: 'forms', requiresMeritScore: true },
+  '/form-selector': { step: 'forms', requiresMeritScore: true },
+  '/smart-documents': { step: 'generate', requiresMeritScore: true, requiresPayment: true },
+  '/generate': { step: 'generate', requiresMeritScore: true, requiresPayment: true },
 };
 
 interface FlowState {
@@ -25,18 +46,31 @@ interface FlowState {
   triageComplete: boolean;
   evidenceCount: number;
   timelineViewed: boolean;
+  meritScoreGenerated: boolean;
+  meritScore: number | null;
+  accessUnlocked: boolean;
   caseId: string | null;
   flowStep: string | null;
+  venue: string | null;
 }
 
-const ProtectedRoute = ({ children, requiresCase, flowStep }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ 
+  children, 
+  requiresCase, 
+  flowStep,
+  requiresMeritScore,
+  requiresPayment,
+}: ProtectedRouteProps) => {
   const { user, loading } = useAuth();
   const location = useLocation();
   const [flowState, setFlowState] = useState<FlowState | null>(null);
   const [checkingFlow, setCheckingFlow] = useState(true);
 
   // Determine which flow step this route requires
-  const requiredStep = flowStep || FLOW_ROUTES[location.pathname];
+  const routeConfig = FLOW_ROUTES[location.pathname];
+  const requiredStep = flowStep || routeConfig?.step;
+  const needsMeritScore = requiresMeritScore ?? routeConfig?.requiresMeritScore ?? false;
+  const needsPayment = requiresPayment ?? routeConfig?.requiresPayment ?? false;
 
   // Check flow state when user is authenticated
   useEffect(() => {
@@ -47,7 +81,7 @@ const ProtectedRoute = ({ children, requiresCase, flowStep }: ProtectedRouteProp
       }
 
       // Skip flow enforcement for non-flow routes
-      if (!requiredStep) {
+      if (!requiredStep && !needsMeritScore && !needsPayment) {
         setCheckingFlow(false);
         return;
       }
@@ -63,7 +97,7 @@ const ProtectedRoute = ({ children, requiresCase, flowStep }: ProtectedRouteProp
         // Check for active case
         const { data: cases } = await supabase
           .from('cases')
-          .select('id, flow_step, triage_complete, timeline_viewed, province')
+          .select('id, flow_step, triage_complete, timeline_viewed, province, venue, merit_score, is_paid')
           .eq('user_id', user.id)
           .order('updated_at', { ascending: false })
           .limit(1);
@@ -80,14 +114,40 @@ const ProtectedRoute = ({ children, requiresCase, flowStep }: ProtectedRouteProp
           evidenceCount = count || 0;
         }
 
+        // Check for paid entitlements
+        let hasAccess = activeCase?.is_paid === true;
+        if (!hasAccess && user.id) {
+          const { data: entitlements } = await supabase
+            .from('entitlements')
+            .select('product_id, ends_at')
+            .eq('user_id', user.id);
+          
+          if (entitlements && entitlements.length > 0) {
+            hasAccess = entitlements.some(e => {
+              if (e.ends_at && new Date(e.ends_at) < new Date()) {
+                return false;
+              }
+              return e.product_id?.toLowerCase().includes('monthly') ||
+                     e.product_id?.toLowerCase().includes('yearly') ||
+                     e.product_id?.toLowerCase().includes('premium') ||
+                     e.product_id?.toLowerCase().includes('professional') ||
+                     e.product_id?.toLowerCase().includes('basic');
+            });
+          }
+        }
+
         setFlowState({
           hasCase: !!activeCase,
           hasProvince: !!(profile?.selected_province || activeCase?.province),
           triageComplete: activeCase?.triage_complete || false,
           evidenceCount,
           timelineViewed: activeCase?.timeline_viewed || false,
+          meritScoreGenerated: activeCase?.merit_score !== null && activeCase?.merit_score !== undefined,
+          meritScore: activeCase?.merit_score || null,
+          accessUnlocked: hasAccess,
           caseId: activeCase?.id || null,
           flowStep: activeCase?.flow_step || null,
+          venue: activeCase?.venue || null,
         });
       } catch (error) {
         console.error('Error checking flow state:', error);
@@ -99,10 +159,10 @@ const ProtectedRoute = ({ children, requiresCase, flowStep }: ProtectedRouteProp
     if (!loading) {
       checkFlowState();
     }
-  }, [user, loading, requiredStep]);
+  }, [user, loading, requiredStep, needsMeritScore, needsPayment]);
 
   // Show loading while checking auth
-  if (loading || (user && checkingFlow && requiredStep)) {
+  if (loading || (user && checkingFlow && (requiredStep || needsMeritScore || needsPayment))) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
@@ -119,56 +179,44 @@ const ProtectedRoute = ({ children, requiresCase, flowStep }: ProtectedRouteProp
   }
 
   // Flow enforcement for flow routes
-  if (requiredStep && flowState) {
+  if ((requiredStep || needsMeritScore || needsPayment) && flowState) {
     let redirectTo: string | null = null;
     let message: string | null = null;
 
-    switch (requiredStep) {
-      case 'triage':
-        // Triage requires province selection
-        if (!flowState.hasProvince) {
-          redirectTo = '/welcome';
-          message = 'Please select your province first';
-        }
-        break;
-
-      case 'evidence':
-        // Evidence requires triage complete
-        if (!flowState.hasProvince) {
-          redirectTo = '/welcome';
-          message = 'Please select your province first';
-        } else if (!flowState.triageComplete) {
-          redirectTo = '/triage';
-          message = 'Please complete the AI triage first';
-        }
-        break;
-
-      case 'timeline':
-        // Timeline requires at least one piece of evidence
-        if (!flowState.hasProvince) {
-          redirectTo = '/welcome';
-          message = 'Please select your province first';
-        } else if (!flowState.triageComplete) {
-          redirectTo = '/triage';
-          message = 'Please complete the AI triage first';
-        } else if (flowState.evidenceCount === 0) {
-          redirectTo = flowState.caseId 
-            ? `/evidence?caseId=${flowState.caseId}` 
-            : '/evidence';
-          message = 'Please upload at least one piece of evidence';
-        }
-        break;
-
-      case 'documents':
-        // Documents (dashboard) requires timeline viewed
-        // But we allow some flexibility here for returning users
-        if (!flowState.hasCase && !flowState.hasProvince) {
-          redirectTo = '/welcome';
-          message = 'Please start by creating a case';
-        }
-        // Note: We don't strictly enforce all steps for dashboard
-        // as users may need to access it for various reasons
-        break;
+    // GUARDRAIL 1: Province required for all flow routes
+    if (!flowState.hasProvince) {
+      redirectTo = '/welcome';
+      message = 'Please select your province first';
+    }
+    // GUARDRAIL 2: Triage required for all routes beyond triage
+    else if (requiredStep !== 'triage' && !flowState.triageComplete) {
+      redirectTo = '/triage';
+      message = 'Please complete the AI triage first';
+    }
+    // GUARDRAIL 3: Evidence required for timeline/forms/generate
+    else if ((requiredStep === 'timeline' || requiredStep === 'forms' || requiredStep === 'generate') && 
+             flowState.evidenceCount === 0) {
+      redirectTo = flowState.caseId 
+        ? `/evidence?caseId=${flowState.caseId}` 
+        : '/evidence';
+      message = 'Please upload at least one piece of evidence';
+    }
+    // GUARDRAIL 4: Merit score required for forms/generate (NON-OPTIONAL)
+    else if ((needsMeritScore || requiredStep === 'forms' || requiredStep === 'generate') && 
+             !flowState.meritScoreGenerated) {
+      // Fire paywall_triggered for analytics
+      analytics.paywallTriggered('merit_score_required', flowState.caseId || undefined, flowState.venue || undefined);
+      
+      redirectTo = '/dashboard';
+      message = 'Your case strength must be calculated first';
+    }
+    // GUARDRAIL 5: Payment required for document generation (DO NOT SOFTEN)
+    else if ((needsPayment || requiredStep === 'generate') && !flowState.accessUnlocked) {
+      // Fire paywall_triggered for analytics
+      analytics.paywallTriggered('payment_required', flowState.caseId || undefined, flowState.venue || undefined);
+      
+      redirectTo = '/pricing';
+      message = 'Please unlock premium features to generate documents';
     }
 
     if (redirectTo) {

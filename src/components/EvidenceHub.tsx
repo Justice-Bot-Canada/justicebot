@@ -337,7 +337,8 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
 
     // Trigger legal pathway analysis after successful uploads
     if (successfulUploads > 0) {
-      // Track evidence upload complete event
+      // Track evidence upload success and complete events - CRITICAL for regression detection
+      analytics.evidenceUploadSuccess(successfulUploads, caseId);
       analytics.evidenceUploadComplete(successfulUploads, caseId);
       
       try {
