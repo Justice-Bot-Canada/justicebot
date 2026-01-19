@@ -169,6 +169,7 @@ const AppContent = () => {
           {/* Main Landing & Getting Started */}
           <Route path="/" element={<Index />} />
           <Route path="/demo-journey" element={<DemoJourney />} />
+          <Route path="/demo" element={<DemoJourney />} />
           <Route path="/welcome" element={<Welcome />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/intake" element={<Intake />} />
