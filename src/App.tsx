@@ -335,6 +335,26 @@ const AppContent = () => {
           <Route path="/login" element={<Navigate to="/welcome" replace />} />
           <Route path="/generate" element={<Navigate to="/forms" replace />} />
           <Route path="/small-claims" element={<Navigate to="/small-claims-journey" replace />} />
+          <Route path="/auth" element={<Navigate to="/welcome" replace />} />
+          
+          {/* Legacy city pages - Ontario cities redirect to LTB pages */}
+          <Route path="/legal-help-toronto" element={<Navigate to="/ltb-toronto" replace />} />
+          <Route path="/legal-help-ottawa" element={<Navigate to="/ltb-ottawa" replace />} />
+          <Route path="/legal-help-mississauga" element={<Navigate to="/ltb-mississauga" replace />} />
+          <Route path="/legal-help-brampton" element={<Navigate to="/ltb-brampton" replace />} />
+          <Route path="/legal-help-hamilton" element={<Navigate to="/ltb-hamilton" replace />} />
+          <Route path="/legal-help-london" element={<Navigate to="/ltb-london" replace />} />
+          <Route path="/legal-help-markham" element={<Navigate to="/ltb-markham" replace />} />
+          <Route path="/legal-help-vaughan" element={<Navigate to="/ltb-vaughan" replace />} />
+          <Route path="/legal-help-kitchener" element={<Navigate to="/ltb-kitchener" replace />} />
+          <Route path="/legal-help-windsor" element={<Navigate to="/ltb-windsor" replace />} />
+          
+          {/* Non-Ontario cities redirect to triage */}
+          <Route path="/legal-help-edmonton" element={<Navigate to="/triage" replace />} />
+          <Route path="/legal-help-vancouver" element={<Navigate to="/triage" replace />} />
+          <Route path="/legal-help-calgary" element={<Navigate to="/triage" replace />} />
+          <Route path="/legal-help-montreal" element={<Navigate to="/triage" replace />} />
+          <Route path="/legal-help-winnipeg" element={<Navigate to="/triage" replace />} />
 
           {/* 404 Catch-all */}
           <Route path="*" element={<NotFound />} />
