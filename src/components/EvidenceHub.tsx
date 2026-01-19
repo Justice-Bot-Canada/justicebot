@@ -64,9 +64,13 @@ interface EvidenceHubProps {
   selectionMode?: boolean;
   onBuildBook?: () => void;
   onUploadComplete?: (count: number) => void;
+  /** If true, show success message and trigger redirect after upload completes */
+  autoRedirectAfterUpload?: boolean;
+  /** Callback when redirect should happen after upload */
+  onRedirectToDashboard?: () => void;
 }
 
-export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelect, selectionMode = false, onBuildBook, onUploadComplete }: EvidenceHubProps) {
+export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelect, selectionMode = false, onBuildBook, onUploadComplete, autoRedirectAfterUpload = false, onRedirectToDashboard }: EvidenceHubProps) {
   const [evidence, setEvidence] = useState<Evidence[]>([]);
   const [selectedEvidence, setSelectedEvidence] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -333,6 +337,9 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
 
     // Trigger legal pathway analysis after successful uploads
     if (successfulUploads > 0) {
+      // Track evidence upload complete event
+      analytics.evidenceUploadComplete(successfulUploads, caseId);
+      
       try {
         toast.info('Analyzing your evidence for legal pathways...');
         const { data: analysisResult, error: analysisError } = await supabase.functions.invoke('analyze-legal-case', {
@@ -346,10 +353,32 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
         if (analysisError) {
           console.error('Legal analysis error:', analysisError);
         } else if (analysisResult) {
-          toast.success('Legal pathway analysis complete! Check your recommended forms below.');
+          // Show success message before redirect
+          if (autoRedirectAfterUpload) {
+            toast.success('Evidence saved successfully! Redirecting to your dashboard...', {
+              duration: 2000,
+            });
+            // Trigger redirect after short delay for user feedback
+            setTimeout(() => {
+              if (onRedirectToDashboard) {
+                onRedirectToDashboard();
+              }
+            }, 1500);
+          } else {
+            toast.success('Legal pathway analysis complete! Check your recommended forms below.');
+          }
         }
       } catch (err) {
         console.error('Failed to analyze legal pathway:', err);
+        // Still redirect even if analysis fails - upload was successful
+        if (autoRedirectAfterUpload && onRedirectToDashboard) {
+          toast.success('Evidence saved! Redirecting to your dashboard...', {
+            duration: 2000,
+          });
+          setTimeout(() => {
+            onRedirectToDashboard();
+          }, 1500);
+        }
       }
     }
 

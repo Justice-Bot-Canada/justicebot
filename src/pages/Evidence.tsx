@@ -50,6 +50,15 @@ const Evidence = () => {
     }
   };
 
+  // Handler to redirect user to dashboard after successful upload
+  const handleRedirectToDashboard = () => {
+    // Track the redirect success event
+    analytics.redirectToDashboardSuccess('/evidence', caseId || undefined);
+    
+    // Force redirect to dashboard
+    navigate('/dashboard');
+  };
+
   // Check if user has Book of Documents entitlement
   const checkBookEntitlement = async () => {
     if (!user || !caseId) return;
@@ -278,7 +287,9 @@ const Evidence = () => {
           <div className="space-y-6">
             <EvidenceHub 
               caseId={caseId} 
-              onUploadComplete={handleEvidenceUploaded} 
+              onUploadComplete={handleEvidenceUploaded}
+              autoRedirectAfterUpload={true}
+              onRedirectToDashboard={handleRedirectToDashboard}
             />
             
             {/* Show full analysis results after pipeline runs */}

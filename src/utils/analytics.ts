@@ -156,6 +156,24 @@ export const analytics = {
     });
   },
 
+  // evidence_upload_complete - when all uploads finish and user is ready to continue
+  evidenceUploadComplete: (fileCount: number, caseId?: string) => {
+    sendGA4Event('evidence_upload_complete', {
+      file_count: fileCount,
+      case_id: caseId || 'unknown',
+      page_path: window.location.pathname,
+    });
+  },
+
+  // redirect_to_dashboard_success - when user is redirected to dashboard after upload
+  redirectToDashboardSuccess: (fromPage: string, caseId?: string) => {
+    sendGA4Event('redirect_to_dashboard_success', {
+      from_page: fromPage,
+      case_id: caseId || 'unknown',
+      page_path: '/dashboard',
+    });
+  },
+
   // login - successful login
   loginGA4: (method: string) => {
     sendGA4Event('login', {
