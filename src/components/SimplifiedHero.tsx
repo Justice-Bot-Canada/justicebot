@@ -16,7 +16,7 @@ const SimplifiedHero = () => {
   const handleUploadDocument = () => {
     trackEvent('cta_click', { button: 'upload_document', location: 'hero_simplified' });
     analytics.funnelStart(window.location.pathname);
-    navigate('/triage');
+    navigate('/upload');
   };
 
   return (
