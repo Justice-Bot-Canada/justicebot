@@ -327,6 +327,15 @@ const AppContent = () => {
           <Route path="/ltb-help" element={<LTBHelp />} />
           <Route path="/small-claims-court" element={<SmallClaimsCourt />} />
 
+          {/* Redirects for crawled legacy URLs - prevents 404s in Google Search Console */}
+          <Route path="/download" element={<Navigate to="/templates" replace />} />
+          <Route path="/docs" element={<Navigate to="/legal-resources" replace />} />
+          <Route path="/docs/*" element={<Navigate to="/legal-resources" replace />} />
+          <Route path="/signup" element={<Navigate to="/welcome" replace />} />
+          <Route path="/login" element={<Navigate to="/welcome" replace />} />
+          <Route path="/generate" element={<Navigate to="/forms" replace />} />
+          <Route path="/small-claims" element={<Navigate to="/small-claims-journey" replace />} />
+
           {/* 404 Catch-all */}
           <Route path="*" element={<NotFound />} />
         </Routes>
