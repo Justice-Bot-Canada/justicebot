@@ -128,20 +128,20 @@ export default function SubscriptionPlans() {
 
       <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
         <PlanCard
-          title="Monthly Plan"
-          price="19.99"
+          title="Basic Monthly"
+          price="19"
           period="month"
           features={monthlyFeatures}
           planId={PAYPAL_PLANS.monthly}
         />
         <PlanCard
-          title="Yearly Plan"
-          price="199.99"
+          title="Yearly Access"
+          price="99.99"
           period="year"
           features={yearlyFeatures}
           planId={PAYPAL_PLANS.yearly}
           isPopular
-          savingsText="Save $39.89 per year"
+          savingsText="Best Value - Full Year Access"
         />
       </div>
 

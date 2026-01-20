@@ -51,11 +51,12 @@ interface EntitlementInfo {
 }
 
 const PRODUCT_OPTIONS = [
-  { value: 'monthly_premium', label: 'Monthly Premium ($59.99/mo)' },
-  { value: 'yearly_premium', label: 'Yearly Premium ($499.99/yr)' },
-  { value: 'low_income_premium', label: 'Low-Income ($19.99/mo)' },
-  { value: 'court_ready_bundle', label: 'Court Ready Bundle (One-time)' },
-  { value: 'form_unlock', label: 'Form Unlock (One-time)' },
+  { value: 'basic_monthly', label: 'Basic Monthly ($19/mo)' },
+  { value: 'professional_monthly', label: 'Professional Monthly ($29.99/mo)' },
+  { value: 'premium_monthly', label: 'Premium Monthly ($49.99/mo)' },
+  { value: 'yearly_access', label: 'Yearly Access ($99.99/yr)' },
+  { value: 'court_ready_bundle', label: 'Court-Ready Document Pack ($39)' },
+  { value: 'form_unlock', label: 'Legal Form ($5.99)' },
 ];
 
 export default function AdminEntitlementManager() {

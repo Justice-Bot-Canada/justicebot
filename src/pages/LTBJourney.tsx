@@ -77,7 +77,7 @@ const LTBJourney = () => {
       <PerformanceMonitor />
       <EnhancedSEO
         title="LTB Forms Ontario 2025 - How to File T2 T6 Form | Tenant Rights Canada"
-        description="File LTB applications online with step-by-step guidance. Complete T2, T6, N4, N12 forms for eviction notice Ontario, rent disputes & Landlord Tenant Board Canada help. Free resources & affordable legal support starting $5.99/month."
+        description="File LTB applications online with step-by-step guidance. Complete T2, T6, N4, N12 forms for eviction notice Ontario, rent disputes & Landlord Tenant Board Canada help. Forms from $5.99, Court-Ready Pack $39."
         keywords="LTB forms Ontario, how to file T2 T6 form, tenant rights Canada, Landlord Tenant Board Canada help, eviction notice Ontario, N4 form, N12 form, LTB application Ontario, tenant rights Ontario 2025"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}

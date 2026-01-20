@@ -63,7 +63,7 @@ export const StickyBottomCTA = () => {
                 Start Your Case Today - 7-Day Money Back Guarantee
               </p>
               <p className="text-xs md:text-sm opacity-90">
-                Only $5.99/mo • Cancel anytime • Court-ready forms in minutes
+                Forms from $5.99 • Court-Ready Pack $39 • Plans from $19/mo
               </p>
             </div>
           </div>

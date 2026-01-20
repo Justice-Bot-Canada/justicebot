@@ -71,40 +71,54 @@ export default function PaymentPolicy() {
               </ul>
             </Card>
 
+            <Card className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Legal Form (One-Time)</h3>
+                  <p className="text-muted-foreground">Access to one specific Canadian legal form</p>
+                </div>
+                <Badge variant="outline">$5.99 CAD</Badge>
+              </div>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>✓ Plain-language explanation of the form</li>
+                <li>✓ Guided walkthrough of required sections</li>
+                <li>✓ Download completed or partially completed form</li>
+                <li>✓ No subscription required</li>
+              </ul>
+            </Card>
+
             <Card className="p-6 border-primary">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-xl font-bold mb-2">Monthly Subscription</h3>
-                  <p className="text-muted-foreground">Full access to platform features</p>
+                  <h3 className="text-xl font-bold mb-2">Court-Ready Document Pack</h3>
+                  <p className="text-muted-foreground">Everything you need to file correctly</p>
                 </div>
-                <Badge className="bg-primary">$5.99 CAD/month</Badge>
+                <Badge className="bg-primary">$39 CAD</Badge>
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground mb-4">
-                <li>✓ Everything in Free tier</li>
-                <li>✓ Unlimited AI legal analysis</li>
-                <li>✓ Document generation & auto-fill</li>
-                <li>✓ Case progress tracking</li>
-                <li>✓ Priority support</li>
-                <li>✓ Evidence organization tools</li>
+                <li>✓ Primary legal form plus supporting documents</li>
+                <li>✓ Step-by-step guidance on how forms fit together</li>
+                <li>✓ Filing and service instructions (procedural only)</li>
+                <li>✓ Downloadable, court-ready documents</li>
               </ul>
               <p className="text-xs text-muted-foreground">
-                Billed monthly. Cancel anytime. Prorated refunds available.
+                One-time payment. No subscription required.
               </p>
             </Card>
 
             <Card className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-xl font-bold mb-2">One-Time Forms</h3>
-                  <p className="text-muted-foreground">Purchase specific legal forms as needed</p>
+                  <h3 className="text-xl font-bold mb-2">Monthly Subscriptions</h3>
+                  <p className="text-muted-foreground">Ongoing access for complex cases</p>
                 </div>
-                <Badge variant="outline">$9.99 - $29.99 CAD</Badge>
+                <Badge variant="outline">$19 - $49.99/mo</Badge>
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>✓ Professional court-ready documents</li>
-                <li>✓ Automatic form completion from your case data</li>
-                <li>✓ Filing instructions included</li>
-                <li>✓ Lifetime access to purchased forms</li>
+                <li>✓ Basic: $19/mo - Triage, forms, limited docs</li>
+                <li>✓ Professional: $29.99/mo - Full docs, timeline tools</li>
+                <li>✓ Premium: $49.99/mo - Unlimited, all tribunals</li>
+                <li>✓ Yearly: $99.99/yr - Best value</li>
               </ul>
             </Card>
           </div>

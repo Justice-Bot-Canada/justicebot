@@ -26,7 +26,7 @@ const ConversionFAQ = () => {
     {
       id: "cost",
       question: "What does it cost?",
-      answer: "Your initial case assessment is 100% free — no credit card required. If you want generated documents and advanced features, premium plans start at just $5.99 per form. That's a fraction of what a paralegal would charge."
+      answer: "Your initial case assessment is 100% free — no credit card required. Single forms are $5.99, the Court-Ready Document Pack is $39, and monthly subscriptions start at $19. That's a fraction of what a paralegal would charge."
     },
     {
       id: "accuracy",

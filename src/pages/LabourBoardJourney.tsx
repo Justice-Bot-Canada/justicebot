@@ -60,7 +60,7 @@ const LabourBoardJourney = () => {
       <PerformanceMonitor />
       <EnhancedSEO 
         title="Employment Law Ontario 2025 - Wrongful Dismissal, WSIB & Workers Rights"
-        description="Employment law help Ontario. File for wrongful dismissal, unpaid wages, WSIB claims, workplace harassment. Know your workers rights, ESA violations, severance pay. Affordable legal guidance from $5.99."
+        description="Employment law help Ontario. File for wrongful dismissal, unpaid wages, WSIB claims, workplace harassment. Know your workers rights, ESA violations, severance pay. Forms from $5.99, Court-Ready Pack $39."
         keywords="employment law Ontario, wrongful dismissal Ontario, WSIB claim, workers rights Ontario, unpaid wages, ESA Ontario, workplace harassment, severance pay, unjust termination, labour board Ontario"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}
