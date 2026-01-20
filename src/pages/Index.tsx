@@ -5,6 +5,7 @@ import EnhancedSEO from "@/components/EnhancedSEO";
 import LocalBusinessSchema from "@/components/LocalBusinessSchema";
 import ClinicWelcomeBanner from "@/components/ClinicWelcomeBanner";
 import ConversationalOnboarding from "@/components/ConversationalOnboarding";
+import { ExplainerVideo } from "@/components/ExplainerVideo";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -66,7 +67,12 @@ const Index = () => {
         {/* Hero Section - Tattered Flag, Dark/Red Theme */}
         <HeroSection />
 
-        {/* Conversational Onboarding - Below Hero */}
+        {/* How It Works - Video Section */}
+        <section id="how-it-works" className="py-12 sm:py-16 lg:py-20 bg-muted/30">
+          <ExplainerVideo />
+        </section>
+
+        {/* Conversational Onboarding - Below Video */}
         <section id="get-started" className="py-12 sm:py-16 lg:py-20 bg-background">
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 max-w-2xl mx-auto">
