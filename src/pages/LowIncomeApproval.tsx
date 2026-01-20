@@ -220,7 +220,7 @@ const LowIncomeApproval = () => {
               <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-lg">
                 <h3 className="font-semibold mb-2">What You'll Get When Approved:</h3>
                 <ul className="text-sm space-y-1 text-muted-foreground">
-                  <li>✓ Access to ALL legal forms ($25/year instead of $5.99 per form)</li>
+                  <li>✓ Reduced pricing on all legal forms</li>
                   <li>✓ Unlimited document generation and downloads</li>
                   <li>✓ AI-powered legal analysis and guidance</li>
                   <li>✓ Case tracking and deadline reminders</li>

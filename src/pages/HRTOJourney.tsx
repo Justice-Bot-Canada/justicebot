@@ -83,7 +83,7 @@ const HRTOJourney = () => {
       <PerformanceMonitor />
       <EnhancedSEO
         title="HRTO Application Form 1 Ontario 2025 - File Human Rights Complaint Canada"
-        description="How to file a human rights complaint Canada with HRTO Form 1 & Schedule A. Step-by-step guide for discrimination at work Ontario tribunal, housing discrimination & workplace harassment. Affordable legal help from $5.99/month."
+        description="How to file a human rights complaint Canada with HRTO Form 1 & Schedule A. Step-by-step guide for discrimination at work Ontario tribunal, housing discrimination & workplace harassment. Forms from $5.99, Court-Ready Pack $39."
         keywords="HRTO application form 1 Ontario, how to file a human rights complaint Canada, discrimination at work Ontario tribunal, HRTO Form 1, Schedule A HRTO, human rights complaint Ontario, workplace discrimination Canada"
         structuredData={structuredData}
         breadcrumbs={breadcrumbs}

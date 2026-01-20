@@ -18,7 +18,7 @@ export default function FAQ() {
       faqs: [
         {
           question: "How much does Justice-Bot cost?",
-          answer: "Justice-Bot offers flexible pricing: Free tier for basic triage and guides, $5.99/month for document generation and AI assistance, or $99.99/year (save 30%). We also offer a $2.99 low-income plan for eligible users."
+          answer: "Justice-Bot offers flexible pricing: $5.99 one-time for a single legal form, $39 one-time Court-Ready Document Pack, or monthly subscriptions starting at $19/month (Basic), $29.99/month (Professional), $49.99/month (Premium). Yearly access is $99.99/year for best value. We also offer reduced pricing for eligible low-income users."
         },
         {
           question: "Who qualifies for the low-income plan?",

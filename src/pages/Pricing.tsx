@@ -108,53 +108,46 @@ const Pricing = () => {
     {
       name: "Basic",
       key: "basic" as const,
-      description: "Essential legal document tools",
+      description: "Still figuring things out or dealing with a single issue over time",
       price: "$19",
       period: "per month",
       features: [
-        "Access to basic legal forms",
-        "Standard PDF generation",
-        "Email support",
-        "Case tracking dashboard",
-        "Document storage (5 GB)",
+        "Ongoing access to legal triage",
+        "Explore multiple legal forms",
+        "Save case progress",
+        "View form explanations and next steps",
+        "Limited document generation",
         "Cancel anytime"
       ],
     },
     {
       name: "Professional",
       key: "professional" as const,
-      description: "Advanced features for active cases",
-      price: "$29",
+      description: "Actively preparing filings or managing a complex issue",
+      price: "$29.99",
       period: "per month",
       popular: true,
       features: [
         "Everything in Basic",
-        "All premium legal forms",
-        "Smart form pre-filling",
-        "Priority email support",
-        "Advanced case tracking",
-        "Document templates library",
-        "Evidence builder tools",
-        "Document storage (20 GB)",
+        "Full document generation access",
+        "Multiple form downloads",
+        "Case timeline and walkthrough tools",
+        "Priority access to advanced explanations",
         "Cancel anytime"
       ],
     },
     {
       name: "Premium",
       key: "premium" as const,
-      description: "Complete legal toolkit with priority support",
-      price: "$49",
+      description: "Power users, advocates, or managing multiple legal matters",
+      price: "$49.99",
       period: "per month",
       features: [
         "Everything in Professional",
-        "Priority phone support",
-        "AI-powered legal analysis",
-        "Multi-case management",
-        "Custom document templates",
-        "Bulk document processing",
-        "Unlimited document storage",
-        "Early access to new features",
-        "Dedicated account manager",
+        "Unlimited document generation",
+        "Full case tracking and history",
+        "Advanced procedural guidance",
+        "Access to all supported Canadian tribunals and courts",
         "Cancel anytime"
       ],
     }
@@ -177,7 +170,7 @@ const Pricing = () => {
           "url": "https://justice-bot.com/pricing",
           "priceCurrency": "CAD",
           "price": "19",
-          "priceValidUntil": "2025-12-31",
+          "priceValidUntil": "2026-12-31",
           "availability": "https://schema.org/InStock",
           "itemCondition": "https://schema.org/NewCondition"
         }
@@ -185,7 +178,7 @@ const Pricing = () => {
       {
         "@type": "Product",
         "name": "Justice-Bot Professional Plan",
-        "description": "Advanced legal document features with priority support for active cases",
+        "description": "Full document generation and case management for active cases",
         "brand": {
           "@type": "Organization",
           "name": "Justice-Bot"
@@ -194,15 +187,15 @@ const Pricing = () => {
           "@type": "Offer",
           "url": "https://justice-bot.com/pricing",
           "priceCurrency": "CAD",
-          "price": "29",
-          "priceValidUntil": "2025-12-31",
+          "price": "29.99",
+          "priceValidUntil": "2026-12-31",
           "availability": "https://schema.org/InStock"
         }
       },
       {
         "@type": "Product",
         "name": "Justice-Bot Premium Plan",
-        "description": "Complete legal toolkit with AI analysis and dedicated support for Canadian legal needs",
+        "description": "Complete legal toolkit with unlimited access for power users",
         "brand": {
           "@type": "Organization",
           "name": "Justice-Bot"
@@ -211,8 +204,25 @@ const Pricing = () => {
           "@type": "Offer",
           "url": "https://justice-bot.com/pricing",
           "priceCurrency": "CAD",
-          "price": "49",
-          "priceValidUntil": "2025-12-31",
+          "price": "49.99",
+          "priceValidUntil": "2026-12-31",
+          "availability": "https://schema.org/InStock"
+        }
+      },
+      {
+        "@type": "Product",
+        "name": "Justice-Bot Yearly Access",
+        "description": "Full year of uninterrupted premium access at the best value",
+        "brand": {
+          "@type": "Organization",
+          "name": "Justice-Bot"
+        },
+        "offers": {
+          "@type": "Offer",
+          "url": "https://justice-bot.com/pricing",
+          "priceCurrency": "CAD",
+          "price": "99.99",
+          "priceValidUntil": "2026-12-31",
           "availability": "https://schema.org/InStock"
         }
       }

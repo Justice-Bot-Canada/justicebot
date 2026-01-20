@@ -162,7 +162,7 @@ const Forms = () => {
     "@context": "https://schema.org",
     "@type": "Service",
     "name": "Legal Forms & Court Documents - Justice-Bot",
-    "description": "AI-powered legal form filling service for Ontario courts and tribunals. Automated document preparation for LTB, HRTO, Small Claims, Family Court, and more. Starting at $29.99 per form.",
+    "description": "AI-powered legal form filling service for Ontario courts and tribunals. Automated document preparation for LTB, HRTO, Small Claims, Family Court, and more. Single forms $5.99, Court-Ready Pack $39.",
     "provider": {
       "@type": "Organization",
       "name": "Justice-Bot",
@@ -185,7 +185,7 @@ const Forms = () => {
   const faqData = [
     {
       question: "How much do legal forms cost on Justice-Bot?",
-      answer: "Legal forms are $29.99 each as a one-time purchase, or included free with our $19/month subscription. All forms include AI-powered auto-fill and step-by-step guidance."
+      answer: "Single legal forms are $5.99 one-time. The Court-Ready Document Pack is $39 one-time and includes your primary form plus supporting documents. Monthly subscriptions start at $19/month (Basic). All forms include AI-powered auto-fill and step-by-step guidance."
     },
     {
       question: "Which courts and tribunals do you support?",

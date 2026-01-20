@@ -76,16 +76,24 @@ const Terms = () => {
               <li>Cancel anytime through your account</li>
             </ul>
             
-            <h3 className="text-xl font-semibold mb-2 mt-4">Per-Form Purchases</h3>
+            <h3 className="text-xl font-semibold mb-2 mt-4">One-Time Purchases</h3>
             <ul>
-              <li>Regular: $5.99 per form</li>
-              <li>Low-income (approved): $0.99 per form</li>
+              <li>Legal Form: $5.99 per form</li>
+              <li>Court-Ready Document Pack: $39</li>
               <li>One-time payment, no refunds after download</li>
+            </ul>
+
+            <h3 className="text-xl font-semibold mb-2 mt-4">Monthly Subscriptions</h3>
+            <ul>
+              <li>Basic: $19/month</li>
+              <li>Professional: $29.99/month</li>
+              <li>Premium: $49.99/month</li>
+              <li>Yearly Access: $99.99/year</li>
             </ul>
 
             <h3 className="text-xl font-semibold mb-2 mt-4">Low-Income Program</h3>
             <ul>
-              <li>Annual subscription: $25/year (with approval)</li>
+              <li>Reduced pricing available with approval</li>
               <li>Income verification required</li>
               <li>Subject to annual re-verification</li>
               <li>False information may result in account termination</li>
