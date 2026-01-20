@@ -124,7 +124,7 @@ interface ChatMessage {
 
 export default function ConversationalOnboarding() {
   const navigate = useNavigate();
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
@@ -143,9 +143,11 @@ export default function ConversationalOnboarding() {
     trackEvent("onboarding_started", { type: "conversational" });
   }, []);
 
-  // Scroll to bottom on new messages
+  // Scroll within chat container only (not the whole page)
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
   }, [messages]);
 
   const addBotMessage = (content: string, delay = 800) => {
@@ -328,7 +330,7 @@ export default function ConversationalOnboarding() {
           </div>
 
           {/* Chat Messages */}
-          <div className="p-4 space-y-4 min-h-[400px] max-h-[500px] overflow-y-auto">
+          <div ref={chatContainerRef} className="p-4 space-y-4 min-h-[400px] max-h-[500px] overflow-y-auto">
             {messages.map((message) => (
               <div key={message.id}>
                 {message.type === "bot" && (
@@ -508,7 +510,7 @@ export default function ConversationalOnboarding() {
               </div>
             )}
 
-            <div ref={chatEndRef} />
+            
           </div>
 
           {/* Legal Disclaimer */}
