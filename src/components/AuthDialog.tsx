@@ -70,8 +70,8 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     setIsLoading(true);
     setEmailError("");
     
-    // Track login attempt
-    analytics.signupAttempt(email);
+    // Track login attempt (not signup)
+    analytics.loginAttempt(email);
 
     try {
       // Store remember device preference
@@ -90,7 +90,8 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       });
 
       if (error) {
-        analytics.signupFailed(`login_${error.message}`);
+        // Use loginFailed instead of signupFailed
+        analytics.loginFailed(error.message);
         // User-friendly error messages
         if (error.message.toLowerCase().includes('invalid')) {
           setEmailError("Invalid email or password. Please try again.");
@@ -104,7 +105,6 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       } else {
         // Fire GA4 login event
         analytics.loginGA4('email');
-        analytics.signUp('email_login');
         toast({
           title: "Welcome back!",
           description: "Redirecting to your dashboard...",
@@ -113,7 +113,7 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         navigate('/dashboard');
       }
     } catch (error) {
-      analytics.signupFailed('login_unexpected_error');
+      analytics.loginFailed('unexpected_error');
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
