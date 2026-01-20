@@ -494,6 +494,14 @@ export const analytics = {
   },
   signupFailed: (error: string) => trackEvent('signup_failed', { error }),
   
+  // Login failed - separate from signup_failed for accurate funnel analysis
+  loginFailed: (error: string) => trackEvent('login_failed', { error }),
+  
+  // Login attempt - separate from signup_attempt
+  loginAttempt: (email: string) => {
+    trackEvent('login_attempt', { email_domain: email.split('@')[1] });
+  },
+  
   // GA4 Enhanced - Payment flow
   paymentInitiated: (plan: string, amount: string, method: string) => {
     trackEvent('payment_initiated', { plan, amount, method });
