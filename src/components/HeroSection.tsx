@@ -24,9 +24,9 @@ const HeroSection = () => {
 
   const handleHowItWorks = () => {
     trackEvent('cta_click', { button: 'how_it_works', location: 'hero' });
-    const trustSection = document.getElementById('what-we-do');
-    if (trustSection) {
-      trustSection.scrollIntoView({ behavior: 'smooth' });
+    const videoSection = document.getElementById('how-it-works');
+    if (videoSection) {
+      videoSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
