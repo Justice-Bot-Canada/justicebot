@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { analytics } from "@/utils/analytics";
+import { useSignupAnalytics } from "@/hooks/useSignupAnalytics";
 import { CheckCircle, XCircle, Loader2, Chrome } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
@@ -38,6 +39,9 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  // Standardized signup analytics - exactly 4 events
+  const signupAnalytics = useSignupAnalytics({ source: 'auth_dialog' });
 
   // Load remembered email on mount
   useEffect(() => {
@@ -47,17 +51,19 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     }
   }, []);
 
-  // Lock body scroll when dialog is open
+  // Lock body scroll when dialog is open + fire signup_view ONCE
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
+      // Fire signup_view when dialog opens (hook handles deduplication)
+      signupAnalytics.trackSignupView();
     } else {
       document.body.style.overflow = '';
     }
     return () => {
       document.body.style.overflow = '';
     };
-  }, [open]);
+  }, [open, signupAnalytics]);
 
   // Real-time password validation feedback
   const passwordValidation = useMemo(() => ({
@@ -208,7 +214,7 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Prevent double-submit
+    // Prevent double-submit - button is disabled, but also check state
     if (isLoading) return;
     
     setSubmitAttempted(true);
@@ -218,7 +224,7 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     
     let hasError = false;
     
-    // Validate email format
+    // Validate email format (NO analytics for validation errors - they don't hit backend)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim()) {
       setEmailError("Email is required");
@@ -243,13 +249,17 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       hasError = true;
     }
     
-    // Stop if any validation failed
+    // Stop if validation failed - NO signup_error event (validation is not a backend rejection)
     if (hasError) {
-      analytics.signupFailed('validation_error');
       return;
     }
 
-    analytics.signupAttempt(email);
+    // Fire signup_attempt ONCE - this also returns false if already fired (prevents double-click)
+    if (!signupAnalytics.trackSignupAttempt(email)) {
+      return; // Already submitted, wait for response
+    }
+    
+    // Disable button immediately
     setIsLoading(true);
 
     try {
@@ -273,12 +283,9 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
 
       if (error) {
         console.error('[Auth] Signup error:', error);
-        const errorType = error.message.toLowerCase().includes('already registered') 
-          ? 'user_exists' 
-          : error.message.toLowerCase().includes('invalid') 
-            ? 'invalid_email' 
-            : `auth_error:${error.message}`;
-        analytics.signupFailed(errorType);
+        
+        // Fire signup_error with error_type (ONLY for backend rejections)
+        signupAnalytics.trackSignupError(error.message);
         
         // User-friendly inline error messages
         if (error.message.toLowerCase().includes('already registered')) {
@@ -286,7 +293,6 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         } else if (error.message.toLowerCase().includes('invalid')) {
           setEmailError("Please check your email format");
         } else if (error.message.toLowerCase().includes('confirmation')) {
-          // Email sending error - but user may still be created
           toast({
             title: "Account may have been created",
             description: "There was an issue sending confirmation. Try signing in with these credentials.",
@@ -299,15 +305,16 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
             variant: "destructive",
           });
         }
-      } else if (data.session) {
-        // Immediate login - email confirmation is disabled
+        return; // Button re-enabled via resetAttempt in trackSignupError
+      }
+      
+      if (data.session) {
+        // SUCCESS: Immediate login - email confirmation is disabled
         console.log('[Auth] Immediate session created');
-        analytics.signupComplete(email, 'email');
-        // Fire GA4 signup_completed event (mark as conversion in GA4 Admin)
-        analytics.signupCompletedGA4('email');
-        if (typeof window !== 'undefined' && window.gtag) {
-          window.gtag('event', 'sign_up', { method: 'email', country: 'CA' });
-        }
+        
+        // Fire signup_success - THE CONVERSION EVENT
+        signupAnalytics.trackSignupSuccess(email, 'email');
+        
         setSignupSuccess(true);
         toast({
           title: "Account Created ✓",
@@ -316,13 +323,12 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         onOpenChange(false);
         navigate('/welcome');
       } else if (data.user && !data.session) {
-        // Email confirmation required (shouldn't happen if disabled)
-        console.log('[Auth] User created but no session - email confirmation may be required');
-        analytics.signupComplete(email, 'email_pending_confirmation');
-        analytics.signupCompletedEvent('email');
-        if (typeof window !== 'undefined' && window.gtag) {
-          window.gtag('event', 'sign_up', { method: 'email', country: 'CA' });
-        }
+        // SUCCESS: Email confirmation required
+        console.log('[Auth] User created - email confirmation required');
+        
+        // Fire signup_success - account IS created, just needs confirmation
+        signupAnalytics.trackSignupSuccess(email, 'email_pending');
+        
         setSignupSuccess(true);
         toast({
           title: "Check Your Email ✓",
@@ -333,8 +339,9 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
           navigate('/triage');
         }, 2000);
       } else {
-        // Fallback - something unexpected
+        // Unexpected state - treat as error
         console.warn('[Auth] Unexpected signup state:', data);
+        signupAnalytics.trackSignupError('unexpected_response');
         toast({
           title: "Please try signing in",
           description: "Your account may have been created. Try signing in with these credentials.",
@@ -342,7 +349,7 @@ export default function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       }
     } catch (error) {
       console.error('[Auth] Unexpected signup error:', error);
-      analytics.signupFailed('unexpected_error');
+      signupAnalytics.trackSignupError('network_error');
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",

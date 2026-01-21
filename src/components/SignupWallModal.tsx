@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Lock, Eye, FileText, MapPin, ListChecks, AlertTriangle, Loader2, XCircle } from "lucide-react";
+import { Lock, Eye, FileText, MapPin, ListChecks, Loader2, XCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { analytics, trackEvent } from "@/utils/analytics";
+import { useSignupAnalytics } from "@/hooks/useSignupAnalytics";
+import { analytics } from "@/utils/analytics";
 import { Link } from "react-router-dom";
 
 interface BlurredPreview {
@@ -39,12 +40,15 @@ export default function SignupWallModal({
   const [termsError, setTermsError] = useState("");
   const [mode, setMode] = useState<'signup' | 'signin'>('signup');
 
-  // Track when wall is shown
+  // Standardized signup analytics - exactly 4 events
+  const signupAnalytics = useSignupAnalytics({ source: 'signup_wall' });
+
+  // Fire signup_view when modal opens (hook handles deduplication)
   useEffect(() => {
     if (open) {
-      trackEvent('signup_wall_view', { source: 'funnel_results' });
+      signupAnalytics.trackSignupView();
     }
-  }, [open]);
+  }, [open, signupAnalytics]);
 
   const validateForm = () => {
     let valid = true;
@@ -79,8 +83,21 @@ export default function SignupWallModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent double-submit
+    if (isLoading) return;
+    
+    // Validate form (no analytics for validation - it's not a backend rejection)
     if (!validateForm()) return;
 
+    if (mode === 'signup') {
+      // Fire signup_attempt ONCE - returns false if already fired
+      if (!signupAnalytics.trackSignupAttempt(email)) {
+        return;
+      }
+    }
+
+    // Disable button immediately
     setIsLoading(true);
 
     try {
@@ -98,41 +115,49 @@ export default function SignupWallModal({
         });
 
         if (error) {
+          // Fire signup_error with error_type (ONLY for backend rejections)
+          signupAnalytics.trackSignupError(error.message);
+          
           if (error.message.toLowerCase().includes('already registered')) {
             setEmailError("This email is already registered. Try signing in.");
             setMode('signin');
           } else {
             setEmailError(error.message);
           }
-          analytics.signupFailed(error.message);
           return;
         }
 
         if (data.session) {
-          analytics.signupComplete(email, 'email');
-          trackEvent('signup_completed', { source: 'funnel_wall' });
+          // SUCCESS: Account created and logged in
+          signupAnalytics.trackSignupSuccess(email, 'email');
           toast.success("Account created! Showing your results...");
           onSuccess();
         } else if (data.user) {
-          analytics.signupComplete(email, 'email_pending');
+          // SUCCESS: Account created, needs email confirmation
+          signupAnalytics.trackSignupSuccess(email, 'email_pending');
           toast.success("Check your email to confirm, then come back!");
         }
       } else {
-        // Sign in
+        // Sign in (not signup - no signup analytics)
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
 
         if (error) {
+          analytics.loginFailed(error.message);
           setEmailError("Invalid email or password");
           return;
         }
 
+        analytics.loginGA4('email');
         toast.success("Welcome back! Showing your results...");
         onSuccess();
       }
     } catch (error) {
+      if (mode === 'signup') {
+        signupAnalytics.trackSignupError('network_error');
+      }
       toast.error("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
