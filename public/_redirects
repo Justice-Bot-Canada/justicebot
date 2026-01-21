@@ -45,6 +45,7 @@
 /generate           /forms              301!
 /download           /templates          301!
 /small-claims       /small-claims-journey 301!
+/tutorial-library   /tutorials          301!
 
 # Proper 404s for non-existent pages (prevents soft 404s in Google Search Console)
 /account            /not-found          404
