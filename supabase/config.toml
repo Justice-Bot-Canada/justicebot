@@ -151,3 +151,15 @@ verify_jwt = true
 
 [functions.stripe-customer-portal]
 verify_jwt = true
+
+# Forms API (public read)
+[functions.get-forms]
+verify_jwt = false
+
+# Daily sweep (service-to-service calls)
+[functions.sweep-forms]
+verify_jwt = false
+
+# Merit score computation
+[functions.compute-merit]
+verify_jwt = true

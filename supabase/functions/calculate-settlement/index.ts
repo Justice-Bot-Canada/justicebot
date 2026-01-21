@@ -62,25 +62,38 @@ Provide a detailed settlement analysis in the following JSON format:
 
 Base your calculations on Canadian personal injury precedents, consider the specific jurisdiction, and provide realistic estimates. Be conservative but fair.`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Use Lovable AI Gateway with Gemini (free tier friendly)
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('AI service not configured');
+    }
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: 'You are an expert legal settlement calculator. Always respond with valid JSON only.' },
           { role: 'user', content: prompt }
         ],
-        temperature: 0.7,
-        response_format: { type: 'json_object' }
+        temperature: 0.7
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.statusText}`);
+      const errText = await response.text();
+      console.error('AI Gateway error:', response.status, errText);
+      if (response.status === 429) {
+        throw new Error('Rate limit exceeded. Please try again later.');
+      }
+      if (response.status === 402) {
+        throw new Error('AI service quota exceeded.');
+      }
+      throw new Error(`AI service error: ${response.statusText}`);
     }
 
     const data = await response.json();
