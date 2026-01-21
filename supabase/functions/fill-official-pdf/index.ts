@@ -184,10 +184,17 @@ serve(async (req) => {
       throw new Error(`Failed to upload PDF: ${uploadError.message}`);
     }
 
-    // Get public URL
-    const { data: urlData } = supabase.storage
+    // Create signed URL valid for 7 days (private bucket - requires auth)
+    const { data: signedUrlData, error: signedUrlError } = await supabase.storage
       .from('legal-docs')
-      .getPublicUrl(filePath);
+      .createSignedUrl(filePath, 7 * 24 * 60 * 60); // 7 days in seconds
+
+    if (signedUrlError) {
+      console.error('Failed to create signed URL:', signedUrlError);
+      throw new Error(`Failed to create signed URL: ${signedUrlError.message}`);
+    }
+
+    const fileUrl = signedUrlData.signedUrl;
 
     // Log form generation
     await supabase
@@ -202,10 +209,11 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({
       success: true,
-      pdfUrl: urlData.publicUrl,
+      pdfUrl: fileUrl,
       fileName,
       formTitle: formTemplate.title,
-      generatedAt: new Date().toISOString()
+      generatedAt: new Date().toISOString(),
+      expiresIn: '7 days'
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

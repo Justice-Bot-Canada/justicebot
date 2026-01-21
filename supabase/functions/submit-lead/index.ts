@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { checkRateLimit, getClientIP, createIPKey, rateLimitResponse } from "../_shared/rate-limiter.ts";
 
 const allowedOrigins = [
   'https://justice-bot.com',
@@ -15,6 +16,7 @@ function isAllowedOrigin(origin: string | null): boolean {
   if (allowedOrigins.includes(origin)) return true;
   // Allow Lovable preview URLs
   if (origin.endsWith('.lovableproject.com')) return true;
+  if (origin.endsWith('.lovable.app')) return true;
   return false;
 }
 
@@ -53,6 +55,16 @@ serve(async (req: Request) => {
     
     // Use service role key to bypass RLS for lead insertion
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Rate limiting: 5 leads per IP per hour
+    const clientIP = getClientIP(req);
+    const rateLimitKey = createIPKey('submit-lead', clientIP);
+    const rateLimit = await checkRateLimit(supabase, rateLimitKey, 5, 60 * 60 * 1000); // 5 per hour
+    
+    if (!rateLimit.allowed) {
+      console.warn(`Rate limit exceeded for IP: ${clientIP}`);
+      return rateLimitResponse(corsHeaders, rateLimit.resetAt);
+    }
 
     const requestBody = await req.json();
     console.log('Received lead submission:', { 
