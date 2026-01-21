@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { checkRateLimit, getClientIP, createIPKey, rateLimitResponse } from "../_shared/rate-limiter.ts";
 
 // Input validation schema
 const ContactSchema = z.object({
@@ -25,8 +26,24 @@ serve(async (req) => {
 
   try {
     const turnstileSecret = Deno.env.get('CLOUDFLARE_TURNSTILE_SECRET')!;
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    
+    // Use service role for rate limiting
+    const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Rate limiting: 3 contact requests per IP per hour
+    const clientIP = getClientIP(req);
+    const rateLimitKey = createIPKey('submit-contact', clientIP);
+    const rateLimit = await checkRateLimit(supabaseService, rateLimitKey, 3, 60 * 60 * 1000); // 3 per hour
+    
+    if (!rateLimit.allowed) {
+      console.warn(`Rate limit exceeded for IP: ${clientIP}`);
+      return rateLimitResponse(corsHeaders, rateLimit.resetAt);
+    }
+    
     const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
+      supabaseUrl,
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         auth: {

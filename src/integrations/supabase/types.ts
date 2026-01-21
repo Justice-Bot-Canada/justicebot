@@ -1456,6 +1456,24 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          count: number
+          key: string
+          updated_at: string
+        }
+        Insert: {
+          count?: number
+          key: string
+          updated_at?: string
+        }
+        Update: {
+          count?: number
+          key?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       referral_codes: {
         Row: {
           code: string
@@ -2101,6 +2119,7 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: boolean
       }
+      cleanup_old_rate_limits: { Args: never; Returns: undefined }
       export_program_summary: { Args: { program_id: string }; Returns: Json }
       get_all_admins: {
         Args: never

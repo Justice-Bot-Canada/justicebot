@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { checkRateLimit, getClientIP, createIPKey, rateLimitResponse } from "../_shared/rate-limiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': 'https://justice-bot.com',
@@ -30,6 +31,16 @@ serve(async (req) => {
   try {
     const turnstileSecret = Deno.env.get('CLOUDFLARE_TURNSTILE_SECRET')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Rate limiting: 5 feedback submissions per IP per hour
+    const clientIP = getClientIP(req);
+    const rateLimitKey = createIPKey('submit-feedback', clientIP);
+    const rateLimit = await checkRateLimit(supabase, rateLimitKey, 5, 60 * 60 * 1000); // 5 per hour
+    
+    if (!rateLimit.allowed) {
+      console.warn(`Rate limit exceeded for IP: ${clientIP}`);
+      return rateLimitResponse(corsHeaders, rateLimit.resetAt);
+    }
     
     const requestBody = await req.json();
     
