@@ -1,6 +1,8 @@
+# Force www to non-www (canonical domain)
+https://www.justice-bot.com/*  https://justice-bot.com/:splat  301!
+
 # Static files - serve as-is
 /sitemap.xml   /sitemap.xml   200
-/robots.txt    /robots.txt    200
 /manifest.json /manifest.json 200
 
 # Remove trailing slashes (prevents duplicate content)
