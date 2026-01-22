@@ -79,6 +79,8 @@ import LegalResources from "./pages/LegalResources";
 import Journey from "./pages/Journey";
 import CriminalCourtGuide from "./pages/CriminalCourtGuide";
 import CriminalCourtMistakes from "./pages/CriminalCourtMistakes";
+import FamilyCourtMistakes from "./pages/FamilyCourtMistakes";
+import LTBGuide from "./pages/LTBGuide";
 import DemoJourney from "./pages/DemoJourney";
 import UrgentTriage from "./pages/UrgentTriage";
 import FindMyPath from "./pages/FindMyPath";
@@ -230,6 +232,8 @@ const AppContent = () => {
           <Route path="/features" element={<Suspense fallback={<LoadingFallback />}><FeatureGuide /></Suspense>} />
           <Route path="/criminal-court-guide" element={<CriminalCourtGuide />} />
           <Route path="/criminal-court-mistakes" element={<CriminalCourtMistakes />} />
+          <Route path="/family-court-mistakes" element={<FamilyCourtMistakes />} />
+          <Route path="/ltb-guide" element={<LTBGuide />} />
           <Route path="/tribunal-locator" element={<TribunalLocatorPage />} />
           <Route path="/court" element={<CourtInformation />} />
           <Route path="/explain" element={<Explain />} />
