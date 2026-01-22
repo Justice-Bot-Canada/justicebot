@@ -89,5 +89,5 @@ Disallow: /favicon.ico
 Disallow: /dev.html
 Disallow: /dev/
 
-# Sitemap location (MUST use www for canonical consistency)
-Sitemap: https://www.justice-bot.com/sitemap.xml
+# Sitemap location (non-www canonical domain)
+Sitemap: https://justice-bot.com/sitemap.xml
