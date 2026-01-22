@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Lock, Zap, Clock, Sparkles } from "lucide-react";
+import { Check, Lock, Clock, Sparkles, Unlock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import { useShouldHidePricing } from "@/components/ProgramBanner";
-import StripeTrialButton from "@/components/StripeTrialButton";
 import { analytics } from "@/utils/analytics";
+import { UnlockButton } from "@/components/UnlockButton";
+import { BeforeYouPayExplanation } from "@/components/BeforeYouPayExplanation";
+import { PaymentTrustSignals, LegalDisclaimer } from "@/components/PaymentTrustSignals";
+import StripeTrialButton from "@/components/StripeTrialButton";
 
 // Stripe Price IDs
 const STRIPE_PRICE_IDS = {
@@ -51,7 +53,6 @@ export default function FormPaywall({
           return;
         }
 
-        // Check entitlements for this specific form
         const { data, error } = await supabase
           .from('entitlements')
           .select('product_id')
@@ -125,7 +126,7 @@ export default function FormPaywall({
     }
   };
 
-  // Premium users or users who purchased this form get access
+  // Loading state
   if (checkingAccess) {
     return (
       <div className="flex items-center justify-center p-12">
@@ -134,151 +135,110 @@ export default function FormPaywall({
     );
   }
 
-  // Program users, premium users, or users who purchased this form get access
+  // Access granted
   if (isPremium || hasAccess || hasPurchased || shouldHidePricing) {
     return <>{children}</>;
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+      {/* Urgent deadline warning - mobile friendly */}
       {daysUntilDeadline && daysUntilDeadline <= 7 && (
-        <div className="mb-6 p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
-          <div className="flex items-center gap-3">
-            <Clock className="h-5 w-5 text-orange-600" />
-            <p className="font-semibold text-orange-900 dark:text-orange-100">
+        <div className="p-3 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4 text-orange-600 flex-shrink-0" />
+            <p className="text-sm font-medium text-orange-900 dark:text-orange-100">
               {daysUntilDeadline <= 3 ? (
                 <span className="text-red-600 dark:text-red-400">
-                  ⚠️ URGENT: Only {daysUntilDeadline} days left to file!
+                  Only {daysUntilDeadline} days left to file
                 </span>
               ) : (
-                `Time-sensitive: ${daysUntilDeadline} days remaining to submit`
+                `${daysUntilDeadline} days remaining`
               )}
             </p>
           </div>
         </div>
       )}
 
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-2 mb-4">
-          <Lock className="w-5 h-5 text-primary" />
-          <span className="text-sm font-semibold text-primary">Premium Form Access</span>
+      {/* Header - simpler, mobile friendly */}
+      <div className="text-center space-y-2">
+        <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-3 py-1.5">
+          <Unlock className="w-4 h-4 text-primary" />
+          <span className="text-xs font-semibold text-primary">Ready to unlock</span>
         </div>
-        <h2 className="text-3xl font-bold mb-2">Access "{formTitle}"</h2>
-        <p className="text-muted-foreground">
-          Complete your legal forms in minutes with AI-powered assistance
+        <h2 className="text-xl sm:text-2xl font-bold">{formTitle}</h2>
+      </div>
+
+      {/* Before You Pay - What you're getting */}
+      <BeforeYouPayExplanation
+        productName={formTitle}
+        whyItMatters="Filing the correct form saves time and prevents your case from being rejected"
+        problemItSolves="We pre-fill your details and guide you through each section"
+        immediateDeliverable="Download your completed form, ready to file"
+        variant="compact"
+      />
+
+      {/* Single prominent CTA - no choice paralysis */}
+      <Card className="border-2 border-primary">
+        <CardContent className="pt-6 space-y-4">
+          <div className="text-center">
+            <div className="text-3xl font-bold">$39</div>
+            <p className="text-sm text-muted-foreground">One-time payment</p>
+          </div>
+
+          <ul className="space-y-2">
+            <li className="flex items-start gap-2 text-sm">
+              <Check className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+              <span>Complete form with your details filled in</span>
+            </li>
+            <li className="flex items-start gap-2 text-sm">
+              <Check className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+              <span>Step-by-step filing instructions</span>
+            </li>
+            <li className="flex items-start gap-2 text-sm">
+              <Check className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+              <span>Download and keep forever</span>
+            </li>
+          </ul>
+
+          <UnlockButton
+            unlockLabel="This Form"
+            price="$39"
+            isLoading={loading === "form"}
+            onClick={handleFormPurchase}
+          />
+
+          <PaymentTrustSignals variant="minimal" showCanadianBuilt={false} />
+        </CardContent>
+      </Card>
+
+      {/* Alternative: subscription (de-emphasized) */}
+      <div className="text-center pt-2">
+        <p className="text-xs text-muted-foreground mb-3">
+          Need access to multiple forms?
         </p>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* One-Time Purchase */}
-        <Card className="relative border-2 hover:border-primary/50 transition-all">
-          <CardHeader>
-            <div className="flex items-center justify-between mb-2">
-              <CardTitle className="text-2xl">Single Form</CardTitle>
-              <Badge variant="outline">One-Time</Badge>
+        <Card className="border-dashed">
+          <CardContent className="pt-4 pb-4 space-y-3">
+            <div className="flex items-center justify-center gap-2">
+              <Badge variant="secondary" className="text-xs">
+                <Sparkles className="w-3 h-3 mr-1" />
+                5-Day Free Trial
+              </Badge>
             </div>
-            <CardDescription>Perfect if you need just this form</CardDescription>
-            <div className="mt-4">
-              <div className="text-4xl font-bold">$39</div>
-              <div className="text-sm text-muted-foreground">one-time payment</div>
-            </div>
-          </CardHeader>
-
-          <CardContent className="space-y-4">
-            <ul className="space-y-3">
-              <li className="flex items-start gap-2">
-                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-sm">Instant access to {formTitle}</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-sm">AI-powered form filling assistance</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-sm">PDF generation & download</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-sm">Lifetime access to this form</span>
-              </li>
-            </ul>
-
-            <Button 
-              onClick={handleFormPurchase}
-              disabled={loading !== null}
-              className="w-full"
-              size="lg"
-            >
-              {loading === "form" ? (
-                "Processing..."
-              ) : (
-                "Pay with Card - $39"
-              )}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Free Trial / Subscription */}
-        <Card className="relative border-primary ring-2 ring-primary/20">
-          <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-            <Badge className="bg-gradient-to-r from-green-500 to-emerald-600">
-              <Sparkles className="w-3 h-3 mr-1" />
-              5-Day FREE Trial
-            </Badge>
-          </div>
-
-          <CardHeader>
-            <div className="flex items-center justify-between mb-2">
-              <CardTitle className="text-2xl">Unlimited</CardTitle>
-              <Badge variant="outline">Try Free</Badge>
-            </div>
-            <CardDescription>Full access for 5 days, then $29/mo</CardDescription>
-            <div className="mt-4">
-              <div className="text-4xl font-bold text-green-600">FREE</div>
-              <div className="text-sm text-muted-foreground">for 5 days, then $29/mo</div>
-            </div>
-          </CardHeader>
-
-          <CardContent className="space-y-4">
-            <ul className="space-y-3">
-              <li className="flex items-start gap-2">
-                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-sm">Unlimited access to ALL forms</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-sm">AI legal chatbot & document analysis</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-sm">Priority customer support</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                <span className="text-sm">Cancel anytime - no charge if cancelled before trial ends</span>
-              </li>
-            </ul>
-
-            <StripeTrialButton priceId={STRIPE_PRICE_IDS.professional} planKey="professional" trialDays={5} />
+            <p className="text-xs text-muted-foreground">
+              Unlimited forms for 5 days, then $29/mo. Cancel anytime.
+            </p>
+            <StripeTrialButton 
+              priceId={STRIPE_PRICE_IDS.professional} 
+              planKey="professional" 
+              trialDays={5} 
+            />
           </CardContent>
         </Card>
       </div>
 
-      {daysUntilDeadline && daysUntilDeadline <= 7 && (
-        <div className="mt-6 text-center">
-          <div className="inline-flex items-center gap-2 bg-orange-50 dark:bg-orange-900/20 text-orange-900 dark:text-orange-100 px-4 py-2 rounded-lg">
-            <Clock className="w-4 h-4" />
-            <span className="text-sm font-semibold">
-              Complete your forms in under 20 minutes - Don't miss your deadline!
-            </span>
-          </div>
-        </div>
-      )}
-
-      <div className="mt-8 text-center text-sm text-muted-foreground">
-        <p>🔒 Secure payment powered by Stripe • 30-day money-back guarantee</p>
-      </div>
+      {/* Legal disclaimer */}
+      <LegalDisclaimer />
     </div>
   );
 }

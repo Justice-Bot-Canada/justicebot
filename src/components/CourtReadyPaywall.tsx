@@ -6,22 +6,14 @@ import { usePremiumAccess } from '@/hooks/usePremiumAccess';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/lib/toast-stub';
 import { trackEvent, analytics } from '@/utils/analytics';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import AuthDialog from '@/components/AuthDialog';
-import {
-  FileCheck,
-  Upload,
-  BookOpen,
-  ClipboardList,
-  MapPin,
-  CheckCircle,
-  Loader2,
-  Shield,
-  CreditCard,
-} from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { BeforeYouPayExplanation } from '@/components/BeforeYouPayExplanation';
+import { UnlockButton } from '@/components/UnlockButton';
+import { PaymentTrustSignals, LegalDisclaimer } from '@/components/PaymentTrustSignals';
+import { ValuePreview } from '@/components/ValuePreview';
 
 interface CourtReadyPaywallProps {
   triageData?: {
@@ -29,6 +21,7 @@ interface CourtReadyPaywallProps {
     venueTitle: string;
     province: string;
     description: string;
+    recommendedForms?: Array<{ formCode: string; formTitle: string }>;
   };
   caseId?: string | null;
   onAccessGranted?: () => void;
@@ -36,6 +29,68 @@ interface CourtReadyPaywallProps {
 }
 
 const STRIPE_PRICE_ID = 'price_1SmUwAL0pLShFbLtIK429fdX'; // $39 CAD one-time
+
+// Default document structure and filing steps for preview
+const getDocumentStructure = (venue: string) => {
+  const structures: Record<string, string[]> = {
+    ltb: [
+      "Application form with your details",
+      "Statement of facts and timeline",
+      "Evidence list and exhibit tabs",
+      "Service instructions for landlord",
+      "Filing checklist"
+    ],
+    hrto: [
+      "Form 1 Application",
+      "Chronology of events",
+      "Grounds for discrimination",
+      "Remedies sought section",
+      "Evidence organization guide"
+    ],
+    "small-claims": [
+      "Plaintiff's Claim form",
+      "Statement of claim details",
+      "Damages calculation sheet",
+      "Evidence list",
+      "Service requirements"
+    ],
+    default: [
+      "Application form for your case",
+      "Statement of facts",
+      "Evidence organization",
+      "Filing instructions",
+      "Next steps checklist"
+    ]
+  };
+  return structures[venue] || structures.default;
+};
+
+const getFilingSteps = (venue: string) => {
+  const steps: Record<string, string[]> = {
+    ltb: [
+      "Complete your application with pre-filled details",
+      "Organize your evidence with exhibit tabs",
+      "File online or in person at the LTB",
+      "Serve the other party within required timeframe",
+      "Prepare for your hearing date"
+    ],
+    hrto: [
+      "Complete Form 1 with your case details",
+      "Attach supporting documentation",
+      "Submit to the Human Rights Tribunal",
+      "Serve the respondent(s)",
+      "Await case management direction"
+    ],
+    default: [
+      "Complete your application form",
+      "Gather and organize evidence",
+      "File with the appropriate court/tribunal",
+      "Serve required parties",
+      "Prepare for next steps"
+    ]
+  };
+  return steps[venue] || steps.default;
+};
 
 export function CourtReadyPaywall({ triageData, caseId, onAccessGranted, onCaseCreated }: CourtReadyPaywallProps) {
   const navigate = useNavigate();
@@ -48,10 +103,7 @@ export function CourtReadyPaywall({ triageData, caseId, onAccessGranted, onCaseC
   // Track paywall view
   useEffect(() => {
     if (!accessLoading && !hasAccess && !isProgramUser && !shouldHidePricing) {
-      // Track with new funnel event
       analytics.paywallViewed(triageData?.venue, 0);
-      
-      // Legacy event for backwards compatibility
       trackEvent('paywall_viewed', {
         location: 'post_triage',
         venue: triageData?.venue,
@@ -59,7 +111,7 @@ export function CourtReadyPaywall({ triageData, caseId, onAccessGranted, onCaseC
     }
   }, [accessLoading, hasAccess, isProgramUser, shouldHidePricing, triageData?.venue]);
 
-  // If user has access (paid or program), auto-grant
+  // If user has access, auto-grant
   useEffect(() => {
     if (!accessLoading && (hasAccess || isProgramUser || shouldHidePricing)) {
       onAccessGranted?.();
@@ -86,18 +138,14 @@ export function CourtReadyPaywall({ triageData, caseId, onAccessGranted, onCaseC
 
     setIsProcessing(true);
     
-    // ONLY track checkout initiation (NOT purchase - that fires after webhook confirms)
     trackEvent('checkout_initiated', {
       product: 'court_ready_pack',
       price: 39,
       currency: 'CAD',
     });
-    
-    // Track begin_checkout for funnel (NOT purchase)
     analytics.beginCheckout('court_ready_pack', 'Court-Ready Document Pack', 39);
 
     try {
-      // Create case if we don't have one yet
       let finalCaseId = caseId;
       if (!finalCaseId && triageData) {
         const { data: newCase, error: caseError } = await supabase
@@ -155,113 +203,72 @@ export function CourtReadyPaywall({ triageData, caseId, onAccessGranted, onCaseC
     }
   };
 
-  const benefits = [
-    'Guided legal triage based on your situation',
-    'Secure evidence upload and organization',
-    'Automatically formatted Book of Documents',
-    'Correct tribunal or court forms selected for you',
-    'Step-by-step filing instructions',
-  ];
+  const venue = triageData?.venue || 'default';
+  const venueTitle = triageData?.venueTitle || 'Your Legal Case';
+  const primaryForm = triageData?.recommendedForms?.[0];
 
   return (
     <>
-      <div className="max-w-xl mx-auto px-4 py-8">
-        {/* Page Title */}
-        <h1 className="text-2xl md:text-3xl font-bold text-center text-foreground mb-3">
-          Prepare Your Court-Ready Documents
-        </h1>
-        
-        {/* Subheading */}
-        <p className="text-center text-muted-foreground mb-8">
-          You're almost finished. To generate your filing-ready documents, complete the one-time payment below.
-        </p>
+      <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
+        {/* Step 1: Show the VALUE first - what we identified */}
+        <div className="text-center mb-6">
+          <p className="text-sm text-muted-foreground mb-2">Based on your situation</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+            We've identified your legal path
+          </h1>
+        </div>
 
+        {/* Value Preview - Shows what they're getting BEFORE payment */}
+        <ValuePreview
+          venue={venue}
+          venueTitle={venueTitle}
+          formCode={primaryForm?.formCode}
+          formName={primaryForm?.formTitle}
+          documentStructure={getDocumentStructure(venue)}
+          filingSteps={getFilingSteps(venue)}
+        />
+
+        {/* Step 2: Payment Card - Only AFTER value is shown */}
         <Card className="border-border shadow-sm">
-          <CardContent className="pt-6 space-y-6">
-            {/* What You Get */}
-            <div className="space-y-3">
-              <h3 className="font-semibold text-foreground">What You Get</h3>
-              <ul className="space-y-2">
-                {benefits.map((benefit, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm text-foreground">{benefit}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          <CardContent className="pt-6 space-y-5">
+            {/* Before You Pay Explanation */}
+            <BeforeYouPayExplanation
+              productName="Court-Ready Document Package"
+              whyItMatters="Filing the wrong form or missing steps can delay or harm your case"
+              problemItSolves="We prepare the correct forms with your details already filled in"
+              immediateDeliverable="Download your complete document package, ready to file"
+              venue={venueTitle}
+            />
 
             <Separator />
 
-            {/* Divider Text */}
-            <p className="text-sm text-muted-foreground text-center">
-              This prepares your documents for submission.<br />
-              It does not provide legal advice or representation.
-            </p>
-
-            <Separator />
-
-            {/* Price Block */}
+            {/* Price - Clear and simple */}
             <div className="text-center space-y-1">
-              <p className="text-sm text-muted-foreground font-medium">One-Time Payment</p>
               <p className="text-4xl font-bold text-foreground">$39</p>
               <p className="text-sm text-muted-foreground">
-                No subscriptions. No recurring charges.
+                One-time payment • Instant access
               </p>
             </div>
 
-            {/* CTA Button */}
-            <Button
+            {/* Unlock Button - NOT "Buy" or "Purchase" */}
+            <UnlockButton
+              unlockLabel="Your Documents"
+              price="$39"
+              isLoading={isProcessing}
               onClick={handlePurchase}
-              disabled={isProcessing}
-              size="lg"
-              className="w-full text-base py-6 bg-slate-800 hover:bg-slate-900 text-white"
-            >
-              {isProcessing ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Processing...
-                </>
-              ) : (
-                'Generate My Court-Ready Documents'
-              )}
-            </Button>
+              showArrow={true}
+            />
 
-            {/* Under-Button Assurance */}
-            <p className="text-xs text-muted-foreground text-center">
-              Your payment unlocks document generation for this case only.
-            </p>
-
-            {/* Optional Micro-Copy */}
-            <p className="text-xs text-muted-foreground text-center">
-              Most users complete their documents in under 30 minutes.
-            </p>
+            {/* Trust Signals */}
+            <PaymentTrustSignals 
+              variant="minimal" 
+              showCanadianBuilt={false}
+            />
 
             <Separator />
 
-            {/* Trust & Reassurance */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Shield className="h-4 w-4 text-green-600" />
-                <span>Your information is private and secure</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <FileCheck className="h-4 w-4 text-green-600" />
-                <span>Documents are generated specifically for your case</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <ClipboardList className="h-4 w-4 text-green-600" />
-                <span>You keep full control over what you file and when</span>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Legal Clarity Footer */}
-            <p className="text-xs text-muted-foreground text-center">
-              Justice-Bot helps you prepare documents and understand procedure.<br />
-              It does not provide legal advice or replace a lawyer.
-            </p>
+            {/* Legal Disclaimer - Required */}
+            <LegalDisclaimer />
           </CardContent>
         </Card>
       </div>
