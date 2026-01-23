@@ -10,6 +10,8 @@ import CanonicalURL from "@/components/CanonicalURL";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import SmartTriageForm from "@/components/SmartTriageForm";
 import TriageResults from "@/components/TriageResults";
+import { CaseAssessmentScreen } from "@/components/CaseAssessmentScreen";
+import { useDecisionEngine } from "@/hooks/useDecisionEngine";
 import { TriageDiscountModal } from "@/components/TriageDiscountModal";
 import { TriageDocumentUpload, PendingDocument } from "@/components/TriageDocumentUpload";
 import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
@@ -25,6 +27,7 @@ import { Loader2, BookOpen, FileCheck, ArrowRight, ArrowLeft, Save, Shield, Spar
 import { analytics, trackEvent } from "@/utils/analytics";
 import { useProgramCaseFields } from "@/hooks/useProgramCaseFields";
 import { useProgram } from "@/contexts/ProgramContext";
+import type { DecisionResult, FormRecommendation as DecisionFormRec } from "@/types/decisionEngine";
 
 interface FormRecommendation {
   formCode: string;
@@ -68,14 +71,47 @@ const Triage = () => {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   
+  // Decision Engine state - stores the full DecisionResult
+  const [decisionResult, setDecisionResult] = useState<DecisionResult | null>(null);
+  const { runDecisionEngine, loading: decisionLoading } = useDecisionEngine({
+    onSuccess: (result) => {
+      console.log('[Triage] Decision engine success:', result.merit.score, result.merit.band);
+      setDecisionResult(result);
+    },
+    onError: (err) => {
+      console.error('[Triage] Decision engine error:', err);
+      toast.error('Case assessment failed. Using basic analysis.');
+    }
+  });
+  
   // Check if user should see paywall (after triage, before evidence)
   const userHasAccess = hasAccess || isProgramUser || shouldHidePricing;
 
-  const handleTriageComplete = (result: TriageResult, description: string, prov: string, evidenceCount?: number) => {
+  const handleTriageComplete = async (result: TriageResult, description: string, prov: string, evidenceCount?: number) => {
     setTriageResult(result);
     setUserDescription(description);
     setProvince(prov);
     setUploadedEvidenceCount(evidenceCount || 0);
+    
+    // IMMEDIATELY call decision engine after smart-triage
+    console.log('[Triage] Calling decision engine with:', {
+      story_length: description.length,
+      province: prov,
+      venue_hint: result.venue,
+    });
+    
+    const decisionEngineResult = await runDecisionEngine({
+      storyText: description,
+      province: prov,
+      venueHint: result.venue,
+      issueTags: result.flags || [],
+      userAnswers: {
+        health_impact: result.flags?.includes('health') || false,
+        disability_related: result.flags?.includes('disability') || false,
+      },
+    });
+    
+    // Move to step 1 (Assessment screen) AFTER decision engine returns
     setStep(1);
     
     // Track triage completion events
@@ -83,12 +119,13 @@ const Triage = () => {
     analytics.triageCompletedEvent(result.venue, prov);
     
     // Track case snapshot shown (Step 2 of funnel)
-    analytics.caseSnapshotShown(result.venue, result.confidence);
+    const meritScore = decisionEngineResult?.merit?.score || result.confidence;
+    analytics.caseSnapshotShown(result.venue, meritScore);
     
     // Pipeline event with rich payload
     analytics.triageCompleted({
       recommendedJourney: result.venue,
-      meritScore: Math.round(result.confidence),
+      meritScore: Math.round(meritScore),
       groundsDetected: result.flags || [],
       dualPathway: (result.alternativeVenues?.length || 0) > 0,
       userLoggedIn: !!user,
@@ -96,6 +133,7 @@ const Triage = () => {
     trackEvent('triage_complete', { 
       venue: result.venue, 
       confidence: result.confidence,
+      merit_score: decisionEngineResult?.merit?.score,
       province: prov,
       evidenceCount: evidenceCount || 0
     });
@@ -406,23 +444,58 @@ const Triage = () => {
                 </Card>
               )}
 
-              <TriageResults
-                result={triageResult}
-                description={userDescription}
-                province={province}
-                onProceed={() => {
-                  if (!user) {
-                    setShowAuthDialog(true);
-                  } else if (userHasAccess) {
-                    setStep(2);
-                  } else {
-                    setShowPaywall(true);
-                  }
-                }}
-                onBack={() => setStep(0)}
-                onSelectForm={handleSelectForm}
-                isLoading={isSavingDocuments}
-              />
+              {/* Decision Engine loading state */}
+              {decisionLoading && (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+                  <p className="text-muted-foreground">Analyzing your case...</p>
+                </div>
+              )}
+
+              {/* NEW: CaseAssessmentScreen when decision engine result is available */}
+              {decisionResult && !decisionLoading && (
+                <CaseAssessmentScreen
+                  result={decisionResult}
+                  caseId={createdCaseId || undefined}
+                  isPremium={userHasAccess}
+                  onGenerateForm={(form) => {
+                    if (!user) {
+                      setShowAuthDialog(true);
+                      return;
+                    }
+                    // Navigate to form generation
+                    handleProceed(false, form.form_code);
+                  }}
+                  onUploadEvidence={() => {
+                    if (!user) {
+                      setShowAuthDialog(true);
+                      return;
+                    }
+                    setStep(2); // Go to evidence upload step
+                  }}
+                />
+              )}
+
+              {/* FALLBACK: Old TriageResults if decision engine failed */}
+              {!decisionResult && !decisionLoading && (
+                <TriageResults
+                  result={triageResult}
+                  description={userDescription}
+                  province={province}
+                  onProceed={() => {
+                    if (!user) {
+                      setShowAuthDialog(true);
+                    } else if (userHasAccess) {
+                      setStep(2);
+                    } else {
+                      setShowPaywall(true);
+                    }
+                  }}
+                  onBack={() => setStep(0)}
+                  onSelectForm={handleSelectForm}
+                  isLoading={isSavingDocuments}
+                />
+              )}
 
               {/* Paywall - shown after triage for non-paying users */}
               {showPaywall && !userHasAccess && user && (
