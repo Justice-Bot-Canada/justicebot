@@ -163,3 +163,7 @@ verify_jwt = false
 # Merit score computation
 [functions.compute-merit]
 verify_jwt = true
+
+# Decision Engine (deterministic merit + pathway routing)
+[functions.decision-engine]
+verify_jwt = false
