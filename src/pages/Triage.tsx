@@ -191,22 +191,15 @@ const Triage = () => {
     }
   };
 
-  // Validate UUID format before querying
+  // Validate UUID format - synchronous, no network
   const isValidUUID = (str: string): boolean => {
+    if (!str || typeof str !== 'string') return false;
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     return uuidRegex.test(str);
   };
 
+  // Load case from DB - only called with validated UUID
   const loadPersistedDecision = async (caseId: string): Promise<DecisionResult | null> => {
-    setCaseAccessError(null);
-    
-    // Validate UUID format first to avoid DB errors
-    if (!isValidUUID(caseId)) {
-      setCaseAccessError("Invalid case ID format. Please start a new assessment.");
-      console.warn('[Triage] Invalid UUID format:', caseId);
-      return null;
-    }
-    
     try {
       const { data, error } = await supabase
         .from('cases')
@@ -246,35 +239,52 @@ const Triage = () => {
     }
   };
 
-  // Allow refresh/return: checks URL param OR localStorage fallback
+  // SYNCHRONOUS validation on mount - sets error state BEFORE any async work
   useEffect(() => {
     const LAST_CASE_KEY = 'jb_last_case_id';
     let caseId = searchParams.get('caseId');
     
-    // Fallback: if no caseId in URL but one saved in localStorage
+    // Fallback: if no caseId in URL but one saved in localStorage (only for logged-in users)
     if (!caseId && user) {
       const savedCaseId = localStorage.getItem(LAST_CASE_KEY);
-      if (savedCaseId) {
+      if (savedCaseId && isValidUUID(savedCaseId)) {
         caseId = savedCaseId;
-        // Update URL to include it (for bookmarking/sharing)
         setSearchParams({ caseId }, { replace: true });
+      } else if (savedCaseId) {
+        // localStorage has invalid UUID - clear it
+        localStorage.removeItem(LAST_CASE_KEY);
       }
     }
     
-    if (!caseId) return;
+    // No caseId = fresh start, nothing to load
+    if (!caseId) {
+      setCaseAccessError(null);
+      return;
+    }
     
+    // SYNCHRONOUS UUID check - sets error immediately, no network call
+    if (!isValidUUID(caseId)) {
+      setCaseAccessError("Invalid case ID format. Please start a new assessment.");
+      console.warn('[Triage] Invalid UUID format (blocked):', caseId);
+      // Do NOT call loadPersistedDecision - zero network requests
+      return;
+    }
+    
+    // Valid UUID - proceed with DB fetch
+    setCaseAccessError(null);
     setCreatedCaseId(caseId);
     loadPersistedDecision(caseId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
   
-  // Persist lastCaseId to localStorage whenever it changes
+  // Persist lastCaseId to localStorage only after successful persistence
   useEffect(() => {
     const LAST_CASE_KEY = 'jb_last_case_id';
-    if (createdCaseId && user) {
+    // Only store if we have a valid caseId AND a decision result (proves DB persistence)
+    if (createdCaseId && user && decisionResult && isValidUUID(createdCaseId)) {
       localStorage.setItem(LAST_CASE_KEY, createdCaseId);
     }
-  }, [createdCaseId, user]);
+  }, [createdCaseId, user, decisionResult]);
 
   const handleTriageComplete = async (result: TriageResult, description: string, prov: string, evidenceCount?: number) => {
     setTriageResult(result);
