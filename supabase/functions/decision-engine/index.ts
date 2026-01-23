@@ -455,11 +455,29 @@ function calculateMerit(profile: CaseProfile): MeritResult {
 
   const finalScore = Math.max(0, Math.min(100, baseScore + adjustments));
 
-  // Determine band
+  // Determine band with HIGH gate (prevents premature "Strong" labels)
   let band: 'LOW' | 'MEDIUM' | 'HIGH';
-  if (finalScore >= 70) band = 'HIGH';
-  else if (finalScore >= 40) band = 'MEDIUM';
-  else band = 'LOW';
+  
+  // HIGH gate: require at least 2 of 3 conditions
+  const hasLongStory = storyLength >= 800;
+  const hasGoodEvidence = evidenceCount >= 4;
+  const hasDates = (dates.first_incident && dates.last_incident) || evidenceWithDates >= 2;
+  const highGateScore = (hasLongStory ? 1 : 0) + (hasGoodEvidence ? 1 : 0) + (hasDates ? 1 : 0);
+  const passesHighGate = highGateScore >= 2;
+  
+  if (finalScore >= 70 && passesHighGate) {
+    band = 'HIGH';
+  } else if (finalScore >= 70 && !passesHighGate) {
+    // Score qualifies but gate fails - cap at MEDIUM and explain
+    band = 'MEDIUM';
+    if (!hasLongStory) missing.push('Provide a more detailed description (800+ characters) for a Strong rating');
+    if (!hasGoodEvidence) missing.push('Upload at least 4 pieces of evidence for a Strong rating');
+    if (!hasDates) missing.push('Add incident dates for a Strong rating');
+  } else if (finalScore >= 40) {
+    band = 'MEDIUM';
+  } else {
+    band = 'LOW';
+  }
 
   // Calculate confidence
   let confidence = 0.2;
