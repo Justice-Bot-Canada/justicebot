@@ -178,7 +178,8 @@ const AppContent = () => {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/intake" element={<Intake />} />
           <Route path="/intake/summary" element={<IntakeSummary />} />
-          <Route path="/funnel" element={<Funnel />} />
+          {/* Single source of truth: /triage is the product flow */}
+          <Route path="/funnel" element={<Navigate to="/triage" replace />} />
           <Route path="/triage" element={<Triage />} />
           <Route path="/urgent-triage" element={<UrgentTriage />} />
           <Route path="/find-my-path" element={<FindMyPath />} />

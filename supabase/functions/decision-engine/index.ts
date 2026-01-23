@@ -723,19 +723,20 @@ serve(async (req) => {
       next_steps,
     };
 
-    // If case_id provided, persist the result
+     // If case_id provided, persist the result
     if (profile.case_id) {
       const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
       const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
       const supabase = createClient(supabaseUrl, supabaseKey);
 
-      await supabase
-        .from('cases')
-        .update({
-          merit_score: merit.score,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', profile.case_id);
+       await supabase
+         .from('cases')
+         .update({
+           merit_score: merit.score,
+           decision_result_json: result as unknown as Record<string, unknown>,
+           updated_at: new Date().toISOString(),
+         })
+         .eq('id', profile.case_id);
 
       // Store full decision result
       await supabase

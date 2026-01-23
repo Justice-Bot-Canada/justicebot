@@ -13,6 +13,7 @@ interface TriageInput {
   venueHint?: string;
   issueTags?: string[];
   evidenceDescriptions?: string[];
+  evidence?: EvidenceItem[];
   userAnswers?: Record<string, boolean | string | number>;
   keyFacts?: {
     firstIncident?: string;
@@ -33,12 +34,14 @@ export function useDecisionEngine(options: UseDecisionEngineOptions = {}) {
 
     try {
       // Build CaseProfile from input
-      const evidence: EvidenceItem[] = (input.evidenceDescriptions || []).map((desc, i) => ({
-        file_id: `pending_${i}`,
-        type: inferEvidenceType(desc),
-        tags: inferTags(desc),
-        file_name: desc,
-      }));
+      const evidence: EvidenceItem[] = Array.isArray(input.evidence)
+        ? input.evidence
+        : (input.evidenceDescriptions || []).map((desc, i) => ({
+            file_id: `pending_${i}`,
+            type: inferEvidenceType(desc),
+            tags: inferTags(desc),
+            file_name: desc,
+          }));
 
       const profile: CaseProfile = {
         case_id: caseId,
