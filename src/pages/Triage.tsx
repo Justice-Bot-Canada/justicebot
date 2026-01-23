@@ -196,11 +196,15 @@ const Triage = ({ initialCaseId }: TriageProps) => {
     }
   };
 
-  // Validate UUID format - synchronous, no network
+  /**
+   * Strict UUID validation - enforces version (1-5) and variant (8/9/a/b).
+   * Runs synchronously with ZERO network calls.
+   */
   const isValidUUID = (str: string): boolean => {
     if (!str || typeof str !== 'string') return false;
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    return uuidRegex.test(str);
+    // Version 1-5 at position 15, variant 8/9/a/b at position 20
+    const strictUUIDRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return strictUUIDRegex.test(str);
   };
 
   // Load case from DB - only called with validated UUID
