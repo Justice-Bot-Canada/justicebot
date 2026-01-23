@@ -246,59 +246,67 @@ function calculateMerit(profile: CaseProfile): MeritResult {
   const reasons: string[] = [];
   const missing: string[] = [];
 
-  // Start at 50 baseline
-  let baseScore = 50;
+  // Start at 30 baseline (forces needing actual evidence/detail to reach HIGH)
+  let baseScore = 30;
 
   // ==================
   // EVIDENCE STRENGTH (0-30)
   // ==================
   const evidenceCount = profile.evidence.length;
   
-  // +10 if evidence count ≥ 5
-  if (evidenceCount >= 5) {
-    breakdown.evidence_strength += 10;
-    reasons.push(`Strong evidence base with ${evidenceCount} documents uploaded`);
+  // Evidence with REAL metadata (not just file name)
+  const evidenceWithRealTags = profile.evidence.filter(e => 
+    e.tags && e.tags.length > 0 && !e.tags.every(t => t === 'unknown')
+  ).length;
+  const evidenceWithDates = profile.evidence.filter(e => e.date).length;
+  
+  // +8 if evidence count ≥ 5 AND has metadata
+  if (evidenceCount >= 5 && evidenceWithRealTags >= 3) {
+    breakdown.evidence_strength += 8;
+    reasons.push(`Strong evidence base with ${evidenceCount} documents including categorized files`);
   } else if (evidenceCount >= 3) {
-    breakdown.evidence_strength += 6;
+    breakdown.evidence_strength += 5;
     reasons.push(`Good evidence documentation (${evidenceCount} files)`);
   } else if (evidenceCount >= 1) {
-    breakdown.evidence_strength += 3;
+    breakdown.evidence_strength += 2;
+    missing.push('Upload more evidence – 3+ documents significantly strengthens your case');
   } else {
-    breakdown.evidence_strength -= 10;
+    breakdown.evidence_strength -= 5;
     missing.push('No evidence uploaded – upload photos, messages, or documents to strengthen your case');
   }
 
-  // +6 if evidence includes "official" docs
+  // +5 if evidence includes "official" docs (stricter check)
   const hasOfficialDocs = profile.evidence.some(e =>
     ['notice', 'letter', 'medical', 'inspection'].includes(e.type)
   );
   if (hasOfficialDocs) {
-    breakdown.evidence_strength += 6;
+    breakdown.evidence_strength += 5;
     reasons.push('Official documents (notices, letters, or inspections) included');
   } else if (evidenceCount > 0) {
     missing.push('Add official documents like notices or letters from the landlord');
   }
 
-  // +6 if evidence has dates matching story timeline
-  const evidenceWithDates = profile.evidence.filter(e => e.date).length;
+  // +5 if evidence has dates (requires at least 2 dated items)
   if (evidenceWithDates >= 2) {
-    breakdown.evidence_strength += 6;
+    breakdown.evidence_strength += 5;
     reasons.push('Evidence has clear date documentation');
-  } else {
+  } else if (evidenceCount > 0) {
     missing.push('Add dates to your evidence to establish a clear timeline');
   }
 
-  // +8 if evidence tags strongly match issue tags
-  const evidenceTags = profile.evidence.flatMap(e => e.tags);
+  // +6 if evidence tags strongly match issue tags (requires real overlap)
+  const evidenceTags = profile.evidence.flatMap(e => e.tags || []);
   const tagOverlap = profile.issue_tags.filter(tag => 
     evidenceTags.some(et => et.toLowerCase().includes(tag.toLowerCase()))
   );
-  if (tagOverlap.length >= 2) {
-    breakdown.evidence_strength += 8;
+  if (tagOverlap.length >= 2 && evidenceWithRealTags >= 2) {
+    breakdown.evidence_strength += 6;
     reasons.push('Evidence directly supports your claimed issues');
+  } else if (profile.issue_tags.length > 0 && evidenceCount > 0) {
+    missing.push('Tag your evidence to match your issues (repairs, harassment, etc.)');
   }
 
-  breakdown.evidence_strength = Math.max(-10, Math.min(30, breakdown.evidence_strength));
+  breakdown.evidence_strength = Math.max(-5, Math.min(24, breakdown.evidence_strength));
 
   // ==================
   // LEGAL FIT (0-25)
@@ -374,51 +382,64 @@ function calculateMerit(profile: CaseProfile): MeritResult {
   breakdown.timeline_quality = Math.min(15, breakdown.timeline_quality);
 
   // ==================
-  // CREDIBILITY / CONSISTENCY (0-20)
+  // CREDIBILITY / CONSISTENCY (0-20) - stricter scoring
   // ==================
   const storyLength = profile.story_text.length;
   
-  // +10 if story_text length > 800 chars
-  if (storyLength > 800) {
+  // Story length scoring (stricter thresholds)
+  if (storyLength > 1200) {
     breakdown.credibility += 10;
-    reasons.push('Detailed description of your situation provided');
-  } else if (storyLength > 400) {
-    breakdown.credibility += 6;
-  } else if (storyLength < 200) {
-    breakdown.credibility -= 10;
-    missing.push('Provide more detail about what happened – specifics help your case');
+    reasons.push('Comprehensive description of your situation provided');
+  } else if (storyLength > 800) {
+    breakdown.credibility += 7;
+    reasons.push('Detailed description provided');
+  } else if (storyLength > 500) {
+    breakdown.credibility += 4;
+  } else if (storyLength > 300) {
+    breakdown.credibility += 2;
+    missing.push('Provide more detail – longer descriptions help establish your case');
+  } else {
+    breakdown.credibility -= 5;
+    missing.push('Your description is too brief – add specifics about what happened and when');
   }
 
-  // +6 if evidence types are diverse
+  // +5 if evidence types are diverse (at least 3 different types)
   const uniqueTypes = new Set(profile.evidence.map(e => e.type));
   if (uniqueTypes.size >= 3) {
-    breakdown.credibility += 6;
+    breakdown.credibility += 5;
     reasons.push('Multiple types of evidence (photos, messages, documents) provided');
   } else if (uniqueTypes.size >= 2) {
-    breakdown.credibility += 3;
+    breakdown.credibility += 2;
   }
 
-  // +4 if story references specific events that appear in evidence
-  if (profile.evidence.length > 0 && storyLength > 200) {
+  // +4 if story references specific events AND has evidence
+  if (profile.evidence.length >= 2 && storyLength > 400) {
     breakdown.credibility += 4;
   }
 
-  breakdown.credibility = Math.max(-10, Math.min(20, breakdown.credibility));
+  breakdown.credibility = Math.max(-5, Math.min(19, breakdown.credibility));
 
   // ==================
-  // RISK FLAGS (-20 to 0)
+  // RISK FLAGS (-15 to 0) - catches weak cases
   // ==================
-  // -8 if user is asking for relief that doesn't match venue
+  // -6 if user is asking for relief that doesn't match venue
   const money = profile.key_facts?.money || {};
   if (money.damages_sought && money.damages_sought > 35000 && !triggeredRules.some(r => r.venue === 'COURT')) {
-    breakdown.risk_flags -= 8;
+    breakdown.risk_flags -= 6;
     missing.push('For claims over $35,000, consider Superior Court instead of Small Claims');
   }
 
-  // -6 if key elements missing
-  if (evidenceCount === 0 && storyLength < 200) {
-    breakdown.risk_flags -= 6;
+  // -5 if no evidence AND short story (really weak case)
+  if (evidenceCount === 0 && storyLength < 300) {
+    breakdown.risk_flags -= 5;
   }
+
+  // -4 if no timeline info at all
+  if (!dates.first_incident && !dates.last_incident) {
+    breakdown.risk_flags -= 4;
+  }
+
+  breakdown.risk_flags = Math.max(-15, Math.min(0, breakdown.risk_flags));
 
   breakdown.risk_flags = Math.max(-20, Math.min(0, breakdown.risk_flags));
 
@@ -723,23 +744,35 @@ serve(async (req) => {
       next_steps,
     };
 
-     // If case_id provided, persist the result
+    // If case_id provided, persist the result with error checking
     if (profile.case_id) {
       const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
       const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
       const supabase = createClient(supabaseUrl, supabaseKey);
 
-       await supabase
-         .from('cases')
-         .update({
-           merit_score: merit.score,
-           decision_result_json: result as unknown as Record<string, unknown>,
-           updated_at: new Date().toISOString(),
-         })
-         .eq('id', profile.case_id);
+      // Update cases table with REAL error checking
+      const { data: updateData, error: updateError } = await supabase
+        .from('cases')
+        .update({
+          merit_score: merit.score,
+          decision_result_json: result as unknown as Record<string, unknown>,
+          status: 'scored', // Valid status per cases_status_check constraint
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', profile.case_id)
+        .select('id')
+        .single();
 
-      // Store full decision result
-      await supabase
+      if (updateError) {
+        console.error(`Failed to persist to cases table: ${updateError.message}`);
+      } else if (!updateData) {
+        console.error(`No case row found with id ${profile.case_id} - update matched 0 rows`);
+      } else {
+        console.log(`Successfully persisted decision to case ${profile.case_id}`);
+      }
+
+      // Store full decision result in case_merit
+      const { error: meritError } = await supabase
         .from('case_merit')
         .upsert({
           case_id: profile.case_id,
@@ -752,7 +785,9 @@ serve(async (req) => {
           updated_at: new Date().toISOString(),
         }, { onConflict: 'case_id' });
 
-      console.log(`Persisted decision for case ${profile.case_id}`);
+      if (meritError) {
+        console.error(`Failed to persist to case_merit: ${meritError.message}`);
+      }
     }
 
     return new Response(
