@@ -51,7 +51,12 @@ interface TriageResult {
   alternativeVenues?: { venue: string; reason: string }[];
 }
 
-const Triage = () => {
+type TriageProps = {
+  /** When provided (e.g. from /case/:caseId), it takes precedence over ?caseId=. */
+  initialCaseId?: string;
+};
+
+const Triage = ({ initialCaseId }: TriageProps) => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
@@ -242,7 +247,10 @@ const Triage = () => {
   // SYNCHRONOUS validation on mount - sets error state BEFORE any async work
   useEffect(() => {
     const LAST_CASE_KEY = 'jb_last_case_id';
-    let caseId = searchParams.get('caseId');
+    // Prefer a path param (/case/:caseId) when present, otherwise fall back to query param.
+    let caseId = (typeof initialCaseId === 'string' && initialCaseId.length > 0)
+      ? initialCaseId
+      : searchParams.get('caseId');
     
     // Fallback: if no caseId in URL but one saved in localStorage (only for logged-in users)
     if (!caseId && user) {
@@ -275,7 +283,7 @@ const Triage = () => {
     setCreatedCaseId(caseId);
     loadPersistedDecision(caseId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, initialCaseId]);
   
   // Persist lastCaseId to localStorage only after successful persistence
   useEffect(() => {
