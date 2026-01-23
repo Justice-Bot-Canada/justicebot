@@ -292,6 +292,7 @@ export type Database = {
         Row: {
           cohort_batch: string | null
           created_at: string
+          decision_result_json: Json | null
           description: string | null
           flow_step: string | null
           id: string
@@ -316,6 +317,7 @@ export type Database = {
         Insert: {
           cohort_batch?: string | null
           created_at?: string
+          decision_result_json?: Json | null
           description?: string | null
           flow_step?: string | null
           id?: string
@@ -340,6 +342,7 @@ export type Database = {
         Update: {
           cohort_batch?: string | null
           created_at?: string
+          decision_result_json?: Json | null
           description?: string | null
           flow_step?: string | null
           id?: string
