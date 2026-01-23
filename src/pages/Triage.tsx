@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/lib/toast-stub";
@@ -9,7 +9,6 @@ import { RelatedPages } from "@/components/RelatedPages";
 import CanonicalURL from "@/components/CanonicalURL";
 import EnhancedSEO from "@/components/EnhancedSEO";
 import SmartTriageForm from "@/components/SmartTriageForm";
-import TriageResults from "@/components/TriageResults";
 import { CaseAssessmentScreen } from "@/components/CaseAssessmentScreen";
 import { useDecisionEngine } from "@/hooks/useDecisionEngine";
 import { TriageDiscountModal } from "@/components/TriageDiscountModal";
@@ -28,6 +27,7 @@ import { analytics, trackEvent } from "@/utils/analytics";
 import { useProgramCaseFields } from "@/hooks/useProgramCaseFields";
 import { useProgram } from "@/contexts/ProgramContext";
 import type { DecisionResult, FormRecommendation as DecisionFormRec } from "@/types/decisionEngine";
+import type { EvidenceItem } from "@/types/decisionEngine";
 
 interface FormRecommendation {
   formCode: string;
@@ -53,6 +53,7 @@ interface TriageResult {
 
 const Triage = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const programCaseFields = useProgramCaseFields();
   const { program, isProgramMode } = useProgram();
@@ -70,28 +71,172 @@ const Triage = () => {
   const [uploadedEvidenceCount, setUploadedEvidenceCount] = useState(0);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [pendingSubmission, setPendingSubmission] = useState<{
+    result: TriageResult;
+    description: string;
+    prov: string;
+    evidenceCount?: number;
+  } | null>(null);
   
   // Decision Engine state - stores the full DecisionResult
   const [decisionResult, setDecisionResult] = useState<DecisionResult | null>(null);
-  const { runDecisionEngine, loading: decisionLoading } = useDecisionEngine({
+  const { runDecisionEngine, loading: decisionLoading, error: decisionError } = useDecisionEngine({
     onSuccess: (result) => {
       console.log('[Triage] Decision engine success:', result.merit.score, result.merit.band);
       setDecisionResult(result);
     },
     onError: (err) => {
       console.error('[Triage] Decision engine error:', err);
-      toast.error('Case assessment failed. Using basic analysis.');
+      toast.error('We could not generate your assessment. Please retry.');
     }
   });
   
   // Check if user should see paywall (after triage, before evidence)
   const userHasAccess = hasAccess || isProgramUser || shouldHidePricing;
 
+  const mapFileToEvidenceType = (fileType: string | null, fileName: string | null): EvidenceItem['type'] => {
+    const mime = (fileType || '').toLowerCase();
+    const name = (fileName || '').toLowerCase();
+    if (mime.startsWith('image/') || name.match(/\.(png|jpg|jpeg|webp|gif)$/)) return 'photo';
+    if (mime.startsWith('video/') || name.match(/\.(mp4|mov|webm)$/)) return 'video';
+    if (mime.includes('pdf') || name.endsWith('.pdf')) return 'other';
+    // Heuristic by name
+    if (name.includes('email')) return 'email';
+    if (name.includes('text') || name.includes('sms') || name.includes('message')) return 'text';
+    if (name.includes('notice') || name.includes('n4') || name.includes('n12')) return 'notice';
+    if (name.includes('receipt') || name.includes('invoice')) return 'receipt';
+    if (name.includes('medical') || name.includes('doctor')) return 'medical';
+    if (name.includes('inspection')) return 'inspection';
+    return 'other';
+  };
+
+  const inferTagsFromName = (fileName: string | null): string[] => {
+    const n = (fileName || '').toLowerCase();
+    const tags: string[] = [];
+    if (n.includes('repair') || n.includes('maintenance')) tags.push('repairs');
+    if (n.includes('pest') || n.includes('cockroach') || n.includes('bedbug') || n.includes('mice')) tags.push('pests');
+    if (n.includes('mold') || n.includes('mould')) tags.push('mold');
+    if (n.includes('notice') || n.includes('n4') || n.includes('n12')) tags.push('notice');
+    if (n.includes('threat') || n.includes('harass')) tags.push('harassment');
+    if (n.includes('evict')) tags.push('eviction');
+    return tags;
+  };
+
+  const uploadPendingDocumentsToCase = async (caseId: string, venueTitle: string) => {
+    if (!user) return;
+    if (pendingDocuments.length === 0) return;
+
+    for (const doc of pendingDocuments) {
+      if (doc.status === 'uploaded') continue;
+      try {
+        setPendingDocuments(prev =>
+          prev.map(d => d.id === doc.id ? { ...d, status: 'uploading' as const, progress: 20 } : d)
+        );
+
+        const filePath = `${user.id}/${caseId}/${Date.now()}_${doc.file.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from('evidence')
+          .upload(filePath, doc.file);
+
+        if (uploadError) throw uploadError;
+
+        setPendingDocuments(prev =>
+          prev.map(d => d.id === doc.id ? { ...d, progress: 60 } : d)
+        );
+
+        const { data: evidenceRow, error: evidenceError } = await supabase
+          .from('evidence')
+          .insert({
+            case_id: caseId,
+            file_name: doc.file.name,
+            file_path: filePath,
+            file_type: doc.file.type,
+            description: `Uploaded during triage - ${venueTitle}`,
+            upload_date: new Date().toISOString(),
+            tags: inferTagsFromName(doc.file.name),
+          })
+          .select('id')
+          .single();
+
+        if (evidenceError) throw evidenceError;
+
+        setPendingDocuments(prev =>
+          prev.map(d => d.id === doc.id ? { ...d, status: 'uploaded' as const, progress: 100 } : d)
+        );
+
+        // Queue AI analysis (async)
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const content = e.target?.result as string;
+          if (content && content.length > 0) {
+            supabase.functions.invoke('analyze-document', {
+              body: {
+                fileContent: content.substring(0, 50000),
+                fileName: doc.file.name,
+                caseId,
+                evidenceId: evidenceRow?.id,
+              }
+            }).catch(err => console.warn('Document analysis queued:', err));
+          }
+        };
+        reader.readAsText(doc.file);
+      } catch (docError) {
+        console.error('Error uploading document:', doc.file.name, docError);
+        setPendingDocuments(prev =>
+          prev.map(d => d.id === doc.id ? { ...d, status: 'error' as const, error: 'Upload failed' } : d)
+        );
+      }
+    }
+  };
+
+  const loadPersistedDecision = async (caseId: string): Promise<DecisionResult | null> => {
+    const { data, error } = await supabase
+      .from('cases')
+      .select('decision_result_json, triage, province, description, venue')
+      .eq('id', caseId)
+      .single();
+
+    if (error) throw error;
+
+    if (data?.triage) {
+      setTriageResult(data.triage as any);
+    }
+    if (data?.province) setProvince(data.province);
+    if (typeof data?.description === 'string') setUserDescription(data.description);
+
+    const persisted = (data?.decision_result_json || null) as unknown as DecisionResult | null;
+    if (persisted) {
+      setDecisionResult(persisted);
+      setStep(1);
+    }
+    return persisted;
+  };
+
+  // Allow refresh/return: /triage?caseId=... loads from cases.decision_result_json
+  useEffect(() => {
+    const caseId = searchParams.get('caseId');
+    if (!caseId) return;
+    setCreatedCaseId(caseId);
+    loadPersistedDecision(caseId).catch((e) => {
+      console.warn('[Triage] Failed to load persisted decision:', e);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleTriageComplete = async (result: TriageResult, description: string, prov: string, evidenceCount?: number) => {
     setTriageResult(result);
     setUserDescription(description);
     setProvince(prov);
     setUploadedEvidenceCount(evidenceCount || 0);
+
+    // Non-negotiable: case must exist before decision-engine so we can persist.
+    if (!user) {
+      setPendingSubmission({ result, description, prov, evidenceCount });
+      setShowAuthDialog(true);
+      return;
+    }
+
+    setDecisionResult(null);
     
     // IMMEDIATELY call decision engine after smart-triage
     console.log('[Triage] Calling decision engine with:', {
@@ -100,16 +245,71 @@ const Triage = () => {
       venue_hint: result.venue,
     });
     
-    const decisionEngineResult = await runDecisionEngine({
+    // 1) Create case row first
+    const { data: caseRow, error: caseErr } = await supabase
+      .from('cases')
+      .insert({
+        user_id: user.id,
+        title: `${result.venueTitle} Case`,
+        description,
+        venue: result.venue,
+        province: prov,
+        status: 'analyzing',
+        triage: {
+          venue: result.venue,
+          venueTitle: result.venueTitle,
+          confidence: result.confidence,
+          reasoning: result.reasoning,
+          recommendedForms: result.recommendedForms,
+          flags: result.flags,
+        } as any,
+        ...programCaseFields,
+      })
+      .select('id')
+      .single();
+
+    if (caseErr) {
+      console.error('[Triage] Failed to create case before decision engine:', caseErr);
+      toast.error('Could not create your case. Please retry.');
+      return;
+    }
+
+    const caseId = caseRow.id as string;
+    setCreatedCaseId(caseId);
+    setSearchParams({ caseId }, { replace: true });
+
+    // 2) Ensure any pending uploads become real evidence rows before scoring
+    await uploadPendingDocumentsToCase(caseId, result.venueTitle);
+
+    // 3) Pull real evidence metadata from DB and send to decision-engine
+    const { data: evidenceRows } = await supabase
+      .from('evidence')
+      .select('id, file_type, file_name, tags, upload_date')
+      .eq('case_id', caseId);
+
+    const evidence: EvidenceItem[] = (evidenceRows || []).map((e: any) => ({
+      file_id: e.id,
+      type: mapFileToEvidenceType(e.file_type, e.file_name),
+      tags: Array.isArray(e.tags) && e.tags.length ? e.tags : inferTagsFromName(e.file_name),
+      date: typeof e.upload_date === 'string' ? e.upload_date.slice(0, 10) : undefined,
+      file_name: e.file_name,
+    }));
+
+    // 4) Call decision engine with REAL case_id
+    await runDecisionEngine({
       storyText: description,
       province: prov,
       venueHint: result.venue,
       issueTags: result.flags || [],
+      evidence,
       userAnswers: {
         health_impact: result.flags?.includes('health') || false,
         disability_related: result.flags?.includes('disability') || false,
       },
-    });
+    }, caseId);
+
+    // 5) Render from saved result (single truth)
+    await loadPersistedDecision(caseId);
     
     // Move to step 1 (Assessment screen) AFTER decision engine returns
     setStep(1);
@@ -119,7 +319,7 @@ const Triage = () => {
     analytics.triageCompletedEvent(result.venue, prov);
     
     // Track case snapshot shown (Step 2 of funnel)
-    const meritScore = decisionEngineResult?.merit?.score || result.confidence;
+    const meritScore = decisionResult?.merit?.score || result.confidence;
     analytics.caseSnapshotShown(result.venue, meritScore);
     
     // Pipeline event with rich payload
@@ -133,7 +333,7 @@ const Triage = () => {
     trackEvent('triage_complete', { 
       venue: result.venue, 
       confidence: result.confidence,
-      merit_score: decisionEngineResult?.merit?.score,
+      merit_score: decisionResult?.merit?.score,
       province: prov,
       evidenceCount: evidenceCount || 0
     });
@@ -171,106 +371,19 @@ const Triage = () => {
 
     if (!triageResult) return;
 
+    // Case should already exist (created before decision engine). If not, block.
+    if (!createdCaseId) {
+      toast.error('Missing case ID. Please retry the assessment.');
+      setStep(0);
+      return;
+    }
+
     setIsSavingDocuments(true);
 
     try {
-      // Create a case with triage data - CRITICAL: populate merit_score column
-      // triageResult.confidence is sometimes 0-1 (probability) and sometimes 0-100 (percentage)
-      const rawConfidence = Number(triageResult.confidence);
-      const normalizedConfidence = Number.isFinite(rawConfidence)
-        ? (rawConfidence <= 1 ? rawConfidence * 100 : rawConfidence)
-        : 0;
-      const meritScoreFromTriage = Math.min(100, Math.max(1, Math.round(normalizedConfidence)));
+      await uploadPendingDocumentsToCase(createdCaseId, triageResult.venueTitle);
 
-      const { data: caseData, error: caseError } = await supabase
-        .from('cases')
-        .insert({
-          user_id: user.id,
-          title: `${triageResult.venueTitle} Case`,
-          description: userDescription,
-          venue: triageResult.venue,
-          province: province,
-          status: 'pending',
-          merit_score: meritScoreFromTriage, // Store confidence as merit score (1-100)
-          triage: {
-            venue: triageResult.venue,
-            venueTitle: triageResult.venueTitle,
-            confidence: triageResult.confidence,
-            reasoning: triageResult.reasoning,
-            recommendedForms: triageResult.recommendedForms,
-            flags: triageResult.flags,
-          } as any,
-          ...programCaseFields,
-        })
-        .select()
-        .single();
-
-      if (caseError) throw caseError;
-
-      setCreatedCaseId(caseData.id);
-
-      // Upload pending documents to evidence
-      if (pendingDocuments.length > 0) {
-        for (const doc of pendingDocuments) {
-          try {
-            setPendingDocuments(prev =>
-              prev.map(d => d.id === doc.id ? { ...d, status: 'uploading' as const, progress: 20 } : d)
-            );
-
-            const filePath = `${user.id}/${caseData.id}/${Date.now()}_${doc.file.name}`;
-            const { error: uploadError } = await supabase.storage
-              .from('evidence')
-              .upload(filePath, doc.file);
-
-            if (uploadError) throw uploadError;
-
-            setPendingDocuments(prev =>
-              prev.map(d => d.id === doc.id ? { ...d, progress: 60 } : d)
-            );
-
-            const { error: evidenceError } = await supabase
-              .from('evidence')
-              .insert({
-                case_id: caseData.id,
-                file_name: doc.file.name,
-                file_path: filePath,
-                file_type: doc.file.type,
-                description: `Uploaded during triage - ${triageResult.venueTitle}`,
-                upload_date: new Date().toISOString()
-              });
-
-            if (evidenceError) throw evidenceError;
-
-            setPendingDocuments(prev =>
-              prev.map(d => d.id === doc.id ? { ...d, status: 'uploaded' as const, progress: 100 } : d)
-            );
-
-            // Queue AI analysis (async) - read file content first
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-              const content = e.target?.result as string;
-              if (content && content.length > 0) {
-                supabase.functions.invoke('analyze-document', {
-                  body: {
-                    fileContent: content.substring(0, 50000),
-                    fileName: doc.file.name,
-                    caseId: caseData.id
-                  }
-                }).catch(err => console.warn('Document analysis queued:', err));
-              }
-            };
-            reader.readAsText(doc.file);
-
-          } catch (docError) {
-            console.error('Error uploading document:', doc.file.name, docError);
-            setPendingDocuments(prev =>
-              prev.map(d => d.id === doc.id ? { ...d, status: 'error' as const, error: 'Upload failed' } : d)
-            );
-          }
-        }
-      }
-
-      toast.success("Case created with documents!");
+      toast.success("Continuing with your case...");
 
       if (goToBookOfDocs) {
         setShowBookWizard(true);
@@ -279,9 +392,9 @@ const Triage = () => {
           ? `&recommendedForm=${encodeURIComponent(preselectFormCode.trim())}`
           : '';
 
-        navigate(`/forms/${triageResult.venue}?caseId=${caseData.id}${recommendedForm}`, {
+         navigate(`/forms/${triageResult.venue}?caseId=${createdCaseId}${recommendedForm}`, {
           state: {
-            caseId: caseData.id,
+             caseId: createdCaseId,
             userInput: userDescription,
             province,
             triageResult,
@@ -476,25 +589,75 @@ const Triage = () => {
                 />
               )}
 
-              {/* FALLBACK: Old TriageResults if decision engine failed */}
+              {/* No fallback to old results UI. If decision engine fails, show retry state. */}
               {!decisionResult && !decisionLoading && (
-                <TriageResults
-                  result={triageResult}
-                  description={userDescription}
-                  province={province}
-                  onProceed={() => {
-                    if (!user) {
-                      setShowAuthDialog(true);
-                    } else if (userHasAccess) {
-                      setStep(2);
-                    } else {
-                      setShowPaywall(true);
-                    }
-                  }}
-                  onBack={() => setStep(0)}
-                  onSelectForm={handleSelectForm}
-                  isLoading={isSavingDocuments}
-                />
+                <Card>
+                  <CardHeader>
+                    <CardTitle>We couldn’t generate your assessment</CardTitle>
+                    <CardDescription>
+                      Your case was saved. Please retry to generate your Merit Score and recommended pathway.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {decisionError && (
+                      <Alert>
+                        <AlertDescription>
+                          {decisionError.message}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Button
+                        onClick={async () => {
+                          if (!triageResult || !createdCaseId) return;
+                          try {
+                            setDecisionResult(null);
+                            await uploadPendingDocumentsToCase(createdCaseId, triageResult.venueTitle);
+                            const { data: evidenceRows } = await supabase
+                              .from('evidence')
+                              .select('id, file_type, file_name, tags, upload_date')
+                              .eq('case_id', createdCaseId);
+
+                            const evidence: EvidenceItem[] = (evidenceRows || []).map((e: any) => ({
+                              file_id: e.id,
+                              type: mapFileToEvidenceType(e.file_type, e.file_name),
+                              tags: Array.isArray(e.tags) && e.tags.length ? e.tags : inferTagsFromName(e.file_name),
+                              date: typeof e.upload_date === 'string' ? e.upload_date.slice(0, 10) : undefined,
+                              file_name: e.file_name,
+                            }));
+
+                            await runDecisionEngine({
+                              storyText: userDescription,
+                              province,
+                              venueHint: triageResult.venue,
+                              issueTags: triageResult.flags || [],
+                              evidence,
+                            }, createdCaseId);
+
+                            await loadPersistedDecision(createdCaseId);
+                          } catch (e) {
+                            console.error('[Triage] Retry failed:', e);
+                            toast.error('Retry failed. Please try again.');
+                          }
+                        }}
+                        disabled={!createdCaseId || !triageResult}
+                      >
+                        Retry assessment
+                      </Button>
+
+                      <Button
+                        variant="outline"
+                        onClick={() => setStep(2)}
+                        disabled={!userHasAccess}
+                      >
+                        Upload evidence
+                      </Button>
+                    </div>
+                    <Button variant="ghost" onClick={() => setStep(0)}>
+                      Back
+                    </Button>
+                  </CardContent>
+                </Card>
               )}
 
               {/* Paywall - shown after triage for non-paying users */}
@@ -643,9 +806,11 @@ const Triage = () => {
         onOpenChange={setShowAuthDialog}
         onSuccess={() => {
           setShowAuthDialog(false);
-          // After successful signup, proceed with the flow
-          if (triageResult && userHasAccess) {
-            setStep(2);
+          // After successful signup, re-run the pending triage submission end-to-end
+          if (pendingSubmission) {
+            const { result, description, prov, evidenceCount } = pendingSubmission;
+            setPendingSubmission(null);
+            handleTriageComplete(result, description, prov, evidenceCount);
           }
         }}
         venue={triageResult?.venue}
