@@ -21,6 +21,16 @@ interface FormRecommendation {
   priority: 'primary' | 'secondary' | 'optional';
 }
 
+interface MeritBreakdown {
+  evidenceQuantity: number;      // 0-20
+  evidenceRelevance: number;     // 0-20
+  timelineCompleteness: number;  // 0-15
+  internalConsistency: number;   // 0-15
+  precedentAlignment: number;    // 0-20
+  remedyStrength: number;        // 0-10
+  penalty: number;               // -10 to 0
+}
+
 interface TriageResponse {
   venue: string;
   venueTitle: string;
@@ -32,6 +42,10 @@ interface TriageResponse {
   followUpQuestions?: string[];
   flags: string[];
   alternativeVenues?: { venue: string; reason: string }[];
+  // Merit breakdown for value preview
+  meritBreakdown?: MeritBreakdown;
+  meritStrengths?: string[];
+  meritWeaknesses?: string[];
 }
 
 // Comprehensive form catalog for AI reference
@@ -213,8 +227,28 @@ RESPONSE FORMAT (JSON):
   "nextSteps": ["Ordered list of REMAINING actions - skip completed steps, focus on what's next"],
   "followUpQuestions": ["Questions to clarify timeline or strategy if needed"],
   "flags": ["urgent", "safety", "deadline", "complex", "evidence-ready", "book-of-documents-recommended", etc.],
-  "alternativeVenues": [{"venue": "code", "reason": "why this might also apply"}]
-}`;
+  "alternativeVenues": [{"venue": "code", "reason": "why this might also apply"}],
+  "meritBreakdown": {
+    "evidenceQuantity": 0-20,
+    "evidenceRelevance": 0-20,
+    "timelineCompleteness": 0-15,
+    "internalConsistency": 0-15,
+    "precedentAlignment": 0-20,
+    "remedyStrength": 0-10,
+    "penalty": -10 to 0
+  },
+  "meritStrengths": ["Top 3 reasons why this case is strong - plain language, user-focused"],
+  "meritWeaknesses": ["Top 3 gaps or risks in the case - actionable, not discouraging"]
+}
+
+MERIT BREAKDOWN SCORING GUIDE (sum should roughly equal confidence score):
+- evidenceQuantity (0-20): How much evidence user has or described. 0=none, 10=some, 20=comprehensive
+- evidenceRelevance (0-20): How directly evidence supports the legal claim. 0=irrelevant, 20=highly relevant
+- timelineCompleteness (0-15): Whether dates/sequence of events is clear. 0=vague, 15=detailed timeline
+- internalConsistency (0-15): Whether the story/facts are coherent and consistent. 0=contradictory, 15=fully consistent
+- precedentAlignment (0-20): How well the situation matches known legal claims/precedent. 0=novel/weak claim, 20=textbook case
+- remedyStrength (0-10): Whether the requested outcome is reasonable and achievable. 0=unrealistic, 10=clearly achievable
+- penalty (-10 to 0): Deduct points for missed deadlines, limitation periods, or procedural errors. 0=no issues, -10=serious problems`;
 
     const userPrompt = `Analyze this legal situation and recommend the best venue and forms. PAY CLOSE ATTENTION to what the user has already completed based on their uploaded evidence.
 
@@ -283,6 +317,19 @@ Provide your analysis in the specified JSON format. Be thorough but practical. F
     triageResult.nextSteps = triageResult.nextSteps || [];
     triageResult.urgentDeadlines = triageResult.urgentDeadlines || [];
     triageResult.flags = triageResult.flags || [];
+    triageResult.meritStrengths = triageResult.meritStrengths || [];
+    triageResult.meritWeaknesses = triageResult.meritWeaknesses || [];
+    
+    // Ensure merit breakdown exists with defaults
+    triageResult.meritBreakdown = triageResult.meritBreakdown || {
+      evidenceQuantity: Math.round(triageResult.confidence * 0.2),
+      evidenceRelevance: Math.round(triageResult.confidence * 0.2),
+      timelineCompleteness: Math.round(triageResult.confidence * 0.15),
+      internalConsistency: Math.round(triageResult.confidence * 0.15),
+      precedentAlignment: Math.round(triageResult.confidence * 0.2),
+      remedyStrength: Math.round(triageResult.confidence * 0.1),
+      penalty: 0
+    };
 
     // SOC2 Audit Log: Triage completed
     const auditClient = createAuditClient();
@@ -294,6 +341,7 @@ Provide your analysis in the specified JSON format. Be thorough but practical. F
       metadata: {
         venue: triageResult.venue,
         confidence: triageResult.confidence,
+        meritBreakdown: triageResult.meritBreakdown,
         province: province,
         forms_recommended: triageResult.recommendedForms.length,
         has_urgent_deadlines: triageResult.urgentDeadlines.length > 0,
