@@ -32,6 +32,16 @@ interface FormRecommendation {
   priority: 'primary' | 'secondary' | 'optional';
 }
 
+interface MeritBreakdown {
+  evidenceQuantity: number;
+  evidenceRelevance: number;
+  timelineCompleteness: number;
+  internalConsistency: number;
+  precedentAlignment: number;
+  remedyStrength: number;
+  penalty: number;
+}
+
 interface TriageResult {
   venue: string;
   venueTitle: string;
@@ -43,6 +53,9 @@ interface TriageResult {
   followUpQuestions?: string[];
   flags: string[];
   alternativeVenues?: { venue: string; reason: string }[];
+  meritBreakdown?: MeritBreakdown;
+  meritStrengths?: string[];
+  meritWeaknesses?: string[];
 }
 
 interface TriageResultsProps {
@@ -131,10 +144,14 @@ const TriageResults: React.FC<TriageResultsProps> = ({
             </div>
           </div>
 
-          {/* MERIT SCORE - Prominently displayed */}
+          {/* MERIT SCORE - Prominently displayed with breakdown */}
           <MeritScoreBadge 
             score={result.confidence} 
             showExplanation={true}
+            showBreakdown={true}
+            breakdown={result.meritBreakdown}
+            strengths={result.meritStrengths}
+            weaknesses={result.meritWeaknesses}
             compact={false}
           />
 
