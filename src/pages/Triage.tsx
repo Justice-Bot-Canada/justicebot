@@ -80,6 +80,8 @@ const Triage = () => {
   
   // Decision Engine state - stores the full DecisionResult
   const [decisionResult, setDecisionResult] = useState<DecisionResult | null>(null);
+  // Access error state: shows friendly message instead of 404
+  const [caseAccessError, setCaseAccessError] = useState<string | null>(null);
   const { runDecisionEngine, loading: decisionLoading, error: decisionError } = useDecisionEngine({
     onSuccess: (result) => {
       console.log('[Triage] Decision engine success:', result.merit.score, result.merit.band);
@@ -189,39 +191,90 @@ const Triage = () => {
     }
   };
 
-  const loadPersistedDecision = async (caseId: string): Promise<DecisionResult | null> => {
-    const { data, error } = await supabase
-      .from('cases')
-      .select('decision_result_json, triage, province, description, venue')
-      .eq('id', caseId)
-      .single();
-
-    if (error) throw error;
-
-    if (data?.triage) {
-      setTriageResult(data.triage as any);
-    }
-    if (data?.province) setProvince(data.province);
-    if (typeof data?.description === 'string') setUserDescription(data.description);
-
-    const persisted = (data?.decision_result_json || null) as unknown as DecisionResult | null;
-    if (persisted) {
-      setDecisionResult(persisted);
-      setStep(1);
-    }
-    return persisted;
+  // Validate UUID format before querying
+  const isValidUUID = (str: string): boolean => {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(str);
   };
 
-  // Allow refresh/return: /triage?caseId=... loads from cases.decision_result_json
+  const loadPersistedDecision = async (caseId: string): Promise<DecisionResult | null> => {
+    setCaseAccessError(null);
+    
+    // Validate UUID format first to avoid DB errors
+    if (!isValidUUID(caseId)) {
+      setCaseAccessError("Invalid case ID format. Please start a new assessment.");
+      console.warn('[Triage] Invalid UUID format:', caseId);
+      return null;
+    }
+    
+    try {
+      const { data, error } = await supabase
+        .from('cases')
+        .select('decision_result_json, triage, province, description, venue')
+        .eq('id', caseId)
+        .single();
+
+      if (error) {
+        // Handle RLS/auth errors gracefully
+        if (error.code === 'PGRST116' || error.message?.includes('not found')) {
+          setCaseAccessError("This case doesn't exist or you don't have permission to view it.");
+        } else if (error.code === '42501' || error.message?.includes('permission')) {
+          setCaseAccessError("You don't have permission to access this case. Please sign in.");
+        } else {
+          setCaseAccessError("We couldn't load your case. Please try again or start a new assessment.");
+        }
+        console.warn('[Triage] Case access error:', error);
+        return null;
+      }
+
+      if (data?.triage) {
+        setTriageResult(data.triage as any);
+      }
+      if (data?.province) setProvince(data.province);
+      if (typeof data?.description === 'string') setUserDescription(data.description);
+
+      const persisted = (data?.decision_result_json || null) as unknown as DecisionResult | null;
+      if (persisted) {
+        setDecisionResult(persisted);
+        setStep(1);
+      }
+      return persisted;
+    } catch (err) {
+      console.error('[Triage] Unexpected error loading case:', err);
+      setCaseAccessError("Something went wrong. Please start a new assessment.");
+      return null;
+    }
+  };
+
+  // Allow refresh/return: checks URL param OR localStorage fallback
   useEffect(() => {
-    const caseId = searchParams.get('caseId');
+    const LAST_CASE_KEY = 'jb_last_case_id';
+    let caseId = searchParams.get('caseId');
+    
+    // Fallback: if no caseId in URL but one saved in localStorage
+    if (!caseId && user) {
+      const savedCaseId = localStorage.getItem(LAST_CASE_KEY);
+      if (savedCaseId) {
+        caseId = savedCaseId;
+        // Update URL to include it (for bookmarking/sharing)
+        setSearchParams({ caseId }, { replace: true });
+      }
+    }
+    
     if (!caseId) return;
+    
     setCreatedCaseId(caseId);
-    loadPersistedDecision(caseId).catch((e) => {
-      console.warn('[Triage] Failed to load persisted decision:', e);
-    });
+    loadPersistedDecision(caseId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
+  
+  // Persist lastCaseId to localStorage whenever it changes
+  useEffect(() => {
+    const LAST_CASE_KEY = 'jb_last_case_id';
+    if (createdCaseId && user) {
+      localStorage.setItem(LAST_CASE_KEY, createdCaseId);
+    }
+  }, [createdCaseId, user]);
 
   const handleTriageComplete = async (result: TriageResult, description: string, prov: string, evidenceCount?: number) => {
     setTriageResult(result);
@@ -503,7 +556,40 @@ const Triage = () => {
             )}
           </div>
 
-          {step === 0 && (
+          {/* Case access error state - shown at top level, not inside step conditions */}
+          {caseAccessError && (
+            <Card className="border-destructive/50">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-destructive" />
+                  Can't access this case
+                </CardTitle>
+                <CardDescription>{caseAccessError}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {!user && (
+                    <Button onClick={() => setShowAuthDialog(true)}>
+                      Sign in to continue
+                    </Button>
+                  )}
+                  <Button
+                    variant={user ? "default" : "outline"}
+                    onClick={() => {
+                      setCaseAccessError(null);
+                      setSearchParams({}, { replace: true });
+                      localStorage.removeItem('jb_last_case_id');
+                      setStep(0);
+                    }}
+                  >
+                    Start new assessment
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {step === 0 && !caseAccessError && (
             <SmartTriageForm onTriageComplete={handleTriageComplete} />
           )}
 
