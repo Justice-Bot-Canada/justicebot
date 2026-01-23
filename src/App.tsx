@@ -29,6 +29,7 @@ import NotFound from "./pages/NotFound";
 import Welcome from "./pages/Welcome";
 import ResetPassword from "./pages/ResetPassword";
 import Triage from "./pages/Triage";
+import Case from "./pages/Case";
 import FormSelector from "./pages/FormSelector";
 import Forms from "./pages/Forms";
 import TribunalLocatorPage from "./pages/TribunalLocatorPage";
@@ -181,6 +182,8 @@ const AppContent = () => {
           {/* Single source of truth: /triage is the product flow */}
           <Route path="/funnel" element={<Navigate to="/triage" replace />} />
           <Route path="/triage" element={<Triage />} />
+          {/* Rewrite-friendly, shareable case URL (no query params needed) */}
+          <Route path="/case/:caseId" element={<Case />} />
           <Route path="/urgent-triage" element={<UrgentTriage />} />
           <Route path="/find-my-path" element={<FindMyPath />} />
           <Route path="/upload" element={<Upload />} />
