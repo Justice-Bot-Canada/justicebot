@@ -189,7 +189,7 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
     // Verify case exists and belongs to user
     const { data: caseData, error: caseError } = await supabase
       .from('cases')
-      .select('id, user_id, description, venue')
+      .select('id, user_id, description, venue, province')
       .eq('id', caseId)
       .maybeSingle();
 
@@ -327,12 +327,33 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
       }
     }
 
-    // Refresh evidence list
-    fetchEvidence();
+    // Refresh evidence list and VERIFY persistence
+    await fetchEvidence();
     
-    // Notify parent of upload completion
+    // CRITICAL: Verify evidence is actually in the database before showing success
+    if (successfulUploads > 0) {
+      const { count: verifiedCount, error: verifyError } = await supabase
+        .from('evidence')
+        .select('*', { count: 'exact', head: true })
+        .eq('case_id', caseId);
+      
+      if (verifyError || !verifiedCount || verifiedCount === 0) {
+        console.error('Evidence persistence verification failed:', verifyError);
+        toast.error('Failed to save evidence. Please try again.');
+        setUploading(false);
+        return;
+      }
+      
+      console.log(`Verified ${verifiedCount} evidence items persisted for case ${caseId}`);
+    }
+    
+    // Notify parent of upload completion with VERIFIED count
     if (successfulUploads > 0 && onUploadComplete) {
-      onUploadComplete(evidence.length + successfulUploads);
+      const { count } = await supabase
+        .from('evidence')
+        .select('*', { count: 'exact', head: true })
+        .eq('case_id', caseId);
+      onUploadComplete(count || 0);
     }
 
     // Trigger legal pathway analysis after successful uploads
@@ -343,37 +364,54 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
       
       try {
         toast.info('Analyzing your evidence for legal pathways...');
-        const { data: analysisResult, error: analysisError } = await supabase.functions.invoke('analyze-legal-case', {
+        
+        // Run pipeline which sets merit_status = 'pending' immediately
+        const { data: analysisResult, error: analysisError } = await supabase.functions.invoke('run-case-pipeline', {
           body: {
             caseId,
             description: caseData.description || '',
-            province: 'ON', // Default to Ontario
+            province: caseData.province || 'ON',
           }
         });
 
         if (analysisError) {
-          console.error('Legal analysis error:', analysisError);
-        } else if (analysisResult) {
+          console.error('Pipeline error:', analysisError);
+          toast.warning('Evidence saved but analysis failed. You can retry from dashboard.');
+        } else if (analysisResult?.success) {
           // Show success message before redirect
+          const meritMessage = analysisResult.meritScore 
+            ? ` Merit Score: ${analysisResult.meritScore.score}/100`
+            : '';
+          
           if (autoRedirectAfterUpload) {
-            toast.success('Evidence saved successfully! Redirecting to your dashboard...', {
-              duration: 2000,
+            toast.success(`Evidence saved and analyzed!${meritMessage} Redirecting...`, {
+              duration: 2500,
             });
             // Trigger redirect after short delay for user feedback
             setTimeout(() => {
               if (onRedirectToDashboard) {
                 onRedirectToDashboard();
               }
-            }, 1500);
+            }, 2000);
           } else {
-            toast.success('Legal pathway analysis complete! Check your recommended forms below.');
+            toast.success(`Analysis complete!${meritMessage}`);
+          }
+        } else {
+          // Pipeline returned but not successful
+          if (autoRedirectAfterUpload && onRedirectToDashboard) {
+            toast.success('Evidence saved! Redirecting to your dashboard...', {
+              duration: 2000,
+            });
+            setTimeout(() => {
+              onRedirectToDashboard();
+            }, 1500);
           }
         }
       } catch (err) {
-        console.error('Failed to analyze legal pathway:', err);
-        // Still redirect even if analysis fails - upload was successful
+        console.error('Failed to run case pipeline:', err);
+        // Still redirect if upload was successful - evidence is persisted
         if (autoRedirectAfterUpload && onRedirectToDashboard) {
-          toast.success('Evidence saved! Redirecting to your dashboard...', {
+          toast.success('Evidence saved! Analysis in progress...', {
             duration: 2000,
           });
           setTimeout(() => {

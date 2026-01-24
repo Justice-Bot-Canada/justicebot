@@ -116,6 +116,17 @@ serve(async (req) => {
     console.log('Starting case pipeline for:', caseId);
 
     // =====================================
+    // STEP 0: Set merit_status = 'pending' IMMEDIATELY
+    // =====================================
+    await supabase
+      .from('cases')
+      .update({ 
+        merit_status: 'pending',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', caseId);
+
+    // =====================================
     // STEP 1: Fetch case and evidence data
     // =====================================
     const { data: caseData, error: caseError } = await supabase
@@ -125,6 +136,16 @@ serve(async (req) => {
       .single();
 
     if (caseError || !caseData) {
+      // Set error status if case not found
+      await supabase
+        .from('cases')
+        .update({ 
+          merit_status: 'error',
+          merit_error: 'Case not found',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', caseId);
+        
       return new Response(JSON.stringify({ error: 'Case not found' }), {
         status: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -231,18 +252,34 @@ serve(async (req) => {
     );
 
     // =====================================
-    // STEP 6: Store Results
+    // STEP 6: Store Results (CRITICAL - mark merit complete)
     // =====================================
-    // Update case with merit score
-    await supabase
+    // Update case with merit score AND mark as complete
+    const { error: updateError } = await supabase
       .from('cases')
       .update({ 
         merit_score: meritResult.score,
+        merit_status: 'complete',
+        merit_error: null,
+        merit_updated_at: new Date().toISOString(),
         status: 'analyzed',
         flow_step: 'pathways_ready',
         updated_at: new Date().toISOString()
       })
       .eq('id', caseId);
+
+    if (updateError) {
+      console.error('Failed to update case with merit score:', updateError);
+      // Mark as error if update failed
+      await supabase
+        .from('cases')
+        .update({ 
+          merit_status: 'error',
+          merit_error: updateError.message,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', caseId);
+    }
 
     // Store pathway if we have a primary one
     const primaryPathway = pathways.find(p => p.isPrimary) || pathways[0];

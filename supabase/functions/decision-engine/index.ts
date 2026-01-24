@@ -768,11 +768,14 @@ serve(async (req) => {
       const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
       const supabase = createClient(supabaseUrl, supabaseKey);
 
-      // Update cases table with REAL error checking
+      // Update cases table with REAL error checking + merit_status
       const { data: updateData, error: updateError } = await supabase
         .from('cases')
         .update({
           merit_score: merit.score,
+          merit_status: 'complete',
+          merit_error: null,
+          merit_updated_at: new Date().toISOString(),
           decision_result_json: result as unknown as Record<string, unknown>,
           status: 'scored', // Valid status per cases_status_check constraint
           updated_at: new Date().toISOString(),
@@ -783,6 +786,15 @@ serve(async (req) => {
 
       if (updateError) {
         console.error(`Failed to persist to cases table: ${updateError.message}`);
+        // Mark as error status
+        await supabase
+          .from('cases')
+          .update({
+            merit_status: 'error',
+            merit_error: updateError.message,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', profile.case_id);
       } else if (!updateData) {
         console.error(`No case row found with id ${profile.case_id} - update matched 0 rows`);
       } else {
