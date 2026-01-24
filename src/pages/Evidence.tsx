@@ -200,13 +200,22 @@ const Evidence = () => {
     }
   }, [caseId, isProgramMode, program, evidenceCount]);
 
-  if (!user) {
-    navigate("/welcome");
-    return null;
-  }
+  // CRITICAL: Redirect to welcome if not authenticated - must be in useEffect
+  useEffect(() => {
+    if (!user) {
+      navigate("/welcome");
+    }
+  }, [user, navigate]);
 
-  if (!caseId) {
-    navigate("/dashboard");
+  // CRITICAL: Redirect to dashboard if no caseId - must be in useEffect
+  useEffect(() => {
+    if (user && !caseId) {
+      navigate("/dashboard");
+    }
+  }, [user, caseId, navigate]);
+
+  // Don't render until we have user and caseId
+  if (!user || !caseId) {
     return null;
   }
 

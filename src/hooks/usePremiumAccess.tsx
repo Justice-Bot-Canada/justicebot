@@ -65,10 +65,17 @@ export function usePremiumAccess(): PremiumAccess {
         setTier(null);
       }
 
-      // Check free tier eligibility
-      const { data: freeEligible, error } = await supabase.rpc('check_free_tier_eligibility');
-      if (error) throw error;
-      setIsFreeUser(freeEligible === true);
+      // Check free tier eligibility - pass user ID as required by the DB function
+      const { data: freeEligible, error } = await supabase.rpc('check_free_tier_eligibility', {
+        p_user_id: user.id
+      });
+      if (error) {
+        console.error('Free tier check error:', error);
+        // Don't throw - gracefully handle by assuming not eligible
+        setIsFreeUser(false);
+      } else {
+        setIsFreeUser(freeEligible === true);
+      }
 
       // Get user signup number for display (first 200 get free access)
       const { data: profileData } = await supabase

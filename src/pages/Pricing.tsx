@@ -53,11 +53,18 @@ const Pricing = () => {
     if (!user) return;
     
     try {
-      const { data, error } = await supabase.rpc('check_free_tier_eligibility');
-      if (error) throw error;
-      setIsFreeUser(data === true);
+      const { data, error } = await supabase.rpc('check_free_tier_eligibility', {
+        p_user_id: user.id
+      });
+      if (error) {
+        console.error('Free tier check error:', error);
+        setIsFreeUser(false);
+      } else {
+        setIsFreeUser(data === true);
+      }
     } catch (error) {
       console.error('Error checking free eligibility:', error);
+      setIsFreeUser(false);
     }
   };
 
