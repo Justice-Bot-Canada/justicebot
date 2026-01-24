@@ -467,9 +467,10 @@ const Triage = ({ initialCaseId }: TriageProps) => {
           ? `&recommendedForm=${encodeURIComponent(preselectFormCode.trim())}`
           : '';
 
-         navigate(`/forms/${triageResult.venue}?caseId=${createdCaseId}${recommendedForm}`, {
+        // CASE-SCOPED ROUTING: Navigate to /case/:caseId/pathways (path-based, not query params)
+        navigate(`/case/${createdCaseId}/pathways`, {
           state: {
-             caseId: createdCaseId,
+            caseId: createdCaseId,
             userInput: userDescription,
             province,
             triageResult,
