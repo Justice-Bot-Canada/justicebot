@@ -23,33 +23,65 @@ const viewedSources = new Set<string>();
 type SignupErrorType = 
   | 'email_exists'
   | 'invalid_email'
+  | 'weak_password'
+  | 'password_too_short'
   | 'invalid_password'
   | 'verification_failed'
   | 'rate_limited'
   | 'network_error'
+  | 'auth_disabled'
+  | 'captcha_failed'
   | 'unexpected_error';
 
 const mapErrorToType = (errorMessage: string): SignupErrorType => {
   const lowerError = errorMessage.toLowerCase();
   
-  if (lowerError.includes('already registered') || lowerError.includes('already exists')) {
+  // Email errors
+  if (lowerError.includes('already registered') || lowerError.includes('already exists') || lowerError.includes('user already')) {
     return 'email_exists';
   }
-  if (lowerError.includes('invalid email') || lowerError.includes('email format')) {
+  if (lowerError.includes('invalid email') || lowerError.includes('email format') || lowerError.includes('valid email')) {
     return 'invalid_email';
+  }
+  
+  // Password errors - more specific patterns
+  if (lowerError.includes('weak') || lowerError.includes('strength')) {
+    return 'weak_password';
+  }
+  if (lowerError.includes('short') || lowerError.includes('at least') || lowerError.includes('minimum')) {
+    return 'password_too_short';
   }
   if (lowerError.includes('password')) {
     return 'invalid_password';
   }
-  if (lowerError.includes('verification') || lowerError.includes('confirm')) {
+  
+  // Verification/confirmation
+  if (lowerError.includes('verification') || lowerError.includes('confirm') || lowerError.includes('email link')) {
     return 'verification_failed';
   }
-  if (lowerError.includes('rate') || lowerError.includes('too many')) {
+  
+  // Rate limiting
+  if (lowerError.includes('rate') || lowerError.includes('too many') || lowerError.includes('limit')) {
     return 'rate_limited';
   }
-  if (lowerError.includes('network') || lowerError.includes('fetch')) {
+  
+  // Network issues
+  if (lowerError.includes('network') || lowerError.includes('fetch') || lowerError.includes('connection')) {
     return 'network_error';
   }
+  
+  // Auth disabled
+  if (lowerError.includes('signup disabled') || lowerError.includes('registration disabled')) {
+    return 'auth_disabled';
+  }
+  
+  // Captcha
+  if (lowerError.includes('captcha') || lowerError.includes('turnstile')) {
+    return 'captcha_failed';
+  }
+  
+  // Log unmapped errors for future pattern discovery
+  console.warn('[SignupAnalytics] Unmapped error type:', errorMessage);
   return 'unexpected_error';
 };
 

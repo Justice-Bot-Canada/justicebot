@@ -80,6 +80,10 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
   const [filterType, setFilterType] = useState<string>('all');
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
   const [processing, setProcessing] = useState<Set<string>>(new Set());
+  
+  // Stuck timer for diagnostic events - fires if upload takes >10 seconds
+  const stuckTimerRef = useRef<number | null>(null);
+  const uploadPhaseRef = useRef<string>('idle');
 
   // If autoRedirectAfterUpload is enabled, we schedule a redirect after successful upload.
   // Users may click to upload more evidence before that timer fires; clear any pending timer
@@ -93,9 +97,26 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
     }
   };
 
+  const clearStuckTimer = () => {
+    if (stuckTimerRef.current !== null) {
+      window.clearTimeout(stuckTimerRef.current);
+      stuckTimerRef.current = null;
+    }
+  };
+
+  const startStuckTimer = (phase: string) => {
+    clearStuckTimer();
+    uploadPhaseRef.current = phase;
+    stuckTimerRef.current = window.setTimeout(() => {
+      analytics.evidenceUiStuck(10000, phase, caseId);
+      stuckTimerRef.current = null;
+    }, 10000);
+  };
+
   useEffect(() => {
     return () => {
       clearPendingRedirect();
+      clearStuckTimer();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -204,12 +225,20 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
   const onDrop = async (acceptedFiles: File[]) => {
     // If the user is uploading again, cancel any pending auto-redirect.
     clearPendingRedirect();
+    clearStuckTimer();
+    
+    // Fire diagnostic event: upload started
+    analytics.evidenceUploadStarted(acceptedFiles.length, caseId);
+    startStuckTimer('uploading');
+    
     setUploading(true);
     let successfulUploads = 0;
 
     // Get current user ID for storage path
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
+      analytics.evidenceUploadFailed('User not logged in', 'auth_error', caseId);
+      clearStuckTimer();
       toast.error('You must be logged in to upload evidence');
       setUploading(false);
       return;
@@ -223,12 +252,16 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
       .maybeSingle();
 
     if (caseError || !caseData) {
+      analytics.evidenceUploadFailed('Case not found', 'db_error', caseId);
+      clearStuckTimer();
       toast.error('Case not found. Please create a case first.');
       setUploading(false);
       return;
     }
 
     if (caseData.user_id !== user.id) {
+      analytics.evidenceUploadFailed('Permission denied', 'permission_error', caseId);
+      clearStuckTimer();
       toast.error('You do not have permission to upload to this case.');
       setUploading(false);
       return;
@@ -250,6 +283,7 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
 
         if (uploadError) {
           console.error('Storage upload error:', uploadError);
+          analytics.evidenceUploadFailed(uploadError.message, 'storage_error', caseId, file.name);
           toast.error(`Failed to upload ${file.name}: ${uploadError.message}`);
           continue;
         }
@@ -276,6 +310,7 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
 
         if (evidenceError) {
           console.error('Evidence record error:', evidenceError);
+          analytics.evidenceUploadFailed(evidenceError.message, 'db_error', caseId, file.name);
           toast.error(`Failed to save ${file.name}: ${evidenceError.message}`);
           // Try to clean up the uploaded file
           await supabase.storage.from('evidence').remove([filePath]);
@@ -283,6 +318,9 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
         }
         setUploadProgress(prev => ({ ...prev, [fileId]: 75 }));
         successfulUploads++;
+        
+        // Update phase to analyzing
+        startStuckTimer('analyzing');
 
         // Analyze document with AI - use storage path for binary files
         try {
@@ -314,6 +352,7 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
 
           if (analysisError) {
             console.error('Analysis error:', analysisError);
+            analytics.evidenceUploadFailed(analysisError.message || 'Analysis failed', 'analysis_error', caseId, file.name);
             toast.warning(`${file.name} uploaded but analysis failed`);
           } else if (analysisData?.metadata) {
             // Save metadata
@@ -352,9 +391,15 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
 
       } catch (error) {
         console.error('Upload error:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        analytics.evidenceUploadFailed(errorMessage, 'unexpected_error', caseId);
         toast.error(`Failed to upload ${file.name}`);
       }
     }
+    
+    // Clear stuck timer - upload loop complete
+    clearStuckTimer();
+    startStuckTimer('saving');
 
     // Refresh evidence list and VERIFY persistence (don't notify yet - we do it below)
     await fetchEvidence(false);
@@ -368,6 +413,8 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
       
       if (verifyError || !verifiedCount || verifiedCount === 0) {
         console.error('Evidence persistence verification failed:', verifyError);
+        analytics.evidenceUploadFailed('Persistence verification failed', 'db_error', caseId);
+        clearStuckTimer();
         toast.error('Failed to save evidence. Please try again.');
         setUploading(false);
         return;
@@ -387,6 +434,10 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
 
     // Trigger legal pathway analysis after successful uploads
     if (successfulUploads > 0) {
+      // Clear stuck timer and start pipeline phase
+      clearStuckTimer();
+      startStuckTimer('analyzing');
+      
       // Track evidence upload success and complete events - CRITICAL for regression detection
       analytics.evidenceUploadSuccess(successfulUploads, caseId);
       analytics.evidenceUploadComplete(successfulUploads, caseId);
@@ -413,6 +464,8 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
             : '';
           
           if (autoRedirectAfterUpload) {
+            clearStuckTimer();
+            startStuckTimer('redirecting');
             toast.success(`Evidence saved and analyzed!${meritMessage} Redirecting...`, {
               duration: 2500,
             });
@@ -454,11 +507,17 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
       }
     }
 
+    // Clear all timers on completion
+    clearStuckTimer();
     setUploading(false);
   };
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open: openFilePicker } = useDropzone({
     onDrop,
+    onDragEnter: () => {
+      // Fire event when user drags files over
+      analytics.evidenceAddClicked('drag', caseId);
+    },
     accept: {
       'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp'],
       'application/pdf': ['.pdf'],
@@ -469,6 +528,12 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
     },
     maxSize: 100 * 1024 * 1024 // 100MB for large legal documents
   });
+  
+  // Wrapper to track clicks on the dropzone
+  const handleDropzoneClick = () => {
+    analytics.evidenceAddClicked('dropzone', caseId);
+    analytics.evidenceUploadModalOpened(caseId);
+  };
 
   const reprocessOCR = async (evidenceId: string, filePath: string, fileType: string) => {
     setProcessing(prev => new Set(prev).add(evidenceId));
@@ -599,6 +664,11 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
         <CardContent className="pt-6">
           <div
             {...getRootProps()}
+            onClick={(e) => {
+              handleDropzoneClick();
+              // Let the original onClick from getRootProps run
+              getRootProps().onClick?.(e);
+            }}
             className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
               isDragActive ? 'border-primary bg-primary/5' : 'border-muted hover:border-primary/50'
             }`}
