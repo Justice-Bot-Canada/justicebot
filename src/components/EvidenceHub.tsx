@@ -81,11 +81,15 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
   const [processing, setProcessing] = useState<Set<string>>(new Set());
 
+  // Only fetch evidence on initial mount, not on every caseId change to avoid loops
   useEffect(() => {
-    fetchEvidence();
+    if (caseId) {
+      fetchEvidence();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [caseId]);
 
-  const fetchEvidence = async () => {
+  const fetchEvidence = async (notifyOnComplete = false) => {
     try {
       const { data, error } = await supabase
         .from('evidence')
@@ -164,8 +168,12 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
       }) || [];
 
       setEvidence(transformedData);
-      // Notify parent of new evidence count
-      onUploadComplete?.(transformedData.length);
+      
+      // Only notify parent of upload completion when explicitly requested (after actual uploads)
+      // This prevents triggering side effects on initial page load
+      if (notifyOnComplete) {
+        onUploadComplete?.(transformedData.length);
+      }
     } catch (error) {
       console.error('Error fetching evidence:', error);
       toast.error('Failed to load evidence');
@@ -327,8 +335,8 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
       }
     }
 
-    // Refresh evidence list and VERIFY persistence
-    await fetchEvidence();
+    // Refresh evidence list and VERIFY persistence (don't notify yet - we do it below)
+    await fetchEvidence(false);
     
     // CRITICAL: Verify evidence is actually in the database before showing success
     if (successfulUploads > 0) {
@@ -468,7 +476,7 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
       if (updateError) throw updateError;
       
       toast.success(`Re-extracted ${ocrText.length} characters of text`);
-      fetchEvidence();
+      fetchEvidence(false);
     } catch (error: unknown) {
       console.error('OCR reprocess error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to re-process OCR');
@@ -490,7 +498,7 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
 
       if (error) throw error;
       toast.success('Evidence deleted');
-      fetchEvidence();
+      fetchEvidence(false);
     } catch (error) {
       console.error('Delete error:', error);
       toast.error('Failed to delete evidence');
