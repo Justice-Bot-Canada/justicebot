@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -80,6 +80,25 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
   const [filterType, setFilterType] = useState<string>('all');
   const [uploadProgress, setUploadProgress] = useState<Record<string, number>>({});
   const [processing, setProcessing] = useState<Set<string>>(new Set());
+
+  // If autoRedirectAfterUpload is enabled, we schedule a redirect after successful upload.
+  // Users may click to upload more evidence before that timer fires; clear any pending timer
+  // to prevent navigation loops/flashing.
+  const redirectTimeoutRef = useRef<number | null>(null);
+
+  const clearPendingRedirect = () => {
+    if (redirectTimeoutRef.current !== null) {
+      window.clearTimeout(redirectTimeoutRef.current);
+      redirectTimeoutRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      clearPendingRedirect();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Only fetch evidence on initial mount, not on every caseId change to avoid loops
   useEffect(() => {
@@ -183,6 +202,8 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
   };
 
   const onDrop = async (acceptedFiles: File[]) => {
+    // If the user is uploading again, cancel any pending auto-redirect.
+    clearPendingRedirect();
     setUploading(true);
     let successfulUploads = 0;
 
@@ -396,10 +417,10 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
               duration: 2500,
             });
             // Trigger redirect after short delay for user feedback
-            setTimeout(() => {
-              if (onRedirectToDashboard) {
-                onRedirectToDashboard();
-              }
+            clearPendingRedirect();
+            redirectTimeoutRef.current = window.setTimeout(() => {
+              onRedirectToDashboard?.();
+              redirectTimeoutRef.current = null;
             }, 2000);
           } else {
             toast.success(`Analysis complete!${meritMessage}`);
@@ -410,8 +431,10 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
             toast.success('Evidence saved! Redirecting to your dashboard...', {
               duration: 2000,
             });
-            setTimeout(() => {
-              onRedirectToDashboard();
+            clearPendingRedirect();
+            redirectTimeoutRef.current = window.setTimeout(() => {
+              onRedirectToDashboard?.();
+              redirectTimeoutRef.current = null;
             }, 1500);
           }
         }
@@ -422,8 +445,10 @@ export function EvidenceHub({ caseId, caseDescription, caseType, onEvidenceSelec
           toast.success('Evidence saved! Analysis in progress...', {
             duration: 2000,
           });
-          setTimeout(() => {
-            onRedirectToDashboard();
+          clearPendingRedirect();
+          redirectTimeoutRef.current = window.setTimeout(() => {
+            onRedirectToDashboard?.();
+            redirectTimeoutRef.current = null;
           }, 1500);
         }
       }
