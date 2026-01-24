@@ -174,6 +174,59 @@ export const analytics = {
     });
   },
 
+  // ==========================================
+  // EVIDENCE UPLOAD DIAGNOSTIC EVENTS
+  // These help debug freezing/flashing issues in production
+  // ==========================================
+  
+  // Fires when user clicks "Add Evidence" button or dropzone
+  evidenceAddClicked: (source: string, caseId?: string) => {
+    sendGA4Event('evidence_add_clicked', {
+      source, // 'dropzone', 'button', 'drag'
+      case_id: caseId || 'unknown',
+      page_path: window.location.pathname,
+    });
+  },
+
+  // Fires when the file picker/modal opens
+  evidenceUploadModalOpened: (caseId?: string) => {
+    sendGA4Event('evidence_upload_modal_opened', {
+      case_id: caseId || 'unknown',
+      page_path: window.location.pathname,
+    });
+  },
+
+  // Fires at the START of upload (before any network calls)
+  evidenceUploadStarted: (fileCount: number, caseId?: string) => {
+    sendGA4Event('evidence_upload_started', {
+      file_count: fileCount,
+      case_id: caseId || 'unknown',
+      page_path: window.location.pathname,
+      timestamp: Date.now(),
+    });
+  },
+
+  // Fires when upload FAILS with specific error type
+  evidenceUploadFailed: (errorMessage: string, errorType: string, caseId?: string, fileName?: string) => {
+    sendGA4Event('evidence_upload_failed', {
+      error_message: errorMessage.slice(0, 100),
+      error_type: errorType, // 'storage_error', 'db_error', 'analysis_error', 'permission_error', 'auth_error'
+      case_id: caseId || 'unknown',
+      file_name: fileName?.slice(0, 50) || 'unknown',
+      page_path: window.location.pathname,
+    });
+  },
+
+  // Fires if UI appears stuck (loading > 10 seconds without progress)
+  evidenceUiStuck: (durationMs: number, phase: string, caseId?: string) => {
+    sendGA4Event('evidence_ui_stuck', {
+      duration_ms: durationMs,
+      phase, // 'uploading', 'analyzing', 'saving', 'redirecting'
+      case_id: caseId || 'unknown',
+      page_path: window.location.pathname,
+    });
+  },
+
   // redirect_to_dashboard_success - when user is redirected to dashboard after upload
   redirectToDashboardSuccess: (fromPage: string, caseId?: string) => {
     sendGA4Event('redirect_to_dashboard_success', {

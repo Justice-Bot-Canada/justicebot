@@ -2,6 +2,12 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import { initSentry } from "@/lib/sentry";
+import { captureConsoleErrors } from "@/lib/errorCapture";
+
+// Initialize error tracking before app renders
+initSentry();
+captureConsoleErrors();
 
 const rootElement = document.getElementById("root");
 
