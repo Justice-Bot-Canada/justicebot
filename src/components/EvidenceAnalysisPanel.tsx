@@ -44,27 +44,29 @@ export function EvidenceAnalysisPanel({
     const loadExistingAnalysis = async () => {
       try {
         // First get the first evidence item for this case to find linked analysis
-        const { data: evidenceData } = await supabase
+        // Use maybeSingle() to avoid throwing when no evidence exists
+        const { data: evidenceData, error: evidenceError } = await supabase
           .from('evidence')
           .select('id')
           .eq('case_id', caseId)
           .order('upload_date', { ascending: true })
           .limit(1)
-          .single();
+          .maybeSingle();
 
-        if (!evidenceData) {
+        if (evidenceError || !evidenceData) {
           setLoadingExisting(false);
           return;
         }
 
         // Now fetch the analysis linked to this evidence
+        // Use maybeSingle() to avoid throwing when no analysis exists
         const { data, error } = await supabase
           .from('evidence_analysis')
           .select('analysis_data, created_at')
           .eq('evidence_id', evidenceData.id)
           .order('created_at', { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
 
         if (!error && data) {
           setSavedAnalysis(data.analysis_data as unknown as EvidenceAnalysis);
