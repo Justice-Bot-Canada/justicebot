@@ -8,14 +8,20 @@ export interface Program {
   description: string | null;
   organization: string | null;
   contact_email: string | null;
+  contact_phone: string | null;
   is_active: boolean;
-  disable_pricing: boolean;
-  disable_ai_beyond_procedural: boolean;
-  show_no_legal_advice_banner: boolean;
+  disable_pricing: boolean | null;
+  disable_ai_beyond_procedural: boolean | null;
+  show_no_legal_advice_banner: boolean | null;
   cohort_batch: string | null;
   max_referrals: number | null;
-  referral_count: number;
-  settings: Record<string, unknown>;
+  referral_count: number | null;
+  settings: Record<string, unknown> | null;
+  features: Record<string, unknown> | null;
+  logo_url: string | null;
+  primary_color: string | null;
+  secondary_color: string | null;
+  website_url: string | null;
   created_at: string;
   updated_at: string;
 }
