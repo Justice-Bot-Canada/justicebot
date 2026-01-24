@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { analytics } from "@/utils/analytics";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Index - Landing Page with Hero and Conversational Onboarding
@@ -20,11 +21,34 @@ const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Redirect authenticated users to dashboard
+  // Redirect authenticated users - but only if they have a completed case
+  // This prevents redirect loops when ProtectedRoute would bounce them back
   useEffect(() => {
-    if (!loading && user) {
-      navigate('/dashboard', { replace: true });
-    }
+    if (loading || !user) return;
+    
+    const checkCaseAndRedirect = async () => {
+      try {
+        // Check if user has a case with triage_complete = true
+        const { data: cases } = await supabase
+          .from('cases')
+          .select('id, triage_complete')
+          .eq('user_id', user.id)
+          .eq('triage_complete', true)
+          .limit(1);
+        
+        if (cases && cases.length > 0) {
+          // User has completed triage - safe to go to dashboard
+          navigate('/dashboard', { replace: true });
+        } else {
+          // No completed case - stay on landing or go to triage
+          // Don't redirect to dashboard as it would bounce back
+        }
+      } catch (error) {
+        console.error('Error checking case status:', error);
+      }
+    };
+    
+    checkCaseAndRedirect();
   }, [user, loading, navigate]);
 
   // Track landing view
