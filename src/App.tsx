@@ -118,6 +118,8 @@ const FormBuilder = lazy(() => import("./pages/FormBuilder"));
 const CaseAssessment = lazy(() => import("./pages/CaseAssessment"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Evidence = lazy(() => import("./pages/Evidence"));
+const CaseEvidence = lazy(() => import("./pages/CaseEvidence"));
+const CasePathways = lazy(() => import("./pages/CasePathways"));
 const LegalChat = lazy(() => import("./pages/LegalChat"));
 const TutorialLibrary = lazy(() => import("./pages/TutorialLibrary"));
 const TemplateLibrary = lazy(() => import("./pages/TemplateLibrary"));
@@ -184,7 +186,10 @@ const AppContent = () => {
           <Route path="/triage" element={<Triage />} />
           {/* Rewrite-friendly, shareable case URL (no query params needed) */}
           <Route path="/case/:caseId" element={<Case />} />
-          <Route path="/urgent-triage" element={<UrgentTriage />} />
+          {/* CASE-SCOPED ROUTES - caseId in URL path, not query params */}
+          <Route path="/case/:caseId/evidence" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><CaseEvidence /></Suspense></ProtectedRoute>} />
+          <Route path="/case/:caseId/pathways" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><CasePathways /></Suspense></ProtectedRoute>} />
+          <Route path="/case/:caseId/triage" element={<Navigate to="/triage" replace />} />
           <Route path="/find-my-path" element={<FindMyPath />} />
           <Route path="/upload" element={<Upload />} />
           <Route path="/upload-first" element={<UploadFirst />} />
@@ -216,8 +221,10 @@ const AppContent = () => {
           <Route path="/document-analysis" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><DocumentAnalysis /></Suspense></ProtectedRoute>} />
           <Route path="/document-drafter" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><DocumentDrafter /></Suspense></ProtectedRoute>} />
           <Route path="/smart-documents" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SmartDocuments /></Suspense></ProtectedRoute>} />
+          {/* Legacy /evidence route - redirects to case-scoped if caseId in query */}
           <Route path="/evidence" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Evidence /></Suspense></ProtectedRoute>} />
           <Route path="/case-timeline" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><CaseTimeline /></Suspense></ProtectedRoute>} />
+          <Route path="/urgent-triage" element={<UrgentTriage />} />
           <Route path="/case-strength" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><CaseStrengthAnalyzer /></Suspense></ProtectedRoute>} />
           <Route path="/assessment" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><CaseAssessment /></Suspense></ProtectedRoute>} />
           <Route path="/settlement-calculator" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><SettlementCalculator /></Suspense></ProtectedRoute>} />

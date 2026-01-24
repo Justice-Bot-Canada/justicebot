@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { BookOpen, ArrowRight, Upload, FileText, Plus, Loader2 } from "lucide-react";
+import { BookOpen, ArrowRight, FileText, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { FlowHeader } from "@/components/FlowHeader";
 import { FlowProgressIndicator } from "@/components/FlowProgressIndicator";
@@ -9,7 +9,6 @@ import { ProgramBanner, useShouldHidePricing } from "@/components/ProgramBanner"
 import SEOHead from "@/components/SEOHead";
 import { EvidenceHub } from "@/components/EvidenceHub";
 import { CaseAnalysisResults } from "@/components/CaseAnalysisResults";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
 import { BookOfDocsPaywall } from "@/components/paywalls";
@@ -22,57 +21,82 @@ import { useProgram } from "@/contexts/ProgramContext";
 
 const BOOK_DOCS_PRODUCT_KEY = "book_docs_generator";
 
-const Evidence = () => {
+// Strict UUID validation (version 1-5, variant 8/9/a/b)
+const isValidUUID = (s: string) =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s);
+
+/**
+ * Case-scoped Evidence page: /case/:caseId/evidence
+ * This route ensures caseId is in the URL path, not query params.
+ */
+const CaseEvidence = () => {
+  const { caseId } = useParams<{ caseId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { hasAccess, isFreeUser, tier } = usePremiumAccess();
   const { program, isProgramMode } = useProgram();
   const shouldHidePricing = useShouldHidePricing();
-  const [searchParams] = useSearchParams();
-  const caseId = searchParams.get('case') || searchParams.get('caseId');
+  
   const [caseData, setCaseData] = useState<any>(null);
   const [bookWizardOpen, setBookWizardOpen] = useState(false);
   const [showBookPaywall, setShowBookPaywall] = useState(false);
   const [evidenceCount, setEvidenceCount] = useState(0);
   const [hasBookEntitlement, setHasBookEntitlement] = useState(false);
+  const [accessError, setAccessError] = useState<string | null>(null);
 
   const isPremium = hasAccess && (tier === 'monthly' || tier === 'yearly');
-
-  // CASE-SCOPED ROUTING: Redirect to path-based route if caseId is in query params
-  useEffect(() => {
-    if (caseId) {
-      // Redirect from /evidence?case=xxx to /case/xxx/evidence
-      navigate(`/case/${caseId}/evidence`, { replace: true });
-    }
-  }, [caseId, navigate]);
-
-  // Case pipeline hook for post-evidence analysis
   const { runPipeline, result: pipelineResult, loading: pipelineLoading } = useCasePipeline();
 
-  // Handler called after evidence upload completes
-  const handleEvidenceUploaded = async (count: number) => {
-    setEvidenceCount(count);
+  // Validate caseId immediately - no DB calls for invalid UUIDs
+  useEffect(() => {
+    if (!caseId || !isValidUUID(caseId)) {
+      setAccessError("Invalid case ID. Please start a new assessment.");
+      return;
+    }
+    if (!user) {
+      navigate("/welcome");
+      return;
+    }
+    loadCaseData();
+    loadEvidenceCount();
+    checkBookEntitlement();
+  }, [caseId, user]);
+
+  const loadCaseData = async () => {
+    if (!caseId || !isValidUUID(caseId)) return;
     
-    // Automatically run the pipeline after evidence is uploaded
-    if (count > 0 && caseId && !pipelineResult) {
-      await runPipeline(caseId, caseData?.description, caseData?.province);
+    try {
+      const { data, error } = await supabase
+        .from('cases')
+        .select('*')
+        .eq('id', caseId)
+        .single();
+      
+      if (error) {
+        if (error.code === 'PGRST116') {
+          setAccessError("This case doesn't exist or you don't have permission to view it.");
+        } else {
+          setAccessError("Failed to load case. Please try again.");
+        }
+        return;
+      }
+      
+      setCaseData(data);
+    } catch (error) {
+      console.error('Error loading case:', error);
+      setAccessError("Failed to load case data.");
     }
   };
 
-  // Handler to redirect user to case pathways after successful upload
-  const handleRedirectToDashboard = () => {
-    // Track the redirect success event
-    analytics.redirectToDashboardSuccess('/evidence', caseId || undefined);
-    
-    // CASE-SCOPED ROUTING: Redirect to /case/:caseId/pathways
-    if (caseId) {
-      navigate(`/case/${caseId}/pathways`, { replace: true });
-    } else {
-      navigate('/dashboard');
-    }
+  const loadEvidenceCount = async () => {
+    if (!caseId || !isValidUUID(caseId)) return;
+    const { count } = await supabase
+      .from('evidence')
+      .select('*', { count: 'exact', head: true })
+      .eq('case_id', caseId);
+    setEvidenceCount(count || 0);
   };
 
-  // Check if user has Book of Documents entitlement
   const checkBookEntitlement = async () => {
     if (!user || !caseId) return;
     
@@ -83,24 +107,19 @@ const Evidence = () => {
         .eq("user_id", user.id);
       
       if (data) {
-        // Check for global premium OR specific book_docs_generator entitlement
         const hasEntitlement = data.some(e => {
-          // Global subscriptions
           if (e.product_id?.toLowerCase().includes('monthly') || 
               e.product_id?.toLowerCase().includes('yearly') ||
               e.product_id?.toLowerCase().includes('premium')) {
             return !e.ends_at || new Date(e.ends_at) > new Date();
           }
-          // Specific book_docs_generator entitlement
           if (e.product_id === BOOK_DOCS_PRODUCT_KEY || 
               e.product_id?.toLowerCase().includes('book')) {
-            // If case-scoped, must match this case
             if (e.case_id && e.case_id !== caseId) return false;
             return !e.ends_at || new Date(e.ends_at) > new Date();
           }
           return false;
         });
-        
         setHasBookEntitlement(hasEntitlement);
       }
     } catch (err) {
@@ -108,20 +127,24 @@ const Evidence = () => {
     }
   };
 
-  useEffect(() => {
-    if (user && caseId) {
-      checkBookEntitlement();
+  const handleEvidenceUploaded = async (count: number) => {
+    setEvidenceCount(count);
+    if (count > 0 && caseId && !pipelineResult) {
+      await runPipeline(caseId, caseData?.description, caseData?.province);
     }
-  }, [user, caseId]);
+  };
 
-  // Handle Book of Documents button click
+  // CRITICAL: Redirect to /case/:caseId/pathways (path-based routing)
+  const handleRedirectToDashboard = () => {
+    analytics.redirectToDashboardSuccess('/case/evidence', caseId || undefined);
+    navigate(`/case/${caseId}/pathways`, { replace: true });
+  };
+
   const handleBookClick = () => {
-    // Premium users, free users, and program users bypass paywall
     if (isPremium || isFreeUser || shouldHidePricing || hasBookEntitlement) {
       setBookWizardOpen(true);
       return;
     }
-    // Show paywall for non-premium users
     setShowBookPaywall(true);
   };
 
@@ -131,51 +154,15 @@ const Evidence = () => {
     setBookWizardOpen(true);
   };
 
-  // Load case data for analyzer context
-  useEffect(() => {
-    if (caseId) {
-      loadCaseData();
-      loadEvidenceCount();
-    }
-  }, [caseId]);
-
-  const loadCaseData = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('cases')
-        .select('*')
-        .eq('id', caseId)
-        .single();
-      
-      if (!error && data) {
-        setCaseData(data);
-      }
-    } catch (error) {
-      console.error('Error loading case:', error);
-    }
-  };
-
-  const loadEvidenceCount = async () => {
-    if (!caseId) return;
-    const { count } = await supabase
-      .from('evidence')
-      .select('*', { count: 'exact', head: true })
-      .eq('case_id', caseId);
-    setEvidenceCount(count || 0);
-  };
-
-  // Handle generate documents
   const handleGenerateDocuments = async () => {
     if (!caseId) return;
     
     trackEvent('generate_documents_clicked', { caseId, evidenceCount });
     
-    // Track program-specific document generation
     if (isProgramMode && program) {
       analytics.programDocumentsGenerated(program.id, ['book_of_documents', 'filing_forms']);
     }
     
-    // Update case flow step
     await supabase
       .from('cases')
       .update({ 
@@ -184,50 +171,60 @@ const Evidence = () => {
       })
       .eq('id', caseId);
 
-    // Navigate to smart documents for generation
-    navigate(`/smart-documents?case=${caseId}&generate=true`);
+    navigate(`/case/${caseId}/pathways`);
   };
 
-  // Track page view
   useEffect(() => {
-    if (caseId) {
+    if (caseId && isValidUUID(caseId)) {
       trackEvent('evidence_upload_started', { caseId });
-      
-      // Track program-specific evidence upload
       if (isProgramMode && program) {
         analytics.programEvidenceUploaded(program.id, evidenceCount);
       }
     }
   }, [caseId, isProgramMode, program, evidenceCount]);
 
-  if (!user) {
-    navigate("/welcome");
-    return null;
+  // Error state
+  if (accessError) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="max-w-md w-full">
+          <CardContent className="py-8 text-center space-y-4">
+            <div className="text-4xl">🔒</div>
+            <h2 className="text-xl font-semibold">Can't access this case</h2>
+            <p className="text-muted-foreground">{accessError}</p>
+            <div className="flex gap-2 justify-center">
+              <Button variant="outline" onClick={() => navigate("/welcome")}>
+                Sign In
+              </Button>
+              <Button onClick={() => navigate("/triage")}>
+                Start New Assessment
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
-  if (!caseId) {
-    navigate("/dashboard");
-    return null;
-  }
+  if (!user) return null;
+  if (!caseId || !isValidUUID(caseId)) return null;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SEOHead
         title="Upload Evidence - Let's See If You Have a Case | Justice Bot"
-        description="Upload your documents and get a clear, plain-language assessment of your case strength. Private, secure, and built for Canadian law."
+        description="Upload your documents and get a clear, plain-language assessment of your case strength."
         keywords="evidence upload, case assessment, legal documents, AI analysis, Canadian law"
-        canonicalUrl="https://justice-bot.com/evidence"
+        canonicalUrl={`https://justice-bot.com/case/${caseId}/evidence`}
       />
       <FlowHeader currentStep="evidence" caseTitle={caseData?.title} />
       <ProgramBanner />
       <main className="flex-1 container mx-auto px-4 py-6 sm:py-8">
         <div className="max-w-3xl mx-auto">
-          {/* Progress indicator */}
           <div className="mb-6">
             <FlowProgressIndicator currentStep="evidence" />
           </div>
 
-          {/* Onboarding header - calming, guided intro */}
           <div className="text-center mb-8">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">
               Let's see if you have a case
@@ -240,7 +237,6 @@ const Evidence = () => {
             </p>
           </div>
 
-          {/* What you'll do next - process explanation */}
           <Card className="mb-8 border-primary/20 bg-gradient-to-br from-primary/5 to-background">
             <CardContent className="py-6">
               <h2 className="font-semibold text-lg mb-4">What you'll do next</h2>
@@ -261,42 +257,21 @@ const Evidence = () => {
             </CardContent>
           </Card>
 
-          {/* Upload examples helper */}
           <div className="mb-6">
             <p className="text-sm font-medium mb-3 text-center">What should I upload?</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs sm:text-sm text-muted-foreground">
-              <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
-                <FileText className="h-4 w-4 flex-shrink-0" />
-                <span>Notices or letters</span>
-              </div>
-              <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
-                <FileText className="h-4 w-4 flex-shrink-0" />
-                <span>Emails or texts</span>
-              </div>
-              <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
-                <FileText className="h-4 w-4 flex-shrink-0" />
-                <span>Photos or videos</span>
-              </div>
-              <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
-                <FileText className="h-4 w-4 flex-shrink-0" />
-                <span>Court documents</span>
-              </div>
-              <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
-                <FileText className="h-4 w-4 flex-shrink-0" />
-                <span>Applications</span>
-              </div>
-              <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
-                <FileText className="h-4 w-4 flex-shrink-0" />
-                <span>Anything relevant</span>
-              </div>
+              {['Notices or letters', 'Emails or texts', 'Photos or videos', 'Court documents', 'Applications', 'Anything relevant'].map((item) => (
+                <div key={item} className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                  <FileText className="h-4 w-4 flex-shrink-0" />
+                  <span>{item}</span>
+                </div>
+              ))}
             </div>
             <p className="text-xs text-muted-foreground text-center mt-3">
               You don't need everything. Upload what you have.
             </p>
           </div>
 
-          {/* Evidence upload area */}
-          {/* Evidence upload + merit score = ALWAYS FREE (never paywall curiosity) */}
           <div className="space-y-6">
             <EvidenceHub 
               caseId={caseId} 
@@ -305,7 +280,6 @@ const Evidence = () => {
               onRedirectToDashboard={handleRedirectToDashboard}
             />
             
-            {/* Show full analysis results after pipeline runs */}
             {pipelineResult && (
               <CaseAnalysisResults 
                 result={pipelineResult} 
@@ -314,18 +288,13 @@ const Evidence = () => {
               />
             )}
             
-            {/* Show merit status tracker - polls for score updates */}
             {evidenceCount > 0 && !pipelineResult && (
               <MeritStatusTracker 
                 caseId={caseId} 
-                onComplete={(score) => {
-                  console.log('Merit score complete:', score);
-                  // Optionally refresh pipeline result
-                }}
+                onComplete={(score) => console.log('Merit score complete:', score)}
               />
             )}
             
-            {/* Show loading state while pipeline runs */}
             {pipelineLoading && (
               <Card>
                 <CardContent className="py-8 text-center">
@@ -337,7 +306,6 @@ const Evidence = () => {
             )}
           </div>
 
-          {/* Primary action CTA */}
           <Card className="mt-8 border-primary/20 bg-gradient-to-r from-primary/5 to-background">
             <CardContent className="py-6">
               <div className="flex flex-col items-center text-center gap-4">
@@ -377,7 +345,6 @@ const Evidence = () => {
             </CardContent>
           </Card>
 
-          {/* Security reassurance */}
           <div className="mt-6 text-center">
             <p className="text-xs sm:text-sm text-muted-foreground">
               Your files are private and secure.
@@ -387,7 +354,6 @@ const Evidence = () => {
             </p>
           </div>
 
-          {/* Dashboard link for returning users */}
           <div className="mt-8 text-center">
             <Button 
               variant="link" 
@@ -398,7 +364,6 @@ const Evidence = () => {
             </Button>
           </div>
 
-          {/* Hidden components for paywall flow */}
           <BookOfDocsPaywall
             open={showBookPaywall}
             onOpenChange={setShowBookPaywall}
@@ -419,4 +384,4 @@ const Evidence = () => {
   );
 };
 
-export default Evidence;
+export default CaseEvidence;
