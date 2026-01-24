@@ -15,6 +15,7 @@ import { BookOfDocumentsWizard } from "@/components/BookOfDocumentsWizard";
 import { BookOfDocsPaywall } from "@/components/paywalls";
 import { usePremiumAccess } from "@/hooks/usePremiumAccess";
 import { useCasePipeline } from "@/hooks/useCasePipeline";
+import { MeritStatusTracker } from "@/components/MeritStatusTracker";
 import { supabase } from "@/integrations/supabase/client";
 import { trackEvent, analytics } from "@/utils/analytics";
 import { useProgram } from "@/contexts/ProgramContext";
@@ -50,13 +51,17 @@ const Evidence = () => {
     }
   };
 
-  // Handler to redirect user to dashboard after successful upload
+  // Handler to redirect user to dashboard with caseId after successful upload
   const handleRedirectToDashboard = () => {
     // Track the redirect success event
     analytics.redirectToDashboardSuccess('/evidence', caseId || undefined);
     
-    // Force redirect to dashboard
-    navigate('/dashboard');
+    // CRITICAL: Redirect to dashboard WITH caseId so evidence and merit persist
+    if (caseId) {
+      navigate(`/dashboard?case=${caseId}`);
+    } else {
+      navigate('/dashboard');
+    }
   };
 
   // Check if user has Book of Documents entitlement
@@ -298,6 +303,17 @@ const Evidence = () => {
                 result={pipelineResult} 
                 caseId={caseId}
                 onUnlockClick={() => navigate('/pricing')}
+              />
+            )}
+            
+            {/* Show merit status tracker - polls for score updates */}
+            {evidenceCount > 0 && !pipelineResult && (
+              <MeritStatusTracker 
+                caseId={caseId} 
+                onComplete={(score) => {
+                  console.log('Merit score complete:', score);
+                  // Optionally refresh pipeline result
+                }}
               />
             )}
             

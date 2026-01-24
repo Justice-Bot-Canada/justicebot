@@ -298,7 +298,10 @@ export type Database = {
           id: string
           is_paid: boolean | null
           law_section: string | null
+          merit_error: string | null
           merit_score: number | null
+          merit_status: string | null
+          merit_updated_at: string | null
           municipality: string | null
           paid_at: string | null
           program_id: string | null
@@ -323,7 +326,10 @@ export type Database = {
           id?: string
           is_paid?: boolean | null
           law_section?: string | null
+          merit_error?: string | null
           merit_score?: number | null
+          merit_status?: string | null
+          merit_updated_at?: string | null
           municipality?: string | null
           paid_at?: string | null
           program_id?: string | null
@@ -348,7 +354,10 @@ export type Database = {
           id?: string
           is_paid?: boolean | null
           law_section?: string | null
+          merit_error?: string | null
           merit_score?: number | null
+          merit_status?: string | null
+          merit_updated_at?: string | null
           municipality?: string | null
           paid_at?: string | null
           program_id?: string | null
