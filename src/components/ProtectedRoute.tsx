@@ -115,6 +115,8 @@ const ProtectedRoute = ({
         }
 
         // Check for paid entitlements
+        // NOTE: This must stay aligned with server-side paywall logic (check-access).
+        // Stripe subscriptions and one-time products are often stored as Stripe IDs (e.g. price_123).
         let hasAccess = activeCase?.is_paid === true;
         if (!hasAccess && user.id) {
           const { data: entitlements } = await supabase
@@ -126,6 +128,10 @@ const ProtectedRoute = ({
             hasAccess = entitlements.some(e => {
               if (e.ends_at && new Date(e.ends_at) < new Date()) {
                 return false;
+              }
+              // Stripe IDs
+              if (e.product_id?.startsWith('price_')) {
+                return true;
               }
               return e.product_id?.toLowerCase().includes('monthly') ||
                      e.product_id?.toLowerCase().includes('yearly') ||
