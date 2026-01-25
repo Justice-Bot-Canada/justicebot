@@ -41,6 +41,7 @@ const CaseEvidence = () => {
   const [bookWizardOpen, setBookWizardOpen] = useState(false);
   const [showBookPaywall, setShowBookPaywall] = useState(false);
   const [evidenceCount, setEvidenceCount] = useState(0);
+  const [evidenceCountLoaded, setEvidenceCountLoaded] = useState(false);
   const [hasBookEntitlement, setHasBookEntitlement] = useState(false);
   const [accessError, setAccessError] = useState<string | null>(null);
 
@@ -90,11 +91,15 @@ const CaseEvidence = () => {
 
   const loadEvidenceCount = async () => {
     if (!caseId || !isValidUUID(caseId)) return;
-    const { count } = await supabase
-      .from('evidence')
-      .select('*', { count: 'exact', head: true })
-      .eq('case_id', caseId);
-    setEvidenceCount(count || 0);
+    try {
+      const { count } = await supabase
+        .from('evidence')
+        .select('*', { count: 'exact', head: true })
+        .eq('case_id', caseId);
+      setEvidenceCount(count || 0);
+    } finally {
+      setEvidenceCountLoaded(true);
+    }
   };
 
   const checkBookEntitlement = async () => {
@@ -276,7 +281,8 @@ const CaseEvidence = () => {
             <EvidenceHub 
               caseId={caseId} 
               onUploadComplete={handleEvidenceUploaded}
-              autoRedirectAfterUpload={true}
+              // Only auto-redirect after the *first* successful upload.
+              autoRedirectAfterUpload={evidenceCountLoaded && evidenceCount === 0}
               onRedirectToDashboard={handleRedirectToDashboard}
             />
             
