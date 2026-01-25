@@ -24,7 +24,13 @@ const Index = () => {
   // Redirect authenticated users - but only if they have a completed case
   // This prevents redirect loops when ProtectedRoute would bounce them back
   useEffect(() => {
-    if (loading || !user) return;
+    // Wait for auth to be determined
+    if (loading) return;
+    
+    // Only redirect if user is logged in
+    if (!user) return;
+    
+    let cancelled = false;
     
     const checkCaseAndRedirect = async () => {
       try {
@@ -36,19 +42,23 @@ const Index = () => {
           .eq('triage_complete', true)
           .limit(1);
         
+        if (cancelled) return;
+        
         if (cases && cases.length > 0) {
           // User has completed triage - safe to go to dashboard
           navigate('/dashboard', { replace: true });
-        } else {
-          // No completed case - stay on landing or go to triage
-          // Don't redirect to dashboard as it would bounce back
         }
+        // If no completed case, stay on landing page
       } catch (error) {
         console.error('Error checking case status:', error);
       }
     };
     
     checkCaseAndRedirect();
+    
+    return () => {
+      cancelled = true;
+    };
   }, [user, loading, navigate]);
 
   // Track landing view
