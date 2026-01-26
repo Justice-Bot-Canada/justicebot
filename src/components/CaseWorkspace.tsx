@@ -27,6 +27,7 @@ import { EvidenceAnalyzer } from "./EvidenceAnalyzer";
 import { FormsList } from "./FormsList";
 import { FormPrefillPanel } from "./FormPrefillPanel";
 import { ExhibitBookExport } from "./ExhibitBookExport";
+import { CanLIIAnalysisButton } from "./CanLIIAnalysisButton";
 import { toast } from "@/lib/toast-stub";
 
 interface CaseData {
@@ -491,6 +492,9 @@ export function CaseWorkspace({ caseId, onBack }: CaseWorkspaceProps) {
               </CardContent>
             </Card>
           </div>
+
+          {/* CanLII Case Law Analysis */}
+          <CanLIIAnalysisButton caseId={caseId} />
 
           {/* Next Steps */}
           <Card>

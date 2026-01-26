@@ -167,3 +167,7 @@ verify_jwt = true
 # Decision Engine (deterministic merit + pathway routing)
 [functions.decision-engine]
 verify_jwt = false
+
+# CanLII Case Law Analysis
+[functions.analyze-case-law]
+verify_jwt = true
