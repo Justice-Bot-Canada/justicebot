@@ -159,6 +159,65 @@ export type Database = {
           },
         ]
       }
+      case_law_analyses: {
+        Row: {
+          case_id: string
+          confidence: number | null
+          created_at: string
+          id: string
+          jurisdiction: string | null
+          legal_basis: string | null
+          merit_score: number | null
+          outcome_prediction: string | null
+          recommendations: string[] | null
+          search_query: string | null
+          strengths: string[] | null
+          updated_at: string
+          user_id: string
+          weaknesses: string[] | null
+        }
+        Insert: {
+          case_id: string
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          jurisdiction?: string | null
+          legal_basis?: string | null
+          merit_score?: number | null
+          outcome_prediction?: string | null
+          recommendations?: string[] | null
+          search_query?: string | null
+          strengths?: string[] | null
+          updated_at?: string
+          user_id: string
+          weaknesses?: string[] | null
+        }
+        Update: {
+          case_id?: string
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          jurisdiction?: string | null
+          legal_basis?: string | null
+          merit_score?: number | null
+          outcome_prediction?: string | null
+          recommendations?: string[] | null
+          search_query?: string | null
+          strengths?: string[] | null
+          updated_at?: string
+          user_id?: string
+          weaknesses?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_law_analyses_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       case_merit: {
         Row: {
           case_id: string
@@ -1572,6 +1631,56 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      similar_cases: {
+        Row: {
+          analysis_id: string
+          citation: string
+          court: string | null
+          created_at: string
+          decision_date: string | null
+          id: string
+          outcome: string | null
+          relevance_score: number | null
+          summary: string | null
+          title: string
+          url: string | null
+        }
+        Insert: {
+          analysis_id: string
+          citation: string
+          court?: string | null
+          created_at?: string
+          decision_date?: string | null
+          id?: string
+          outcome?: string | null
+          relevance_score?: number | null
+          summary?: string | null
+          title: string
+          url?: string | null
+        }
+        Update: {
+          analysis_id?: string
+          citation?: string
+          court?: string | null
+          created_at?: string
+          decision_date?: string | null
+          id?: string
+          outcome?: string | null
+          relevance_score?: number | null
+          summary?: string | null
+          title?: string
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "similar_cases_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "case_law_analyses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       stripe_customers: {
         Row: {
