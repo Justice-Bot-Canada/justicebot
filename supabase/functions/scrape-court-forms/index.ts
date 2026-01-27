@@ -344,7 +344,7 @@ async function scrapeTribunalsForms(url: string, tribunal: string): Promise<Scra
   }
 }
 
-function extractDescription(link: DOMElement, doc: Document): string {
+function extractDescription(link: DOMElement, _doc: unknown): string {
   // Try to find description near the link
   const parent = link.parentElement;
   if (parent) {

@@ -129,10 +129,12 @@ const handler = async (req: Request): Promise<Response> => {
       html: getOutreachEmailHtml(contactName, organizationName),
     });
 
+    const messageId = 'data' in emailResponse && emailResponse.data?.id ? emailResponse.data.id : 'unknown';
+
     console.log("Referral outreach email sent:", { 
       organizationName, 
       organizationType,
-      messageId: emailResponse.id 
+      messageId
     });
 
     // Log the outreach to database for tracking
@@ -145,7 +147,7 @@ const handler = async (req: Request): Promise<Response> => {
         organization_type: organizationType || "unknown",
         notes,
         sent_at: new Date().toISOString(),
-        message_id: emailResponse.id,
+        message_id: messageId,
       });
 
     if (logError) {
@@ -156,7 +158,7 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        messageId: emailResponse.id,
+        messageId,
         message: "Outreach email sent successfully" 
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
