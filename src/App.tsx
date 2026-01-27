@@ -32,7 +32,7 @@ import NotFound from "./pages/NotFound";
 import Triage from "./pages/Triage";
 import Case from "./pages/Case";
 import Forms from "./pages/Forms";
-import Callback from "./pages/Callback";
+import Callback from "./pages/callback";
 import FormSelector from "./pages/FormSelector";
 
 /* =======================
