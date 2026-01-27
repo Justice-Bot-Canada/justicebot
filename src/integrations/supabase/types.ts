@@ -68,6 +68,41 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_events: {
+        Row: {
+          case_id: string | null
+          created_at: string | null
+          event_type: string
+          id: string
+          metadata: Json
+          user_id: string | null
+        }
+        Insert: {
+          case_id?: string | null
+          created_at?: string | null
+          event_type: string
+          id?: string
+          metadata?: Json
+          user_id?: string | null
+        }
+        Update: {
+          case_id?: string | null
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          metadata?: Json
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_events_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       case_deadlines: {
         Row: {
           case_id: string | null
@@ -340,6 +375,76 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "case_notes_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_recommendations: {
+        Row: {
+          case_id: string | null
+          created_at: string | null
+          id: string
+          priority: number | null
+          rationale: string | null
+          recommendation: string
+        }
+        Insert: {
+          case_id?: string | null
+          created_at?: string | null
+          id?: string
+          priority?: number | null
+          rationale?: string | null
+          recommendation: string
+        }
+        Update: {
+          case_id?: string | null
+          created_at?: string | null
+          id?: string
+          priority?: number | null
+          rationale?: string | null
+          recommendation?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_recommendations_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      case_timeline_steps: {
+        Row: {
+          case_id: string
+          details: Json
+          id: string
+          status: string
+          step_key: string
+          updated_at: string | null
+        }
+        Insert: {
+          case_id: string
+          details?: Json
+          id?: string
+          status?: string
+          step_key: string
+          updated_at?: string | null
+        }
+        Update: {
+          case_id?: string
+          details?: Json
+          id?: string
+          status?: string
+          step_key?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "case_timeline_steps_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "cases"
@@ -778,6 +883,113 @@ export type Database = {
             columns: ["evidence_id"]
             isOneToOne: false
             referencedRelation: "evidence"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_sources: {
+        Row: {
+          authority: string | null
+          created_at: string | null
+          form_code: string
+          id: string
+          is_active: boolean | null
+          jurisdiction: string
+          last_checked_at: string | null
+          last_verified_at: string | null
+          name: string | null
+          official_page_url: string | null
+          official_pdf_url: string | null
+          official_url: string | null
+          pdf_hash: string | null
+          region: string
+          source_url: string | null
+          status: string
+          updated_at: string | null
+          venue: string | null
+          venue_code: string | null
+        }
+        Insert: {
+          authority?: string | null
+          created_at?: string | null
+          form_code: string
+          id?: string
+          is_active?: boolean | null
+          jurisdiction: string
+          last_checked_at?: string | null
+          last_verified_at?: string | null
+          name?: string | null
+          official_page_url?: string | null
+          official_pdf_url?: string | null
+          official_url?: string | null
+          pdf_hash?: string | null
+          region: string
+          source_url?: string | null
+          status?: string
+          updated_at?: string | null
+          venue?: string | null
+          venue_code?: string | null
+        }
+        Update: {
+          authority?: string | null
+          created_at?: string | null
+          form_code?: string
+          id?: string
+          is_active?: boolean | null
+          jurisdiction?: string
+          last_checked_at?: string | null
+          last_verified_at?: string | null
+          name?: string | null
+          official_page_url?: string | null
+          official_pdf_url?: string | null
+          official_url?: string | null
+          pdf_hash?: string | null
+          region?: string
+          source_url?: string | null
+          status?: string
+          updated_at?: string | null
+          venue?: string | null
+          venue_code?: string | null
+        }
+        Relationships: []
+      }
+      form_templates: {
+        Row: {
+          created_at: string | null
+          enabled: boolean
+          field_mappings: Json
+          form_source_id: string | null
+          id: string
+          notes: string | null
+          pdf_hash: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          enabled?: boolean
+          field_mappings?: Json
+          form_source_id?: string | null
+          id?: string
+          notes?: string | null
+          pdf_hash?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          enabled?: boolean
+          field_mappings?: Json
+          form_source_id?: string | null
+          id?: string
+          notes?: string | null
+          pdf_hash?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_templates_form_source_id_fkey"
+            columns: ["form_source_id"]
+            isOneToOne: false
+            referencedRelation: "form_sources"
             referencedColumns: ["id"]
           },
         ]
@@ -1545,6 +1757,51 @@ export type Database = {
         }
         Relationships: []
       }
+      recommendations: {
+        Row: {
+          case_id: string
+          created_at: string | null
+          id: string
+          next_steps: Json
+          recommended_forms: Json
+          recommended_venue: string
+          triage_session_id: string | null
+        }
+        Insert: {
+          case_id: string
+          created_at?: string | null
+          id?: string
+          next_steps?: Json
+          recommended_forms?: Json
+          recommended_venue: string
+          triage_session_id?: string | null
+        }
+        Update: {
+          case_id?: string
+          created_at?: string | null
+          id?: string
+          next_steps?: Json
+          recommended_forms?: Json
+          recommended_venue?: string
+          triage_session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recommendations_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recommendations_triage_session_id_fkey"
+            columns: ["triage_session_id"]
+            isOneToOne: false
+            referencedRelation: "triage_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referral_codes: {
         Row: {
           code: string
@@ -1958,6 +2215,47 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "timeline_events_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      triage_sessions: {
+        Row: {
+          answers: Json
+          case_id: string
+          created_at: string | null
+          derived_signals: Json
+          flow_version: string
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          answers?: Json
+          case_id: string
+          created_at?: string | null
+          derived_signals?: Json
+          flow_version?: string
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          case_id?: string
+          created_at?: string | null
+          derived_signals?: Json
+          flow_version?: string
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "triage_sessions_case_id_fkey"
             columns: ["case_id"]
             isOneToOne: false
             referencedRelation: "cases"

@@ -160,18 +160,20 @@ serve(async (req) => {
       html: emailContent.html,
     });
 
+    const resendId = 'data' in result && result.data?.id ? result.data.id : 'unknown';
+
     // Log email sent
     await supabase.from('email_logs').insert({
       user_id: userId,
       email_type: type,
       sent_to: email,
       sent_at: new Date().toISOString(),
-      resend_id: result.id
+      resend_id: resendId
     });
 
-    console.log("Email sent successfully:", result.id);
+    console.log("Email sent successfully:", resendId);
 
-    return new Response(JSON.stringify({ success: true, emailId: result.id }), {
+    return new Response(JSON.stringify({ success: true, emailId: resendId }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {

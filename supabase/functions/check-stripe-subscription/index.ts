@@ -85,7 +85,7 @@ serve(async (req) => {
 
     // Find active or trialing subscription
     const activeSubscription = subscriptions.data.find(
-      sub => sub.status === "active" || sub.status === "trialing"
+      (sub: { status: string }) => sub.status === "active" || sub.status === "trialing"
     );
 
     if (!activeSubscription) {
