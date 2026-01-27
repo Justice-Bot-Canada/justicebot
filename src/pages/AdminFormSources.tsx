@@ -12,12 +12,10 @@ type FormSource = {
 
 type DocumentTemplate = {
   id: string;
-  source_id: string | null;
-  form_code: string;
   title: string;
-  jurisdiction: string;
+  category: string;
   template_type: string;
-  version: string | null;
+  description: string | null;
   created_at: string | null;
 };
 
@@ -47,7 +45,7 @@ export default function AdminFormSources() {
 
       const { data: templatesData, error: templatesErr } = await supabase
         .from("document_templates")
-        .select("id,source_id,form_code,title,jurisdiction,template_type,version,created_at")
+        .select("id,title,category,template_type,description,created_at")
         .order("created_at", { ascending: false })
         .limit(200);
 
@@ -130,26 +128,24 @@ export default function AdminFormSources() {
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr>
-                  <th style={th}>Form Code</th>
                   <th style={th}>Title</th>
-                  <th style={th}>Jurisdiction</th>
-                  <th style={th}>Version</th>
+                  <th style={th}>Category</th>
+                  <th style={th}>Type</th>
                   <th style={th}>Created</th>
                 </tr>
               </thead>
               <tbody>
                 {templates.map((t) => (
                   <tr key={t.id}>
-                    <td style={td}>{t.form_code}</td>
                     <td style={td}>{t.title}</td>
-                    <td style={td}>{t.jurisdiction}</td>
-                    <td style={td}>{t.version ?? "—"}</td>
+                    <td style={td}>{t.category}</td>
+                    <td style={td}>{t.template_type}</td>
                     <td style={td}>{t.created_at ? new Date(t.created_at).toLocaleString() : "—"}</td>
                   </tr>
                 ))}
                 {templates.length === 0 && (
                   <tr>
-                    <td style={td} colSpan={5}>
+                    <td style={td} colSpan={4}>
                       No templates yet.
                     </td>
                   </tr>
