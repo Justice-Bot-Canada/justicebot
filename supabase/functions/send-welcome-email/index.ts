@@ -188,32 +188,45 @@ serve(async (req) => {
       html: getWelcomeEmailHtml(userName || ''),
     });
 
-    console.log("Welcome email sent:", result.id);
+    const resendId = 'data' in result && result.data?.id ? result.data.id : 'unknown';
+
+    console.log("Welcome email sent:", resendId);
 
     // SOC2 Audit Log: User signup / welcome email sent
-    await logAuditEvent(supabase, {
-      action: 'auth.signup',
-      resource_type: 'user',
-      resource_id: userId || null,
-      user_id: userId || null,
-      metadata: {
-        email_hash: await hashEmail(userEmail),
-        welcome_email_sent: true,
-        resend_id: result.id,
-      }
-    }, req);
+    try {
+      const auditClient = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+      );
+      await logAuditEvent(auditClient, {
+        action: 'auth.signup',
+        resource_type: 'user',
+        resource_id: userId || null,
+        user_id: userId || null,
+        metadata: {
+          email_hash: await hashEmail(userEmail),
+          welcome_email_sent: true,
+          resend_id: resendId,
+        }
+      }, req);
+    } catch (auditErr) {
+      console.error("Failed to log audit event:", auditErr);
+    }
 
     // Log the email
-    await supabase.from('email_queue').insert({
-      email: userEmail,
-      template: 'welcome',
-      status: 'sent',
-      sent_at: new Date().toISOString(),
-      vars: { resend_id: result.id }
-    }).catch(err => console.error("Failed to log email:", err));
+    try {
+      await supabase.from('email_queue').insert({
+        email: userEmail,
+        template: 'welcome',
+        status: 'sent',
+        sent_at: new Date().toISOString(),
+      });
+    } catch (err) {
+      console.error("Failed to log email:", err);
+    }
 
     return new Response(
-      JSON.stringify({ success: true, emailId: result.id }),
+      JSON.stringify({ success: true, emailId: resendId }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {

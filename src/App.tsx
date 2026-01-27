@@ -135,6 +135,8 @@ const SubscriptionSuccess = lazy(() => import("./pages/SubscriptionSuccess"));
 const FeatureGuide = lazy(() => import("./pages/FeatureGuide"));
 const ProgramLanding = lazy(() => import("./pages/ProgramLanding"));
 const AdminProgramDashboard = lazy(() => import("./pages/AdminProgramDashboard"));
+const AdminForms = lazy(() => import("./pages/AdminForms"));
+const AdminKPI = lazy(() => import("./pages/AdminKPI"));
 const DocumentsUnlocked = lazy(() => import("./pages/DocumentsUnlocked"));
 const CaseWorkspacePage = lazy(() => import("./pages/CaseWorkspacePage"));
 
@@ -319,9 +321,11 @@ const AppContent = () => {
 
           {/* Admin */}
           <Route path="/admin" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><Admin /></Suspense></ProtectedRoute>} />
+          <Route path="/admin/forms" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><AdminForms /></Suspense></ProtectedRoute>} />
           <Route path="/admin/forms-sync" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><AdminFormsSync /></Suspense></ProtectedRoute>} />
           <Route path="/admin/testimonials" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><AdminTestimonials /></Suspense></ProtectedRoute>} />
           <Route path="/admin/programs" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><AdminProgramDashboard /></Suspense></ProtectedRoute>} />
+          <Route path="/admin/kpi" element={<ProtectedRoute><Suspense fallback={<LoadingFallback />}><AdminKPI /></Suspense></ProtectedRoute>} />
 
           {/* Program Pilot Routes */}
           <Route path="/program/:slug" element={<Suspense fallback={<LoadingFallback />}><ProgramLanding /></Suspense>} />
