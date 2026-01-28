@@ -1,1 +1,17 @@
-/* /index.html 200
+# Static files
+/sitemap.xml   /sitemap.xml   200
+/robots.txt    /robots.txt    200
+
+# 301 Redirects for old URLs
+/terms-of-use  /terms         301
+/account       /profile       301
+/signup        /welcome       301
+/login         /welcome       301
+/generate      /forms         301
+/download      /templates     301
+/timeline      /dashboard     301
+/small-claims  /small-claims-journey 301
+/demo-video    /              301
+
+# SPA fallback (MUST be last)
+/*             /index.html    200

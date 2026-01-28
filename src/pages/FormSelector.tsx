@@ -122,11 +122,11 @@ const FormSelector = () => {
     if (!venue) return;
     
     try {
-      // Venue codes are now normalized in the database
+      // Try case-insensitive match on tribunal_type
       const { data, error } = await supabase
         .from('forms')
         .select('*')
-        .eq('tribunal_type', venue)
+        .ilike('tribunal_type', venue)
         .eq('is_active', true)
         .order('usage_count', { ascending: false });
 
