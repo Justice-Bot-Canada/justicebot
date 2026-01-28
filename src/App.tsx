@@ -112,8 +112,9 @@ const AppContent = () => {
             <Route path="/" element={<Index />} />
             <Route path="/welcome" element={<Welcome />} />
 
-            {/* Supabase email verification callback (PUBLIC) */}
+            {/* Supabase email verification callback (PUBLIC) - handle both paths */}
             <Route path="/auth/callback" element={<Callback />} />
+            <Route path="/callback" element={<Callback />} />
 
             {/* Core flow */}
             <Route path="/triage" element={<Triage />} />
