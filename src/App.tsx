@@ -34,6 +34,7 @@ import Case from "./pages/Case";
 import Forms from "./pages/Forms";
 import Callback from "./pages/callback";
 import FormSelector from "./pages/FormSelector";
+import FormsVenue from "./pages/FormsVenue";
 
 /* =======================
    Route Pages (non-lazy)
@@ -122,14 +123,8 @@ const AppContent = () => {
 
             {/* Forms */}
             <Route path="/forms" element={<Forms />} />
-            <Route
-              path="/forms/:venue"
-              element={
-                <ProtectedRoute>
-                  <FormSelector />
-                </ProtectedRoute>
-              }
-            />
+            {/* Venue-specific form list (public browsing, paywall on generate) */}
+            <Route path="/forms/:venue" element={<FormsVenue />} />
 
             {/* Dashboard */}
             <Route

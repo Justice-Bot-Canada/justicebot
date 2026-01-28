@@ -45,7 +45,7 @@ const FormsVenue = () => {
   const loadForms = async () => {
     setLoading(true);
     try {
-      // Query form_templates if it exists, otherwise fall back to forms table
+      // First try form_templates joined to form_sources (new schema)
       const { data: templates, error: templatesError } = await supabase
         .from('form_templates')
         .select(`
@@ -61,12 +61,12 @@ const FormsVenue = () => {
         `)
         .eq('enabled', true);
 
-      if (!templatesError && templates && templates.length > 0) {
-        // Filter by venue_code
-        const venueTemplates = templates.filter((t: any) => 
-          t.form_source?.venue_code?.toUpperCase() === venueCode
-        );
-        
+      // Filter by venue_code (case-insensitive)
+      const venueTemplates = (templates || []).filter((t: any) => 
+        t.form_source?.venue_code?.toUpperCase() === venueCode
+      );
+      
+      if (!templatesError && venueTemplates.length > 0) {
         setForms(venueTemplates.map((t: any) => ({
           id: t.id,
           form_code: t.form_source?.form_code || 'Unknown',
@@ -79,7 +79,7 @@ const FormsVenue = () => {
           is_active: t.enabled,
         })));
       } else {
-        // Fall back to forms table
+        // Fall back to forms table (legacy schema) - case-insensitive match
         const { data: formsData, error: formsError } = await supabase
           .from('forms')
           .select('*')

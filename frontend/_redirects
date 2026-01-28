@@ -3,20 +3,15 @@
 /robots.txt    /robots.txt    200
 
 # 301 Redirects for old URLs
-/terms-of-use  /terms         301!
-/account       /profile       301!
-/signup        /welcome       301!
-/login         /welcome       301!
-/generate      /forms         301!
-/download      /templates     301!
-/timeline      /dashboard     301!
-/small-claims  /small-claims-journey 301!
-/demo-video    /              301!
+/terms-of-use  /terms         301
+/account       /profile       301
+/signup        /welcome       301
+/login         /welcome       301
+/generate      /forms         301
+/download      /templates     301
+/timeline      /dashboard     301
+/small-claims  /small-claims-journey 301
+/demo-video    /              301
 
-# Return 404 for non-existent pages
-/payments/*    /                404
-/entitlements  /                404
-/founders-story /               404
-
-# SPA fallback
+# SPA fallback (MUST be last)
 /*             /index.html    200
