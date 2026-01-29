@@ -12,6 +12,7 @@
 /timeline      /dashboard     301
 /small-claims  /small-claims-journey 301
 /demo-video    /              301
+/evidence      /triage        301
 
 # SPA fallback (MUST be last)
 /*             /index.html    200

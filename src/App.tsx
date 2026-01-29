@@ -285,6 +285,7 @@ const AppContent = () => {
             <Route path="/generate" element={<Navigate to="/forms" replace />} />
             <Route path="/small-claims" element={<Navigate to="/small-claims-journey" replace />} />
             <Route path="/auth" element={<Navigate to="/welcome" replace />} />
+            <Route path="/evidence" element={<Navigate to="/triage" replace />} />
 
             {/* Legacy city pages - Ontario cities redirect to LTB pages */}
             <Route path="/legal-help-toronto" element={<Navigate to="/ltb-toronto" replace />} />
