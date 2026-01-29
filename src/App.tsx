@@ -35,6 +35,7 @@ import Forms from "./pages/Forms";
 import Callback from "./pages/callback";
 import FormSelector from "./pages/FormSelector";
 import FormsVenue from "./pages/FormsVenue";
+import Evidence from "./pages/Evidence";
 
 /* =======================
    Route Pages (non-lazy)
@@ -119,6 +120,14 @@ const AppContent = () => {
 
             {/* Core flow */}
             <Route path="/triage" element={<Triage />} />
+            <Route
+              path="/evidence"
+              element={
+                <ProtectedRoute flowStep="evidence">
+                  <Evidence />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/case/:caseId" element={<Case />} />
 
             {/* Forms */}
@@ -285,7 +294,6 @@ const AppContent = () => {
             <Route path="/generate" element={<Navigate to="/forms" replace />} />
             <Route path="/small-claims" element={<Navigate to="/small-claims-journey" replace />} />
             <Route path="/auth" element={<Navigate to="/welcome" replace />} />
-            <Route path="/evidence" element={<Navigate to="/triage" replace />} />
 
             {/* Legacy city pages - Ontario cities redirect to LTB pages */}
             <Route path="/legal-help-toronto" element={<Navigate to="/ltb-toronto" replace />} />
